@@ -12,6 +12,7 @@ import com.hp.autonomy.hod.client.error.HodErrorCode;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 
 import java.io.IOException;
@@ -41,13 +42,34 @@ public class HodViewServiceImpl implements HodViewService {
         this.getContentService = getContentService;
     }
 
+    private String resolveTitle(final Document document) {
+        if (StringUtils.isBlank(document.getTitle())) {
+            // If there is no title field, assume the reference is a path and take the last part (the "file name")
+            final String[] splitReference = document.getReference().split("/|\\\\");
+            final String lastPart = splitReference[splitReference.length - 1];
+
+            if (StringUtils.isBlank(lastPart)) {
+                // If the reference ends with a trailing slash followed by whitespace, use the whole reference
+                return document.getReference();
+            } else {
+                return lastPart;
+            }
+        } else {
+            return document.getTitle();
+        }
+    }
+
     private String escapeAndAddLineBreaks(final String input) {
-        return StringEscapeUtils.escapeHtml(input).replace("\n", "<br>");
+        if (input == null) {
+            return "";
+        } else {
+            return StringEscapeUtils.escapeHtml(input).replace("\n", "<br>");
+        }
     }
 
     // Format the document's content for display in a browser
     private InputStream formatRawContent(final Document document) throws IOException {
-        final String body = "<h1>" + escapeAndAddLineBreaks(document.getTitle()) + "</h1>"
+        final String body = "<h1>" + escapeAndAddLineBreaks(resolveTitle(document)) + "</h1>"
                 + "<p>" + escapeAndAddLineBreaks(document.getContent()) + "</p>";
 
         return IOUtils.toInputStream(body, StandardCharsets.UTF_8);
