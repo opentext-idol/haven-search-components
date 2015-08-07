@@ -78,6 +78,11 @@
             <artifactId>configuration-api</artifactId>
             <version>1.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.hp.autonomy.aci.client</groupId>
+            <artifactId>aci-api</artifactId>
+            <version>5.0.0</version>
+        </dependency>
     </dependencies>
 
 </project>
