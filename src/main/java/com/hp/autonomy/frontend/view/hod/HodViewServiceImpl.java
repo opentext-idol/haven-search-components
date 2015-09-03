@@ -1,5 +1,7 @@
 package com.hp.autonomy.frontend.view.hod;
 
+import com.hp.autonomy.aci.content.fieldtext.FieldText;
+import com.hp.autonomy.aci.content.fieldtext.MATCH;
 import com.hp.autonomy.hod.client.api.analysis.viewdocument.ViewDocumentRequestBuilder;
 import com.hp.autonomy.hod.client.api.analysis.viewdocument.ViewDocumentService;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
