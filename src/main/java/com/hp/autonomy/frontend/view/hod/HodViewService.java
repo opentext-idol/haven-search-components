@@ -21,4 +21,5 @@ public interface HodViewService {
      */
     void viewDocument(String reference, ResourceIdentifier index, OutputStream outputStream) throws IOException, HodErrorException;
 
+    void viewStaticContentPromotion(String documentReference, ResourceIdentifier queryManipulationIndex, OutputStream outputStream) throws IOException, HodErrorException;
 }

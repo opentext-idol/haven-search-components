@@ -13,7 +13,7 @@
 
     <groupId>com.hp.autonomy.frontend.view</groupId>
     <artifactId>view-proxy-components</artifactId>
-    <version>0.1.1</version>
+    <version>0.2.0</version>
 
     <name>HP View Proxy Components</name>
     <description>Components for proxying the HP Haven OnDemand view document API.</description>
@@ -77,6 +77,16 @@
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-api</artifactId>
             <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hp.autonomy.aci.client</groupId>
+            <artifactId>aci-api</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hp.autonomy.aci.content</groupId>
+            <artifactId>content-parameter-api</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 
