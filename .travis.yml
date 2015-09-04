@@ -2,7 +2,7 @@ language: java
 jdk:
 - oraclejdk7
 before_install:
-- gpg --batch --passphrase GPG_KEY -o secret.gpg secret.gpg.gpg
+- echo $GPG_KEY | gpg --batch --passphrase-fd 0 secret.gpg.gpg
 script: mvn test -Prelease
 after_success: bash travis.sh
 env:
