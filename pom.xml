@@ -12,11 +12,20 @@
 
     <groupId>com.hp.autonomy.hod</groupId>
     <artifactId>java-parametric-databases</artifactId>
-    <version>0.0.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <name>${project.groupId}:${project.artifactId}</name>
 
     <description>Java Client for retrieving parametric values</description>
 
     <url>https://github.com/hpautonomy/java-hod-client</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
 
     <inceptionYear>2015</inceptionYear>
 

@@ -1,4 +1,4 @@
-# java-hod-client
+# java-parametric-databases
 
 Java Client for parametric values.
 
