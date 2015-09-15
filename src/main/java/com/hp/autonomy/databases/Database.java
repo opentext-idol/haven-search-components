@@ -5,14 +5,20 @@
 
 package com.hp.autonomy.databases;
 
+import com.autonomy.aci.client.annotations.IdolBuilder;
+import com.autonomy.aci.client.annotations.IdolBuilderBuild;
+import com.autonomy.aci.client.annotations.IdolDocument;
+import com.autonomy.aci.client.annotations.IdolField;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Set;
 
 @Data
+@IdolDocument(Database.ROOT_FIELD)
 public final class Database implements Serializable {
     private static final long serialVersionUID = -3966566623844850811L;
+    static final String ROOT_FIELD = "database";
 
     private final String name;
     private final long documents;
@@ -28,6 +34,8 @@ public final class Database implements Serializable {
         this.fieldNames = fieldNames;
     }
 
+    @IdolBuilder
+    @IdolDocument(ROOT_FIELD)
     public static class Builder {
         private String name;
         private long documents;
@@ -35,11 +43,13 @@ public final class Database implements Serializable {
         private String domain = "";
         private Set<String> indexFields;
 
+        @IdolField("name")
         public Builder setName(final String name) {
             this.name = name.toLowerCase();
             return this;
         }
 
+        @IdolField("documents")
         public Builder setDocuments(final long documents) {
             this.documents = documents;
             return this;
@@ -60,6 +70,7 @@ public final class Database implements Serializable {
             return this;
         }
 
+        @IdolBuilderBuild
         public Database build() {
             return new Database(name, documents, isPublic, domain, indexFields);
         }
