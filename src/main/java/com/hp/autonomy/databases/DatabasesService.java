@@ -10,5 +10,5 @@ import com.hp.autonomy.hod.client.error.HodErrorException;
 import java.util.Set;
 
 public interface DatabasesService {
-    Set<Database> getDatabases() throws HodErrorException;
+    Set<Database> getDatabases(String domain) throws HodErrorException;
 }

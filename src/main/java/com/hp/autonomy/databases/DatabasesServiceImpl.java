@@ -25,20 +25,17 @@ import java.util.Set;
 public class DatabasesServiceImpl implements DatabasesService {
     private static final EnumSet<ResourceFlavour> CONTENT_FLAVOURS = EnumSet.of(ResourceFlavour.explorer, ResourceFlavour.standard, ResourceFlavour.custom_fields);
 
-    private final String domain;
-
     private final ResourcesService resourcesService;
 
     private final IndexFieldsService indexFieldsService;
 
-    public DatabasesServiceImpl(final String domain, final ResourcesService resourcesService, final IndexFieldsService indexFieldsService) {
-        this.domain = domain;
+    public DatabasesServiceImpl(final ResourcesService resourcesService, final IndexFieldsService indexFieldsService) {
         this.resourcesService = resourcesService;
         this.indexFieldsService = indexFieldsService;
     }
 
     @Override
-    public Set<Database> getDatabases() throws HodErrorException {
+    public Set<Database> getDatabases(final String domain) throws HodErrorException {
         final ListResourcesRequestBuilder builder = new ListResourcesRequestBuilder()
             .setTypes(Collections.singleton(ResourceType.content));
 
