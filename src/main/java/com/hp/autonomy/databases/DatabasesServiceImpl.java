@@ -5,6 +5,7 @@
 
 package com.hp.autonomy.databases;
 
+import com.hp.autonomy.fields.IndexFieldsService;
 import com.hp.autonomy.hod.client.api.resource.ListResourcesRequestBuilder;
 import com.hp.autonomy.hod.client.api.resource.Resource;
 import com.hp.autonomy.hod.client.api.resource.ResourceFlavour;
@@ -13,17 +14,15 @@ import com.hp.autonomy.hod.client.api.resource.ResourceType;
 import com.hp.autonomy.hod.client.api.resource.Resources;
 import com.hp.autonomy.hod.client.api.resource.ResourcesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
-import com.hp.autonomy.fields.IndexFieldsService;
 import lombok.Data;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
 public class DatabasesServiceImpl implements DatabasesService {
-    private static final EnumSet<ResourceFlavour> CONTENT_FLAVOURS = EnumSet.of(ResourceFlavour.explorer, ResourceFlavour.standard, ResourceFlavour.custom_fields);
+    private static final Set<ResourceFlavour> CONTENT_FLAVOURS = ResourceFlavour.of(ResourceFlavour.EXPLORER, ResourceFlavour.STANDARD, ResourceFlavour.CUSTOM_FIELDS);
 
     private final ResourcesService resourcesService;
 
@@ -37,7 +36,7 @@ public class DatabasesServiceImpl implements DatabasesService {
     @Override
     public Set<Database> getDatabases(final String domain) throws HodErrorException {
         final ListResourcesRequestBuilder builder = new ListResourcesRequestBuilder()
-            .setTypes(Collections.singleton(ResourceType.content));
+            .setTypes(Collections.singleton(ResourceType.CONTENT));
 
         final Resources resources = resourcesService.list(builder);
         final Set<Database> databases = new HashSet<>();
