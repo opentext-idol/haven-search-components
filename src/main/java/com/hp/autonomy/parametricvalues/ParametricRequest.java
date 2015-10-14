@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -20,12 +21,14 @@ import java.util.Set;
 public class ParametricRequest implements Serializable {
     private static final long serialVersionUID = 2235023046934181036L;
 
+    private final ResourceIdentifier queryProfile;
     private final Set<ResourceIdentifier> databases;
     private final Set<String> fieldNames;
     private final String query;
     private final String fieldText;
 
-    private ParametricRequest(final Set<ResourceIdentifier> databases, final Set<String> fieldNames, final String query, final String fieldText) {
+    private ParametricRequest(final ResourceIdentifier queryProfile, final Set<ResourceIdentifier> databases, final Set<String> fieldNames, final String query, final String fieldText) {
+        this.queryProfile = queryProfile;
         this.databases = databases;
         this.query = query;
         this.fieldText = fieldText;
@@ -35,14 +38,24 @@ public class ParametricRequest implements Serializable {
     @JsonPOJOBuilder(withPrefix = "set")
     @Setter
     @Accessors(chain = true)
+    @NoArgsConstructor
     public static class Builder {
+        private ResourceIdentifier queryProfile;
         private Set<ResourceIdentifier> databases;
         private Set<String> fieldNames;
         private String query;
         private String fieldText;
 
+        public Builder(final ParametricRequest parametricRequest) {
+            queryProfile = parametricRequest.getQueryProfile();
+            databases = parametricRequest.getDatabases();
+            fieldNames = parametricRequest.getFieldNames();
+            query = parametricRequest.getQuery();
+            fieldText = parametricRequest.getFieldText();
+        }
+
         public ParametricRequest build() {
-             return new ParametricRequest(databases, fieldNames, query, fieldText);
+             return new ParametricRequest(queryProfile, databases, fieldNames, query, fieldText);
         }
     }
 }

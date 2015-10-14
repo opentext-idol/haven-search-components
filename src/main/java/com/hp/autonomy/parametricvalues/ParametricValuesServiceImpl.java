@@ -26,6 +26,7 @@ public class ParametricValuesServiceImpl implements ParametricValuesService {
     @Override
     public Set<ParametricFieldName> getAllParametricValues(final ParametricRequest parametricRequest) throws HodErrorException {
         final GetParametricValuesRequestBuilder parametricParams = new GetParametricValuesRequestBuilder()
+                .setQueryProfile(parametricRequest.getQueryProfile())
                 .setSort(ParametricSort.document_count)
                 .setText(parametricRequest.getQuery())
                 .setFieldText(parametricRequest.getFieldText())
