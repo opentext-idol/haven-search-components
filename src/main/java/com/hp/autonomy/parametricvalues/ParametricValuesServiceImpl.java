@@ -12,6 +12,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.parametric.ParametricSort;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,6 +32,10 @@ public class ParametricValuesServiceImpl implements ParametricValuesService {
                 .setText(parametricRequest.getQuery())
                 .setFieldText(parametricRequest.getFieldText())
                 .setMaxValues(5);
+
+        if(parametricRequest.getFieldNames().isEmpty()) {
+            return Collections.emptySet();
+        }
 
         final FieldNames fieldNames = getParametricValuesService.getParametricValues(parametricRequest.getFieldNames(),
                 new ArrayList<>(parametricRequest.getDatabases()), parametricParams);

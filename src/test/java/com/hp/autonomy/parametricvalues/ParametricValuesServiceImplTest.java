@@ -14,6 +14,7 @@ import com.hp.autonomy.hod.client.error.HodErrorException;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -66,6 +67,24 @@ public class ParametricValuesServiceImplTest {
         final ParametricFieldName grassyField = fieldNamesMap.get("grassy field");
 
         assertThat(grassyField.getValues(), hasItem(new ParametricFieldName.SerializableValueAndCount("snakes", 33)));
+    }
+
+    @Test
+    public void emptyFieldNamesReturnEmptyParametricValues() throws HodErrorException {
+        final ParametricValuesService parametricValuesServiceImpl = new ParametricValuesServiceImpl(getParametricValuesService());
+
+        final Set<ResourceIdentifier> indexes = ImmutableSet.<ResourceIdentifier>builder()
+                .add(ResourceIdentifier.PATENTS)
+                .build();
+
+        final ParametricRequest testRequest = new ParametricRequest.Builder()
+                .setDatabases(indexes)
+                .setFieldNames(Collections.<String>emptySet())
+                .build();
+
+        final Set<ParametricFieldName> fieldNamesSet = parametricValuesServiceImpl.getAllParametricValues(testRequest);
+
+        assertThat(fieldNamesSet, is(empty()));
     }
 
     private GetParametricValuesService getParametricValuesService() throws HodErrorException {
