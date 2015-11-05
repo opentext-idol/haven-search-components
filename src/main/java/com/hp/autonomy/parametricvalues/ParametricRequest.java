@@ -14,6 +14,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Set;
 
 @Data
@@ -32,7 +33,7 @@ public class ParametricRequest implements Serializable {
         this.databases = databases;
         this.query = query;
         this.fieldText = fieldText;
-        this.fieldNames = fieldNames;
+        this.fieldNames = fieldNames == null ? Collections.<String>emptySet() : fieldNames;
     }
 
     @JsonPOJOBuilder(withPrefix = "set")
