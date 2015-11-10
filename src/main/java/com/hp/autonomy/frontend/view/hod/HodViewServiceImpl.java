@@ -22,6 +22,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -109,7 +110,7 @@ public class HodViewServiceImpl implements HodViewService {
         // reference doesn't exist in the index
         final Document document = documents.getDocuments().get(0);
 
-        final Map<String, Object> fields = document.getFields();
+        final Map<String, Serializable> fields = document.getFields();
         final Object urlField = fields.get(URL_FIELD);
 
         final String documentUrl;
@@ -163,7 +164,7 @@ public class HodViewServiceImpl implements HodViewService {
             .setPrint(Print.all);
 
         final Documents documents = queryTextIndexService.queryTextIndexWithText("*", queryParams);
-        final Map<String, Object> fields = documents.getDocuments().get(0).getFields();
+        final Map<String, Serializable> fields = documents.getDocuments().get(0).getFields();
 
         final String staticContent = hodFieldValueAsString(fields.get(CONTENT_FIELD));
         final String staticTitle = hodFieldValueAsString(fields.get(TITLE_FIELD));
