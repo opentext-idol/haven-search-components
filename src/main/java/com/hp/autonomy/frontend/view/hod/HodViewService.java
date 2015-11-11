@@ -21,5 +21,14 @@ public interface HodViewService {
      */
     void viewDocument(String reference, ResourceIdentifier index, OutputStream outputStream) throws IOException, HodErrorException;
 
+    /**
+     * View a static content promotion, writing the output to the given output stream.
+     * @param documentReference The reference of the search result created by the promotion
+     * @param queryManipulationIndex The domain and name of the query manipulation index
+     * @param outputStream The output stream to write the viewed document to
+     * @throws IOException
+     * @throws HodErrorException
+     */
     void viewStaticContentPromotion(String documentReference, ResourceIdentifier queryManipulationIndex, OutputStream outputStream) throws IOException, HodErrorException;
+
 }
