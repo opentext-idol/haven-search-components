@@ -45,10 +45,14 @@ public class HodViewServiceImpl implements HodViewService {
     public static final String HOD_RULE_CATEGORY = "default";
 
     private final ViewDocumentService viewDocumentService;
-    private final GetContentService<Documents> getContentService;
-    private final QueryTextIndexService<Documents> queryTextIndexService;
+    private final GetContentService<Document> getContentService;
+    private final QueryTextIndexService<Document> queryTextIndexService;
 
-    public HodViewServiceImpl(final ViewDocumentService viewDocumentService, final GetContentService<Documents> getContentService, final QueryTextIndexService<Documents> queryTextIndexService) {
+    public HodViewServiceImpl(
+            final ViewDocumentService viewDocumentService,
+            final GetContentService<Document> getContentService,
+            final QueryTextIndexService<Document> queryTextIndexService
+    ) {
         this.viewDocumentService = viewDocumentService;
         this.getContentService = getContentService;
         this.queryTextIndexService = queryTextIndexService;
@@ -104,7 +108,7 @@ public class HodViewServiceImpl implements HodViewService {
     @Override
     public void viewDocument(final String reference, final ResourceIdentifier index, final OutputStream outputStream) throws IOException, HodErrorException {
         final GetContentRequestBuilder getContentParams = new GetContentRequestBuilder().setPrint(Print.all);
-        final Documents documents = getContentService.getContent(Collections.singletonList(reference), index, getContentParams);
+        final Documents<Document> documents = getContentService.getContent(Collections.singletonList(reference), index, getContentParams);
 
         // This document will always exist because the GetContentService.getContent throws a HodErrorException if the
         // reference doesn't exist in the index
@@ -163,7 +167,7 @@ public class HodViewServiceImpl implements HodViewService {
             .setIndexes(Collections.singletonList(queryManipulationIndex))
             .setPrint(Print.all);
 
-        final Documents documents = queryTextIndexService.queryTextIndexWithText("*", queryParams);
+        final Documents<Document> documents = queryTextIndexService.queryTextIndexWithText("*", queryParams);
         final Map<String, Serializable> fields = documents.getDocuments().get(0).getFields();
 
         final String staticContent = hodFieldValueAsString(fields.get(CONTENT_FIELD));
