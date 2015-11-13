@@ -12,6 +12,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.parametric.ParametricSort;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,10 +27,15 @@ public class ParametricValuesServiceImpl implements ParametricValuesService {
     @Override
     public Set<ParametricFieldName> getAllParametricValues(final ParametricRequest parametricRequest) throws HodErrorException {
         final GetParametricValuesRequestBuilder parametricParams = new GetParametricValuesRequestBuilder()
+                .setQueryProfile(parametricRequest.getQueryProfile())
                 .setSort(ParametricSort.document_count)
                 .setText(parametricRequest.getQuery())
                 .setFieldText(parametricRequest.getFieldText())
                 .setMaxValues(5);
+
+        if(parametricRequest.getFieldNames().isEmpty()) {
+            return Collections.emptySet();
+        }
 
         final FieldNames fieldNames = getParametricValuesService.getParametricValues(parametricRequest.getFieldNames(),
                 new ArrayList<>(parametricRequest.getDatabases()), parametricParams);
