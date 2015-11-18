@@ -5,12 +5,14 @@
 
 package com.hp.autonomy.fields;
 
+import com.hp.autonomy.hod.client.api.authentication.TokenType;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.api.textindex.query.fields.FieldType;
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsResponse;
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.hod.client.token.TokenProxy;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,10 +27,23 @@ public class IndexFieldsServiceImpl implements IndexFieldsService {
 
     @Override
     public Set<String> getParametricFields(final ResourceIdentifier index) throws HodErrorException {
-        final RetrieveIndexFieldsRequestBuilder fieldsParams = new RetrieveIndexFieldsRequestBuilder()
-                .setFieldType(FieldType.parametric);
+        return getParametricFields(null, index);
+    }
 
-        final RetrieveIndexFieldsResponse indexFields = retrieveIndexFieldsService.retrieveIndexFields(index, fieldsParams);
+    @Override
+    public Set<String> getParametricFields(final TokenProxy<?, TokenType.Simple> tokenProxy, final ResourceIdentifier index) throws HodErrorException {
+        final RetrieveIndexFieldsRequestBuilder fieldsParams = new RetrieveIndexFieldsRequestBuilder()
+            .setFieldType(FieldType.parametric);
+
+        final RetrieveIndexFieldsResponse indexFields;
+
+        if (tokenProxy == null) {
+            indexFields = retrieveIndexFieldsService.retrieveIndexFields(index, fieldsParams);
+        }
+        else {
+            indexFields = retrieveIndexFieldsService.retrieveIndexFields(tokenProxy, index, fieldsParams);
+        }
+
         return new HashSet<>(indexFields.getAllFields());
     }
 
