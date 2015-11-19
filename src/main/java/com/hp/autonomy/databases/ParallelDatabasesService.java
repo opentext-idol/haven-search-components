@@ -40,7 +40,7 @@ public class ParallelDatabasesService implements DatabasesService {
     private final ExecutorService executorService;
 
     public ParallelDatabasesService(final ResourcesService resourcesService, final IndexFieldsService indexFieldsService) {
-        this(resourcesService, indexFieldsService, Executors.newFixedThreadPool(8));
+        this(resourcesService, indexFieldsService, Executors.newFixedThreadPool(16));
     }
 
     public ParallelDatabasesService(final ResourcesService resourcesService, final IndexFieldsService indexFieldsService, final ExecutorService executorService) {
