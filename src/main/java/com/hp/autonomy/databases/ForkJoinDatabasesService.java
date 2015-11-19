@@ -152,29 +152,38 @@ public class ForkJoinDatabasesService implements DatabasesService {
         @Override
         protected Set<Database> compute() {
             if (input.isEmpty()) {
-                return Collections.synchronizedSet(new HashSet<Database>());
+                return Collections.emptySet();
             }
+            else if(input.size() == 1) {
+                final Resource resource = input.get(0);
 
-            final DatabaseTask tailTask = new DatabaseTask(tokenProxy, input.subList(1, input.size()), domain, isPublic);
-            tailTask.fork();
+                final Database database;
 
-            final Resource resource = input.get(0);
+                try {
+                    database = databaseForResource(tokenProxy, resource.getResource(), domain, isPublic);
+                } catch (final HodErrorException e) {
+                    completeExceptionally(e);
+                    // this value is irrelevant as completeExceptionally will throw a RuntimeException
+                    return null;
+                }
 
-            final Database database;
-
-            try {
-                database = databaseForResource(tokenProxy, resource.getResource(), domain, isPublic);
-            } catch (final HodErrorException e) {
-                completeExceptionally(e);
-                // this value is irrelevant as completeExceptionally will throw a RuntimeException
-                return null;
+                return Collections.singleton(database);
             }
+            else {
+                final int middle = (input.size() / 2); // truncation is OK
 
-            final Set<Database> output = tailTask.join();
+                final DatabaseTask left =  new DatabaseTask(tokenProxy, input.subList(0, middle), domain, isPublic);
+                left.fork();
 
-            output.add(database);
+                final DatabaseTask right = new DatabaseTask(tokenProxy, input.subList(middle, input.size()), domain, isPublic);
+                right.fork();
 
-            return output;
+                final Set<Database> result = new HashSet<>();
+                result.addAll(left.join());
+                result.addAll(right.join());
+
+                return result;
+            }
         }
     }
 
