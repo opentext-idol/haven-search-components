@@ -63,6 +63,13 @@
             <artifactId>commons-validator</artifactId>
             <version>1.4.1</version>
         </dependency>
+        <!-- commons-collections:3.2.1 is required by validator, and is vulnerable to https://www.kb.cert.org/vuls/id/576313 -->
+        <!-- If a later version of validator exists, this can go as we don't actually use it -->
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.2</version>
+        </dependency>
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
