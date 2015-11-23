@@ -106,8 +106,10 @@ public class ForkJoinDatabasesService implements DatabasesService {
             databases.addAll(privateTask.get());
             databases.addAll(publicTask.get());
         } catch (final InterruptedException e) {
-            log.error("Interrupted", e);
-            throw new IllegalStateException("Interrupted while waiting for databases", e);
+            // preserve interrupted status
+            Thread.currentThread().interrupt();
+            // anything we return may be incomplete
+            throw new IllegalStateException("Interrupted while waiting for parametric fields", e);
         } catch (final ExecutionException e) {
             throw new IllegalStateException("Error occurred executing task", e);
         }

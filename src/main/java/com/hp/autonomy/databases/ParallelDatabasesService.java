@@ -110,7 +110,10 @@ public class ParallelDatabasesService implements DatabasesService {
             try {
                 databases.add(databaseFuture.get());
             } catch (final InterruptedException e) {
-                log.error("Interrupted", e);
+                // preserve interrupted status
+                Thread.currentThread().interrupt();
+                // anything we return may be incomplete
+                throw new IllegalStateException("Interrupted while waiting for parametric fields", e);
             } catch (final ExecutionException e) {
                 if (e.getCause() instanceof HodErrorException) {
                     throw (HodErrorException) e.getCause();
