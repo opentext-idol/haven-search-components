@@ -5,7 +5,6 @@
 
 package com.hp.autonomy.databases;
 
-import com.hp.autonomy.fields.IndexFieldsService;
 import com.hp.autonomy.hod.client.api.authentication.TokenType;
 import com.hp.autonomy.hod.client.api.resource.ListResourcesRequestBuilder;
 import com.hp.autonomy.hod.client.api.resource.Resource;
@@ -28,11 +27,11 @@ public class DatabasesServiceImpl implements DatabasesService {
 
     private final ResourcesService resourcesService;
 
-    private final IndexFieldsService indexFieldsService;
+    private final ResourceMapper resourceMapper;
 
-    public DatabasesServiceImpl(final ResourcesService resourcesService, final IndexFieldsService indexFieldsService) {
+    public DatabasesServiceImpl(final ResourcesService resourcesService, final ResourceMapper resourceMapper) {
         this.resourcesService = resourcesService;
-        this.indexFieldsService = indexFieldsService;
+        this.resourceMapper = resourceMapper;
     }
 
     @Override
@@ -58,42 +57,29 @@ public class DatabasesServiceImpl implements DatabasesService {
 
         // Private and public indexes can have the same name. You can't do anything with the public index in this case,
         // so we remove the public index duplicates here.
-        final Set<String> privateDatabaseNames = new HashSet<>();
+        final Set<String> privateResourceNames = new HashSet<>();
 
         for (final Resource resource : resources.getResources()) {
             if (CONTENT_FLAVOURS.contains(resource.getFlavour())) {
                 final String name = resource.getResource();
-                databases.add(databaseForResource(tokenProxy, name, domain, false));
-                privateDatabaseNames.add(name);
+                privateResourceNames.add(name);
             }
         }
 
+        databases.addAll(resourceMapper.map(tokenProxy, privateResourceNames, domain));
+
+        final Set<String> publicResourceNames = new HashSet<>();
+
         for (final Resource resource : resources.getPublicResources()) {
-            if (!privateDatabaseNames.contains(resource.getResource())) {
-                databases.add(databaseForResource(tokenProxy, resource.getResource(), ResourceIdentifier.PUBLIC_INDEXES_DOMAIN, true));
+            if (!privateResourceNames.contains(resource.getResource())) {
+                publicResourceNames.add(resource.getResource());
             }
         }
+
+        databases.addAll(resourceMapper.map(tokenProxy, publicResourceNames, ResourceIdentifier.PUBLIC_INDEXES_DOMAIN));
 
         return databases;
     }
 
-    private Database databaseForResource(final TokenProxy<?, TokenType.Simple> tokenProxy, final String name, final String domain, final boolean isPublic) throws HodErrorException {
-        final ResourceIdentifier resourceIdentifier = new ResourceIdentifier(domain, name);
-        final Set<String> parametricFields;
-
-        if (tokenProxy == null) {
-            parametricFields = indexFieldsService.getParametricFields(resourceIdentifier);
-        }
-        else {
-            parametricFields = indexFieldsService.getParametricFields(tokenProxy, resourceIdentifier);
-        }
-
-        return new Database.Builder()
-            .setName(name)
-            .setIsPublic(isPublic)
-            .setDomain(domain)
-            .setIndexFields(parametricFields)
-            .build();
-    }
 
 }
