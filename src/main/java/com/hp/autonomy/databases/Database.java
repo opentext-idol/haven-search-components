@@ -9,15 +9,14 @@ import com.autonomy.aci.client.annotations.IdolBuilder;
 import com.autonomy.aci.client.annotations.IdolBuilderBuild;
 import com.autonomy.aci.client.annotations.IdolDocument;
 import com.autonomy.aci.client.annotations.IdolField;
-import com.hp.autonomy.types.IdolDatabase;
 import lombok.Data;
 
-import java.util.HashSet;
+import java.io.Serializable;
 import java.util.Set;
 
 @Data
 @IdolDocument(Database.ROOT_FIELD)
-public final class Database implements IdolDatabase {
+public final class Database implements Serializable {
     private static final long serialVersionUID = -3966566623844850811L;
     static final String ROOT_FIELD = "database";
 
@@ -67,7 +66,7 @@ public final class Database implements IdolDatabase {
         }
 
         public Builder setIndexFields(final Set<String> indexFields) {
-            this.indexFields = new HashSet<>(indexFields);
+            this.indexFields = indexFields;
             return this;
         }
 
