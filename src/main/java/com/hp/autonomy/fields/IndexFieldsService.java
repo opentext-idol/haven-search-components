@@ -5,13 +5,17 @@
 
 package com.hp.autonomy.fields;
 
+import com.hp.autonomy.hod.client.api.authentication.TokenType;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.hod.client.token.TokenProxy;
 
 import java.util.Set;
 
 public interface IndexFieldsService {
 
     Set<String> getParametricFields(ResourceIdentifier index) throws HodErrorException;
+
+    Set<String> getParametricFields(TokenProxy<?, TokenType.Simple> tokenProxy, ResourceIdentifier index) throws HodErrorException;
 
 }
