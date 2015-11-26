@@ -5,10 +5,13 @@
 
 package com.hp.autonomy.databases;
 
+import com.hp.autonomy.hod.client.api.authentication.TokenType;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.hod.client.token.TokenProxy;
 
 import java.util.Set;
 
 public interface DatabasesService {
     Set<Database> getDatabases(String domain) throws HodErrorException;
+    Set<Database> getDatabases(TokenProxy<?, TokenType.Simple> tokenProxy, String domain) throws HodErrorException;
 }
