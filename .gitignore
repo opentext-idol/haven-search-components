@@ -11,3 +11,6 @@
 
 # Maven
 target/
+core/target/
+hod/target/
+idol/target/
