@@ -20,27 +20,44 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
+/**
+ * ResourceMapper that uses a {@link ForkJoinPool} to perform mapping in parallel. If using the internal ForkJoinPool,
+ * the {@link #destroy} method should be called when the ResourceMapper is finished with.
+ */
 @Slf4j
 public class ForkJoinResourceMapper extends AbstractResourceMapper {
     private final ForkJoinPool forkJoinPool;
 
+    /**
+     * Constructs a new ForkJoinResourceMapper with the given IndexFieldsService. The {@link #destroy} method should be
+     * called when using this constructor when the ForkJoinResourceMapper is finished with.
+     * @param indexFieldsService The IndexFieldsService to use
+     */
     public ForkJoinResourceMapper(final IndexFieldsService indexFieldsService) {
         this(indexFieldsService, new ForkJoinPool());
     }
 
+    /**
+     * Constructs a new ForkJoinResourceMapper with the given IndexFieldsService and ForkJoinPool.
+     * @param indexFieldsService The IndexFieldsService to use
+     * @param forkJoinPool The ForkJoinPool to use
+     */
     public ForkJoinResourceMapper(final IndexFieldsService indexFieldsService, final ForkJoinPool forkJoinPool) {
         super(indexFieldsService);
 
         this.forkJoinPool = forkJoinPool;
     }
 
+    /**
+     * Shuts down the ForkJoinPool.
+     */
     public void destroy() {
         forkJoinPool.shutdown();
     }
 
     @Override
-    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<String> resources, final String domain) throws HodErrorException {
-        final DatabaseTask privateTask = new DatabaseTask(tokenProxy, new ArrayList<>(resources), domain);
+    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<String> resourceNames, final String domain) throws HodErrorException {
+        final DatabaseTask privateTask = new DatabaseTask(tokenProxy, new ArrayList<>(resourceNames), domain);
 
         forkJoinPool.submit(privateTask);
 

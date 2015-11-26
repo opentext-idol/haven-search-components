@@ -13,6 +13,9 @@ import com.hp.autonomy.hod.client.token.TokenProxy;
 
 import java.util.Set;
 
+/**
+ * Abstract base class for {@link ResourceMapper}
+ */
 public abstract class AbstractResourceMapper implements ResourceMapper {
 
     private final IndexFieldsService indexFieldsService;
@@ -21,6 +24,14 @@ public abstract class AbstractResourceMapper implements ResourceMapper {
         this.indexFieldsService = indexFieldsService;
     }
 
+    /**
+     * Converts the given resource name to a database
+     * @param tokenProxy The token proxy to use to retrieve parametric fields
+     * @param name The name of the resource
+     * @param domain The domain of the resource
+     * @return A database representation of the resource
+     * @throws HodErrorException
+     */
     protected Database databaseForResource(final TokenProxy<?, TokenType.Simple> tokenProxy, final String name, final String domain) throws HodErrorException {
         final ResourceIdentifier resourceIdentifier = new ResourceIdentifier(domain, name);
         final Set<String> parametricFields;

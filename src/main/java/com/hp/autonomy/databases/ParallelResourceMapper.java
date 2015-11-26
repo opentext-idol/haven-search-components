@@ -21,30 +21,48 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * ResourceMapper that uses an {@link ExecutorService} to map resources in parallel. If using the internal ExecutorService,
+ * the {@link #destroy} method should be called when the ResourceMapper is finished with.
+ */
 @Slf4j
 public class ParallelResourceMapper extends AbstractResourceMapper {
 
     private final ExecutorService executorService;
 
+    /**
+     * Creates a new ParallelResourceMapper using the given IndexFieldsService and an ExecutorService with 16 threads.
+     * The {@link #destroy} method should be called when using this constructor when the ParallelResourceMapper
+     * is finished with.
+     * @param indexFieldsService The IndexFieldsService to use
+     */
     public ParallelResourceMapper(final IndexFieldsService indexFieldsService) {
         this(indexFieldsService, Executors.newFixedThreadPool(16));
     }
 
+    /**
+     * Creates a new ParallelResourceMapper using the given IndexFieldsService and ExecutorService.
+     * @param indexFieldsService The IndexFieldsService to use
+     * @param executorService The ExecutorService to use
+     */
     public ParallelResourceMapper(final IndexFieldsService indexFieldsService, final ExecutorService executorService) {
         super(indexFieldsService);
 
         this.executorService = executorService;
     }
 
+    /**
+     * Shuts down the ExecutorService
+     */
     public void destroy() {
         executorService.shutdown();
     }
 
     @Override
-    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<String> resources, final String domain) throws HodErrorException {
+    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<String> resourceNames, final String domain) throws HodErrorException {
         final List<Future<Database>> databaseFutures = new ArrayList<>();
 
-        for (final String resource : resources) {
+        for (final String resource : resourceNames) {
             databaseFutures.add(executorService.submit(new DatabaseCallable(tokenProxy, resource, domain)));
         }
 

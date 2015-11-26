@@ -11,8 +11,19 @@ import com.hp.autonomy.hod.client.token.TokenProxy;
 
 import java.util.Set;
 
+/**
+ * Maps resource names into databases
+ */
 public interface ResourceMapper {
 
-    Set<Database> map(TokenProxy<?, TokenType.Simple> tokenProxy, Set<String> resources, String domain) throws HodErrorException;
+    /**
+     * Maps the given resource names in the given domain into instances of {@link Database}
+     * @param tokenProxy The token proxy to use. May be null.
+     * @param resourceNames The resource names to map.
+     * @param domain The domain in which the resources reside.
+     * @return A set of Databases corresponding to the resource names
+     * @throws HodErrorException
+     */
+    Set<Database> map(TokenProxy<?, TokenType.Simple> tokenProxy, Set<String> resourceNames, String domain) throws HodErrorException;
 
 }

@@ -13,6 +13,9 @@ import com.hp.autonomy.hod.client.token.TokenProxy;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Default implementation of ResourceMapper
+ */
 public class ResourceMapperImpl extends AbstractResourceMapper {
 
     public ResourceMapperImpl(final IndexFieldsService indexFieldsService) {
@@ -20,10 +23,10 @@ public class ResourceMapperImpl extends AbstractResourceMapper {
     }
 
     @Override
-    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<String> resources, final String domain) throws HodErrorException {
+    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<String> resourceNames, final String domain) throws HodErrorException {
         final Set<Database> databases = new HashSet<>();
 
-        for (final String resourceName : resources) {
+        for (final String resourceName : resourceNames) {
             databases.add(databaseForResource(tokenProxy, resourceName, domain));
         }
 
