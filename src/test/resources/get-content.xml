@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<autnresponse xmlns:autn='http://schemas.autonomy.com/aci/'>
+    <action>GETCONTENT</action>
+    <response>SUCCESS</response>
+    <responsedata>
+        <autn:numhits>1</autn:numhits>
+        <autn:hit>
+            <autn:reference>dede952d-8a4d-4f54-ac1f-5187bf10a744</autn:reference>
+            <autn:id>1</autn:id>
+            <autn:section>0</autn:section>
+            <autn:title>Cars</autn:title>
+            <autn:content>
+                <DOCUMENT>
+                    <DREREFERENCE>dede952d-8a4d-4f54-ac1f-5187bf10a744</DREREFERENCE>
+                    <DRETITLE>Cars</DRETITLE>
+                    <URL>http://en.wikipedia.org/wiki/Car</URL>
+                    <DRECONTENT>Cars are fun.</DRECONTENT>
+                </DOCUMENT>
+            </autn:content>
+        </autn:hit>
+    </responsedata>
+</autnresponse>
