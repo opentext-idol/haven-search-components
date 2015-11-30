@@ -10,6 +10,7 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.AciURLCodec;
 import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.aci.content.identifier.reference.Reference;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
@@ -81,7 +82,7 @@ public class IdolViewServerService implements ViewServerService {
         if (!indexes.isEmpty()) {
             parameters.add(GetContentParams.DatabaseMatch.name(), new Databases(indexes));
         }
-        parameters.add(GetContentParams.Reference.name(), new Reference(documentReference));
+        parameters.add(GetContentParams.Reference.name(), new Reference(AciURLCodec.getInstance().encode(documentReference)));
         parameters.add(GetContentParams.Print.name(), PrintParam.Fields);
         parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField));
 
