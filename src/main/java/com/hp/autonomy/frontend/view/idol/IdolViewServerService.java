@@ -1,31 +1,47 @@
+/*
+ * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
+ */
+
 package com.hp.autonomy.frontend.view.idol;
 
-import com.autonomy.aci.actions.idol.query.Document;
-import com.autonomy.aci.actions.idol.query.DocumentField;
-import com.autonomy.aci.actions.idol.query.QueryResponse;
-import com.autonomy.aci.actions.idol.query.QueryResponseProcessor;
+
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.autonomy.aci.content.identifier.reference.Reference;
 import com.autonomy.aci.content.printfields.PrintFields;
+import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.view.idol.configuration.ViewCapable;
+import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.types.idol.GetContentResponseData;
+import com.hp.autonomy.types.idol.Hit;
+import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
+import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
+import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
+import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
+import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import org.apache.commons.lang.StringUtils;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class IdolViewServerService implements ViewServerService {
     private final AciService contentAciService;
     private final AciService viewAciService;
+    private final Processor<GetContentResponseData> getContentResponseProcessor;
     private final ConfigService<? extends ViewCapable> configService;
 
-    public IdolViewServerService(final AciService contentAciService, final AciService viewAciService, final ConfigService<? extends ViewCapable> configService) {
+    public IdolViewServerService(final AciService contentAciService, final AciService viewAciService, final AciResponseJaxbProcessorFactory processorFactory, final ConfigService<? extends ViewCapable> configService) {
         this.contentAciService = contentAciService;
         this.viewAciService = viewAciService;
         this.configService = configService;
+
+        getContentResponseProcessor = processorFactory.createAciResponseProcessor(GetContentResponseData.class);
     }
 
     /**
@@ -33,6 +49,7 @@ public class IdolViewServerService implements ViewServerService {
      * document exists, then reads the configured reference field and passes the value of the field to ViewServer.
      *
      * @param documentReference The IDOL document reference of the document to view
+     * @param indexes           The IDOL databases containing the reference (no restriction set on getContent query if this is an empty collection)
      * @param processor         The processor that will consume the ViewServer output
      * @param <T>               The return type of the processor
      * @return The return value of the given processor
@@ -42,36 +59,53 @@ public class IdolViewServerService implements ViewServerService {
      * @throws ViewServerErrorException      If ViewServer returns a status code outside the 200 range
      */
     @Override
-    public <T> T viewDocument(final String documentReference, final Processor<T> processor) throws ViewDocumentNotFoundException, ViewNoReferenceFieldException, ReferenceFieldBlankException {
+    public <T> T viewDocument(final String documentReference, final Collection<String> indexes, final Processor<T> processor) throws ViewDocumentNotFoundException, ViewNoReferenceFieldException, ReferenceFieldBlankException {
+        final String referenceFieldValue = getReferenceFieldValue(documentReference, indexes);
+
+        final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
+        viewParameters.add(ViewParams.NoACI.name(), true);
+        viewParameters.add(ViewParams.Reference.name(), referenceFieldValue);
+        viewParameters.add(ViewParams.EmbedImages.name(), true);
+        viewParameters.add(ViewParams.StripScript.name(), true);
+
+        return viewAciService.executeAction(viewParameters, processor);
+    }
+
+    private String getReferenceFieldValue(final String documentReference, final Collection<String> indexes) throws ReferenceFieldBlankException, ViewDocumentNotFoundException, ViewNoReferenceFieldException {
         final String referenceField = configService.getConfig().getViewConfig().getReferenceField();
         if (StringUtils.isEmpty(referenceField)) {
             throw new ReferenceFieldBlankException();
         }
 
-        final AciParameters parameters = new AciParameters("GetContent");
-        parameters.add("Reference", new Reference(documentReference));
-        parameters.add("Print", "Fields");
-        parameters.add("PrintFields", new PrintFields(referenceField));
+        final AciParameters parameters = new AciParameters(QueryActions.GetContent.name());
+        if (!indexes.isEmpty()) {
+            parameters.add(GetContentParams.DatabaseMatch.name(), new Databases(indexes));
+        }
+        parameters.add(GetContentParams.Reference.name(), new Reference(documentReference));
+        parameters.add(GetContentParams.Print.name(), PrintParam.Fields);
+        parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField));
 
-        final QueryResponse queryResponse;
+        final GetContentResponseData queryResponse;
         try {
-            queryResponse = contentAciService.executeAction(parameters, new QueryResponseProcessor());
+            queryResponse = contentAciService.executeAction(parameters, getContentResponseProcessor);
         } catch (final AciErrorException e) {
-            throw new ViewDocumentNotFoundException(documentReference);
+            throw new ViewDocumentNotFoundException(documentReference, e);
         }
 
-        final List<Document> documents = queryResponse.getDocuments();
+        final List<Hit> documents = queryResponse.getHit();
         if (documents.isEmpty()) {
             throw new ViewDocumentNotFoundException(documentReference);
         }
 
-        final Document document = documents.get(0);
-        String referenceFieldValue = null;
+        final Hit document = documents.get(0);
 
+        String referenceFieldValue = null;
         // Assume the field names are case insensitive
-        for (final Map.Entry<String, List<DocumentField>> entry : document.getDocumentFields().entrySet()) {
-            if (entry.getKey().equalsIgnoreCase(referenceField)) {
-                referenceFieldValue = entry.getValue().get(0).getValue();
+        final NodeList fields = ((Node) document.getContent().getContent().get(0)).getChildNodes();
+        for (int i = 0; i < fields.getLength(); i++) {
+            final Node field = fields.item(i);
+            if (field.getLocalName().equalsIgnoreCase(referenceField)) {
+                referenceFieldValue = field.getFirstChild() == null ? null : field.getFirstChild().getNodeValue();
                 break;
             }
         }
@@ -79,14 +113,7 @@ public class IdolViewServerService implements ViewServerService {
         if (referenceFieldValue == null) {
             throw new ViewNoReferenceFieldException(documentReference, referenceField);
         }
-
-        final AciParameters viewParameters = new AciParameters("View");
-        viewParameters.add("NoACI", true);
-        viewParameters.add("Reference", referenceFieldValue);
-        viewParameters.add("EmbedImages", true);
-        viewParameters.add("StripScript", true);
-
-        return viewAciService.executeAction(viewParameters, processor);
+        return referenceFieldValue;
     }
 
 }
