@@ -112,16 +112,6 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>com.autonomy.aci.client</groupId>
-            <artifactId>autonomy-aci-client-api</artifactId>
-            <version>4.1.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.autonomy.aci.client</groupId>
-            <artifactId>autonomy-aci-annotations-processor</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
             <groupId>com.autonomy.aci.content</groupId>
             <artifactId>autonomy-content-parameter-api</artifactId>
             <version>1.0.0</version>
