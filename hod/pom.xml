@@ -11,6 +11,43 @@
 
     <artifactId>parametric-databases-hod</artifactId>
 
+    <profiles>
+        <profile>
+            <id>travis</id>
+            <activation>
+                <property>
+                    <name>env.TRAVIS</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <defaultKeyring>false</defaultKeyring>
+                                    <keyname>${env.GPG_KEYID}</keyname>
+                                    <passphrase>${env.GPG_PASSPHRASE}</passphrase>
+                                    <publicKeyring>${project.parent.basedir}/public.gpg</publicKeyring>
+                                    <secretKeyring>${project.parent.basedir}/secret.gpg</secretKeyring>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>com.hp.autonomy.frontend</groupId>
