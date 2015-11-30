@@ -112,11 +112,6 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>com.autonomy.aci.content</groupId>
-            <artifactId>autonomy-content-parameter-api</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.hp.autonomy.frontend</groupId>
             <artifactId>idol-utils</artifactId>
             <version>1.1.0-SNAPSHOT</version>
