@@ -11,6 +11,8 @@ import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldNames;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -50,11 +52,11 @@ public class HodParametricValuesServiceTest {
                 .setFieldNames(fieldNames)
                 .build();
 
-        final Set<ParametricFieldName> fieldNamesSet = parametricValuesServiceImpl.getAllParametricValues(testRequest);
+        final Set<QueryTagInfo> fieldNamesSet = parametricValuesServiceImpl.getAllParametricValues(testRequest);
 
-        final Map<String, ParametricFieldName> fieldNamesMap = new HashMap<>();
+        final Map<String, QueryTagInfo> fieldNamesMap = new HashMap<>();
 
-        for (final ParametricFieldName parametricFieldName : fieldNamesSet) {
+        for (final QueryTagInfo parametricFieldName : fieldNamesSet) {
             fieldNamesMap.put(parametricFieldName.getName(), parametricFieldName);
         }
 
@@ -64,9 +66,9 @@ public class HodParametricValuesServiceTest {
 
         assertThat(fieldNamesMap, not(hasKey("empty field")));
 
-        final ParametricFieldName grassyField = fieldNamesMap.get("grassy field");
+        final QueryTagInfo grassyField = fieldNamesMap.get("grassy field");
 
-        assertThat(grassyField.getValues(), hasItem(new FieldNames.ValueAndCount("snakes", 33)));
+        assertThat(grassyField.getValues(), hasItem(new QueryTagCountInfo("snakes", 33)));
     }
 
     @Test
@@ -82,7 +84,7 @@ public class HodParametricValuesServiceTest {
                 .setFieldNames(Collections.<String>emptySet())
                 .build();
 
-        final Set<ParametricFieldName> fieldNamesSet = hodParametricValuesService.getAllParametricValues(testRequest);
+        final Set<QueryTagInfo> fieldNamesSet = hodParametricValuesService.getAllParametricValues(testRequest);
 
         assertThat(fieldNamesSet, is(empty()));
     }

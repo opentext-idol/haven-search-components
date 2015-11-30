@@ -19,19 +19,19 @@ import java.util.Set;
 
 @Data
 @JsonDeserialize(builder = HodParametricRequest.Builder.class)
-public class HodParametricRequest implements ParametricRequest {
+public class HodParametricRequest implements ParametricRequest<ResourceIdentifier> {
     private static final long serialVersionUID = 2235023046934181036L;
 
     private final ResourceIdentifier queryProfile;
     private final Set<ResourceIdentifier> databases;
     private final Set<String> fieldNames;
-    private final String query;
+    private final String queryText;
     private final String fieldText;
 
-    private HodParametricRequest(final ResourceIdentifier queryProfile, final Set<ResourceIdentifier> databases, final Set<String> fieldNames, final String query, final String fieldText) {
+    private HodParametricRequest(final ResourceIdentifier queryProfile, final Set<ResourceIdentifier> databases, final Set<String> fieldNames, final String queryText, final String fieldText) {
         this.queryProfile = queryProfile;
         this.databases = databases;
-        this.query = query;
+        this.queryText = queryText;
         this.fieldText = fieldText;
         this.fieldNames = fieldNames == null ? Collections.<String>emptySet() : fieldNames;
     }
@@ -44,19 +44,19 @@ public class HodParametricRequest implements ParametricRequest {
         private ResourceIdentifier queryProfile;
         private Set<ResourceIdentifier> databases;
         private Set<String> fieldNames;
-        private String query;
+        private String queryText;
         private String fieldText;
 
         public Builder(final HodParametricRequest hodParametricRequest) {
             queryProfile = hodParametricRequest.getQueryProfile();
             databases = hodParametricRequest.getDatabases();
             fieldNames = hodParametricRequest.getFieldNames();
-            query = hodParametricRequest.getQuery();
+            queryText = hodParametricRequest.getQueryText();
             fieldText = hodParametricRequest.getFieldText();
         }
 
         public HodParametricRequest build() {
-             return new HodParametricRequest(queryProfile, databases, fieldNames, query, fieldText);
+             return new HodParametricRequest(queryProfile, databases, fieldNames, queryText, fieldText);
         }
     }
 }

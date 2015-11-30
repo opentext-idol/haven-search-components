@@ -5,15 +5,13 @@
 
 package com.hp.autonomy.core.parametricvalues;
 
-import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.io.Serializable;
 import java.util.Set;
 
-public interface ParametricValuesService<R extends ParametricRequest, T extends QueryTagInfo<C>, C extends QueryTagCountInfo, E extends Exception> {
+public interface ParametricValuesService<R extends ParametricRequest<S>, S extends Serializable, E extends Exception> {
 
-    Set<T> getAllParametricValues(R parametricRequest) throws E;
+    Set<QueryTagInfo> getAllParametricValues(R parametricRequest) throws E;
 
 }
