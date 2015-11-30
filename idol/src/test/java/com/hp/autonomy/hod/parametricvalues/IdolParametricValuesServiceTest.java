@@ -13,6 +13,7 @@ import com.hp.autonomy.idol.parametricvalues.IdolParametricValuesService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.types.idol.FlatField;
 import com.hp.autonomy.types.idol.GetQueryTagValuesResponseData;
+import com.hp.autonomy.types.idol.GetTagNamesResponseData;
 import com.hp.autonomy.types.idol.TagValue;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import org.junit.Before;
@@ -61,6 +62,37 @@ public class IdolParametricValuesServiceTest {
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
         final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
+    }
+
+    @Test
+    public void getFieldNamesFirst() {
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setDatabases(Collections.<String>emptySet()).setFieldNames(Collections.<String>emptySet()).setQueryText("*").setFieldText("").build();
+
+        final GetTagNamesResponseData tagNamesResponseData = mockTagNamesResponse();
+
+        final GetQueryTagValuesResponseData responseData = mockQueryResponse();
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(tagNamesResponseData).thenReturn(responseData);
+
+        final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
+        assertThat(results, is(not(empty())));
+    }
+
+    @Test
+    public void parametricValuesNotConfigured() {
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setDatabases(Collections.<String>emptySet()).setFieldNames(Collections.<String>emptySet()).setQueryText("*").setFieldText("").build();
+
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(new GetTagNamesResponseData());
+
+        final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
+        assertThat(results, is(empty()));
+    }
+
+    private GetTagNamesResponseData mockTagNamesResponse() {
+        final GetTagNamesResponseData responseData = new GetTagNamesResponseData();
+        final GetTagNamesResponseData.Name name = new GetTagNamesResponseData.Name();
+        name.setValue("DOCUMENT/CATEGORY");
+        responseData.getName().add(name);
+        return responseData;
     }
 
     private GetQueryTagValuesResponseData mockQueryResponse() {
