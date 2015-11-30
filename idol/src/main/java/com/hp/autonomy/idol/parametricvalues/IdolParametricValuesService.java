@@ -17,11 +17,11 @@ import com.hp.autonomy.types.idol.GetQueryTagValuesResponseData;
 import com.hp.autonomy.types.idol.GetTagNamesResponseData;
 import com.hp.autonomy.types.idol.TagValue;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
-import com.hp.autonomy.types.requests.idol.actions.tags.GetQueryTagValuesParams;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetTagNamesParams;
 import org.apache.commons.lang3.StringUtils;
 
