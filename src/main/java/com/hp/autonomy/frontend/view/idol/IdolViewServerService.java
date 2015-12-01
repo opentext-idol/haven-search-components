@@ -82,7 +82,7 @@ public class IdolViewServerService implements ViewServerService {
         if (!indexes.isEmpty()) {
             parameters.add(GetContentParams.DatabaseMatch.name(), new Databases(indexes));
         }
-        parameters.add(GetContentParams.Reference.name(), new Reference(AciURLCodec.getInstance().encode(documentReference)));
+        parameters.add(GetContentParams.Reference.name(), new Reference(documentReference));
         parameters.add(GetContentParams.Print.name(), PrintParam.Fields);
         parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField));
 
