@@ -81,7 +81,8 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
                         values.add(new QueryTagCountInfo(tagValue.getValue(), tagValue.getCount()));
                     }
                 }
-                results.add(new QueryTagInfo(field.getName().get(0), values));
+                final String fieldName = getFieldNameFromPath(field.getName().get(0));
+                results.add(new QueryTagInfo(fieldName, values));
             }
         }
 
@@ -98,9 +99,13 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         final Collection<String> tagNames = new ArrayList<>(names.size());
         for (final GetTagNamesResponseData.Name name : names) {
             final String value = name.getValue();
-            tagNames.add(value.contains("/") ? value.substring(value.lastIndexOf('/') + 1) : value);
+            tagNames.add(getFieldNameFromPath(value));
         }
 
         return tagNames;
+    }
+
+    private String getFieldNameFromPath(final String value) {
+        return value.contains("/") ? value.substring(value.lastIndexOf('/') + 1) : value;
     }
 }
