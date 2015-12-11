@@ -67,6 +67,7 @@ public class IdolViewServerService implements ViewServerService {
         viewParameters.add(ViewParams.Reference.name(), referenceFieldValue);
         viewParameters.add(ViewParams.EmbedImages.name(), true);
         viewParameters.add(ViewParams.StripScript.name(), true);
+        viewParameters.add(ViewParams.OriginalBaseURL.name(), true);
 
         return viewAciService.executeAction(viewParameters, processor);
     }
