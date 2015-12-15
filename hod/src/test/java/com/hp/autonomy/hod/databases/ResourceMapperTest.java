@@ -6,7 +6,10 @@
 package com.hp.autonomy.hod.databases;
 
 import com.google.common.collect.ImmutableMap;
+import com.hp.autonomy.hod.client.api.resource.Resource;
+import com.hp.autonomy.hod.client.api.resource.ResourceFlavour;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceType;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.fields.IndexFieldsService;
 import org.junit.Test;
@@ -32,12 +35,12 @@ public class ResourceMapperTest {
 
     private static final String DOMAIN = "DOMAIN";
 
-    private static final Map<String, Set<String>> RESOURCES = ImmutableMap.<String, Set<String>>builder()
-        .put("resource1", new HashSet<>(Arrays.asList("author", "category")))
-        .put("resource2", Collections.singleton("category"))
-        .put("resource3", new HashSet<>(Arrays.asList("category", "colour")))
-        .put("resource4", new HashSet<>(Arrays.asList("size", "colour")))
-        .put("resource5", new HashSet<>(Arrays.asList("author", "category")))
+    private static final Map<Resource, Set<String>> RESOURCES = ImmutableMap.<Resource, Set<String>>builder()
+        .put(new Resource("resource1", null,ResourceType.QUERY_PROFILE, ResourceFlavour.CATEGORIZATION, null, "Resource One"), new HashSet<>(Arrays.asList("author", "category")))
+        .put(new Resource("resource2", null,ResourceType.QUERY_PROFILE, ResourceFlavour.CATEGORIZATION, null, "Resource Two"), Collections.singleton("category"))
+        .put(new Resource("resource3", null,ResourceType.QUERY_PROFILE, ResourceFlavour.CATEGORIZATION, null, "Resource Three"), new HashSet<>(Arrays.asList("category", "colour")))
+        .put(new Resource("resource4", null,ResourceType.QUERY_PROFILE, ResourceFlavour.CATEGORIZATION, null, "Resource Four"), new HashSet<>(Arrays.asList("size", "colour")))
+        .put(new Resource("resource5", null,ResourceType.QUERY_PROFILE, ResourceFlavour.CATEGORIZATION, null, "Resource Five"), new HashSet<>(Arrays.asList("author", "category")))
         .build();
 
     private final ResourceMapper resourceMapper;
@@ -50,8 +53,8 @@ public class ResourceMapperTest {
     public static Iterable<Object[]> parameters() throws HodErrorException {
         final IndexFieldsService indexFieldsService = mock(IndexFieldsService.class);
 
-        for(final Map.Entry<String, Set<String>> resourceEntry : RESOURCES.entrySet()) {
-            when(indexFieldsService.getParametricFields(new ResourceIdentifier(DOMAIN, resourceEntry.getKey()))).thenAnswer(new Answer<Object>() {
+        for(final Map.Entry<Resource, Set<String>> resourceEntry : RESOURCES.entrySet()) {
+            when(indexFieldsService.getParametricFields(new ResourceIdentifier(DOMAIN, resourceEntry.getKey().getResource()))).thenAnswer(new Answer<Object>() {
                 @Override
                 public Object answer(final InvocationOnMock invocation) throws Throwable {
                     TimeUnit.SECONDS.sleep(1);
@@ -74,9 +77,10 @@ public class ResourceMapperTest {
         final Set<Database> databases = resourceMapper.map(null, RESOURCES.keySet(), DOMAIN);
         final Set<Database> expectation = new HashSet<>();
 
-        for (final Map.Entry<String, Set<String>> resource : RESOURCES.entrySet()) {
+        for (final Map.Entry<Resource, Set<String>> resource : RESOURCES.entrySet()) {
             expectation.add(new Database.Builder()
-                .setName(resource.getKey())
+                .setName(resource.getKey().getResource())
+                .setDisplayName(resource.getKey().getDisplayName())
                 .setIndexFields(resource.getValue())
                 .setDomain(DOMAIN)
                 .setIsPublic(false)

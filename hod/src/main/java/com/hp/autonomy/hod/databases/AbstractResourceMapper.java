@@ -6,6 +6,7 @@
 package com.hp.autonomy.hod.databases;
 
 import com.hp.autonomy.hod.client.api.authentication.TokenType;
+import com.hp.autonomy.hod.client.api.resource.Resource;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.token.TokenProxy;
@@ -27,13 +28,13 @@ public abstract class AbstractResourceMapper implements ResourceMapper {
     /**
      * Converts the given resource name to a database
      * @param tokenProxy The token proxy to use to retrieve parametric fields
-     * @param name The name of the resource
+     * @param resource The resource
      * @param domain The domain of the resource
      * @return A database representation of the resource
      * @throws HodErrorException
      */
-    protected Database databaseForResource(final TokenProxy<?, TokenType.Simple> tokenProxy, final String name, final String domain) throws HodErrorException {
-        final ResourceIdentifier resourceIdentifier = new ResourceIdentifier(domain, name);
+    protected Database databaseForResource(final TokenProxy<?, TokenType.Simple> tokenProxy, final Resource resource, final String domain) throws HodErrorException {
+        final ResourceIdentifier resourceIdentifier = new ResourceIdentifier(domain, resource.getResource());
         final Set<String> parametricFields;
 
         if (tokenProxy == null) {
@@ -44,7 +45,8 @@ public abstract class AbstractResourceMapper implements ResourceMapper {
         }
 
         return new Database.Builder()
-            .setName(name)
+            .setName(resource.getResource())
+            .setDisplayName(resource.getDisplayName())
             .setIsPublic(ResourceIdentifier.PUBLIC_INDEXES_DOMAIN.equals(domain))
             .setDomain(domain)
             .setIndexFields(parametricFields)

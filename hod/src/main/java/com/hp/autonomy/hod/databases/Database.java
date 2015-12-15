@@ -22,14 +22,16 @@ public final class Database implements IdolDatabase {
     static final String ROOT_FIELD = "database";
 
     private final String name;
+    private final String displayName;
     private final long documents;
     private final boolean isPublic;
     private final String domain;
     private final Set<String> fieldNames;
 
-    private Database(final String name, final long documents, final boolean isPublic, final String domain, final Set<String> fieldNames) {
+    private Database(final String name, final String displayName, final long documents, final boolean isPublic, final String domain, final Set<String> fieldNames) {
         this.documents = documents;
         this.name = name;
+        this.displayName = displayName;
         this.isPublic = isPublic;
         this.domain = domain;
         this.fieldNames = fieldNames;
@@ -39,6 +41,7 @@ public final class Database implements IdolDatabase {
     @IdolDocument(ROOT_FIELD)
     public static class Builder {
         private String name;
+        private String displayName;
         private long documents;
         private boolean isPublic;
         private String domain = "";
@@ -47,6 +50,11 @@ public final class Database implements IdolDatabase {
         @IdolField("name")
         public Builder setName(final String name) {
             this.name = name.toLowerCase();
+            return this;
+        }
+
+        public Builder setDisplayName(final String displayName) {
+            this.displayName = displayName;
             return this;
         }
 
@@ -73,7 +81,7 @@ public final class Database implements IdolDatabase {
 
         @IdolBuilderBuild
         public Database build() {
-            return new Database(name, documents, isPublic, domain, indexFields);
+            return new Database(name, displayName, documents, isPublic, domain, indexFields);
         }
     }
 }

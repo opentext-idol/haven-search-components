@@ -6,13 +6,7 @@
 package com.hp.autonomy.hod.databases;
 
 import com.hp.autonomy.hod.client.api.authentication.TokenType;
-import com.hp.autonomy.hod.client.api.resource.ListResourcesRequestBuilder;
-import com.hp.autonomy.hod.client.api.resource.Resource;
-import com.hp.autonomy.hod.client.api.resource.ResourceFlavour;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
-import com.hp.autonomy.hod.client.api.resource.ResourceType;
-import com.hp.autonomy.hod.client.api.resource.Resources;
-import com.hp.autonomy.hod.client.api.resource.ResourcesService;
+import com.hp.autonomy.hod.client.api.resource.*;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.token.TokenProxy;
 import lombok.Data;
@@ -59,24 +53,26 @@ public class DatabasesServiceImpl implements DatabasesService {
         // so we remove the public index duplicates here.
         final Set<String> privateResourceNames = new HashSet<>();
 
+        final Set<Resource> privateResources = new HashSet<>();
+
         for (final Resource resource : resources.getResources()) {
             if (CONTENT_FLAVOURS.contains(resource.getFlavour())) {
-                final String name = resource.getResource();
-                privateResourceNames.add(name);
+                privateResources.add(resource);
+                privateResourceNames.add(resource.getResource());
             }
         }
 
-        databases.addAll(resourceMapper.map(tokenProxy, privateResourceNames, domain));
+        databases.addAll(resourceMapper.map(tokenProxy, privateResources, domain));
 
-        final Set<String> publicResourceNames = new HashSet<>();
+        final Set<Resource> publicResources = new HashSet<>();
 
         for (final Resource resource : resources.getPublicResources()) {
             if (!privateResourceNames.contains(resource.getResource())) {
-                publicResourceNames.add(resource.getResource());
+                publicResources.add(resource);
             }
         }
 
-        databases.addAll(resourceMapper.map(tokenProxy, publicResourceNames, ResourceIdentifier.PUBLIC_INDEXES_DOMAIN));
+        databases.addAll(resourceMapper.map(tokenProxy, publicResources, ResourceIdentifier.PUBLIC_INDEXES_DOMAIN));
 
         return databases;
     }

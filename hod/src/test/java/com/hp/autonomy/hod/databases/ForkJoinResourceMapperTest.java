@@ -7,7 +7,10 @@ package com.hp.autonomy.hod.databases;
 
 import com.hp.autonomy.hod.client.api.authentication.EntityType;
 import com.hp.autonomy.hod.client.api.authentication.TokenType;
+import com.hp.autonomy.hod.client.api.resource.Resource;
+import com.hp.autonomy.hod.client.api.resource.ResourceFlavour;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceType;
 import com.hp.autonomy.hod.client.error.HodError;
 import com.hp.autonomy.hod.client.error.HodErrorCode;
 import com.hp.autonomy.hod.client.error.HodErrorException;
@@ -25,18 +28,18 @@ import java.util.concurrent.TimeUnit;
 public class ForkJoinResourceMapperTest {
 
     private ForkJoinResourceMapper resourceMapper;
-    private Set<String> resourceNames;
+    private Set<Resource> resourceNames;
 
     @Before
     public void setUp() throws HodErrorException {
         final IndexFieldsService indexFieldsService = new SlowThrowingIndexFieldsService();
 
         resourceNames = new HashSet<>(Arrays.asList(
-            "resource1",
-            "resource2",
-            "resource3",
-            "resource4",
-            "resource5"
+            new Resource("resource1", null, ResourceType.QUERY_PROFILE, ResourceFlavour.CATEGORIZATION, null, "Resource One"),
+            new Resource("resource2", null, ResourceType.QUERY_PROFILE, ResourceFlavour.CATEGORIZATION, null, "Resource Two"),
+            new Resource("resource3", null, ResourceType.QUERY_PROFILE, ResourceFlavour.CATEGORIZATION, null, "Resource Three"),
+            new Resource("resource4", null, ResourceType.QUERY_PROFILE, ResourceFlavour.CATEGORIZATION, null, "Resource Four"),
+            new Resource("resource5", null, ResourceType.QUERY_PROFILE, ResourceFlavour.CATEGORIZATION, null, "Resource Five")
         ));
 
         resourceMapper = new ForkJoinResourceMapper(indexFieldsService);
