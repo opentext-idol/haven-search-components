@@ -4,16 +4,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+    <modules>
+        <module>core</module>
+        <module>hod</module>
+        <module>idol</module>
+    </modules>
 
     <parent>
         <groupId>com.hp.autonomy</groupId>
         <artifactId>foss-master-pom</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </parent>
 
     <groupId>com.hp.autonomy.frontend.view</groupId>
     <artifactId>view-proxy-components</artifactId>
-    <version>0.3.1</version>
+    <version>0.4.0</version>
 
     <name>HP View Proxy Components</name>
     <description>Components for proxying the HP Haven OnDemand view document API.</description>
@@ -50,50 +56,51 @@
             <organization>HP</organization>
             <organizationUrl>http://www.hp.com</organizationUrl>
         </developer>
+        <developer>
+            <name>Ivo Miller</name>
+            <email>ivo.miller@hpe.com</email>
+            <organization>Hewlett-Packard Enterprise</organization>
+            <organizationUrl>http://www.hpe.com</organizationUrl>
+        </developer>
     </developers>
 
     <dependencies>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
-            <version>1.4.1</version>
-        </dependency>
-        <!-- commons-collections:3.2.1 is required by validator, and is vulnerable to https://www.kb.cert.org/vuls/id/576313 -->
-        <!-- If a later version of validator exists, this can go as we don't actually use it -->
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.2</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-web-api</artifactId>
-            <version>7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hp.autonomy.hod</groupId>
-            <artifactId>java-hod-client</artifactId>
-            <version>0.14.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hp.autonomy.frontend.configuration</groupId>
-            <artifactId>configuration-api</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hp.autonomy.aci.client</groupId>
-            <artifactId>aci-api</artifactId>
-            <version>5.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hp.autonomy.aci.content</groupId>
-            <artifactId>content-parameter-api</artifactId>
+            <groupId>com.hp.autonomy.test.xml</groupId>
+            <artifactId>xml-test-utils</artifactId>
             <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

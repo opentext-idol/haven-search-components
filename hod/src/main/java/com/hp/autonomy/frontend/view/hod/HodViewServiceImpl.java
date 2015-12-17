@@ -1,3 +1,8 @@
+/*
+ * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
+ */
+
 package com.hp.autonomy.frontend.view.hod;
 
 import com.hp.autonomy.aci.content.fieldtext.FieldText;
@@ -8,12 +13,12 @@ import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Document;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Documents;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
 import com.hp.autonomy.hod.client.error.HodErrorCode;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.types.requests.Documents;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
