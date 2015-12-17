@@ -12,6 +12,7 @@ import com.autonomy.aci.client.annotations.IdolField;
 import com.hp.autonomy.types.IdolDatabase;
 import lombok.Data;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +33,7 @@ public final class Database implements IdolDatabase {
         this.name = name;
         this.isPublic = isPublic;
         this.domain = domain;
-        this.fieldNames = fieldNames;
+        this.fieldNames = fieldNames == null ? Collections.<String>emptySet() : fieldNames;
     }
 
     @IdolBuilder

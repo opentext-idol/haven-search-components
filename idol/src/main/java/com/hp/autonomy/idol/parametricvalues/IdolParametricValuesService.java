@@ -82,7 +82,9 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
                     }
                 }
                 final String fieldName = getFieldNameFromPath(field.getName().get(0));
-                results.add(new QueryTagInfo(fieldName, values));
+                if (!values.isEmpty()) {
+                    results.add(new QueryTagInfo(fieldName, values));
+                }
             }
         }
 
