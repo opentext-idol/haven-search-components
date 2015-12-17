@@ -6,16 +6,13 @@
 package com.hp.autonomy.hod.databases;
 
 import com.hp.autonomy.hod.client.api.authentication.TokenType;
+import com.hp.autonomy.hod.client.api.resource.Resource;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.token.TokenProxy;
 import com.hp.autonomy.hod.fields.IndexFieldsService;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
@@ -56,8 +53,8 @@ public class ForkJoinResourceMapper extends AbstractResourceMapper {
     }
 
     @Override
-    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<String> resourceNames, final String domain) throws HodErrorException {
-        final DatabaseTask privateTask = new DatabaseTask(tokenProxy, new ArrayList<>(resourceNames), domain);
+    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<Resource> resources, final String domain) throws HodErrorException {
+        final DatabaseTask privateTask = new DatabaseTask(tokenProxy, new ArrayList<>(resources), domain);
 
         forkJoinPool.submit(privateTask);
 
@@ -88,27 +85,26 @@ public class ForkJoinResourceMapper extends AbstractResourceMapper {
 
         private static final long serialVersionUID = -8514152774998360171L;
         private final TokenProxy<?, TokenType.Simple> tokenProxy;
-        private final List<String> input;
+        private final List<Resource> inputResources;
         private final String domain;
 
-        private DatabaseTask(final TokenProxy<?, TokenType.Simple> tokenProxy, final List<String> input, final String domain) {
+        private DatabaseTask(final TokenProxy<?, TokenType.Simple> tokenProxy, final List<Resource> inputResources, final String domain) {
             this.tokenProxy = tokenProxy;
-            this.input = input;
+            this.inputResources = inputResources;
             this.domain = domain;
         }
 
         @Override
         protected Set<Database> compute() {
-            if (input.isEmpty()) {
+            if (inputResources.isEmpty()) {
                 return Collections.emptySet();
             }
-            else if(input.size() == 1) {
-                final String resourceName = input.get(0);
+            else if(inputResources.size() == 1) {
 
                 final Database database;
 
                 try {
-                    database = databaseForResource(tokenProxy, resourceName, domain);
+                    database = databaseForResource(tokenProxy, inputResources.get(0), domain);
                 } catch (final HodErrorException e) {
                     completeExceptionally(e);
                     // this value is irrelevant as completeExceptionally will throw a RuntimeException
@@ -118,12 +114,12 @@ public class ForkJoinResourceMapper extends AbstractResourceMapper {
                 return Collections.singleton(database);
             }
             else {
-                final int middle = (input.size() / 2); // truncation is OK
+                final int middle = (inputResources.size() / 2); // truncation is OK
 
-                final DatabaseTask left =  new DatabaseTask(tokenProxy, input.subList(0, middle), domain);
+                final DatabaseTask left =  new DatabaseTask(tokenProxy, inputResources.subList(0, middle), domain);
                 left.fork();
 
-                final DatabaseTask right = new DatabaseTask(tokenProxy, input.subList(middle, input.size()), domain);
+                final DatabaseTask right = new DatabaseTask(tokenProxy, inputResources.subList(middle, inputResources.size()), domain);
                 right.fork();
 
                 final Set<Database> result = new HashSet<>();

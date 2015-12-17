@@ -6,6 +6,7 @@
 package com.hp.autonomy.hod.databases;
 
 import com.hp.autonomy.hod.client.api.authentication.TokenType;
+import com.hp.autonomy.hod.client.api.resource.Resource;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.token.TokenProxy;
 import com.hp.autonomy.hod.fields.IndexFieldsService;
@@ -15,11 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * ResourceMapper that uses an {@link ExecutorService} to map resources in parallel. If using the internal ExecutorService,
@@ -59,10 +56,10 @@ public class ParallelResourceMapper extends AbstractResourceMapper {
     }
 
     @Override
-    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<String> resourceNames, final String domain) throws HodErrorException {
+    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<Resource> resources, final String domain) throws HodErrorException {
         final List<Future<Database>> databaseFutures = new ArrayList<>();
 
-        for (final String resource : resourceNames) {
+        for (final Resource resource : resources) {
             databaseFutures.add(executorService.submit(new DatabaseCallable(tokenProxy, resource, domain)));
         }
 
@@ -92,18 +89,18 @@ public class ParallelResourceMapper extends AbstractResourceMapper {
     private class DatabaseCallable implements Callable<Database> {
 
         private final TokenProxy<?, TokenType.Simple> tokenProxy;
-        private final String resourceName;
+        private final Resource resource;
         private final String domain;
 
-        private DatabaseCallable(final TokenProxy<?, TokenType.Simple> tokenProxy, final String resourceName, final String domain) {
+        private DatabaseCallable(final TokenProxy<?, TokenType.Simple> tokenProxy, final Resource resource, final String domain) {
             this.tokenProxy = tokenProxy;
-            this.resourceName = resourceName;
+            this.resource = resource;
             this.domain = domain;
         }
 
         @Override
         public Database call() throws HodErrorException {
-            return databaseForResource(tokenProxy, resourceName, domain);
+            return databaseForResource(tokenProxy, resource, domain);
         }
     }
 

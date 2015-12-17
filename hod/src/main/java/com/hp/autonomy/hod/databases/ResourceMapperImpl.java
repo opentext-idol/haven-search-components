@@ -6,6 +6,7 @@
 package com.hp.autonomy.hod.databases;
 
 import com.hp.autonomy.hod.client.api.authentication.TokenType;
+import com.hp.autonomy.hod.client.api.resource.Resource;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.token.TokenProxy;
 import com.hp.autonomy.hod.fields.IndexFieldsService;
@@ -23,11 +24,11 @@ public class ResourceMapperImpl extends AbstractResourceMapper {
     }
 
     @Override
-    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<String> resourceNames, final String domain) throws HodErrorException {
+    public Set<Database> map(final TokenProxy<?, TokenType.Simple> tokenProxy, final Set<Resource> resources, final String domain) throws HodErrorException {
         final Set<Database> databases = new HashSet<>();
 
-        for (final String resourceName : resourceNames) {
-            databases.add(databaseForResource(tokenProxy, resourceName, domain));
+        for (final Resource resource : resources) {
+            databases.add(databaseForResource(tokenProxy, resource, domain));
         }
 
         return databases;
