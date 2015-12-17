@@ -24,6 +24,8 @@ import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetTagNamesParams;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.ReadableInstant;
+import org.joda.time.format.DateTimeFormat;
 
 import javax.xml.bind.JAXBElement;
 import java.io.Serializable;
@@ -36,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 public class IdolParametricValuesService implements ParametricValuesService<IdolParametricRequest, String, AciErrorException> {
+    private static final String IDOL_DATE_PARAMETER_FORMAT = "HH:mm:ss dd/MM/yyyy";
     private static final String VALUE_NODE_NAME = "value";
     private static final int MAX_VALUES = 10;
 
@@ -65,6 +68,8 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
             aciParameters.add(QueryParams.Text.name(), idolParametricRequest.getQueryText());
             aciParameters.add(QueryParams.FieldText.name(), idolParametricRequest.getFieldText());
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(idolParametricRequest.getDatabases()));
+            aciParameters.add(QueryParams.MinDate.name(), formatDate(idolParametricRequest.getMinDate()));
+            aciParameters.add(QueryParams.MaxDate.name(), formatDate(idolParametricRequest.getMaxDate()));
             aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
             aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), MAX_VALUES);
             aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
@@ -89,6 +94,10 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         }
 
         return results;
+    }
+
+    private String formatDate(final ReadableInstant date) {
+        return date == null ? null : DateTimeFormat.forPattern(IDOL_DATE_PARAMETER_FORMAT).print(date);
     }
 
     private Collection<String> getTagNames() {

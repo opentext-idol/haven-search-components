@@ -18,15 +18,16 @@ import java.util.Collections;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
 @JsonDeserialize(builder = HodParametricRequest.Builder.class)
 public class HodParametricRequest implements ParametricRequest<ResourceIdentifier> {
     private static final long serialVersionUID = 2235023046934181036L;
 
-    private final ResourceIdentifier queryProfile;
-    private final Set<ResourceIdentifier> databases;
-    private final Set<String> fieldNames;
-    private final String queryText;
-    private final String fieldText;
+    private Set<ResourceIdentifier> databases;
+    private Set<String> fieldNames;
+    private String queryText;
+    private String fieldText;
+    private ResourceIdentifier queryProfile;
 
     private HodParametricRequest(final ResourceIdentifier queryProfile, final Set<ResourceIdentifier> databases, final Set<String> fieldNames, final String queryText, final String fieldText) {
         this.queryProfile = queryProfile;
@@ -56,7 +57,7 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
         }
 
         public HodParametricRequest build() {
-             return new HodParametricRequest(queryProfile, databases, fieldNames, queryText, fieldText);
+            return new HodParametricRequest(queryProfile, databases, fieldNames, queryText, fieldText);
         }
     }
 }

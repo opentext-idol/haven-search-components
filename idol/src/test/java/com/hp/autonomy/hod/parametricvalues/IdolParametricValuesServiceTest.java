@@ -16,6 +16,7 @@ import com.hp.autonomy.types.idol.GetQueryTagValuesResponseData;
 import com.hp.autonomy.types.idol.GetTagNamesResponseData;
 import com.hp.autonomy.types.idol.TagValue;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,7 +80,7 @@ public class IdolParametricValuesServiceTest {
 
     @Test
     public void parametricValuesNotConfigured() {
-        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setDatabases(Collections.<String>emptySet()).setFieldNames(Collections.<String>emptySet()).setQueryText("*").setFieldText("").build();
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setDatabases(Collections.<String>emptySet()).setFieldNames(Collections.<String>emptySet()).setQueryText("*").setFieldText("").setMinDate(null).setMaxDate(DateTime.now()).build();
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(new GetTagNamesResponseData());
 
