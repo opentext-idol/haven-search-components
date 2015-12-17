@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>parametric-databases</artifactId>
+        <groupId>com.hp.autonomy.frontend</groupId>
+        <version>0.4.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>parametric-databases-hod</artifactId>
+
+    <properties>
+        <gpg.publicKeyring>${project.parent.basedir}/public.gpg</gpg.publicKeyring>
+        <gpg.secretKeyring>${project.parent.basedir}/secret.gpg</gpg.secretKeyring>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.hp.autonomy.frontend</groupId>
+            <artifactId>parametric-databases-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hp.autonomy.hod</groupId>
+            <artifactId>java-hod-client</artifactId>
+            <version>0.15.0</version>
+        </dependency>
+    </dependencies>
+</project>
