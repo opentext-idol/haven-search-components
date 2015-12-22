@@ -11,14 +11,11 @@ public class ViewServerErrorException extends RuntimeException {
     private static final long serialVersionUID = 6320193035187739418L;
 
     @Getter
-    private final int statusCode;
-    @Getter
     private final String reference;
 
-    public ViewServerErrorException(final int statusCode, final String reference) {
-        super("ViewServer returned an HTTP status code " + statusCode);
+    public ViewServerErrorException(final String reference, final Throwable cause) {
+        super("HTTP error communicating with ViewServer", cause);
 
-        this.statusCode = statusCode;
         this.reference = reference;
     }
 }

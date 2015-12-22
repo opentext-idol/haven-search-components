@@ -8,6 +8,7 @@ package com.hp.autonomy.frontend.view.idol;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
+import com.autonomy.aci.client.services.AciServiceException;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.database.Databases;
@@ -69,7 +70,11 @@ public class IdolViewServerService implements ViewServerService {
         viewParameters.add(ViewParams.StripScript.name(), true);
         viewParameters.add(ViewParams.OriginalBaseURL.name(), true);
 
-        return viewAciService.executeAction(viewParameters, processor);
+        try {
+            return viewAciService.executeAction(viewParameters, processor);
+        } catch (final AciServiceException e) {
+            throw new ViewServerErrorException(documentReference, e);
+        }
     }
 
     private String getReferenceFieldValue(final String documentReference, final Collection<String> indexes) throws ReferenceFieldBlankException, ViewDocumentNotFoundException, ViewNoReferenceFieldException {

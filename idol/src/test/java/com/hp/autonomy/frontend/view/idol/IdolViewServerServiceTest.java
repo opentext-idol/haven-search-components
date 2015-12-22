@@ -7,6 +7,7 @@ package com.hp.autonomy.frontend.view.idol;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
+import com.autonomy.aci.client.services.AciServiceException;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
@@ -108,6 +109,15 @@ public class IdolViewServerServiceTest {
 
         when(contentAciService.executeAction(any(AciParameters.class), any(Processor.class))).thenReturn(responseData);
         idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", Collections.<String>emptyList(), mock(Processor.class));
+    }
+
+    @Test(expected = ViewServerErrorException.class)
+    public void viewServer404() {
+        final GetContentResponseData responseData = mockResponseData();
+        when(contentAciService.executeAction(any(AciParameters.class), any(Processor.class))).thenReturn(responseData);
+        when(viewAciService.executeAction(any(AciParameters.class), any(Processor.class))).thenThrow(new AciServiceException());
+
+        idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", Collections.singletonList("SomeDatabase"), mock(Processor.class));
     }
 
     private GetContentResponseData mockResponseData() {
