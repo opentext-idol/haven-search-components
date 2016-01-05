@@ -12,7 +12,7 @@ The view proxy components library is available from maven:
     <dependency>
         <groupId>com.hp.autonomy.frontend.view</groupId>
         <artifactId>view-proxy-components</artifactId>
-        <version>0.5.0</version>
+        <version>0.5.1</version>
     </dependency>
 
 ## Is it any good?

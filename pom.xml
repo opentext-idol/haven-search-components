@@ -19,7 +19,7 @@
 
     <groupId>com.hp.autonomy.frontend.view</groupId>
     <artifactId>view-proxy-components</artifactId>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.5.1</version>
 
     <name>HP View Proxy Components</name>
     <description>Components for proxying the HP Haven OnDemand view document API.</description>
