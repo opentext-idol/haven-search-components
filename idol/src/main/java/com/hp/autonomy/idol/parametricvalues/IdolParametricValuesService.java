@@ -16,6 +16,7 @@ import com.hp.autonomy.types.idol.FlatField;
 import com.hp.autonomy.types.idol.GetQueryTagValuesResponseData;
 import com.hp.autonomy.types.idol.GetTagNamesResponseData;
 import com.hp.autonomy.types.idol.TagValue;
+import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
@@ -66,11 +67,13 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
             results = Collections.emptySet();
         } else {
             final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
+            aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
             aciParameters.add(QueryParams.Text.name(), idolParametricRequest.getQueryText());
             aciParameters.add(QueryParams.FieldText.name(), idolParametricRequest.getFieldText());
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(idolParametricRequest.getDatabases()));
             aciParameters.add(QueryParams.MinDate.name(), formatDate(idolParametricRequest.getMinDate()));
             aciParameters.add(QueryParams.MaxDate.name(), formatDate(idolParametricRequest.getMaxDate()));
+            aciParameters.add(QueryParams.AnyLanguage.name(), true);
             aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
             aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), MAX_VALUES);
             aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
