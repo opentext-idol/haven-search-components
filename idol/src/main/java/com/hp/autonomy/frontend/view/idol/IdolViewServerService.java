@@ -17,6 +17,7 @@ import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.view.idol.configuration.ViewCapable;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.GetContentResponseData;
 import com.hp.autonomy.types.idol.Hit;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
@@ -24,6 +25,7 @@ import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -103,21 +105,28 @@ public class IdolViewServerService implements ViewServerService {
             throw new ViewDocumentNotFoundException(documentReference);
         }
 
+        final String referenceFieldValue = parseReferenceFieldValue(referenceField, documents);
+        if (referenceFieldValue == null) {
+            throw new ViewNoReferenceFieldException(documentReference, referenceField);
+        }
+        return referenceFieldValue;
+    }
+
+    private String parseReferenceFieldValue(final String referenceField, final List<Hit> documents) {
         final Hit document = documents.get(0);
 
         String referenceFieldValue = null;
         // Assume the field names are case insensitive
-        final NodeList fields = ((Node) document.getContent().getContent().get(0)).getChildNodes();
-        for (int i = 0; i < fields.getLength(); i++) {
-            final Node field = fields.item(i);
-            if (field.getLocalName().equalsIgnoreCase(referenceField)) {
-                referenceFieldValue = field.getFirstChild() == null ? null : field.getFirstChild().getNodeValue();
-                break;
+        final DocContent documentContent = document.getContent();
+        if (documentContent != null && CollectionUtils.isNotEmpty(documentContent.getContent())) {
+            final NodeList fields = ((Node) documentContent.getContent().get(0)).getChildNodes();
+            for (int i = 0; i < fields.getLength(); i++) {
+                final Node field = fields.item(i);
+                if (field.getLocalName().equalsIgnoreCase(referenceField)) {
+                    referenceFieldValue = field.getFirstChild() == null ? null : field.getFirstChild().getNodeValue();
+                    break;
+                }
             }
-        }
-
-        if (referenceFieldValue == null) {
-            throw new ViewNoReferenceFieldException(documentReference, referenceField);
         }
         return referenceFieldValue;
     }
