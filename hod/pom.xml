@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>haven-search-components</artifactId>
+        <groupId>com.hp.autonomy.frontend</groupId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>haven-search-components-hod</artifactId>
+
+    <properties>
+        <gpg.publicKeyring>${project.parent.basedir}/public.gpg</gpg.publicKeyring>
+        <gpg.secretKeyring>${project.parent.basedir}/secret.gpg</gpg.secretKeyring>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.hp.autonomy.frontend</groupId>
+            <artifactId>haven-search-components-core</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hp.autonomy.hod</groupId>
+            <artifactId>java-hod-client</artifactId>
+            <version>0.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hp.autonomy.aci.content</groupId>
+            <artifactId>content-parameter-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

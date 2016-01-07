@@ -1,17 +1,8 @@
-# Java
-*.class
-*.log
-*.jar
-*.war
-
 # IntelliJ
 .idea/
-*.ipr
 *.iml
-*.iws
 
 # Maven
-target/
 core/target/
 hod/target/
 idol/target/
