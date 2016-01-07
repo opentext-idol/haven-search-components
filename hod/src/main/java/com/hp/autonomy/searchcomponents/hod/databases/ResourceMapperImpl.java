@@ -11,6 +11,7 @@ import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.token.TokenProxy;
 import com.hp.autonomy.searchcomponents.hod.fields.IndexFieldsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import java.util.Set;
  * Default implementation of ResourceMapper
  */
 @Component
+@ConditionalOnMissingBean(ResourceMapper.class)
 public class ResourceMapperImpl extends AbstractResourceMapper {
     @Autowired
     public ResourceMapperImpl(final IndexFieldsService indexFieldsService) {
