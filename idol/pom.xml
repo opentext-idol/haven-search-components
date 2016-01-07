@@ -24,11 +24,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.hp.autonomy.frontend</groupId>
-            <artifactId>aci-types</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-api</artifactId>
             <version>1.0.1</version>
@@ -57,6 +52,11 @@
             <groupId>com.hp.autonomy.frontend</groupId>
             <artifactId>idol-utils</artifactId>
             <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hp.autonomy.frontend.user</groupId>
+            <artifactId>idol-user-service</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>

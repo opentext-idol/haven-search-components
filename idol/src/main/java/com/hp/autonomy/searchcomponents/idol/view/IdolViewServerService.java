@@ -27,18 +27,22 @@ import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.Collection;
 import java.util.List;
 
+@Service
 public class IdolViewServerService implements ViewServerService {
     private final AciService contentAciService;
     private final AciService viewAciService;
     private final Processor<GetContentResponseData> getContentResponseProcessor;
     private final ConfigService<? extends ViewCapable> configService;
 
+    @Autowired
     public IdolViewServerService(final AciService contentAciService, final AciService viewAciService, final AciResponseJaxbProcessorFactory processorFactory, final ConfigService<? extends ViewCapable> configService) {
         this.contentAciService = contentAciService;
         this.viewAciService = viewAciService;

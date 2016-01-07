@@ -28,6 +28,8 @@ import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormat;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBElement;
 import java.io.Serializable;
@@ -39,6 +41,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+@Service
 public class IdolParametricValuesService implements ParametricValuesService<IdolParametricRequest, String, AciErrorException> {
     private static final String IDOL_DATE_PARAMETER_FORMAT = "HH:mm:ss dd/MM/yyyy";
     private static final String VALUE_NODE_NAME = "value";
@@ -48,6 +51,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
     private final Processor<GetTagNamesResponseData> tagNamesResponseProcessor;
     private final Processor<GetQueryTagValuesResponseData> queryTagValuesResponseProcessor;
 
+    @Autowired
     public IdolParametricValuesService(final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
         this.contentAciService = contentAciService;
         tagNamesResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(GetTagNamesResponseData.class);

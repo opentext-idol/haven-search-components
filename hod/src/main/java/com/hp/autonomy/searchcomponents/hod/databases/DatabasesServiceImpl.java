@@ -10,19 +10,23 @@ import com.hp.autonomy.hod.client.api.resource.*;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.token.TokenProxy;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Service
 public class DatabasesServiceImpl implements DatabasesService {
     private static final Set<ResourceFlavour> CONTENT_FLAVOURS = ResourceFlavour.of(ResourceFlavour.EXPLORER, ResourceFlavour.STANDARD, ResourceFlavour.CUSTOM_FIELDS);
 
     private final ResourcesService resourcesService;
-
     private final ResourceMapper resourceMapper;
 
+    @Autowired
     public DatabasesServiceImpl(final ResourcesService resourcesService, final ResourceMapper resourceMapper) {
         this.resourcesService = resourcesService;
         this.resourceMapper = resourceMapper;
@@ -38,20 +42,13 @@ public class DatabasesServiceImpl implements DatabasesService {
         final ListResourcesRequestBuilder builder = new ListResourcesRequestBuilder()
             .setTypes(Collections.singleton(ResourceType.CONTENT));
 
-        final Resources resources;
-
-        if (tokenProxy == null) {
-            resources = resourcesService.list(builder);
-        }
-        else {
-            resources = resourcesService.list(tokenProxy, builder);
-        }
+        final Resources resources = tokenProxy == null ? resourcesService.list(builder) : resourcesService.list(tokenProxy, builder);
 
         final Set<Database> databases = new HashSet<>();
 
         // Private and public indexes can have the same name. You can't do anything with the public index in this case,
         // so we remove the public index duplicates here.
-        final Set<String> privateResourceNames = new HashSet<>();
+        final Collection<String> privateResourceNames = new HashSet<>();
 
         final Set<Resource> privateResources = new HashSet<>();
 
@@ -76,6 +73,4 @@ public class DatabasesServiceImpl implements DatabasesService {
 
         return databases;
     }
-
-
 }

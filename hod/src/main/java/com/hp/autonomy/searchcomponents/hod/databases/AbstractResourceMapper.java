@@ -35,14 +35,8 @@ public abstract class AbstractResourceMapper implements ResourceMapper {
      */
     protected Database databaseForResource(final TokenProxy<?, TokenType.Simple> tokenProxy, final Resource resource, final String domain) throws HodErrorException {
         final ResourceIdentifier resourceIdentifier = new ResourceIdentifier(domain, resource.getResource());
-        final Set<String> parametricFields;
 
-        if (tokenProxy == null) {
-            parametricFields = indexFieldsService.getParametricFields(resourceIdentifier);
-        }
-        else {
-            parametricFields = indexFieldsService.getParametricFields(tokenProxy, resourceIdentifier);
-        }
+        final Set<String> parametricFields = tokenProxy == null ? indexFieldsService.getParametricFields(resourceIdentifier) : indexFieldsService.getParametricFields(tokenProxy, resourceIdentifier);
 
         return new Database.Builder()
             .setName(resource.getResource())

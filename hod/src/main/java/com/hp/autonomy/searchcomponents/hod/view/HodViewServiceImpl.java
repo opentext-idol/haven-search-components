@@ -23,6 +23,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +42,7 @@ import java.util.Map;
 /**
  * Implementation of {@link HodViewService}, using the java HOD client.
  */
+@Service
 public class HodViewServiceImpl implements HodViewService {
     // Field on text index documents which (when present) contains the view URL
     private static final String URL_FIELD = "url";
@@ -53,6 +56,7 @@ public class HodViewServiceImpl implements HodViewService {
     private final GetContentService<Document> getContentService;
     private final QueryTextIndexService<Document> queryTextIndexService;
 
+    @Autowired
     public HodViewServiceImpl(
             final ViewDocumentService viewDocumentService,
             final GetContentService<Document> getContentService,
@@ -99,7 +103,7 @@ public class HodViewServiceImpl implements HodViewService {
     // TODO: Reconcile with the above
     private String formatRawContent(final String title, final String content) throws IOException {
         return "<h1>" + escapeAndAddLineBreaks(title) + "</h1>"
-            + "<p>" + escapeAndAddLineBreaks(content) + "</p>";
+                + "<p>" + escapeAndAddLineBreaks(content) + "</p>";
     }
 
     private String hodFieldValueAsString(final Object value) {
@@ -165,12 +169,12 @@ public class HodViewServiceImpl implements HodViewService {
     @Override
     public void viewStaticContentPromotion(final String documentReference, final ResourceIdentifier queryManipulationIndex, final OutputStream outputStream) throws IOException, HodErrorException {
         final FieldText fieldText = new MATCH(REFERENCE_FIELD, documentReference)
-            .AND(new MATCH("category", HOD_RULE_CATEGORY));
+                .AND(new MATCH("category", HOD_RULE_CATEGORY));
 
         final QueryRequestBuilder queryParams = new QueryRequestBuilder()
-            .setFieldText(fieldText.toString())
-            .setIndexes(Collections.singletonList(queryManipulationIndex))
-            .setPrint(Print.all);
+                .setFieldText(fieldText.toString())
+                .setIndexes(Collections.singletonList(queryManipulationIndex))
+                .setPrint(Print.all);
 
         final Documents<Document> documents = queryTextIndexService.queryTextIndexWithText("*", queryParams);
         final Map<String, Serializable> fields = documents.getDocuments().get(0).getFields();
