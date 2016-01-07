@@ -21,8 +21,6 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Document;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexServiceImpl;
 import com.hp.autonomy.hod.client.config.HodServiceConfig;
-import com.hp.autonomy.hod.client.token.TokenProxyService;
-import com.hp.autonomy.hod.sso.SpringSecurityTokenProxyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -65,17 +63,5 @@ public class HavenSearchHodConfiguration {
     @Bean
     public ResourcesService resourcesService() {
         return new ResourcesServiceImpl(hodServiceConfig);
-    }
-
-    @Bean
-    public TokenProxyService<EntityType.Combined, TokenType.Simple> tokenProxyService() {
-        return new SpringSecurityTokenProxyService();
-    }
-
-    @Bean
-    public HodServiceConfig<EntityType.Combined, TokenType.Simple> hodServiceConfig(final HodServiceConfig.Builder<EntityType.Combined, TokenType.Simple> hodServiceConfigBuilder, final TokenProxyService<EntityType.Combined, TokenType.Simple> tokenProxyService) {
-        return hodServiceConfigBuilder
-                .setTokenProxyService(tokenProxyService)
-                .build();
     }
 }
