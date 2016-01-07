@@ -9,8 +9,10 @@ import com.hp.autonomy.frontend.configuration.ServerConfig;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 
 /**
- * Created by milleriv on 07/01/2016.
+ * Configuration required for any application performing Haven Search
  */
 public interface HavenSearchCapable extends ViewCapable {
     ServerConfig getContent();
+
+    ServerConfig getQms();
 }

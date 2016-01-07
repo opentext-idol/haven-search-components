@@ -10,13 +10,20 @@ import com.autonomy.aci.client.services.AciService;
 import com.hp.autonomy.frontend.configuration.ValidationResult;
 import com.hp.autonomy.frontend.configuration.Validator;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Setter
+@Component
 public class ViewConfigValidator implements Validator<ViewConfig> {
 
     private AciService testAciService;
-
     private IdolAnnotationsProcessorFactory idolAnnotationsProcessorFactory;
+
+    @Autowired
+    public ViewConfigValidator(final AciService testAciService, final IdolAnnotationsProcessorFactory idolAnnotationsProcessorFactory) {
+        this.testAciService = testAciService;
+        this.idolAnnotationsProcessorFactory = idolAnnotationsProcessorFactory;
+    }
 
     @Override
     public ValidationResult<?> validate(final ViewConfig config) {
