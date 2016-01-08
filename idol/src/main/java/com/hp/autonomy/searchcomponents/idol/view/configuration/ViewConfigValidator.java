@@ -16,18 +16,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class ViewConfigValidator implements Validator<ViewConfig> {
 
-    private AciService testAciService;
-    private IdolAnnotationsProcessorFactory idolAnnotationsProcessorFactory;
+    private final AciService validatorAciService;
+    private final IdolAnnotationsProcessorFactory idolAnnotationsProcessorFactory;
 
     @Autowired
-    public ViewConfigValidator(final AciService testAciService, final IdolAnnotationsProcessorFactory idolAnnotationsProcessorFactory) {
-        this.testAciService = testAciService;
+    public ViewConfigValidator(final AciService validatorAciService, final IdolAnnotationsProcessorFactory idolAnnotationsProcessorFactory) {
+        this.validatorAciService = validatorAciService;
         this.idolAnnotationsProcessorFactory = idolAnnotationsProcessorFactory;
     }
 
     @Override
     public ValidationResult<?> validate(final ViewConfig config) {
-        return config.validate(testAciService, idolAnnotationsProcessorFactory);
+        return config.validate(validatorAciService, idolAnnotationsProcessorFactory);
     }
 
     @Override

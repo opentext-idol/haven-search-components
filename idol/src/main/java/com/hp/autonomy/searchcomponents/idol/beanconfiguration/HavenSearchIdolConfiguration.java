@@ -16,6 +16,7 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.ServerConfig;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.user.UserService;
 import com.hp.autonomy.user.UserServiceConfig;
 import com.hp.autonomy.user.UserServiceImpl;
@@ -60,8 +61,8 @@ public class HavenSearchIdolConfiguration<C extends HavenSearchCapable & UserSer
         return new AbstractConfigurableAciService(aciService) {
             @Override
             public AciServerDetails getServerDetails() {
-                final ServerConfig qms = configService.getConfig().getQms();
-                return qms != null ? qms.toAciServerDetails() : null;
+                final QueryManipulation queryManipulation = configService.getConfig().getQueryManipulation();
+                return queryManipulation != null ? queryManipulation.getServer().toAciServerDetails() : null;
             }
         };
     }

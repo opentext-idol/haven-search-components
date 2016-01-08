@@ -14,5 +14,5 @@ import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 public interface HavenSearchCapable extends ViewCapable {
     ServerConfig getContent();
 
-    ServerConfig getQms();
+    QueryManipulation getQueryManipulation();
 }

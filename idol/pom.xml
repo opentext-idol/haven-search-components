@@ -30,11 +30,6 @@
         </dependency>
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
-            <artifactId>configuration-impl</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-idol</artifactId>
             <version>3.1.0</version>
         </dependency>
@@ -42,11 +37,6 @@
             <groupId>com.hp.autonomy.aci.client</groupId>
             <artifactId>aci-api</artifactId>
             <version>5.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hp.autonomy.aci.content</groupId>
-            <artifactId>content-parameter-api</artifactId>
-            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.hp.autonomy.frontend</groupId>
@@ -57,12 +47,6 @@
             <groupId>com.hp.autonomy.frontend.user</groupId>
             <artifactId>idol-user-service</artifactId>
             <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.3</version>
         </dependency>
     </dependencies>
 </project>
