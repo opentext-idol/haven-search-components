@@ -12,6 +12,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.types.idol.QsElement;
 import com.hp.autonomy.types.idol.QueryResponseData;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
@@ -37,13 +38,13 @@ public class IdolRelatedConceptsService implements RelatedConceptsService<QsElem
     }
 
     @Override
-    public List<QsElement> findRelatedConcepts(final String text, final List<String> indexes, final String fieldText) throws AciErrorException {
+    public List<QsElement> findRelatedConcepts(final SearchRequest<String> request) throws AciErrorException {
         final AciParameters parameters = new AciParameters(QueryActions.Query.name());
-        parameters.add(QueryParams.Text.name(), text);
-        if (!indexes.isEmpty()) {
-            parameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexes));
+        parameters.add(QueryParams.Text.name(), request.getQueryText());
+        if (!request.getIndex().isEmpty()) {
+            parameters.add(QueryParams.DatabaseMatch.name(), new Databases(request.getIndex()));
         }
-        parameters.add(QueryParams.FieldText.name(), fieldText);
+        parameters.add(QueryParams.FieldText.name(), request.getFieldText());
         parameters.add(QueryParams.MaxResults.name(), MAX_RESULTS);
         parameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         parameters.add(QueryParams.QuerySummary.name(), true);

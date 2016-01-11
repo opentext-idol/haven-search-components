@@ -12,6 +12,6 @@ import java.util.List;
 
 public interface RelatedConceptsService<Q extends QuerySummaryElement, S extends Serializable, E extends Exception> {
 
-    List<Q> findRelatedConcepts(String text, List<S> indexes, String fieldText) throws E;
+    List<Q> findRelatedConcepts(final SearchRequest<S> request) throws E;
 
 }

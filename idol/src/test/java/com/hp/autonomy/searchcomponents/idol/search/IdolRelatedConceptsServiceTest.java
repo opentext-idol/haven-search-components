@@ -9,6 +9,7 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.types.idol.Qs;
 import com.hp.autonomy.types.idol.QsElement;
 import com.hp.autonomy.types.idol.QueryResponseData;
@@ -53,7 +54,8 @@ public class IdolRelatedConceptsServiceTest {
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final List<QsElement> results = idolRelatedConceptsService.findRelatedConcepts("Some text", Collections.singletonList("Database1"), "Some field text");
+        final SearchRequest<String> request = new SearchRequest<>("Some text", "Some field text", 0, 30, null, Collections.singletonList("Database1"), null, null, null, null, false, null);
+        final List<QsElement> results = idolRelatedConceptsService.findRelatedConcepts(request);
         assertThat(results, is(not(empty())));
     }
 }
