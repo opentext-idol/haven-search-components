@@ -8,7 +8,6 @@ package com.hp.autonomy.searchcomponents.core.search;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.google.common.collect.ImmutableSet;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +16,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -38,7 +38,7 @@ public class SearchResult implements Serializable {
     public static final String QMS_ID_FIELD = "qmsid";
     public static final String INJECTED_PROMOTION_FIELD = "injectedpromotion";
 
-    public static final ImmutableSet<String> ALL_FIELDS = ImmutableSet.of(
+    public static final List<String> ALL_FIELDS = Arrays.asList(
             CONTENT_TYPE_FIELD,
             URL_FIELD,
             OFFSET_FIELD,

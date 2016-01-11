@@ -35,6 +35,9 @@ import java.util.Set;
 @Service
 @ConditionalOnMissingBean(DocumentsService.class)
 public class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
+    // IOD limits max results to 2500
+    private static final int IOD_MAX_RESULTS = 2500;
+
     private static final ImmutableSet<String> PUBLIC_INDEX_NAMES = ImmutableSet.of(
             ResourceIdentifier.WIKI_CHI.getName(),
             ResourceIdentifier.WIKI_ENG.getName(),
@@ -66,7 +69,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
 
     @Override
     public Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> findQueryParams) throws HodErrorException {
-        return queryTextIndex(findQueryParams, false);
+        return queryTextIndex(findQueryParams, findQueryParams.getQueryType() == SearchRequest.QueryType.PROMOTIONS);
     }
 
     @Override
@@ -96,8 +99,11 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
         final String profileName = configService.getConfig().getQueryManipulation().getProfile();
 
         final QueryRequestBuilder params = new QueryRequestBuilder()
-                .setAbsoluteMaxResults(findQueryParams.getMaxResults())
-                .setSummary(findQueryParams.getSummary() != null ? Summary.valueOf(findQueryParams.getSummary()) : null)
+                .setAbsoluteMaxResults(Math.min(findQueryParams.getMaxResults(), IOD_MAX_RESULTS))
+                .setSummary(findQueryParams.getSummary() != null ? Summary.valueOf(findQueryParams.getSummary()) : Summary.context)
+                .setStart(findQueryParams.getStart())
+                .setMaxPageResults(findQueryParams.getMaxResults() - findQueryParams.getStart() + 1)
+                .setTotalResults(true)
                 .setIndexes(findQueryParams.getIndex())
                 .setFieldText(findQueryParams.getFieldText())
                 .setQueryProfile(new ResourceIdentifier(getDomain(), profileName))
