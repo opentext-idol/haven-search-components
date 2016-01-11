@@ -13,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -22,8 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Data
-@JsonDeserialize(builder = HavenDocument.Builder.class)
-public class HavenDocument implements Serializable {
+@JsonDeserialize(builder = SearchResult.Builder.class)
+public class SearchResult implements Serializable {
     public static final String CONTENT_TYPE_FIELD = "content_type";
     public static final String URL_FIELD = "url";
     public static final String OFFSET_FIELD = "offset";
@@ -34,6 +35,8 @@ public class HavenDocument implements Serializable {
     public static final String CREATED_DATE_FIELD = "created_date";
     public static final String DATE_MODIFIED_FIELD = "date_modified";
     public static final String MODIFIED_DATE_FIELD = "modified_date";
+    public static final String QMS_ID_FIELD = "qmsid";
+    public static final String INJECTED_PROMOTION_FIELD = "injectedpromotion";
 
     public static final ImmutableSet<String> ALL_FIELDS = ImmutableSet.of(
             CONTENT_TYPE_FIELD,
@@ -45,7 +48,9 @@ public class HavenDocument implements Serializable {
             DATE_CREATED_FIELD,
             CREATED_DATE_FIELD,
             DATE_MODIFIED_FIELD,
-            MODIFIED_DATE_FIELD
+            MODIFIED_DATE_FIELD,
+            QMS_ID_FIELD,
+            INJECTED_PROMOTION_FIELD
     );
 
     private static final long serialVersionUID = 7647398627476128115L;
@@ -66,7 +71,12 @@ public class HavenDocument implements Serializable {
     private final DateTime dateCreated;
     private final DateTime dateModified;
 
-    protected HavenDocument(final Builder builder) {
+    private final String qmsId;
+    private final String promotionName;
+    private final Double weight;
+    private final Boolean injectedPromotion;
+
+    protected SearchResult(final Builder builder) {
         reference = builder.reference;
         index = builder.index;
 
@@ -83,6 +93,11 @@ public class HavenDocument implements Serializable {
         date = builder.date;
         dateCreated = builder.dateCreated;
         dateModified = builder.dateModified;
+
+        qmsId = builder.qmsId;
+        promotionName = builder.promotionName;
+        weight = builder.weight;
+        injectedPromotion = builder.injectedPromotion;
     }
 
     @SuppressWarnings("FieldMayBeFinal")
@@ -112,7 +127,12 @@ public class HavenDocument implements Serializable {
         private DateTime dateCreated;
         private DateTime dateModified;
 
-        public Builder(final HavenDocument document) {
+        private String qmsId;
+        private String promotionName;
+        private Double weight;
+        private Boolean injectedPromotion;
+
+        public Builder(final SearchResult document) {
             reference = document.reference;
             index = document.index;
             title = document.title;
@@ -125,6 +145,10 @@ public class HavenDocument implements Serializable {
             date = document.date;
             dateCreated = document.dateCreated;
             dateModified = document.dateModified;
+            qmsId = document.qmsId;
+            promotionName = document.promotionName;
+            weight = document.weight;
+            injectedPromotion = document.injectedPromotion;
         }
 
         @JsonProperty(CONTENT_TYPE_FIELD)
@@ -218,8 +242,26 @@ public class HavenDocument implements Serializable {
             return this;
         }
 
-        public HavenDocument build() {
-            return new HavenDocument(this);
+        @JsonProperty(QMS_ID_FIELD)
+        public Builder setQmsId(final List<String> qmsIds) {
+            if (CollectionUtils.isNotEmpty(qmsIds)) {
+                qmsId = qmsIds.get(0);
+            }
+
+            return this;
+        }
+
+        @JsonProperty(INJECTED_PROMOTION_FIELD)
+        public Builder setInjectedPromotion(final List<String> injectedPromotions) {
+            if (CollectionUtils.isNotEmpty(injectedPromotions)) {
+                injectedPromotion = Boolean.parseBoolean(injectedPromotions.get(0));
+            }
+
+            return this;
+        }
+
+        public SearchResult build() {
+            return new SearchResult(this);
         }
 
         private DateTime parseDateList(final List<String> dateStrings) {

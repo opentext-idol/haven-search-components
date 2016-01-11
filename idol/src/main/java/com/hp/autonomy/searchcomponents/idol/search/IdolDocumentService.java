@@ -14,9 +14,10 @@ import com.hp.autonomy.aci.content.identifier.reference.Reference;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
-import com.hp.autonomy.searchcomponents.core.search.HavenDocument;
-import com.hp.autonomy.searchcomponents.core.search.HavenQueryParams;
+import com.hp.autonomy.searchcomponents.core.search.SearchResult;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.Hit;
@@ -46,21 +47,23 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class IdolDocumentService implements DocumentsService<String, HavenDocument, AciErrorException> {
+public class IdolDocumentService implements DocumentsService<String, SearchResult, AciErrorException> {
     static final String MISSING_RULE_ERROR = "missing rule";
     static final String INVALID_RULE_ERROR = "invalid rule";
     private static final String IDOL_DATE_PARAMETER_FORMAT = "HH:mm:ss dd/MM/yyyy";
     private static final int MAX_SIMILAR_DOCUMENTS = 3;
 
     private final ConfigService<? extends HavenSearchCapable> configService;
+    private final LanguagesService languagesService;
     private final AciService contentAciService;
     private final AciService qmsAciService;
     private final Processor<QueryResponseData> queryResponseProcessor;
     private final Processor<SuggestResponseData> suggestResponseProcessor;
 
     @Autowired
-    public IdolDocumentService(final ConfigService<? extends HavenSearchCapable> configService, final AciService contentAciService, final AciService qmsAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    public IdolDocumentService(final ConfigService<? extends HavenSearchCapable> configService, final LanguagesService languagesService, final AciService contentAciService, final AciService qmsAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
         this.configService = configService;
+        this.languagesService = languagesService;
         this.contentAciService = contentAciService;
         this.qmsAciService = qmsAciService;
 
@@ -69,8 +72,10 @@ public class IdolDocumentService implements DocumentsService<String, HavenDocume
     }
 
     @Override
-    public Documents<HavenDocument> queryTextIndex(final HavenQueryParams<String> HavenQueryParams) throws AciErrorException {
-        return queryTextIndex(qmsEnabled() ? qmsAciService : contentAciService, HavenQueryParams, false);
+    public Documents<SearchResult> queryTextIndex(final SearchRequest<String> searchRequest) throws AciErrorException {
+        final SearchRequest.QueryType queryType = searchRequest.getQueryType();
+        final boolean useQms = qmsEnabled() && queryType != SearchRequest.QueryType.RAW;
+        return queryTextIndex(useQms ? qmsAciService : contentAciService, searchRequest, queryType == SearchRequest.QueryType.PROMOTIONS);
     }
 
     private boolean qmsEnabled() {
@@ -78,32 +83,34 @@ public class IdolDocumentService implements DocumentsService<String, HavenDocume
     }
 
     @Override
-    public Documents<HavenDocument> queryTextIndexForPromotions(final HavenQueryParams<String> HavenQueryParams) throws AciErrorException {
-        return qmsEnabled() ? queryTextIndex(qmsAciService, HavenQueryParams, true) : new Documents<>(Collections.<HavenDocument>emptyList(), 0, null);
+    public Documents<SearchResult> queryTextIndexForPromotions(final SearchRequest<String> searchRequest) throws AciErrorException {
+        return qmsEnabled() ? queryTextIndex(qmsAciService, searchRequest, true) : new Documents<>(Collections.<SearchResult>emptyList(), 0, null);
     }
 
-    private Documents<HavenDocument> queryTextIndex(final AciService aciService, final HavenQueryParams<String> HavenQueryParams, final boolean promotions) {
+    private Documents<SearchResult> queryTextIndex(final AciService aciService, final SearchRequest<String> searchRequest, final boolean promotions) {
         final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
-        aciParameters.add(QueryParams.Text.name(), HavenQueryParams.getText());
-        aciParameters.add(QueryParams.MaxResults.name(), HavenQueryParams.getMaxResults());
-        aciParameters.add(QueryParams.Summary.name(), SummaryParam.fromValue(HavenQueryParams.getSummary(), null));
+        aciParameters.add(QueryParams.Text.name(), searchRequest.getQueryText());
+        aciParameters.add(QueryParams.Start.name(), searchRequest.getStart());
+        aciParameters.add(QueryParams.MaxResults.name(), searchRequest.getMaxResults());
+        aciParameters.add(QueryParams.Summary.name(), SummaryParam.fromValue(searchRequest.getSummary(), null));
 
-        if (!promotions && !HavenQueryParams.getIndex().isEmpty()) {
-            aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(HavenQueryParams.getIndex()));
+        if (!promotions && !searchRequest.getIndex().isEmpty()) {
+            aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(searchRequest.getIndex()));
         }
 
         aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
         aciParameters.add(QueryParams.Predict.name(), false);
-        aciParameters.add(QueryParams.FieldText.name(), HavenQueryParams.getFieldText());
-        aciParameters.add(QueryParams.Sort.name(), HavenQueryParams.getSort());
-        aciParameters.add(QueryParams.MinDate.name(), formatDate(HavenQueryParams.getMinDate()));
-        aciParameters.add(QueryParams.MaxDate.name(), formatDate(HavenQueryParams.getMaxDate()));
+        aciParameters.add(QueryParams.FieldText.name(), searchRequest.getFieldText());
+        aciParameters.add(QueryParams.Sort.name(), searchRequest.getSort());
+        aciParameters.add(QueryParams.MinDate.name(), formatDate(searchRequest.getMinDate()));
+        aciParameters.add(QueryParams.MaxDate.name(), formatDate(searchRequest.getMaxDate()));
         aciParameters.add(QueryParams.Print.name(), PrintParam.Fields);
-        aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(HavenDocument.ALL_FIELDS));
+        aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(SearchResult.ALL_FIELDS));
+        aciParameters.add(QueryParams.TotalResults.name(), true);
         aciParameters.add(QueryParams.XMLMeta.name(), true);
-        aciParameters.add(QueryParams.AnyLanguage.name(), true);
+        addLanguageRestriction(searchRequest, aciParameters);
 
-        if (HavenQueryParams.isHighlight()) {
+        if (searchRequest.isHighlight()) {
             aciParameters.add(QueryParams.Highlight.name(), HighlightParam.SummaryTerms);
             aciParameters.add(QueryParams.StartTag.name(), HIGHLIGHT_START_TAG);
             aciParameters.add(QueryParams.EndTag.name(), HIGHLIGHT_END_TAG);
@@ -119,7 +126,16 @@ public class IdolDocumentService implements DocumentsService<String, HavenDocume
         return executeQuery(aciService, aciParameters);
     }
 
-    private Documents<HavenDocument> executeQuery(final AciService aciService, final AciParameters aciParameters) {
+    private void addLanguageRestriction(final SearchRequest<String> searchRequest, final AciParameters aciParameters) {
+        final String languageType = searchRequest.getLanguageType() != null ? searchRequest.getLanguageType() : languagesService.getDefaultLanguageId();
+        if (languageType != null) {
+            aciParameters.add(QueryParams.LanguageType.name(), languageType);
+        } else {
+            aciParameters.add(QueryParams.AnyLanguage.name(), true);
+        }
+    }
+
+    private Documents<SearchResult> executeQuery(final AciService aciService, final AciParameters aciParameters) {
         QueryResponseData responseData;
         try {
             responseData = aciService.executeAction(aciParameters, queryResponseProcessor);
@@ -135,12 +151,12 @@ public class IdolDocumentService implements DocumentsService<String, HavenDocume
         }
 
         final List<Hit> hits = responseData.getHit();
-        final List<HavenDocument> results = parseQueryHits(hits);
+        final List<SearchResult> results = parseQueryHits(hits);
         return new Documents<>(results, responseData.getTotalhits(), null);
     }
 
     @Override
-    public List<HavenDocument> findSimilar(final Set<String> indexes, final String reference) throws AciErrorException {
+    public List<SearchResult> findSimilar(final Set<String> indexes, final String reference) throws AciErrorException {
         final AciParameters aciParameters = new AciParameters(QueryActions.Suggest.name());
         aciParameters.add(SuggestParams.Reference.name(), new Reference(reference));
         if (!indexes.isEmpty()) {
@@ -159,28 +175,32 @@ public class IdolDocumentService implements DocumentsService<String, HavenDocume
         return date == null ? null : DateTimeFormat.forPattern(IDOL_DATE_PARAMETER_FORMAT).print(date);
     }
 
-    private List<HavenDocument> parseQueryHits(final Collection<Hit> hits) {
-        final List<HavenDocument> results = new ArrayList<>(hits.size());
+    private List<SearchResult> parseQueryHits(final Collection<Hit> hits) {
+        final List<SearchResult> results = new ArrayList<>(hits.size());
         for (final Hit hit : hits) {
-            final HavenDocument.Builder HavenDocumentBuilder = new HavenDocument.Builder()
+            final SearchResult.Builder HavenDocumentBuilder = new SearchResult.Builder()
                     .setReference(hit.getReference())
                     .setIndex(hit.getDatabase())
                     .setTitle(hit.getTitle())
                     .setSummary(hit.getSummary())
-                    .setDate(hit.getDatestring());
+                    .setDate(hit.getDatestring())
+                    .setWeight(hit.getWeight())
+                    .setPromotionName(hit.getPromotionname());
 
             final DocContent content = hit.getContent();
             if (content != null) {
                 final Element docContent = (Element) content.getContent().get(0);
                 HavenDocumentBuilder
-                        .setContentType(parseFields(docContent, HavenDocument.CONTENT_TYPE_FIELD))
-                        .setUrl(parseFields(docContent, HavenDocument.URL_FIELD))
-                        .setAuthors(parseFields(docContent, HavenDocument.AUTHOR_FIELD))
-                        .setCategories(parseFields(docContent, HavenDocument.CATEGORY_FIELD))
-                        .setDateCreated(parseFields(docContent, HavenDocument.DATE_CREATED_FIELD))
-                        .setCreatedDate(parseFields(docContent, HavenDocument.CREATED_DATE_FIELD))
-                        .setModifiedDate(parseFields(docContent, HavenDocument.MODIFIED_DATE_FIELD))
-                        .setDateModified(parseFields(docContent, HavenDocument.DATE_MODIFIED_FIELD));
+                        .setContentType(parseFields(docContent, SearchResult.CONTENT_TYPE_FIELD))
+                        .setUrl(parseFields(docContent, SearchResult.URL_FIELD))
+                        .setAuthors(parseFields(docContent, SearchResult.AUTHOR_FIELD))
+                        .setCategories(parseFields(docContent, SearchResult.CATEGORY_FIELD))
+                        .setDateCreated(parseFields(docContent, SearchResult.DATE_CREATED_FIELD))
+                        .setCreatedDate(parseFields(docContent, SearchResult.CREATED_DATE_FIELD))
+                        .setModifiedDate(parseFields(docContent, SearchResult.MODIFIED_DATE_FIELD))
+                        .setDateModified(parseFields(docContent, SearchResult.DATE_MODIFIED_FIELD))
+                        .setQmsId(parseFields(docContent, SearchResult.QMS_ID_FIELD))
+                        .setInjectedPromotion(parseFields(docContent, SearchResult.INJECTED_PROMOTION_FIELD));
             }
             results.add(HavenDocumentBuilder.build());
         }

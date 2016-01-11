@@ -11,13 +11,13 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-public interface DocumentsService<S extends Serializable, D extends HavenDocument, E extends Exception> {
+public interface DocumentsService<S extends Serializable, D extends SearchResult, E extends Exception> {
     String HIGHLIGHT_START_TAG = "<Find-IOD-QueryText-Placeholder>";
     String HIGHLIGHT_END_TAG = "</Find-IOD-QueryText-Placeholder>";
 
-    Documents<D> queryTextIndex(final HavenQueryParams<S> havenQueryParams) throws E;
+    Documents<D> queryTextIndex(final SearchRequest<S> searchRequest) throws E;
 
-    Documents<D> queryTextIndexForPromotions(final HavenQueryParams<S> havenQueryParams) throws E;
+    Documents<D> queryTextIndexForPromotions(final SearchRequest<S> searchRequest) throws E;
 
     List<D> findSimilar(Set<S> indexes, String reference) throws E;
 

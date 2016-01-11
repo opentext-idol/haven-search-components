@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.search.PromotionType;
-import com.hp.autonomy.searchcomponents.core.search.HavenDocument;
+import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -18,14 +18,14 @@ import lombok.experimental.Accessors;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@JsonDeserialize(builder = HodDocument.Builder.class)
-public class HodDocument extends HavenDocument {
+@JsonDeserialize(builder = HodSearchResult.Builder.class)
+public class HodSearchResult extends SearchResult {
     private static final long serialVersionUID = -7386227266595690038L;
 
     private final String domain;
     private final PromotionType promotionType;
 
-    public HodDocument(final Builder builder) {
+    public HodSearchResult(final Builder builder) {
         super(builder);
         domain = builder.domain;
         promotionType = builder.promotionType == null ? PromotionType.NONE : builder.promotionType;
@@ -35,21 +35,21 @@ public class HodDocument extends HavenDocument {
     @NoArgsConstructor
     @Accessors(chain = true)
     @JsonPOJOBuilder(withPrefix = "set")
-    public static class Builder extends HavenDocument.Builder {
+    public static class Builder extends SearchResult.Builder {
         private String domain;
 
         @JsonProperty("promotion")
         private PromotionType promotionType;
 
-        public Builder(final HodDocument document) {
+        public Builder(final HodSearchResult document) {
             super(document);
             domain = document.domain;
             promotionType = document.promotionType;
         }
 
         @Override
-        public HodDocument build() {
-            return new HodDocument(this);
+        public HodSearchResult build() {
+            return new HodSearchResult(this);
         }
     }
 }

@@ -11,8 +11,9 @@ import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.searchcomponents.core.search.HavenDocument;
-import com.hp.autonomy.searchcomponents.core.search.HavenQueryParams;
+import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
+import com.hp.autonomy.searchcomponents.core.search.SearchResult;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.types.idol.DocContent;
@@ -48,6 +49,9 @@ public class IdolDocumentServiceTest {
     private HavenSearchCapable havenSearchConfig;
 
     @Mock
+    private LanguagesService languagesService;
+
+    @Mock
     private ConfigService<HavenSearchCapable> configService;
 
     @Mock
@@ -65,7 +69,7 @@ public class IdolDocumentServiceTest {
     public void setUp() {
         when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().build());
         when(configService.getConfig()).thenReturn(havenSearchConfig);
-        idolDocumentService = new IdolDocumentService(configService, contentAciService, qmsAciService, aciResponseProcessorFactory);
+        idolDocumentService = new IdolDocumentService(configService, languagesService, contentAciService, qmsAciService, aciResponseProcessorFactory);
     }
 
     @Test
@@ -73,7 +77,7 @@ public class IdolDocumentServiceTest {
         final QueryResponseData responseData = mockQueryResponse();
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final Documents<HavenDocument> results = idolDocumentService.queryTextIndex(mockQueryParams());
+        final Documents<SearchResult> results = idolDocumentService.queryTextIndex(mockQueryParams());
         assertThat(results.getDocuments(), is(not(empty())));
     }
 
@@ -83,7 +87,7 @@ public class IdolDocumentServiceTest {
         final QueryResponseData responseData = mockQueryResponse();
         when(qmsAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final Documents<HavenDocument> results = idolDocumentService.queryTextIndex(mockQueryParams());
+        final Documents<SearchResult> results = idolDocumentService.queryTextIndex(mockQueryParams());
         assertThat(results.getDocuments(), is(not(empty())));
     }
 
@@ -95,7 +99,7 @@ public class IdolDocumentServiceTest {
         blacklistError.setErrorString(IdolDocumentService.MISSING_RULE_ERROR);
         when(qmsAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenThrow(blacklistError).thenReturn(responseData);
 
-        final Documents<HavenDocument> results = idolDocumentService.queryTextIndex(mockQueryParams());
+        final Documents<SearchResult> results = idolDocumentService.queryTextIndex(mockQueryParams());
         assertThat(results.getDocuments(), is(not(empty())));
     }
 
@@ -109,7 +113,7 @@ public class IdolDocumentServiceTest {
 
     @Test
     public void queryContentForPromotions() {
-        final Documents<HavenDocument> results = idolDocumentService.queryTextIndexForPromotions(mockQueryParams());
+        final Documents<SearchResult> results = idolDocumentService.queryTextIndexForPromotions(mockQueryParams());
         assertThat(results.getDocuments(), is(empty()));
     }
 
@@ -119,7 +123,7 @@ public class IdolDocumentServiceTest {
         final QueryResponseData responseData = mockQueryResponse();
         when(qmsAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final Documents<HavenDocument> results = idolDocumentService.queryTextIndexForPromotions(mockQueryParams());
+        final Documents<SearchResult> results = idolDocumentService.queryTextIndexForPromotions(mockQueryParams());
         assertThat(results.getDocuments(), is(not(empty())));
     }
 
@@ -132,12 +136,12 @@ public class IdolDocumentServiceTest {
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final List<HavenDocument> results = idolDocumentService.findSimilar(Collections.singleton("Database1"), "Some reference");
+        final List<SearchResult> results = idolDocumentService.findSimilar(Collections.singleton("Database1"), "Some reference");
         assertThat(results, is(not(empty())));
     }
 
-    private HavenQueryParams<String> mockQueryParams() {
-        return new HavenQueryParams<>("*", 50, null, Arrays.asList("Database1", "Database2"), null, null, null, DateTime.now(), true);
+    private SearchRequest<String> mockQueryParams() {
+        return new SearchRequest<>("*", null, 0, 50, null, Arrays.asList("Database1", "Database2"), null, null, null, DateTime.now(), true, null);
     }
 
     private QueryResponseData mockQueryResponse() {

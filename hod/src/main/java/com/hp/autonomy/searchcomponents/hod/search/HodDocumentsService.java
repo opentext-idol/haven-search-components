@@ -18,8 +18,8 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthentication;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
-import com.hp.autonomy.searchcomponents.core.search.HavenDocument;
-import com.hp.autonomy.searchcomponents.core.search.HavenQueryParams;
+import com.hp.autonomy.searchcomponents.core.search.SearchResult;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
 import com.hp.autonomy.types.requests.Documents;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ import java.util.Set;
 
 @Service
 @ConditionalOnMissingBean(DocumentsService.class)
-public class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodDocument, HodErrorException> {
+public class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
     private static final ImmutableSet<String> PUBLIC_INDEX_NAMES = ImmutableSet.of(
             ResourceIdentifier.WIKI_CHI.getName(),
             ResourceIdentifier.WIKI_ENG.getName(),
@@ -53,46 +53,46 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
 
     private static final int MAX_SIMILAR_DOCUMENTS = 3;
 
-    private final FindSimilarService<HodDocument> findSimilarService;
+    private final FindSimilarService<HodSearchResult> findSimilarService;
     private final ConfigService<? extends QueryManipulationCapable> configService;
-    private final QueryTextIndexService<HodDocument> queryTextIndexService;
+    private final QueryTextIndexService<HodSearchResult> queryTextIndexService;
 
     @Autowired
-    public HodDocumentsService(final FindSimilarService<HodDocument> findSimilarService, final ConfigService<? extends QueryManipulationCapable> configService, final QueryTextIndexService<HodDocument> queryTextIndexService) {
+    public HodDocumentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends QueryManipulationCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService) {
         this.findSimilarService = findSimilarService;
         this.configService = configService;
         this.queryTextIndexService = queryTextIndexService;
     }
 
     @Override
-    public Documents<HodDocument> queryTextIndex(final HavenQueryParams<ResourceIdentifier> findQueryParams) throws HodErrorException {
+    public Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> findQueryParams) throws HodErrorException {
         return queryTextIndex(findQueryParams, false);
     }
 
     @Override
-    public Documents<HodDocument> queryTextIndexForPromotions(final HavenQueryParams<ResourceIdentifier> findQueryParams) throws HodErrorException {
+    public Documents<HodSearchResult> queryTextIndexForPromotions(final SearchRequest<ResourceIdentifier> findQueryParams) throws HodErrorException {
         return queryTextIndex(findQueryParams, true);
     }
 
     @Override
-    public List<HodDocument> findSimilar(final Set<ResourceIdentifier> indexes, final String reference) throws HodErrorException {
+    public List<HodSearchResult> findSimilar(final Set<ResourceIdentifier> indexes, final String reference) throws HodErrorException {
         final QueryRequestBuilder requestBuilder = new QueryRequestBuilder()
                 .setIndexes(indexes)
                 .setPrint(Print.none)
                 .setAbsoluteMaxResults(MAX_SIMILAR_DOCUMENTS)
                 .setSummary(Summary.concept);
 
-        final Documents<HodDocument> result = findSimilarService.findSimilarDocumentsToIndexReference(reference, requestBuilder);
-        final List<HodDocument> documents = new LinkedList<>();
+        final Documents<HodSearchResult> result = findSimilarService.findSimilarDocumentsToIndexReference(reference, requestBuilder);
+        final List<HodSearchResult> documents = new LinkedList<>();
 
-        for (final HodDocument document : result.getDocuments()) {
+        for (final HodSearchResult document : result.getDocuments()) {
             documents.add(addDomain(indexes, document));
         }
 
         return documents;
     }
 
-    private Documents<HodDocument> queryTextIndex(final HavenQueryParams<ResourceIdentifier> findQueryParams, final boolean fetchPromotions) throws HodErrorException {
+    private Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> findQueryParams, final boolean fetchPromotions) throws HodErrorException {
         final String profileName = configService.getConfig().getQueryManipulation().getProfile();
 
         final QueryRequestBuilder params = new QueryRequestBuilder()
@@ -106,23 +106,23 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
                 .setMaxDate(findQueryParams.getMaxDate())
                 .setPromotions(fetchPromotions)
                 .setPrint(Print.fields)
-                .setPrintFields(new ArrayList<>(HavenDocument.ALL_FIELDS))
+                .setPrintFields(new ArrayList<>(SearchResult.ALL_FIELDS))
                 .setHighlight(Highlight.terms)
                 .setStartTag(HIGHLIGHT_START_TAG)
                 .setEndTag(HIGHLIGHT_END_TAG);
 
-        final Documents<HodDocument> hodDocuments = queryTextIndexService.queryTextIndexWithText(findQueryParams.getText(), params);
-        final List<HodDocument> documentList = new LinkedList<>();
+        final Documents<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(findQueryParams.getQueryText(), params);
+        final List<HodSearchResult> documentList = new LinkedList<>();
 
-        for (final HodDocument hodDocument : hodDocuments.getDocuments()) {
-            documentList.add(addDomain(findQueryParams.getIndex(), hodDocument));
+        for (final HodSearchResult hodSearchResult : hodDocuments.getDocuments()) {
+            documentList.add(addDomain(findQueryParams.getIndex(), hodSearchResult));
         }
 
         return new Documents<>(documentList, hodDocuments.getTotalResults(), hodDocuments.getExpandedQuery());
     }
 
     // Add a domain to a FindDocument, given the collection of indexes which were queried against to return it from HOD
-    private HodDocument addDomain(final Iterable<ResourceIdentifier> indexIdentifiers, final HodDocument document) {
+    private HodSearchResult addDomain(final Iterable<ResourceIdentifier> indexIdentifiers, final HodSearchResult document) {
         // HOD does not return the domain for documents yet, but it does return the index
         final String index = document.getIndex();
         String domain = null;
@@ -141,7 +141,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
             domain = PUBLIC_INDEX_NAMES.contains(index) ? ResourceIdentifier.PUBLIC_INDEXES_DOMAIN : getDomain();
         }
 
-        return new HodDocument.Builder(document)
+        return new HodSearchResult.Builder(document)
                 .setDomain(domain)
                 .build();
     }
