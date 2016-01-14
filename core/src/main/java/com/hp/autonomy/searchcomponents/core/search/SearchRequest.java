@@ -23,6 +23,7 @@ public class SearchRequest<S extends Serializable> implements Serializable {
     protected String summary;
     protected String sort;
     protected boolean highlight;
+    protected boolean autoCorrect;
 
     protected QueryType queryType;
 

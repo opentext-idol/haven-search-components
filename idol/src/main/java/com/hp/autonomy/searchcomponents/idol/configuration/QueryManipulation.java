@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.frontend.configuration.ConfigException;
 import com.hp.autonomy.frontend.configuration.ConfigurationComponent;
 import com.hp.autonomy.frontend.configuration.ServerConfig;
+import com.hp.autonomy.types.requests.qms.actions.typeahead.params.ModeParam;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,12 +23,14 @@ public class QueryManipulation implements ConfigurationComponent {
     private final ServerConfig server;
     private final Boolean expandQuery;
     private final String blacklist;
+    private final ModeParam typeAheadMode;
     private final Boolean enabled;
 
     private QueryManipulation(final Builder builder) {
         server = builder.server;
         expandQuery = builder.expandQuery;
         blacklist = builder.blacklist;
+        typeAheadMode = builder.typeAheadMode;
         enabled = builder.enabled;
     }
 
@@ -35,13 +38,13 @@ public class QueryManipulation implements ConfigurationComponent {
         if (queryManipulation == null) {
             return this;
         } else {
-            final Builder builder = new Builder();
-            builder.setServer(server == null ? queryManipulation.server : server.merge(queryManipulation.server));
-            builder.setExpandQuery(expandQuery == null ? queryManipulation.expandQuery : expandQuery);
-            builder.setBlacklist(blacklist == null ? queryManipulation.blacklist : blacklist);
-            builder.setEnabled(enabled == null ? queryManipulation.enabled : enabled);
-
-            return builder.build();
+            return new Builder()
+                    .setServer(server == null ? queryManipulation.server : server.merge(queryManipulation.server))
+                    .setExpandQuery(expandQuery == null ? queryManipulation.expandQuery : expandQuery)
+                    .setBlacklist(blacklist == null ? queryManipulation.blacklist : blacklist)
+                    .setTypeAheadMode(typeAheadMode == null ? queryManipulation.typeAheadMode : typeAheadMode)
+                    .setEnabled(enabled == null ? queryManipulation.enabled : enabled)
+                    .build();
         }
     }
 
@@ -67,6 +70,7 @@ public class QueryManipulation implements ConfigurationComponent {
         private ServerConfig server;
         private Boolean expandQuery;
         private String blacklist;
+        private ModeParam typeAheadMode;
         private Boolean enabled;
 
         public QueryManipulation build() {

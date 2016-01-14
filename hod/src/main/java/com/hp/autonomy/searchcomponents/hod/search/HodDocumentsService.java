@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.hod.search;
 import com.google.common.collect.ImmutableSet;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.textindex.query.search.CheckSpelling;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindSimilarService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Highlight;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
@@ -111,6 +112,10 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
                 .setStartTag(HIGHLIGHT_START_TAG)
                 .setEndTag(HIGHLIGHT_END_TAG);
 
+        if (findQueryParams.isAutoCorrect()) {
+            params.setCheckSpelling(CheckSpelling.autocorrect);
+        }
+
         final Documents<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(findQueryParams.getQueryRestrictions().getQueryText(), params);
         final List<HodSearchResult> documentList = new LinkedList<>();
 
@@ -118,7 +123,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
             documentList.add(addDomain(findQueryParams.getQueryRestrictions().getDatabases(), hodSearchResult));
         }
 
-        return new Documents<>(documentList, hodDocuments.getTotalResults(), hodDocuments.getExpandedQuery());
+        return new Documents<>(documentList, hodDocuments.getTotalResults(), hodDocuments.getExpandedQuery(), null, hodDocuments.getAutoCorrection());
     }
 
     // Add a domain to a FindDocument, given the collection of indexes which were queried against to return it from HOD

@@ -101,6 +101,19 @@ public class IdolDocumentServiceTest {
     }
 
     @Test
+    public void autoCorrect() {
+        final QueryResponseData responseData = mockQueryResponse();
+        responseData.setSpellingquery("spelling");
+        responseData.setSpelling("mm, mmh");
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
+        final SearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, null, true, true, null);
+        final Documents<SearchResult> results = idolDocumentService.queryTextIndex(searchRequest);
+        assertThat(results.getDocuments(), is(not(empty())));
+    }
+
+    @Test
     public void queryQmsForPromotions() {
         when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setEnabled(true).build());
         final QueryResponseData responseData = mockQueryResponse();
@@ -125,7 +138,7 @@ public class IdolDocumentServiceTest {
 
     protected SearchRequest<String> mockQueryParams() {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        return new SearchRequest<>(queryRestrictions, 0, 50, null, null, true, null);
+        return new SearchRequest<>(queryRestrictions, 0, 50, null, null, true, false, null);
     }
 
     protected QueryResponseData mockQueryResponse() {

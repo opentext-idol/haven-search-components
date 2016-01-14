@@ -20,7 +20,7 @@ import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
-import com.hp.autonomy.types.requests.qms.QmsActionParams;
+import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormat;
 
@@ -80,8 +80,8 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
 
     @Override
     public void addQmsParameters(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions) {
-        aciParameters.add(QmsActionParams.Blacklist.name(), configService.getConfig().getQueryManipulation().getBlacklist());
-        aciParameters.add(QmsActionParams.ExpandQuery.name(), configService.getConfig().getQueryManipulation().getExpandQuery());
+        aciParameters.add(QmsQueryParams.Blacklist.name(), configService.getConfig().getQueryManipulation().getBlacklist());
+        aciParameters.add(QmsQueryParams.ExpandQuery.name(), configService.getConfig().getQueryManipulation().getExpandQuery());
     }
 
     protected String formatDate(final ReadableInstant date) {

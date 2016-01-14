@@ -22,23 +22,28 @@ import com.hp.autonomy.types.idol.Hit;
 import com.hp.autonomy.types.idol.QueryResponseData;
 import com.hp.autonomy.types.idol.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
+import com.hp.autonomy.types.requests.Spelling;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SuggestParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
-import com.hp.autonomy.types.requests.qms.QmsActionParams;
+import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class IdolDocumentService implements DocumentsService<String, SearchResult, AciErrorException> {
     private static final int MAX_SIMILAR_DOCUMENTS = 3;
+    private static final Pattern SPELLING_SEPARATOR_PATTERN = Pattern.compile(", ");
 
     protected final ConfigService<? extends HavenSearchCapable> configService;
     protected final HavenSearchAciParameterHandler parameterHandler;
@@ -70,7 +75,7 @@ public class IdolDocumentService implements DocumentsService<String, SearchResul
 
     @Override
     public Documents<SearchResult> queryTextIndexForPromotions(final SearchRequest<String> searchRequest) throws AciErrorException {
-        return qmsEnabled() ? queryTextIndex(qmsAciService, searchRequest, true) : new Documents<>(Collections.<SearchResult>emptyList(), 0, null);
+        return qmsEnabled() ? queryTextIndex(qmsAciService, searchRequest, true) : new Documents<>(Collections.<SearchResult>emptyList(), 0, null, null, null);
     }
 
     private Documents<SearchResult> queryTextIndex(final AciService aciService, final SearchRequest<String> searchRequest, final boolean promotions) {
@@ -80,19 +85,44 @@ public class IdolDocumentService implements DocumentsService<String, SearchResul
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
         parameterHandler.addQmsParameters(aciParameters, searchRequest.getQueryRestrictions());
 
-        if (promotions) {
-            aciParameters.add(QmsActionParams.Promotions.name(), true);
+        if (searchRequest.isAutoCorrect()) {
+            aciParameters.add(QueryParams.SpellCheck.name(), true);
         }
 
-        return executeQuery(aciService, aciParameters);
+        if (promotions) {
+            aciParameters.add(QmsQueryParams.Promotions.name(), true);
+        }
+
+        return executeQuery(aciService, aciParameters, searchRequest.isAutoCorrect());
     }
 
-    @SuppressWarnings("TypeMayBeWeakened")
-    protected Documents<SearchResult> executeQuery(final AciService aciService, final AciParameters aciParameters) {
+    protected Documents<SearchResult> executeQuery(final AciService aciService, final AciParameters aciParameters, final boolean autoCorrect) {
         final QueryResponseData responseData = aciService.executeAction(aciParameters, queryResponseProcessor);
         final List<Hit> hits = responseData.getHit();
-        final List<SearchResult> results = parseQueryHits(hits);
-        return new Documents<>(results, responseData.getTotalhits(), null);
+
+        final String spellingQuery = responseData.getSpellingquery();
+
+        // If IDOL has a spelling suggestion, retry query for auto correct
+        final Documents<SearchResult> documents;
+        if (autoCorrect && spellingQuery != null) {
+            documents = rerunQueryWithAdjustedSpelling(aciService, aciParameters, responseData, spellingQuery);
+        } else {
+            final List<SearchResult> results = parseQueryHits(hits);
+            documents = new Documents<>(results, responseData.getTotalhits(), null, null, null);
+        }
+
+        return documents;
+    }
+
+    protected Documents<SearchResult> rerunQueryWithAdjustedSpelling(final AciService aciService, final AciParameters aciParameters, final QueryResponseData responseData, final String spellingQuery) {
+        final AciParameters correctedParameters = new AciParameters(aciParameters);
+        correctedParameters.put(QueryParams.Text.name(), spellingQuery);
+
+        final Documents<SearchResult> correctedDocuments = executeQuery(aciService, correctedParameters, false);
+
+        final Spelling spelling = new Spelling(Arrays.asList(SPELLING_SEPARATOR_PATTERN.split(responseData.getSpelling())), spellingQuery, aciParameters.get(QueryParams.Text.name()));
+
+        return new Documents<>(correctedDocuments.getDocuments(), correctedDocuments.getTotalResults(), correctedDocuments.getExpandedQuery(), null, spelling);
     }
 
     @Override
@@ -114,7 +144,7 @@ public class IdolDocumentService implements DocumentsService<String, SearchResul
     protected List<SearchResult> parseQueryHits(final Collection<Hit> hits) {
         final List<SearchResult> results = new ArrayList<>(hits.size());
         for (final Hit hit : hits) {
-            final SearchResult.Builder HavenDocumentBuilder = new SearchResult.Builder()
+            final SearchResult.Builder searchResultBuilder = new SearchResult.Builder()
                     .setReference(hit.getReference())
                     .setIndex(hit.getDatabase())
                     .setTitle(hit.getTitle())
@@ -126,7 +156,7 @@ public class IdolDocumentService implements DocumentsService<String, SearchResul
             final DocContent content = hit.getContent();
             if (content != null) {
                 final Element docContent = (Element) content.getContent().get(0);
-                HavenDocumentBuilder
+                searchResultBuilder
                         .setContentType(parseFields(docContent, SearchResult.CONTENT_TYPE_FIELD))
                         .setUrl(parseFields(docContent, SearchResult.URL_FIELD))
                         .setAuthors(parseFields(docContent, SearchResult.AUTHOR_FIELD))
@@ -138,7 +168,7 @@ public class IdolDocumentService implements DocumentsService<String, SearchResul
                         .setQmsId(parseFields(docContent, SearchResult.QMS_ID_FIELD))
                         .setInjectedPromotion(parseFields(docContent, SearchResult.INJECTED_PROMOTION_FIELD));
             }
-            results.add(HavenDocumentBuilder.build());
+            results.add(searchResultBuilder.build());
         }
         return results;
     }

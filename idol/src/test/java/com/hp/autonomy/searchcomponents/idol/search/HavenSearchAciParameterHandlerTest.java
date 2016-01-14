@@ -55,7 +55,7 @@ public class HavenSearchAciParameterHandlerTest {
     @Test
     public void addSearchOutputParameters() {
         final AciParameters aciParameters = new AciParameters();
-        final SearchRequest<String> searchRequest = new SearchRequest<>(null, 0, 50, "Context", null, true, null);
+        final SearchRequest<String> searchRequest = new SearchRequest<>(null, 0, 50, "Context", null, true, false, null);
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
         assertThat(aciParameters, is(not(empty())));
     }
