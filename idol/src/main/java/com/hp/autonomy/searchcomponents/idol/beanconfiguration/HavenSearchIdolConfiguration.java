@@ -16,9 +16,6 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
-import com.hp.autonomy.user.UserService;
-import com.hp.autonomy.user.UserServiceConfig;
-import com.hp.autonomy.user.UserServiceImpl;
 import org.apache.http.client.HttpClient;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -35,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan("com.hp.autonomy.searchcomponents.idol")
-public class HavenSearchIdolConfiguration<C extends HavenSearchCapable & UserServiceConfig> {
+public class HavenSearchIdolConfiguration<C extends HavenSearchCapable> {
     private static final int HTTP_SOCKET_TIMEOUT = 90000;
     private static final int HTTP_MAX_CONNECTIONS_PER_ROUTE = 20;
     private static final int HTTP_MAX_CONNECTIONS_TOTAL = 120;
@@ -74,11 +71,6 @@ public class HavenSearchIdolConfiguration<C extends HavenSearchCapable & UserSer
                 return configService.getConfig().getViewConfig().toAciServerDetails();
             }
         };
-    }
-
-    @Bean
-    public UserService userService(final ConfigService<C> configService, final AciService aciService, final AciResponseJaxbProcessorFactory processorFactory, final IdolAnnotationsProcessorFactory annotationsProcessorFactory) {
-        return new UserServiceImpl(configService, aciService, annotationsProcessorFactory);
     }
 
     @Bean
