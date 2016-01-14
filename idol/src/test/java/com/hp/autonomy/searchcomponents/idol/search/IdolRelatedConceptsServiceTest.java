@@ -9,10 +9,11 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.types.idol.Qs;
 import com.hp.autonomy.types.idol.QsElement;
 import com.hp.autonomy.types.idol.QueryResponseData;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +34,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class IdolRelatedConceptsServiceTest {
     @Mock
+    private HavenSearchAciParameterHandler parameterHandler;
+
+    @Mock
     private AciService contentAciService;
 
     @Mock
@@ -42,7 +46,7 @@ public class IdolRelatedConceptsServiceTest {
 
     @Before
     public void setUp() {
-        idolRelatedConceptsService = new IdolRelatedConceptsService(contentAciService, aciResponseProcessorFactory);
+        idolRelatedConceptsService = new IdolRelatedConceptsService(parameterHandler, contentAciService, aciResponseProcessorFactory);
     }
 
     @Test
@@ -54,8 +58,8 @@ public class IdolRelatedConceptsServiceTest {
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final SearchRequest<String> request = new SearchRequest<>("Some text", "Some field text", 0, 30, null, Collections.singletonList("Database1"), null, null, null, null, false, null);
-        final List<QsElement> results = idolRelatedConceptsService.findRelatedConcepts(request);
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("Some field text").setDatabases(Collections.singletonList("Database1")).setMaxDate(DateTime.now()).build();
+        final List<QsElement> results = idolRelatedConceptsService.findRelatedConcepts(queryRestrictions);
         assertThat(results, is(not(empty())));
     }
 }

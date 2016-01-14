@@ -13,20 +13,13 @@ import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFields
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.token.TokenProxy;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@ConditionalOnMissingBean(IndexFieldsService.class)
-@Service
 public class IndexFieldsServiceImpl implements IndexFieldsService {
-
     private final RetrieveIndexFieldsService retrieveIndexFieldsService;
 
-    @Autowired
     public IndexFieldsServiceImpl(final RetrieveIndexFieldsService retrieveIndexFieldsService) {
         this.retrieveIndexFieldsService = retrieveIndexFieldsService;
     }
@@ -38,8 +31,7 @@ public class IndexFieldsServiceImpl implements IndexFieldsService {
 
     @Override
     public Set<String> getParametricFields(final TokenProxy<?, TokenType.Simple> tokenProxy, final ResourceIdentifier index) throws HodErrorException {
-        final RetrieveIndexFieldsRequestBuilder fieldsParams = new RetrieveIndexFieldsRequestBuilder()
-            .setFieldType(FieldType.parametric);
+        final RetrieveIndexFieldsRequestBuilder fieldsParams = new RetrieveIndexFieldsRequestBuilder().setFieldType(FieldType.parametric);
 
         final RetrieveIndexFieldsResponse indexFields = tokenProxy == null ? retrieveIndexFieldsService.retrieveIndexFields(index, fieldsParams) : retrieveIndexFieldsService.retrieveIndexFields(tokenProxy, index, fieldsParams);
 

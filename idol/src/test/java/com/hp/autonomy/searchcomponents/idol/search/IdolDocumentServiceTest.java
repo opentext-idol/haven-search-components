@@ -5,15 +5,15 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
-import com.hp.autonomy.searchcomponents.core.search.SearchResult;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.types.idol.DocContent;
@@ -46,30 +46,33 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class IdolDocumentServiceTest {
     @Mock
-    private HavenSearchCapable havenSearchConfig;
+    protected HavenSearchAciParameterHandler parameterHandler;
 
     @Mock
-    private LanguagesService languagesService;
+    protected HavenSearchCapable havenSearchConfig;
 
     @Mock
-    private ConfigService<HavenSearchCapable> configService;
+    protected LanguagesService languagesService;
 
     @Mock
-    private AciService contentAciService;
+    protected ConfigService<HavenSearchCapable> configService;
 
     @Mock
-    private AciService qmsAciService;
+    protected AciService contentAciService;
 
     @Mock
-    private AciResponseJaxbProcessorFactory aciResponseProcessorFactory;
+    protected AciService qmsAciService;
 
-    private IdolDocumentService idolDocumentService;
+    @Mock
+    protected AciResponseJaxbProcessorFactory aciResponseProcessorFactory;
+
+    protected IdolDocumentService idolDocumentService;
 
     @Before
     public void setUp() {
         when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().build());
         when(configService.getConfig()).thenReturn(havenSearchConfig);
-        idolDocumentService = new IdolDocumentService(configService, languagesService, contentAciService, qmsAciService, aciResponseProcessorFactory);
+        idolDocumentService = new IdolDocumentService(configService, parameterHandler, contentAciService, qmsAciService, aciResponseProcessorFactory);
     }
 
     @Test
@@ -89,26 +92,6 @@ public class IdolDocumentServiceTest {
 
         final Documents<SearchResult> results = idolDocumentService.queryTextIndex(mockQueryParams());
         assertThat(results.getDocuments(), is(not(empty())));
-    }
-
-    @Test
-    public void queryQmsButNoBlackList() {
-        when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setEnabled(true).build());
-        final QueryResponseData responseData = mockQueryResponse();
-        final AciErrorException blacklistError = new AciErrorException();
-        blacklistError.setErrorString(IdolDocumentService.MISSING_RULE_ERROR);
-        when(qmsAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenThrow(blacklistError).thenReturn(responseData);
-
-        final Documents<SearchResult> results = idolDocumentService.queryTextIndex(mockQueryParams());
-        assertThat(results.getDocuments(), is(not(empty())));
-    }
-
-    @Test(expected = AciErrorException.class)
-    public void queryQmsButUnexpectedError() {
-        when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setEnabled(true).build());
-        when(qmsAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenThrow(new AciErrorException());
-
-        idolDocumentService.queryTextIndex(mockQueryParams());
     }
 
     @Test
@@ -140,11 +123,12 @@ public class IdolDocumentServiceTest {
         assertThat(results, is(not(empty())));
     }
 
-    private SearchRequest<String> mockQueryParams() {
-        return new SearchRequest<>("*", null, 0, 50, null, Arrays.asList("Database1", "Database2"), null, null, null, DateTime.now(), true, null);
+    protected SearchRequest<String> mockQueryParams() {
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
+        return new SearchRequest<>(queryRestrictions, 0, 50, null, null, true, null);
     }
 
-    private QueryResponseData mockQueryResponse() {
+    protected QueryResponseData mockQueryResponse() {
         final QueryResponseData responseData = new QueryResponseData();
         responseData.setTotalhits(1);
         final Hit hit = mockHit();

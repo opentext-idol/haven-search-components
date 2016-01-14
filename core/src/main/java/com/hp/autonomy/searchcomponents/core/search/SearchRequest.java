@@ -5,29 +5,26 @@
 
 package com.hp.autonomy.searchcomponents.core.search;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.joda.time.DateTime;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SearchRequest<S extends Serializable> implements Serializable {
     private static final long serialVersionUID = -6338199353489914631L;
 
-    protected final String queryText;
-    protected final String fieldText;
-    protected final int start;
-    protected final int maxResults;
-    protected final String summary;
-    protected final List<S> index;
-    protected final String languageType;
-    protected final String sort;
-    protected final DateTime minDate;
-    protected final DateTime maxDate;
-    protected final boolean highlight;
+    protected QueryRestrictions<S> queryRestrictions;
+    protected int start;
+    protected int maxResults;
+    protected String summary;
+    protected String sort;
+    protected boolean highlight;
 
-    protected final QueryType queryType;
+    protected QueryType queryType;
 
     public enum QueryType {
         RAW, MODIFIED, PROMOTIONS

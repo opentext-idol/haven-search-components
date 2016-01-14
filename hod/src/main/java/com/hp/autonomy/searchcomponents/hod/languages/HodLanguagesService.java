@@ -7,14 +7,10 @@ package com.hp.autonomy.searchcomponents.hod.languages;
 
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.types.idol.LanguageType;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
-@ConditionalOnMissingBean(LanguagesService.class)
 public class HodLanguagesService implements LanguagesService {
     public static final String THE_LANGUAGE = "English";
 

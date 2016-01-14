@@ -5,14 +5,14 @@
 
 package com.hp.autonomy.searchcomponents.idol.configuration;
 
-import com.hp.autonomy.frontend.configuration.ServerConfig;
+import com.autonomy.aci.client.transport.AciServerDetails;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 
 /**
  * Configuration required for any application performing Haven Search
  */
 public interface HavenSearchCapable extends ViewCapable {
-    ServerConfig getContent();
+    AciServerDetails getContentAciServerDetails();
 
     QueryManipulation getQueryManipulation();
 }

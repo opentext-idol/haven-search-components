@@ -13,7 +13,6 @@ import com.autonomy.aci.client.transport.AciServerDetails;
 import com.autonomy.aci.client.transport.impl.AciHttpClientImpl;
 import com.hp.autonomy.frontend.configuration.AbstractConfigurableAciService;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.frontend.configuration.ServerConfig;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
@@ -49,14 +48,14 @@ public class HavenSearchIdolConfiguration<C extends HavenSearchCapable & UserSer
         return new AbstractConfigurableAciService(aciService) {
             @Override
             public AciServerDetails getServerDetails() {
-                return configService.getConfig().getContent().toAciServerDetails();
+                return configService.getConfig().getContentAciServerDetails();
             }
         };
     }
 
 
     @Bean
-    @ConditionalOnMissingBean(name ="qmsAciService")
+    @ConditionalOnMissingBean(name = "qmsAciService")
     public AciService qmsAciService(@Qualifier("aciService") final AciService aciService, final ConfigService<C> configService) {
         return new AbstractConfigurableAciService(aciService) {
             @Override

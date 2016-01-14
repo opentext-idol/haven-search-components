@@ -9,8 +9,8 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.types.idol.QsElement;
@@ -28,23 +28,21 @@ import java.util.List;
 public class IdolRelatedConceptsService implements RelatedConceptsService<QsElement, String, AciErrorException> {
     private static final int MAX_RESULTS = 50;
 
+    private final HavenSearchAciParameterHandler parameterHandler;
     private final AciService contentAciService;
     private final Processor<QueryResponseData> queryResponseProcessor;
 
     @Autowired
-    public IdolRelatedConceptsService(final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    public IdolRelatedConceptsService(final HavenSearchAciParameterHandler parameterHandler, final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+        this.parameterHandler = parameterHandler;
         this.contentAciService = contentAciService;
         queryResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(QueryResponseData.class);
     }
 
     @Override
-    public List<QsElement> findRelatedConcepts(final SearchRequest<String> request) throws AciErrorException {
+    public List<QsElement> findRelatedConcepts(final QueryRestrictions<String> queryRestrictions) throws AciErrorException {
         final AciParameters parameters = new AciParameters(QueryActions.Query.name());
-        parameters.add(QueryParams.Text.name(), request.getQueryText());
-        if (!request.getIndex().isEmpty()) {
-            parameters.add(QueryParams.DatabaseMatch.name(), new Databases(request.getIndex()));
-        }
-        parameters.add(QueryParams.FieldText.name(), request.getFieldText());
+        parameterHandler.addSearchRestrictions(parameters, queryRestrictions);
         parameters.add(QueryParams.MaxResults.name(), MAX_RESULTS);
         parameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         parameters.add(QueryParams.QuerySummary.name(), true);

@@ -9,6 +9,9 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
+import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.types.idol.FlatField;
 import com.hp.autonomy.types.idol.GetQueryTagValuesResponseData;
 import com.hp.autonomy.types.idol.GetTagNamesResponseData;
@@ -38,6 +41,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class IdolParametricValuesServiceTest {
     @Mock
+    private HavenSearchAciParameterHandler parameterHandler;
+
+    @Mock
     private AciService contentAciService;
 
     @Mock
@@ -50,12 +56,13 @@ public class IdolParametricValuesServiceTest {
 
     @Before
     public void setUp() {
-        parametricValuesService = new IdolParametricValuesService(contentAciService, aciResponseProcessorFactory);
+        parametricValuesService = new IdolParametricValuesService(parameterHandler, contentAciService, aciResponseProcessorFactory);
     }
 
     @Test
     public void getAllParametricValues() {
-        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setDatabases(Collections.<String>emptySet()).setFieldNames(Collections.singleton("Some field")).setQueryText("*").setFieldText("").build();
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).build();
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.singleton("Some field")).setQueryRestrictions(queryRestrictions).build();
 
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
@@ -65,7 +72,8 @@ public class IdolParametricValuesServiceTest {
 
     @Test
     public void getFieldNamesFirst() {
-        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setDatabases(Collections.<String>emptySet()).setFieldNames(Collections.<String>emptySet()).setQueryText("*").setFieldText("").build();
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).build();
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.<String>emptySet()).setQueryRestrictions(queryRestrictions).build();
 
         final GetTagNamesResponseData tagNamesResponseData = mockTagNamesResponse();
 
@@ -78,7 +86,8 @@ public class IdolParametricValuesServiceTest {
 
     @Test
     public void parametricValuesNotConfigured() {
-        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setDatabases(Collections.<String>emptySet()).setFieldNames(Collections.<String>emptySet()).setQueryText("*").setFieldText("").setMinDate(null).setMaxDate(DateTime.now()).build();
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).setMaxDate(DateTime.now()).build();
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.<String>emptySet()).setQueryRestrictions(queryRestrictions).build();
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(new GetTagNamesResponseData());
 

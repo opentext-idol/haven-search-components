@@ -74,8 +74,7 @@ public class IdolLanguagesServiceTest {
 
         final LanguageSettingsResponseData languageSettingsResponseData = new LanguageSettingsResponseData();
         final Languages languages = new Languages();
-        languages.setDefaultLanguage(sampleLanguage);
-        languages.setDefaultEncoding(IdolLanguagesService.IDOL_UTF8_ENCODING);
+        languages.setDefaultLanguageType(sampleLanguage);
         languageSettingsResponseData.setLanguages(languages);
 
         when(contentAciService.executeAction(any(AciParameters.class), eq(languageSettingsProcessor))).thenReturn(languageSettingsResponseData);

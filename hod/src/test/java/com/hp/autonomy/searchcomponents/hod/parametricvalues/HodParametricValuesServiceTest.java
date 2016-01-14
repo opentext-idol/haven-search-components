@@ -11,14 +11,18 @@ import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldNames;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,10 +40,7 @@ public class HodParametricValuesServiceTest {
     public void getsParametricValues() throws HodErrorException {
         final HodParametricValuesService parametricValuesServiceImpl = new HodParametricValuesService(getParametricValuesService());
 
-        final Set<ResourceIdentifier> indexes = ImmutableSet.<ResourceIdentifier>builder()
-                .add(ResourceIdentifier.WIKI_ENG)
-                .add(ResourceIdentifier.PATENTS)
-                .build();
+        final List<ResourceIdentifier> indexes = Arrays.asList(ResourceIdentifier.WIKI_ENG, ResourceIdentifier.PATENTS);
 
         final Set<String> fieldNames = ImmutableSet.<String>builder()
                 .add("grassy field")
@@ -47,9 +48,10 @@ public class HodParametricValuesServiceTest {
                 .add("football field")
                 .build();
 
+        final QueryRestrictions<ResourceIdentifier> queryRestrictions = new HodQueryRestrictions.Builder().setDatabases(indexes).build();
         final HodParametricRequest testRequest = new HodParametricRequest.Builder()
-                .setDatabases(indexes)
                 .setFieldNames(fieldNames)
+                .setQueryRestrictions(queryRestrictions)
                 .build();
 
         final Set<QueryTagInfo> fieldNamesSet = parametricValuesServiceImpl.getAllParametricValues(testRequest);
@@ -75,13 +77,12 @@ public class HodParametricValuesServiceTest {
     public void emptyFieldNamesReturnEmptyParametricValues() throws HodErrorException {
         final HodParametricValuesService hodParametricValuesService = new HodParametricValuesService(getParametricValuesService());
 
-        final Set<ResourceIdentifier> indexes = ImmutableSet.<ResourceIdentifier>builder()
-                .add(ResourceIdentifier.PATENTS)
-                .build();
+        final List<ResourceIdentifier> indexes = Collections.singletonList(ResourceIdentifier.PATENTS);
 
+        final QueryRestrictions<ResourceIdentifier> queryRestrictions = new HodQueryRestrictions.Builder().setDatabases(indexes).build();
         final HodParametricRequest testRequest = new HodParametricRequest.Builder()
-                .setDatabases(indexes)
                 .setFieldNames(Collections.<String>emptySet())
+                .setQueryRestrictions(queryRestrictions)
                 .build();
 
         final Set<QueryTagInfo> fieldNamesSet = hodParametricValuesService.getAllParametricValues(testRequest);

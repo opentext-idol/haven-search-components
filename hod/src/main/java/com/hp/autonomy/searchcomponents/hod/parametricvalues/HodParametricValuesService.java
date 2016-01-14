@@ -14,22 +14,16 @@ import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-@ConditionalOnMissingBean(ParametricValuesService.class)
-@Service
 public class HodParametricValuesService implements ParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> {
 
     private final GetParametricValuesService getParametricValuesService;
 
-    @Autowired
     public HodParametricValuesService(final GetParametricValuesService getParametricValuesService) {
         this.getParametricValuesService = getParametricValuesService;
     }
@@ -39,8 +33,8 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
         final GetParametricValuesRequestBuilder parametricParams = new GetParametricValuesRequestBuilder()
                 .setQueryProfile(parametricRequest.getQueryProfile())
                 .setSort(ParametricSort.document_count)
-                .setText(parametricRequest.getQueryText())
-                .setFieldText(parametricRequest.getFieldText())
+                .setText(parametricRequest.getQueryRestrictions().getQueryText())
+                .setFieldText(parametricRequest.getQueryRestrictions().getFieldText())
                 .setMaxValues(5);
 
         if (parametricRequest.getFieldNames().isEmpty()) {
@@ -48,7 +42,7 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
         }
 
         final FieldNames fieldNames = getParametricValuesService.getParametricValues(parametricRequest.getFieldNames(),
-                new ArrayList<>(parametricRequest.getDatabases()), parametricParams);
+                new ArrayList<>(parametricRequest.getQueryRestrictions().getDatabases()), parametricParams);
         final Set<String> fieldNamesSet = fieldNames.getFieldNames();
         final Set<QueryTagInfo> parametricFieldNames = new HashSet<>();
 

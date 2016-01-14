@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,18 +24,15 @@ import java.util.Set;
 public class HodParametricRequest implements ParametricRequest<ResourceIdentifier> {
     private static final long serialVersionUID = 2235023046934181036L;
 
-    private Set<ResourceIdentifier> databases;
     private Set<String> fieldNames;
-    private String queryText;
-    private String fieldText;
+    @SuppressWarnings("InstanceVariableOfConcreteClass")
+    private QueryRestrictions<ResourceIdentifier> queryRestrictions;
     private ResourceIdentifier queryProfile;
 
-    private HodParametricRequest(final ResourceIdentifier queryProfile, final Set<ResourceIdentifier> databases, final Set<String> fieldNames, final String queryText, final String fieldText) {
-        this.queryProfile = queryProfile;
-        this.databases = databases;
-        this.queryText = queryText;
-        this.fieldText = fieldText;
+    private HodParametricRequest(final Set<String> fieldNames, final QueryRestrictions<ResourceIdentifier> queryRestrictions, final ResourceIdentifier queryProfile) {
         this.fieldNames = fieldNames == null ? Collections.<String>emptySet() : fieldNames;
+        this.queryRestrictions = queryRestrictions;
+        this.queryProfile = queryProfile;
     }
 
     @JsonPOJOBuilder(withPrefix = "set")
@@ -42,22 +40,19 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
     @Accessors(chain = true)
     @NoArgsConstructor
     public static class Builder {
-        private ResourceIdentifier queryProfile;
-        private Set<ResourceIdentifier> databases;
         private Set<String> fieldNames;
-        private String queryText;
-        private String fieldText;
+        private ResourceIdentifier queryProfile;
+        @SuppressWarnings("InstanceVariableOfConcreteClass")
+        private QueryRestrictions<ResourceIdentifier> queryRestrictions;
 
         public Builder(final HodParametricRequest hodParametricRequest) {
-            queryProfile = hodParametricRequest.getQueryProfile();
-            databases = hodParametricRequest.getDatabases();
             fieldNames = hodParametricRequest.getFieldNames();
-            queryText = hodParametricRequest.getQueryText();
-            fieldText = hodParametricRequest.getFieldText();
+            queryRestrictions = hodParametricRequest.getQueryRestrictions();
+            queryProfile = hodParametricRequest.getQueryProfile();
         }
 
         public HodParametricRequest build() {
-            return new HodParametricRequest(queryProfile, databases, fieldNames, queryText, fieldText);
+            return new HodParametricRequest(fieldNames, queryRestrictions, queryProfile);
         }
     }
 }

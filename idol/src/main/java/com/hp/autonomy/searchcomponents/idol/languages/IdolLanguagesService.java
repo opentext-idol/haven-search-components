@@ -72,7 +72,7 @@ public class IdolLanguagesService implements LanguagesService {
     @Cacheable(value = "IdolLanguagesService.getDefaultLanguageId", key = "#root.methodName")
     public String getDefaultLanguageId() {
         final Languages languages = contentAciService.executeAction(new AciParameters(GeneralActions.LanguageSettings.name()), languageSettingsProcessor).getLanguages();
-        return IDOL_UTF8_ENCODING.equals(languages.getDefaultEncoding()) ? languages.getDefaultLanguage() : null;
+        return languages.getDefaultLanguageType();
     }
 
     @Override

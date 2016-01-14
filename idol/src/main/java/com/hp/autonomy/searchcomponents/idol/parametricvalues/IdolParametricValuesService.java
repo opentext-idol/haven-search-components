@@ -9,15 +9,13 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
+import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.types.idol.FlatField;
 import com.hp.autonomy.types.idol.GetQueryTagValuesResponseData;
 import com.hp.autonomy.types.idol.GetTagNamesResponseData;
 import com.hp.autonomy.types.idol.TagValue;
-import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
-import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
@@ -26,8 +24,6 @@ import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValues
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetTagNamesParams;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.ReadableInstant;
-import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,16 +39,17 @@ import java.util.Set;
 
 @Service
 public class IdolParametricValuesService implements ParametricValuesService<IdolParametricRequest, String, AciErrorException> {
-    private static final String IDOL_DATE_PARAMETER_FORMAT = "HH:mm:ss dd/MM/yyyy";
     private static final String VALUE_NODE_NAME = "value";
     private static final int MAX_VALUES = 10;
 
+    private final HavenSearchAciParameterHandler parameterHandler;
     private final AciService contentAciService;
     private final Processor<GetTagNamesResponseData> tagNamesResponseProcessor;
     private final Processor<GetQueryTagValuesResponseData> queryTagValuesResponseProcessor;
 
     @Autowired
-    public IdolParametricValuesService(final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    public IdolParametricValuesService(final HavenSearchAciParameterHandler parameterHandler, final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+        this.parameterHandler = parameterHandler;
         this.contentAciService = contentAciService;
         tagNamesResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(GetTagNamesResponseData.class);
         queryTagValuesResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(GetQueryTagValuesResponseData.class);
@@ -71,13 +68,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
             results = Collections.emptySet();
         } else {
             final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
-            aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
-            aciParameters.add(QueryParams.Text.name(), idolParametricRequest.getQueryText());
-            aciParameters.add(QueryParams.FieldText.name(), idolParametricRequest.getFieldText());
-            aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(idolParametricRequest.getDatabases()));
-            aciParameters.add(QueryParams.MinDate.name(), formatDate(idolParametricRequest.getMinDate()));
-            aciParameters.add(QueryParams.MaxDate.name(), formatDate(idolParametricRequest.getMaxDate()));
-            aciParameters.add(QueryParams.AnyLanguage.name(), true);
+            parameterHandler.addSearchRestrictions(aciParameters, idolParametricRequest.getQueryRestrictions());
             aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
             aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), MAX_VALUES);
             aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
@@ -103,10 +94,6 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         }
 
         return results;
-    }
-
-    private String formatDate(final ReadableInstant date) {
-        return date == null ? null : DateTimeFormat.forPattern(IDOL_DATE_PARAMETER_FORMAT).print(date);
     }
 
     private Collection<String> getTagNames() {

@@ -18,22 +18,17 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthentication;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
-import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
 import com.hp.autonomy.types.requests.Documents;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-@Service
-@ConditionalOnMissingBean(DocumentsService.class)
 public class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
     // IOD limits max results to 2500
     private static final int IOD_MAX_RESULTS = 2500;
@@ -60,7 +55,6 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     private final ConfigService<? extends QueryManipulationCapable> configService;
     private final QueryTextIndexService<HodSearchResult> queryTextIndexService;
 
-    @Autowired
     public HodDocumentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends QueryManipulationCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService) {
         this.findSimilarService = findSimilarService;
         this.configService = configService;
@@ -100,16 +94,16 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
 
         final QueryRequestBuilder params = new QueryRequestBuilder()
                 .setAbsoluteMaxResults(Math.min(findQueryParams.getMaxResults(), IOD_MAX_RESULTS))
-                .setSummary(findQueryParams.getSummary() != null ? Summary.valueOf(findQueryParams.getSummary()) : Summary.context)
+                .setSummary(findQueryParams.getSummary() != null ? Summary.valueOf(findQueryParams.getSummary()) : null)
                 .setStart(findQueryParams.getStart())
                 .setMaxPageResults(findQueryParams.getMaxResults() - findQueryParams.getStart() + 1)
                 .setTotalResults(true)
-                .setIndexes(findQueryParams.getIndex())
-                .setFieldText(findQueryParams.getFieldText())
+                .setIndexes(findQueryParams.getQueryRestrictions().getDatabases())
+                .setFieldText(findQueryParams.getQueryRestrictions().getFieldText())
                 .setQueryProfile(new ResourceIdentifier(getDomain(), profileName))
                 .setSort(findQueryParams.getSort() != null ? Sort.valueOf(findQueryParams.getSort()) : null)
-                .setMinDate(findQueryParams.getMinDate())
-                .setMaxDate(findQueryParams.getMaxDate())
+                .setMinDate(findQueryParams.getQueryRestrictions().getMinDate())
+                .setMaxDate(findQueryParams.getQueryRestrictions().getMaxDate())
                 .setPromotions(fetchPromotions)
                 .setPrint(Print.fields)
                 .setPrintFields(new ArrayList<>(SearchResult.ALL_FIELDS))
@@ -117,11 +111,11 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
                 .setStartTag(HIGHLIGHT_START_TAG)
                 .setEndTag(HIGHLIGHT_END_TAG);
 
-        final Documents<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(findQueryParams.getQueryText(), params);
+        final Documents<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(findQueryParams.getQueryRestrictions().getQueryText(), params);
         final List<HodSearchResult> documentList = new LinkedList<>();
 
         for (final HodSearchResult hodSearchResult : hodDocuments.getDocuments()) {
-            documentList.add(addDomain(findQueryParams.getIndex(), hodSearchResult));
+            documentList.add(addDomain(findQueryParams.getQueryRestrictions().getDatabases(), hodSearchResult));
         }
 
         return new Documents<>(documentList, hodDocuments.getTotalResults(), hodDocuments.getExpandedQuery());
