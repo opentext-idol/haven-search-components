@@ -9,13 +9,13 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.aci.content.identifier.reference.Reference;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
+import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.Hit;
@@ -24,10 +24,8 @@ import com.hp.autonomy.types.idol.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.Spelling;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
-import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SuggestParams;
-import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -38,11 +36,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class IdolDocumentService implements DocumentsService<String, SearchResult, AciErrorException> {
-    private static final int MAX_SIMILAR_DOCUMENTS = 3;
     private static final Pattern SPELLING_SEPARATOR_PATTERN = Pattern.compile(", ");
 
     protected final ConfigService<? extends HavenSearchCapable> configService;
@@ -126,19 +122,16 @@ public class IdolDocumentService implements DocumentsService<String, SearchResul
     }
 
     @Override
-    public List<SearchResult> findSimilar(final Set<String> indexes, final String reference) throws AciErrorException {
+    public Documents<SearchResult> findSimilar(final SuggestRequest<String> suggestRequest) throws AciErrorException {
         final AciParameters aciParameters = new AciParameters(QueryActions.Suggest.name());
-        aciParameters.add(SuggestParams.Reference.name(), new Reference(reference));
-        if (!indexes.isEmpty()) {
-            aciParameters.add(SuggestParams.DatabaseMatch.name(), new Databases(indexes));
-        }
-        aciParameters.add(SuggestParams.Print.name(), PrintParam.None);
-        aciParameters.add(SuggestParams.MaxResults.name(), MAX_SIMILAR_DOCUMENTS);
-        aciParameters.add(SuggestParams.Summary.name(), SummaryParam.Concept);
+        aciParameters.add(SuggestParams.Reference.name(), new Reference(suggestRequest.getReference()));
+
+        parameterHandler.addSearchRestrictions(aciParameters, suggestRequest.getQueryRestrictions());
+        parameterHandler.addSearchOutputParameters(aciParameters, suggestRequest);
 
         final SuggestResponseData responseData = contentAciService.executeAction(aciParameters, suggestResponseProcessor);
         final List<Hit> hits = responseData.getHit();
-        return parseQueryHits(hits);
+        return new Documents<>(parseQueryHits(hits), responseData.getTotalhits(), null, null, null);
     }
 
     protected List<SearchResult> parseQueryHits(final Collection<Hit> hits) {
