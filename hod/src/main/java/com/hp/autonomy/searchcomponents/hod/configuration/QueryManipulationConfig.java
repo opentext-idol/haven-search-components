@@ -17,7 +17,7 @@ public class QueryManipulationConfig {
     private final String profile;
     private final String index;
 
-    QueryManipulationConfig(
+    public QueryManipulationConfig(
             @JsonProperty("profile") final String profile,
             @JsonProperty("index") final String index
     ) {
