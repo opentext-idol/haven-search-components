@@ -17,7 +17,9 @@ public class HodLanguagesService implements LanguagesService {
     @Override
     public Map<String, LanguageType> getLanguages() {
         final LanguageType theLanguage = new LanguageType();
+        theLanguage.setName(THE_LANGUAGE);
         theLanguage.setLanguage(THE_LANGUAGE);
+        theLanguage.setDocuments(10);
 
         final Map<String, LanguageType> languages = new HashMap<>(1);
         languages.put(THE_LANGUAGE, theLanguage);

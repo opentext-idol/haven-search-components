@@ -26,6 +26,7 @@ import com.hp.autonomy.types.requests.Documents;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -111,6 +112,11 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
                 .setHighlight(Highlight.terms)
                 .setStartTag(HIGHLIGHT_START_TAG)
                 .setEndTag(HIGHLIGHT_END_TAG);
+
+        //TODO remove this when IOD have fixed the the default value of the indexes parameter (IOD-6168)
+        if (fetchPromotions) {
+            params.setIndexes(Collections.singletonList(ResourceIdentifier.WIKI_ENG));
+        }
 
         if (findQueryParams.isAutoCorrect()) {
             params.setCheckSpelling(CheckSpelling.autocorrect);
