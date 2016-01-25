@@ -9,6 +9,7 @@ import com.autonomy.aci.client.transport.AciServerDetails;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.when;
 @Configuration
 public class IdolTestConfiguration {
     @Bean
+    @ConditionalOnMissingBean(ConfigService.class)
     public ConfigService<HavenSearchCapable> configService() {
         @SuppressWarnings("unchecked") final ConfigService<HavenSearchCapable> configService = (ConfigService<HavenSearchCapable>) mock(ConfigService.class);
         final HavenSearchCapable config = mock(HavenSearchCapable.class);
