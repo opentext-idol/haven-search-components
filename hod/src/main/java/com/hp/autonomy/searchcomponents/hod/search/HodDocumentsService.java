@@ -28,6 +28,7 @@ import com.hp.autonomy.types.requests.Documents;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -87,6 +88,8 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
 
         if (fetchPromotions) {
             params.setPromotions(true);
+            //TODO remove this when IOD have fixed the the default value of the indexes parameter (IOD-6168)
+            params.setIndexes(Collections.singletonList(ResourceIdentifier.WIKI_ENG));
         }
 
         final Documents<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(searchRequest.getQueryRestrictions().getQueryText(), params);
