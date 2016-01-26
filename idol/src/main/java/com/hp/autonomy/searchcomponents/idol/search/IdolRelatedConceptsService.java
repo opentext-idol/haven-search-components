@@ -10,9 +10,7 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.types.idol.QsElement;
 import com.hp.autonomy.types.idol.QueryResponseData;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
@@ -25,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class IdolRelatedConceptsService implements RelatedConceptsService<QsElement, String, AciErrorException> {
+public class IdolRelatedConceptsService implements RelatedConceptsService<IdolRelatedConceptsRequest, QsElement, String, AciErrorException> {
     private static final int MAX_RESULTS = 50;
 
     private final HavenSearchAciParameterHandler parameterHandler;
@@ -40,12 +38,13 @@ public class IdolRelatedConceptsService implements RelatedConceptsService<QsElem
     }
 
     @Override
-    public List<QsElement> findRelatedConcepts(final QueryRestrictions<String> queryRestrictions) throws AciErrorException {
+    public List<QsElement> findRelatedConcepts(IdolRelatedConceptsRequest relatedConceptsRequest) throws AciErrorException {
         final AciParameters parameters = new AciParameters(QueryActions.Query.name());
-        parameterHandler.addSearchRestrictions(parameters, queryRestrictions);
+        parameterHandler.addSearchRestrictions(parameters, relatedConceptsRequest.getQueryRestrictions());
         parameters.add(QueryParams.MaxResults.name(), MAX_RESULTS);
         parameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         parameters.add(QueryParams.QuerySummary.name(), true);
+        parameters.add(QueryParams.QuerySummaryLength.name(), relatedConceptsRequest.getQuerySummaryLength());
 
         final QueryResponseData responseData = contentAciService.executeAction(parameters, queryResponseProcessor);
         return responseData.getQs() != null ? responseData.getQs().getElement() : Collections.<QsElement>emptyList();

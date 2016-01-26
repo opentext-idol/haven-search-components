@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class HodRelatedConceptsService implements RelatedConceptsService<Entity, ResourceIdentifier, HodErrorException> {
+public class HodRelatedConceptsService implements RelatedConceptsService<HodRelatedConceptsRequest, Entity, ResourceIdentifier, HodErrorException> {
     private final FindRelatedConceptsService findRelatedConceptsService;
 
     @Autowired
@@ -30,8 +30,9 @@ public class HodRelatedConceptsService implements RelatedConceptsService<Entity,
 
     @Override
     @Cacheable(CacheNames.RELATED_CONCEPTS)
-    public List<Entity> findRelatedConcepts(final QueryRestrictions<ResourceIdentifier> queryRestrictions) throws HodErrorException {
+    public List<Entity> findRelatedConcepts(final HodRelatedConceptsRequest relatedConceptsRequest) throws HodErrorException {
 
+        final QueryRestrictions<ResourceIdentifier> queryRestrictions = relatedConceptsRequest.getQueryRestrictions();
         final FindRelatedConceptsRequestBuilder params = new FindRelatedConceptsRequestBuilder()
                 .setIndexes(queryRestrictions.getDatabases())
                 .setFieldText(queryRestrictions.getFieldText());
