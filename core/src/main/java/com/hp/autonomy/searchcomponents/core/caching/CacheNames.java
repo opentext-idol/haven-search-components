@@ -7,4 +7,5 @@ package com.hp.autonomy.searchcomponents.core.caching;
 
 public class CacheNames {
     public static final String RELATED_CONCEPTS = "related-concepts";
+    public static final String GET_DOCUMENT_CONTENT = "get-content";
 }

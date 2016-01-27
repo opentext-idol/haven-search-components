@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -49,15 +50,30 @@ public abstract class AbstractDocumentServiceIT<S extends Serializable, D extend
 
     @Test
     public void findSimilar() throws E {
-        final SearchRequest<S> searchRequest = new SearchRequest<>();
-        final QueryRestrictions<S> queryRestrictions = buildQueryRestrictions();
-        searchRequest.setQueryRestrictions(queryRestrictions);
-        final Documents<D> documents = documentsService.queryTextIndex(searchRequest);
+        final String reference = getValidReference();
 
+        final QueryRestrictions<S> queryRestrictions = buildQueryRestrictions();
         final SuggestRequest<S> suggestRequest = new SuggestRequest<>();
-        suggestRequest.setReference(documents.getDocuments().get(0).getReference());
+        suggestRequest.setReference(reference);
         suggestRequest.setQueryRestrictions(queryRestrictions);
         final Documents<D> results = documentsService.findSimilar(suggestRequest);
         assertThat(results.getDocuments(), is(not(empty())));
+    }
+
+    @Test
+    public void getContent() throws E {
+        final String reference = getValidReference();
+
+        final GetContentRequest<S> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>(indexes.get(0), Collections.singleton(reference))));
+        final List<D> results = documentsService.getDocumentContent(getContentRequest);
+        assertThat(results, hasSize(1));
+    }
+
+    private String getValidReference() throws E {
+        final QueryRestrictions<S> queryRestrictions = buildQueryRestrictions();
+        final SearchRequest<S> searchRequest = new SearchRequest<>();
+        searchRequest.setQueryRestrictions(queryRestrictions);
+        final Documents<D> documents = documentsService.queryTextIndex(searchRequest);
+        return documents.getDocuments().get(0).getReference();
     }
 }
