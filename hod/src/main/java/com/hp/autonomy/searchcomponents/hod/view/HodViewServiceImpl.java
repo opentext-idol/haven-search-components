@@ -59,11 +59,11 @@ public class HodViewServiceImpl implements HodViewService {
     @Autowired
     public HodViewServiceImpl(
             final ViewDocumentService viewDocumentService,
-            final GetContentService<Document> getContentService,
+            final GetContentService<Document> viewGetContentService,
             final QueryTextIndexService<Document> queryTextIndexService
     ) {
         this.viewDocumentService = viewDocumentService;
-        this.getContentService = getContentService;
+        getContentService = viewGetContentService;
         this.queryTextIndexService = queryTextIndexService;
     }
 

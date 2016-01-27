@@ -9,10 +9,14 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
+import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.aci.content.identifier.reference.Reference;
+import com.hp.autonomy.aci.content.identifier.reference.ReferencesBuilder;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
@@ -24,8 +28,10 @@ import com.hp.autonomy.types.idol.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.Spelling;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
+import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SuggestParams;
+import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -40,6 +46,7 @@ import java.util.regex.Pattern;
 
 public class IdolDocumentService implements DocumentsService<String, SearchResult, AciErrorException> {
     private static final Pattern SPELLING_SEPARATOR_PATTERN = Pattern.compile(", ");
+    private static final String GET_CONTENT_QUERY_TEXT = "*";
 
     protected final ConfigService<? extends HavenSearchCapable> configService;
     protected final HavenSearchAciParameterHandler parameterHandler;
@@ -132,6 +139,31 @@ public class IdolDocumentService implements DocumentsService<String, SearchResul
         final SuggestResponseData responseData = contentAciService.executeAction(aciParameters, suggestResponseProcessor);
         final List<Hit> hits = responseData.getHit();
         return new Documents<>(parseQueryHits(hits), responseData.getTotalhits(), null, null, null);
+    }
+
+    @Override
+    public List<SearchResult> getDocumentContent(final GetContentRequest<String> request) throws AciErrorException {
+        final List<SearchResult> results = new ArrayList<>(request.getIndexesAndReferences().size());
+
+        for (final GetContentRequestIndex<String> indexAndReferences : request.getIndexesAndReferences()) {
+            final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
+            aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(indexAndReferences.getReferences()));
+            aciParameters.add(QueryParams.Summary.name(), SummaryParam.Concept);
+            aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
+            aciParameters.add(QueryParams.Text.name(), GET_CONTENT_QUERY_TEXT);
+            aciParameters.add(QueryParams.MaxResults.name(), 1);
+            aciParameters.add(QueryParams.AnyLanguage.name(), true);
+
+            if (indexAndReferences.getIndex() != null) {
+                aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexAndReferences.getIndex()));
+            }
+
+            final QueryResponseData responseData = contentAciService.executeAction(aciParameters, queryResponseProcessor);
+            final List<Hit> hits = responseData.getHit();
+            results.addAll(parseQueryHits(hits));
+        }
+
+        return results;
     }
 
     protected List<SearchResult> parseQueryHits(final Collection<Hit> hits) {

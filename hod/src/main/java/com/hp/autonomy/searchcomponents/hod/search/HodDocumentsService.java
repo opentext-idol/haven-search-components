@@ -8,6 +8,8 @@ package com.hp.autonomy.searchcomponents.hod.search;
 import com.google.common.collect.ImmutableSet;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentRequestBuilder;
+import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.CheckSpelling;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindSimilarService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Highlight;
@@ -18,13 +20,17 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthentication;
+import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
 import com.hp.autonomy.types.requests.Documents;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
@@ -55,11 +61,13 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     private final FindSimilarService<HodSearchResult> findSimilarService;
     private final ConfigService<? extends QueryManipulationCapable> configService;
     private final QueryTextIndexService<HodSearchResult> queryTextIndexService;
+    private final GetContentService<HodSearchResult> getContentService;
 
-    public HodDocumentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends QueryManipulationCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService) {
+    public HodDocumentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends QueryManipulationCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService, final GetContentService<HodSearchResult> getContentService) {
         this.findSimilarService = findSimilarService;
         this.configService = configService;
         this.queryTextIndexService = queryTextIndexService;
+        this.getContentService = getContentService;
     }
 
     @Override
@@ -77,6 +85,22 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
         final QueryRequestBuilder requestBuilder = setQueryParams(suggestRequest);
 
         return findSimilarService.findSimilarDocumentsToIndexReference(suggestRequest.getReference(), requestBuilder);
+    }
+
+    @Cacheable(CacheNames.GET_DOCUMENT_CONTENT)
+    @Override
+    public List<HodSearchResult> getDocumentContent(final GetContentRequest<ResourceIdentifier> request) throws HodErrorException {
+        final List<HodSearchResult> contentResults = new ArrayList<>();
+
+        for (final GetContentRequestIndex<ResourceIdentifier> indexAndReferences : request.getIndexesAndReferences()) {
+            final GetContentRequestBuilder builder = new GetContentRequestBuilder()
+                    .setPrintFields(new ArrayList<>(HodSearchResult.ALL_FIELDS))
+                    .setSummary(Summary.concept);
+
+            contentResults.addAll(getContentService.getContent(new ArrayList<>(indexAndReferences.getReferences()), indexAndReferences.getIndex(), builder).getDocuments());
+        }
+
+        return contentResults;
     }
 
     private Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> searchRequest, final boolean fetchPromotions) throws HodErrorException {

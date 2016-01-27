@@ -41,8 +41,13 @@ public class HavenSearchHodConfiguration {
     private HodServiceConfig<EntityType.Combined, TokenType.Simple> hodServiceConfig;
 
     @Bean
-    public GetContentService<Document> getContentService() {
-        return GetContentServiceImpl.documentsService(hodServiceConfig);
+    public GetContentService<HodSearchResult> getContentService() {
+        return new GetContentServiceImpl<>(hodServiceConfig, HodSearchResult.class);
+    }
+
+    @Bean
+    public GetContentService<Document> viewGetContentService() {
+        return new GetContentServiceImpl<>(hodServiceConfig, Document.class);
     }
 
     @Bean
