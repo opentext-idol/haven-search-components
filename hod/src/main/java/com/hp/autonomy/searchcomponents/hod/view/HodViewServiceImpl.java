@@ -59,11 +59,11 @@ public class HodViewServiceImpl implements HodViewService {
     @Autowired
     public HodViewServiceImpl(
             final ViewDocumentService viewDocumentService,
-            final GetContentService<Document> getContentService,
+            final GetContentService<Document> viewGetContentService,
             final QueryTextIndexService<Document> queryTextIndexService
     ) {
         this.viewDocumentService = viewDocumentService;
-        this.getContentService = getContentService;
+        getContentService = viewGetContentService;
         this.queryTextIndexService = queryTextIndexService;
     }
 
@@ -73,27 +73,18 @@ public class HodViewServiceImpl implements HodViewService {
             final String[] splitReference = document.getReference().split("/|\\\\");
             final String lastPart = splitReference[splitReference.length - 1];
 
-            if (StringUtils.isBlank(lastPart)) {
-                // If the reference ends with a trailing slash followed by whitespace, use the whole reference
-                return document.getReference();
-            } else {
-                return lastPart;
-            }
+            return StringUtils.isBlank(lastPart) ? document.getReference() : lastPart;
         } else {
             return document.getTitle();
         }
     }
 
     private String escapeAndAddLineBreaks(final String input) {
-        if (input == null) {
-            return "";
-        } else {
-            return StringEscapeUtils.escapeHtml(input).replace("\n", "<br>");
-        }
+        return input == null ? "" : StringEscapeUtils.escapeHtml(input).replace("\n", "<br>");
     }
 
     // Format the document's content for display in a browser
-    private InputStream formatRawContent(final Document document) throws IOException {
+    private InputStream formatRawContent(final Document document) {
         final String body = "<h1>" + escapeAndAddLineBreaks(resolveTitle(document)) + "</h1>"
                 + "<p>" + escapeAndAddLineBreaks(document.getContent()) + "</p>";
 
@@ -101,17 +92,13 @@ public class HodViewServiceImpl implements HodViewService {
     }
 
     // TODO: Reconcile with the above
-    private String formatRawContent(final String title, final String content) throws IOException {
+    private String formatRawContent(final String title, final String content) {
         return "<h1>" + escapeAndAddLineBreaks(title) + "</h1>"
                 + "<p>" + escapeAndAddLineBreaks(content) + "</p>";
     }
 
     private String hodFieldValueAsString(final Object value) {
-        if (value instanceof List) {
-            return ((List<?>) value).get(0).toString();
-        } else {
-            return value.toString();
-        }
+        return value instanceof List ? ((List<?>) value).get(0).toString() : value.toString();
     }
 
     @Override
@@ -126,13 +113,7 @@ public class HodViewServiceImpl implements HodViewService {
         final Map<String, Serializable> fields = document.getFields();
         final Object urlField = fields.get(URL_FIELD);
 
-        final String documentUrl;
-
-        if (urlField instanceof List) {
-            documentUrl = ((List<?>) urlField).get(0).toString();
-        } else {
-            documentUrl = document.getReference();
-        }
+        final String documentUrl = urlField instanceof List ? ((List<?>) urlField).get(0).toString() : document.getReference();
 
         final UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_2_SLASHES);
         InputStream inputStream = null;

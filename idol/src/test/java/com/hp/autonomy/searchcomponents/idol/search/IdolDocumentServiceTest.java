@@ -11,9 +11,12 @@ import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
+import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.types.idol.DocContent;
@@ -36,6 +39,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
@@ -132,8 +136,23 @@ public class IdolDocumentServiceTest {
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final List<SearchResult> results = idolDocumentService.findSimilar(Collections.singleton("Database1"), "Some reference");
-        assertThat(results, is(not(empty())));
+        final SuggestRequest<String> suggestRequest = new SuggestRequest<>("Some reference", new IdolQueryRestrictions.Builder().build(), 1, 30, "context", "relevance", true);
+        final Documents<SearchResult> results = idolDocumentService.findSimilar(suggestRequest);
+        assertThat(results.getDocuments(), is(not(empty())));
+    }
+
+    @Test
+    public void getContent() {
+        final QueryResponseData responseData = new QueryResponseData();
+        responseData.setTotalhits(1);
+        final Hit hit = mockHit();
+        responseData.getHit().add(hit);
+
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+
+        final GetContentRequest<String> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference"))));
+        final List<SearchResult> results = idolDocumentService.getDocumentContent(getContentRequest);
+        assertThat(results, hasSize(1));
     }
 
     protected SearchRequest<String> mockQueryParams() {

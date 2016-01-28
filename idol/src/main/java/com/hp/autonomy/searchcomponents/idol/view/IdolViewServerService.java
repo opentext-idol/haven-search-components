@@ -16,6 +16,8 @@ import com.hp.autonomy.aci.content.identifier.reference.Reference;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.idolutils.processors.CopyResponseProcessor;
+import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.GetContentResponseData;
@@ -32,11 +34,11 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.Collection;
+import java.io.OutputStream;
 import java.util.List;
 
 @Service
-public class IdolViewServerService implements ViewServerService {
+public class IdolViewServerService implements ViewServerService<String, AciErrorException> {
     private final AciService contentAciService;
     private final AciService viewAciService;
     private final Processor<GetContentResponseData> getContentResponseProcessor;
@@ -56,18 +58,16 @@ public class IdolViewServerService implements ViewServerService {
      * document exists, then reads the configured reference field and passes the value of the field to ViewServer.
      *
      * @param documentReference The IDOL document reference of the document to view
-     * @param indexes           The IDOL databases containing the reference (no restriction set on getContent query if this is an empty collection)
-     * @param processor         The processor that will consume the ViewServer output
-     * @param <T>               The return type of the processor
-     * @return The return value of the given processor
+     * @param database          The IDOL databases containing the reference (no restriction set on getContent query if this is an empty collection)
+     * @param outputStream      The ViewServer output
      * @throws ViewDocumentNotFoundException If the given document reference does not exist in IDOL
      * @throws ViewNoReferenceFieldException If the document with the given reference does not have the required reference field
      * @throws ReferenceFieldBlankException  If the configured reference field name is blank
      * @throws ViewServerErrorException      If ViewServer returns a status code outside the 200 range
      */
     @Override
-    public <T> T viewDocument(final String documentReference, final Collection<String> indexes, final Processor<T> processor) throws ViewDocumentNotFoundException, ViewNoReferenceFieldException, ReferenceFieldBlankException {
-        final String referenceFieldValue = getReferenceFieldValue(documentReference, indexes);
+    public void viewDocument(final String documentReference, final String database, final OutputStream outputStream) throws ViewDocumentNotFoundException, ViewNoReferenceFieldException, ReferenceFieldBlankException {
+        final String referenceFieldValue = getReferenceFieldValue(documentReference, database);
 
         final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
         viewParameters.add(ViewParams.NoACI.name(), true);
@@ -77,21 +77,21 @@ public class IdolViewServerService implements ViewServerService {
         viewParameters.add(ViewParams.OriginalBaseURL.name(), true);
 
         try {
-            return viewAciService.executeAction(viewParameters, processor);
+            viewAciService.executeAction(viewParameters, new CopyResponseProcessor(outputStream));
         } catch (final AciServiceException e) {
             throw new ViewServerErrorException(documentReference, e);
         }
     }
 
-    private String getReferenceFieldValue(final String documentReference, final Collection<String> indexes) throws ReferenceFieldBlankException, ViewDocumentNotFoundException, ViewNoReferenceFieldException {
+    private String getReferenceFieldValue(final String documentReference, final String database) throws ReferenceFieldBlankException, ViewDocumentNotFoundException, ViewNoReferenceFieldException {
         final String referenceField = configService.getConfig().getViewConfig().getReferenceField();
         if (StringUtils.isEmpty(referenceField)) {
             throw new ReferenceFieldBlankException();
         }
 
         final AciParameters parameters = new AciParameters(QueryActions.GetContent.name());
-        if (!indexes.isEmpty()) {
-            parameters.add(GetContentParams.DatabaseMatch.name(), new Databases(indexes));
+        if (database != null) {
+            parameters.add(GetContentParams.DatabaseMatch.name(), new Databases(database));
         }
         parameters.add(GetContentParams.Reference.name(), new Reference(documentReference));
         parameters.add(GetContentParams.Print.name(), PrintParam.Fields);

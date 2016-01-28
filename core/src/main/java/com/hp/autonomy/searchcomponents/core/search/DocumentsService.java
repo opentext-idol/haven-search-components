@@ -9,7 +9,6 @@ import com.hp.autonomy.types.requests.Documents;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 
 public interface DocumentsService<S extends Serializable, D extends SearchResult, E extends Exception> {
     String HIGHLIGHT_START_TAG = "<HavenSearch-QueryText-Placeholder>";
@@ -19,6 +18,8 @@ public interface DocumentsService<S extends Serializable, D extends SearchResult
 
     Documents<D> queryTextIndexForPromotions(final SearchRequest<S> searchRequest) throws E;
 
-    List<D> findSimilar(Set<S> indexes, String reference) throws E;
+    Documents<D> findSimilar(final SuggestRequest<S> suggestRequest) throws E;
+
+    List<D> getDocumentContent(final GetContentRequest<S> request) throws E;
 
 }

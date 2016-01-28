@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.hod.beanconfiguration;
 
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsService;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindSimilarService;
@@ -39,8 +40,8 @@ class DefaultHodConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(DocumentsService.class)
-    public DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> documentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends QueryManipulationCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService) {
-        return new HodDocumentsService(findSimilarService, configService, queryTextIndexService);
+    public DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> documentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends QueryManipulationCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService, final GetContentService<HodSearchResult> getContentService) {
+        return new HodDocumentsService(findSimilarService, configService, queryTextIndexService, getContentService);
     }
 
     @Bean

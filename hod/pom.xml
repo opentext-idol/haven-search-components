@@ -16,6 +16,24 @@
         <gpg.secretKeyring>${project.parent.basedir}/secret.gpg</gpg.secretKeyring>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>test-jar</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>com.hp.autonomy.frontend</groupId>
@@ -38,6 +56,14 @@
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.5.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hp.autonomy.frontend</groupId>
+            <artifactId>haven-search-components-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
