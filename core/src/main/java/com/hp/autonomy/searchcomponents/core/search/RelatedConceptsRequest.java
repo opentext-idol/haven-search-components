@@ -6,7 +6,6 @@
 package com.hp.autonomy.searchcomponents.core.search;
 
 import java.io.Serializable;
-import java.util.Set;
 
 public interface RelatedConceptsRequest<S extends Serializable> extends Serializable {
     int getQuerySummaryLength();

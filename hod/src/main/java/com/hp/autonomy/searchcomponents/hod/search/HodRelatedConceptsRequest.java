@@ -29,16 +29,16 @@ public class HodRelatedConceptsRequest implements RelatedConceptsRequest<Resourc
     @Accessors(chain = true)
     @NoArgsConstructor
     public static class Builder {
-        private int maxRelatedConcepts = 0;
+        private int querySummaryLength = 0;
         private QueryRestrictions<ResourceIdentifier> queryRestrictions;
         
         public Builder(final RelatedConceptsRequest<ResourceIdentifier> relatedConceptsRequest) {
-            maxRelatedConcepts = relatedConceptsRequest.getQuerySummaryLength();
+            querySummaryLength = relatedConceptsRequest.getQuerySummaryLength();
             queryRestrictions = relatedConceptsRequest.getQueryRestrictions();
         }
 
         public HodRelatedConceptsRequest build() {
-            return new HodRelatedConceptsRequest(maxRelatedConcepts, queryRestrictions);
+            return new HodRelatedConceptsRequest(querySummaryLength, queryRestrictions);
         }
     }
 }
