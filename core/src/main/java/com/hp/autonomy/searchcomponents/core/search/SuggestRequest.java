@@ -19,8 +19,8 @@ public class SuggestRequest<S extends Serializable> implements AciSearchRequest<
 
     protected String reference;
     protected QueryRestrictions<S> queryRestrictions;
-    protected int start;
-    protected int maxResults;
+    protected int start = DEFAULT_START;
+    protected int maxResults = DEFAULT_MAX_RESULTS;
     protected String summary;
     protected String sort;
     protected boolean highlight;

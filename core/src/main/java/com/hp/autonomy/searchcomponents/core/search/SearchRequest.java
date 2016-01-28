@@ -18,8 +18,8 @@ public class SearchRequest<S extends Serializable> implements AciSearchRequest<S
     private static final long serialVersionUID = -6338199353489914631L;
 
     protected QueryRestrictions<S> queryRestrictions;
-    protected int start;
-    protected int maxResults;
+    protected int start = DEFAULT_START;
+    protected int maxResults = DEFAULT_MAX_RESULTS;
     protected String summary;
     protected String sort;
     protected boolean highlight;

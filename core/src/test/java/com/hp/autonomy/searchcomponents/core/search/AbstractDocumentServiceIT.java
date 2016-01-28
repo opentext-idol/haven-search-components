@@ -5,6 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.search;
 
+import com.hp.autonomy.searchcomponents.core.test.IntegrationTestUtils;
 import com.hp.autonomy.types.requests.Documents;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,18 +24,13 @@ public abstract class AbstractDocumentServiceIT<S extends Serializable, D extend
     @Autowired
     protected DocumentsService<S, D, E> documentsService;
 
-    protected final List<S> indexes;
-
-    protected AbstractDocumentServiceIT(final List<S> indexes) {
-        this.indexes = new ArrayList<>(indexes);
-    }
-
-    protected abstract QueryRestrictions<S> buildQueryRestrictions();
+    @Autowired
+    protected IntegrationTestUtils<S, D, E> integrationTestUtils;
 
     @Test
     public void query() throws E {
         final SearchRequest<S> searchRequest = new SearchRequest<>();
-        searchRequest.setQueryRestrictions(buildQueryRestrictions());
+        searchRequest.setQueryRestrictions(integrationTestUtils.buildQueryRestrictions());
         final Documents<D> documents = documentsService.queryTextIndex(searchRequest);
         assertThat(documents.getDocuments(), is(not(empty())));
     }
@@ -43,16 +38,16 @@ public abstract class AbstractDocumentServiceIT<S extends Serializable, D extend
     @Test
     public void queryForPromotions() throws E {
         final SearchRequest<S> searchRequest = new SearchRequest<>();
-        searchRequest.setQueryRestrictions(buildQueryRestrictions());
+        searchRequest.setQueryRestrictions(integrationTestUtils.buildQueryRestrictions());
         final Documents<D> documents = documentsService.queryTextIndexForPromotions(searchRequest);
         assertThat(documents.getDocuments(), is(empty())); // TODO: configure this later
     }
 
     @Test
     public void findSimilar() throws E {
-        final String reference = getValidReference();
+        final String reference = integrationTestUtils.getValidReference();
 
-        final QueryRestrictions<S> queryRestrictions = buildQueryRestrictions();
+        final QueryRestrictions<S> queryRestrictions = integrationTestUtils.buildQueryRestrictions();
         final SuggestRequest<S> suggestRequest = new SuggestRequest<>();
         suggestRequest.setReference(reference);
         suggestRequest.setQueryRestrictions(queryRestrictions);
@@ -62,18 +57,11 @@ public abstract class AbstractDocumentServiceIT<S extends Serializable, D extend
 
     @Test
     public void getContent() throws E {
-        final String reference = getValidReference();
+        final String reference = integrationTestUtils.getValidReference();
 
-        final GetContentRequest<S> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>(indexes.get(0), Collections.singleton(reference))));
+        final S database = integrationTestUtils.getDatabases().get(0);
+        final GetContentRequest<S> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>(database, Collections.singleton(reference))));
         final List<D> results = documentsService.getDocumentContent(getContentRequest);
         assertThat(results, hasSize(1));
-    }
-
-    private String getValidReference() throws E {
-        final QueryRestrictions<S> queryRestrictions = buildQueryRestrictions();
-        final SearchRequest<S> searchRequest = new SearchRequest<>();
-        searchRequest.setQueryRestrictions(queryRestrictions);
-        final Documents<D> documents = documentsService.queryTextIndex(searchRequest);
-        return documents.getDocuments().get(0).getReference();
     }
 }
