@@ -38,7 +38,7 @@ public class IdolRelatedConceptsService implements RelatedConceptsService<IdolRe
     }
 
     @Override
-    public List<QsElement> findRelatedConcepts(IdolRelatedConceptsRequest relatedConceptsRequest) throws AciErrorException {
+    public List<QsElement> findRelatedConcepts(final IdolRelatedConceptsRequest relatedConceptsRequest) throws AciErrorException {
         final AciParameters parameters = new AciParameters(QueryActions.Query.name());
         parameterHandler.addSearchRestrictions(parameters, relatedConceptsRequest.getQueryRestrictions());
         parameters.add(QueryParams.MaxResults.name(), MAX_RESULTS);

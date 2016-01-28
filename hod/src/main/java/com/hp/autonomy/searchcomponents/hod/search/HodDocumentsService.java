@@ -8,6 +8,8 @@ package com.hp.autonomy.searchcomponents.hod.search;
 import com.google.common.collect.ImmutableSet;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentRequestBuilder;
+import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.CheckSpelling;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindSimilarService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Highlight;
@@ -18,18 +20,23 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthentication;
+import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
+import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
+import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
 import com.hp.autonomy.types.requests.Documents;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
     // IOD limits max results to 2500
@@ -51,16 +58,16 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
             ResourceIdentifier.PATENTS.getName()
     );
 
-    private static final int MAX_SIMILAR_DOCUMENTS = 3;
-
     private final FindSimilarService<HodSearchResult> findSimilarService;
     private final ConfigService<? extends QueryManipulationCapable> configService;
     private final QueryTextIndexService<HodSearchResult> queryTextIndexService;
+    private final GetContentService<HodSearchResult> getContentService;
 
-    public HodDocumentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends QueryManipulationCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService) {
+    public HodDocumentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends QueryManipulationCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService, final GetContentService<HodSearchResult> getContentService) {
         this.findSimilarService = findSimilarService;
         this.configService = configService;
         this.queryTextIndexService = queryTextIndexService;
+        this.getContentService = getContentService;
     }
 
     @Override
@@ -74,62 +81,77 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     }
 
     @Override
-    public List<HodSearchResult> findSimilar(final Set<ResourceIdentifier> indexes, final String reference) throws HodErrorException {
-        final QueryRequestBuilder requestBuilder = new QueryRequestBuilder()
-                .setIndexes(indexes)
-                .setPrint(Print.none)
-                .setAbsoluteMaxResults(MAX_SIMILAR_DOCUMENTS)
-                .setSummary(Summary.concept);
+    public Documents<HodSearchResult> findSimilar(final SuggestRequest<ResourceIdentifier> suggestRequest) throws HodErrorException {
+        final QueryRequestBuilder requestBuilder = setQueryParams(suggestRequest);
 
-        final Documents<HodSearchResult> result = findSimilarService.findSimilarDocumentsToIndexReference(reference, requestBuilder);
-        final List<HodSearchResult> documents = new LinkedList<>();
-
-        for (final HodSearchResult document : result.getDocuments()) {
-            documents.add(addDomain(indexes, document));
-        }
-
-        return documents;
+        return findSimilarService.findSimilarDocumentsToIndexReference(suggestRequest.getReference(), requestBuilder);
     }
 
-    private Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> findQueryParams, final boolean fetchPromotions) throws HodErrorException {
-        final String profileName = configService.getConfig().getQueryManipulation().getProfile();
+    @Cacheable(CacheNames.GET_DOCUMENT_CONTENT)
+    @Override
+    public List<HodSearchResult> getDocumentContent(final GetContentRequest<ResourceIdentifier> request) throws HodErrorException {
+        final List<HodSearchResult> contentResults = new ArrayList<>();
 
-        final QueryRequestBuilder params = new QueryRequestBuilder()
-                .setAbsoluteMaxResults(Math.min(findQueryParams.getMaxResults(), IOD_MAX_RESULTS))
-                .setSummary(findQueryParams.getSummary() != null ? Summary.valueOf(findQueryParams.getSummary()) : null)
-                .setStart(findQueryParams.getStart())
-                .setMaxPageResults(findQueryParams.getMaxResults() - findQueryParams.getStart() + 1)
-                .setTotalResults(true)
-                .setIndexes(findQueryParams.getQueryRestrictions().getDatabases())
-                .setFieldText(findQueryParams.getQueryRestrictions().getFieldText())
-                .setQueryProfile(new ResourceIdentifier(getDomain(), profileName))
-                .setSort(findQueryParams.getSort() != null ? Sort.valueOf(findQueryParams.getSort()) : null)
-                .setMinDate(findQueryParams.getQueryRestrictions().getMinDate())
-                .setMaxDate(findQueryParams.getQueryRestrictions().getMaxDate())
-                .setPromotions(fetchPromotions)
-                .setPrint(Print.fields)
-                .setPrintFields(new ArrayList<>(SearchResult.ALL_FIELDS))
-                .setHighlight(Highlight.terms)
-                .setStartTag(HIGHLIGHT_START_TAG)
-                .setEndTag(HIGHLIGHT_END_TAG);
+        for (final GetContentRequestIndex<ResourceIdentifier> indexAndReferences : request.getIndexesAndReferences()) {
+            final GetContentRequestBuilder builder = new GetContentRequestBuilder()
+                    .setPrintFields(new ArrayList<>(HodSearchResult.ALL_FIELDS))
+                    .setSummary(Summary.concept);
 
-        //TODO remove this when IOD have fixed the the default value of the indexes parameter (IOD-6168)
-        if (fetchPromotions) {
-            params.setIndexes(Collections.singletonList(ResourceIdentifier.WIKI_ENG));
+            contentResults.addAll(getContentService.getContent(new ArrayList<>(indexAndReferences.getReferences()), indexAndReferences.getIndex(), builder).getDocuments());
         }
 
-        if (findQueryParams.isAutoCorrect()) {
+        return contentResults;
+    }
+
+    private Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> searchRequest, final boolean fetchPromotions) throws HodErrorException {
+        final QueryRequestBuilder params = setQueryParams(searchRequest);
+
+        if (searchRequest.isAutoCorrect()) {
             params.setCheckSpelling(CheckSpelling.autocorrect);
         }
 
-        final Documents<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(findQueryParams.getQueryRestrictions().getQueryText(), params);
+        if (fetchPromotions) {
+            params.setPromotions(true);
+            //TODO remove this when IOD have fixed the the default value of the indexes parameter (IOD-6168)
+            params.setIndexes(Collections.singletonList(ResourceIdentifier.WIKI_ENG));
+        }
+
+        final Documents<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(searchRequest.getQueryRestrictions().getQueryText(), params);
         final List<HodSearchResult> documentList = new LinkedList<>();
 
         for (final HodSearchResult hodSearchResult : hodDocuments.getDocuments()) {
-            documentList.add(addDomain(findQueryParams.getQueryRestrictions().getDatabases(), hodSearchResult));
+            documentList.add(addDomain(searchRequest.getQueryRestrictions().getDatabases(), hodSearchResult));
         }
 
         return new Documents<>(documentList, hodDocuments.getTotalResults(), hodDocuments.getExpandedQuery(), null, hodDocuments.getAutoCorrection());
+    }
+
+    private QueryRequestBuilder setQueryParams(final AciSearchRequest<ResourceIdentifier> searchRequest) {
+        final String profileName = configService.getConfig().getQueryManipulation().getProfile();
+
+        final QueryRequestBuilder queryRequestBuilder = new QueryRequestBuilder()
+                .setAbsoluteMaxResults(Math.min(searchRequest.getMaxResults(), IOD_MAX_RESULTS))
+                .setSummary(searchRequest.getSummary() != null ? Summary.valueOf(searchRequest.getSummary()) : null)
+                .setStart(searchRequest.getStart())
+                .setMaxPageResults(searchRequest.getMaxResults() - searchRequest.getStart() + 1)
+                .setTotalResults(true)
+                .setIndexes(searchRequest.getQueryRestrictions().getDatabases())
+                .setFieldText(searchRequest.getQueryRestrictions().getFieldText())
+                .setQueryProfile(new ResourceIdentifier(getDomain(), profileName))
+                .setSort(searchRequest.getSort() != null ? Sort.valueOf(searchRequest.getSort()) : null)
+                .setMinDate(searchRequest.getQueryRestrictions().getMinDate())
+                .setMaxDate(searchRequest.getQueryRestrictions().getMaxDate())
+                .setPrint(Print.fields)
+                .setPrintFields(new ArrayList<>(SearchResult.ALL_FIELDS));
+
+        if (searchRequest.isHighlight()) {
+            queryRequestBuilder
+                    .setHighlight(Highlight.terms)
+                    .setStartTag(HIGHLIGHT_START_TAG)
+                    .setEndTag(HIGHLIGHT_END_TAG);
+        }
+
+        return queryRequestBuilder;
     }
 
     // Add a domain to a FindDocument, given the collection of indexes which were queried against to return it from HOD

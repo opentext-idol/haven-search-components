@@ -28,16 +28,16 @@ public class IdolRelatedConceptsRequest implements RelatedConceptsRequest<String
     @Accessors(chain = true)
     @NoArgsConstructor
     public static class Builder {
-        private int maxRelatedConcepts = 0;
+        private int querySummaryLength = 0;
         private QueryRestrictions<String> queryRestrictions;
         
         public Builder(final RelatedConceptsRequest<String> relatedConceptsRequest) {
-            maxRelatedConcepts = relatedConceptsRequest.getQuerySummaryLength();
+            querySummaryLength = relatedConceptsRequest.getQuerySummaryLength();
             queryRestrictions = relatedConceptsRequest.getQueryRestrictions();
         }
 
         public IdolRelatedConceptsRequest build() {
-            return new IdolRelatedConceptsRequest(maxRelatedConcepts, queryRestrictions);
+            return new IdolRelatedConceptsRequest(querySummaryLength, queryRestrictions);
         }
     }
 }

@@ -10,9 +10,9 @@ import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
+import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
@@ -50,7 +50,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
     }
 
     @Override
-    public void addSearchOutputParameters(final AciParameters aciParameters, final SearchRequest<String> searchRequest) {
+    public void addSearchOutputParameters(final AciParameters aciParameters, final AciSearchRequest<String> searchRequest) {
         aciParameters.add(QueryParams.Start.name(), searchRequest.getStart());
         aciParameters.add(QueryParams.MaxResults.name(), searchRequest.getMaxResults());
         aciParameters.add(QueryParams.Summary.name(), SummaryParam.fromValue(searchRequest.getSummary(), null));
