@@ -12,6 +12,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.FindRelatedConcepts
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class HodRelatedConceptsService implements RelatedConceptsService<HodRelatedConceptsRequest, Entity, ResourceIdentifier, HodErrorException> {
+public class HodRelatedConceptsService implements RelatedConceptsService<Entity, ResourceIdentifier, HodErrorException> {
     private final FindRelatedConceptsService findRelatedConceptsService;
 
     @Autowired
@@ -30,7 +31,7 @@ public class HodRelatedConceptsService implements RelatedConceptsService<HodRela
 
     @Override
     @Cacheable(CacheNames.RELATED_CONCEPTS)
-    public List<Entity> findRelatedConcepts(final HodRelatedConceptsRequest relatedConceptsRequest) throws HodErrorException {
+    public List<Entity> findRelatedConcepts(final RelatedConceptsRequest<ResourceIdentifier> relatedConceptsRequest) throws HodErrorException {
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = relatedConceptsRequest.getQueryRestrictions();
         final FindRelatedConceptsRequestBuilder params = new FindRelatedConceptsRequestBuilder()
