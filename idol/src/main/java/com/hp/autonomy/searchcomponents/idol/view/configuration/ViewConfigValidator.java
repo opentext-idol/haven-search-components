@@ -9,7 +9,6 @@ import com.autonomy.aci.client.annotations.IdolAnnotationsProcessorFactory;
 import com.autonomy.aci.client.services.AciService;
 import com.hp.autonomy.frontend.configuration.ValidationResult;
 import com.hp.autonomy.frontend.configuration.Validator;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
