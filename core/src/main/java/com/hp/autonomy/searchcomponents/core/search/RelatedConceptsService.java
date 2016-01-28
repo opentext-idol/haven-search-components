@@ -10,8 +10,8 @@ import com.hp.autonomy.types.requests.idol.actions.query.QuerySummaryElement;
 import java.io.Serializable;
 import java.util.List;
 
-public interface RelatedConceptsService<R extends RelatedConceptsRequest<S>, Q extends QuerySummaryElement, S extends Serializable, E extends Exception> {
+public interface RelatedConceptsService<Q extends QuerySummaryElement, S extends Serializable, E extends Exception> {
 
-    List<Q> findRelatedConcepts(R relatedConceptsRequest) throws E;
+    List<Q> findRelatedConcepts(RelatedConceptsRequest<S> relatedConceptsRequest) throws E;
 
 }

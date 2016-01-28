@@ -10,6 +10,7 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
 import com.hp.autonomy.types.idol.QsElement;
 import com.hp.autonomy.types.idol.QueryResponseData;
@@ -23,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class IdolRelatedConceptsService implements RelatedConceptsService<IdolRelatedConceptsRequest, QsElement, String, AciErrorException> {
+public class IdolRelatedConceptsService implements RelatedConceptsService<QsElement, String, AciErrorException> {
     private static final int MAX_RESULTS = 50;
 
     private final HavenSearchAciParameterHandler parameterHandler;
@@ -38,7 +39,7 @@ public class IdolRelatedConceptsService implements RelatedConceptsService<IdolRe
     }
 
     @Override
-    public List<QsElement> findRelatedConcepts(final IdolRelatedConceptsRequest relatedConceptsRequest) throws AciErrorException {
+    public List<QsElement> findRelatedConcepts(final RelatedConceptsRequest<String> relatedConceptsRequest) throws AciErrorException {
         final AciParameters parameters = new AciParameters(QueryActions.Query.name());
         parameterHandler.addSearchRestrictions(parameters, relatedConceptsRequest.getQueryRestrictions());
         parameters.add(QueryParams.MaxResults.name(), MAX_RESULTS);
