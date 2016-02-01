@@ -22,4 +22,6 @@ public interface DocumentsService<S extends Serializable, D extends SearchResult
 
     List<D> getDocumentContent(final GetContentRequest<S> request) throws E;
 
+    String getStateToken(final QueryRestrictions<S> queryRestrictions, final int maxResults) throws E;
+
 }

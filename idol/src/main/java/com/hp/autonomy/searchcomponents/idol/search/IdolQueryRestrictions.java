@@ -8,14 +8,11 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.joda.time.DateTime;
 
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -31,6 +28,8 @@ public class IdolQueryRestrictions implements QueryRestrictions<String> {
     private final DateTime maxDate;
     private final String languageType;
     private final boolean anyLanguage;
+    private final List<String> stateMatchId;
+    private final List<String> stateDontMatchId;
 
     @JsonPOJOBuilder(withPrefix = "set")
     @Setter
@@ -44,9 +43,11 @@ public class IdolQueryRestrictions implements QueryRestrictions<String> {
         private DateTime maxDate;
         private String languageType;
         private boolean anyLanguage;
+        private List<String> stateMatchId = Collections.emptyList();
+        private List<String> stateDontMatchId = Collections.emptyList();
 
         public IdolQueryRestrictions build() {
-            return new IdolQueryRestrictions(queryText, fieldText, databases, minDate, maxDate, languageType, anyLanguage);
+            return new IdolQueryRestrictions(queryText, fieldText, databases, minDate, maxDate, languageType, anyLanguage, stateMatchId, stateDontMatchId);
         }
     }
 }
