@@ -43,6 +43,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -153,6 +154,18 @@ public class IdolDocumentServiceTest {
         final GetContentRequest<String> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference"))));
         final List<SearchResult> results = idolDocumentService.getDocumentContent(getContentRequest);
         assertThat(results, hasSize(1));
+    }
+
+    @Test
+    public void getStateToken() {
+        final String mockStateToken = "abc";
+        final QueryResponseData responseData = new QueryResponseData();
+        responseData.setState(mockStateToken);
+
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+
+        final String stateToken = idolDocumentService.getStateToken(mockQueryParams().getQueryRestrictions(), 42);
+        assertEquals(stateToken, mockStateToken);
     }
 
     protected SearchRequest<String> mockQueryParams() {

@@ -25,12 +25,14 @@ import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
 import com.hp.autonomy.types.requests.Documents;
 import org.springframework.cache.annotation.Cacheable;
+import org.apache.commons.lang.NotImplementedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
@@ -101,6 +103,11 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
         }
 
         return contentResults;
+    }
+
+    @Override
+    public String getStateToken(final QueryRestrictions<ResourceIdentifier> queryRestrictions, final int maxResults) throws HodErrorException {
+        throw new NotImplementedException("State tokens are not yet retrievable from Haven OnDemand");
     }
 
     private Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> searchRequest, final boolean fetchPromotions) throws HodErrorException {
