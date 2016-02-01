@@ -9,14 +9,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.joda.time.DateTime;
 
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -32,6 +29,10 @@ public class HodQueryRestrictions implements QueryRestrictions<ResourceIdentifie
     private final DateTime maxDate;
     private final String languageType;
     private final boolean anyLanguage;
+
+    // State tokens not yet supported in HoD, so leaving these out of the builder for now
+    private final List<String> stateMatchId = Collections.emptyList();
+    private final List<String> stateDontMatchId = Collections.emptyList();
 
     @JsonPOJOBuilder(withPrefix = "set")
     @Setter
