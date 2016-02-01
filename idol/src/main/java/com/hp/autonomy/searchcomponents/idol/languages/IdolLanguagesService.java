@@ -51,16 +51,16 @@ public class IdolLanguagesService implements LanguagesService {
         final Map<String, LanguageType> nonUtf8Languages = new HashMap<>(languageTypes.size());
         for (final LanguageType languageType : languageTypes) {
             if (IDOL_UTF8_ENCODING.equals(languageType.getEncoding())) {
-                languages.put(languageType.getLanguage(), languageType);
-                languagesByName.put(languageType.getName(), languageType);
+                languages.put(languageType.getName(), languageType);
+                languagesByName.put(languageType.getLanguage(), languageType);
             } else {
-                nonUtf8Languages.put(languageType.getName(), languageType);
+                nonUtf8Languages.put(languageType.getLanguage(), languageType);
             }
         }
 
         for (final Map.Entry<String, LanguageType> entry : nonUtf8Languages.entrySet()) {
             if (languagesByName.containsKey(entry.getKey())) {
-                final LanguageType equivalentUtf8languageType = languages.get(languagesByName.get(entry.getKey()).getLanguage());
+                final LanguageType equivalentUtf8languageType = languages.get(languagesByName.get(entry.getKey()).getName());
                 equivalentUtf8languageType.setDocuments(equivalentUtf8languageType.getDocuments() + entry.getValue().getDocuments());
             }
         }

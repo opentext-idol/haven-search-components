@@ -20,7 +20,7 @@ import java.util.List;
 public class HodIntegrationTestUtils extends IntegrationTestUtils<ResourceIdentifier, HodSearchResult, HodErrorException> {
     @Override
     public List<ResourceIdentifier> getDatabases() {
-        return Collections.singletonList(ResourceIdentifier.NEWS_ENG);
+        return Collections.singletonList(ResourceIdentifier.WIKI_ENG);
     }
 
     @Override
