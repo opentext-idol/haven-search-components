@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.database.Databases;
+import com.hp.autonomy.aci.content.identifier.stateid.StateIdsBuilder;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
@@ -15,11 +16,7 @@ import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
-import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
-import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
-import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
-import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
-import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.*;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormat;
@@ -40,6 +37,12 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.Text.name(), queryRestrictions.getQueryText());
         if (!queryRestrictions.getDatabases().isEmpty()) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(queryRestrictions.getDatabases()));
+        }
+        if (!queryRestrictions.getStateMatchId().isEmpty()) {
+            aciParameters.add(QueryParams.StateMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateMatchId()));
+        }
+        if (!queryRestrictions.getStateDontMatchId().isEmpty()) {
+            aciParameters.add(QueryParams.StateDontMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateDontMatchId()));
         }
         aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
         aciParameters.add(QueryParams.MinDate.name(), formatDate(queryRestrictions.getMinDate()));

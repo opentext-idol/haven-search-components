@@ -23,5 +23,9 @@ public interface QueryRestrictions<S extends Serializable> extends Serializable 
 
     String getLanguageType();
 
+    List<String> getStateMatchId();
+
+    List<String> getStateDontMatchId();
+
     boolean isAnyLanguage();
 }

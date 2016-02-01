@@ -47,7 +47,15 @@ public class HavenSearchAciParameterHandlerTest {
     @Test
     public void addSearchRestrictions() {
         final AciParameters aciParameters = new AciParameters();
-        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("Some Text").setFieldText("Some field text").setDatabases(Collections.singletonList("Database1")).setMaxDate(DateTime.now()).setAnyLanguage(true).build();
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder()
+                .setQueryText("Some Text")
+                .setFieldText("Some field text")
+                .setDatabases(Collections.singletonList("Database1"))
+                .setStateMatchId(Collections.singletonList("stateID1"))
+                .setStateDontMatchId(Collections.singletonList("stateID2"))
+                .setMaxDate(DateTime.now())
+                .setAnyLanguage(true)
+                .build();
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
         assertThat(aciParameters, is(not(empty())));
     }
