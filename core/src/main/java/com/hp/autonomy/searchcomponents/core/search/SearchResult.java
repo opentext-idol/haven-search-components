@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -80,7 +81,6 @@ public class SearchResult implements Serializable {
         reference = builder.reference;
         index = builder.index;
 
-        title = builder.title;
         summary = builder.summary;
         contentType = builder.contentType;
         url = builder.url;
@@ -98,6 +98,22 @@ public class SearchResult implements Serializable {
         promotionName = builder.promotionName;
         weight = builder.weight;
         injectedPromotion = builder.injectedPromotion;
+
+        if (builder.title == null && reference != null) {
+            // If there is no title, assume the reference is a path and take the last part (the "file name")
+            final String[] splitReference = reference.split("/|\\\\");
+            final String lastPart = splitReference[splitReference.length - 1];
+
+            if (StringUtils.isBlank(lastPart)) {
+                // If the reference ends with a trailing slash followed by whitespace, use the whole reference
+                title = reference;
+            } else {
+                title = lastPart;
+            }
+        }
+        else {
+            title = builder.title;
+        }
     }
 
     @SuppressWarnings("FieldMayBeFinal")
