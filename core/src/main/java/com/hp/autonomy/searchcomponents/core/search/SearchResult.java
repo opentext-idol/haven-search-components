@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2016 Hewlett-Packard Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -104,7 +104,7 @@ public class SearchResult implements Serializable {
             final String[] splitReference = reference.split("/|\\\\");
             final String lastPart = splitReference[splitReference.length - 1];
 
-            if (StringUtils.isBlank(lastPart)) {
+            if (StringUtils.isBlank(lastPart) || reference.endsWith("/") || reference.endsWith("\\")) {
                 // If the reference ends with a trailing slash followed by whitespace, use the whole reference
                 title = reference;
             } else {
