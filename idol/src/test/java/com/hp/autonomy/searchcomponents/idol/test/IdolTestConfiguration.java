@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 
 @Configuration
 public class IdolTestConfiguration {
-    public static final String IDOL_HOST = "find-idol";
+    public static final String IDOL_HOST = "iso-idol";
     public static final int CONTENT_PORT = 9000;
     public static final int VIEW_SERVER_PORT = 9080;
 

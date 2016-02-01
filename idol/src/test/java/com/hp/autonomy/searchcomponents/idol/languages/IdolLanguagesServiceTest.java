@@ -93,11 +93,11 @@ public class IdolLanguagesServiceTest {
         final GetStatusResponseData getStatusResponseData = new GetStatusResponseData();
         final LanguageTypeSettings languageTypeSettings = new LanguageTypeSettings();
         final List<LanguageType> languageTypes = languageTypeSettings.getLanguageType();
-        languageTypes.add(newLanguageType("afrikaansAWESOME", "AFRIKAANS", "UTF8", 10));
-        languageTypes.add(newLanguageType("chineseUTF8", "CHINESE", "UTF8", 2));
-        languageTypes.add(newLanguageType("englishASCII", "ENGLISH", "ASCII", 102));
-        languageTypes.add(newLanguageType("englishUTF8", "ENGLISH", "UTF8", 25));
-        languageTypes.add(newLanguageType("frenchASCII", "FRENCH", "ASCII", 25));
+        languageTypes.add(newLanguageType("AFRIKAANS", "afrikaansAWESOME", "UTF8", 10));
+        languageTypes.add(newLanguageType("CHINESE", "chineseUTF8", "UTF8", 2));
+        languageTypes.add(newLanguageType("ENGLISH", "englishASCII", "ASCII", 102));
+        languageTypes.add(newLanguageType("ENGLISH", "englishUTF8", "UTF8", 25));
+        languageTypes.add(newLanguageType("FRENCH", "frenchASCII", "ASCII", 25));
         getStatusResponseData.setLanguageTypeSettings(languageTypeSettings);
         when(contentAciService.executeAction(any(AciParameters.class), eq(getStatusProcessor))).thenReturn(getStatusResponseData);
     }
