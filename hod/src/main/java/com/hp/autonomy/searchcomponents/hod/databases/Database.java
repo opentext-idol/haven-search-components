@@ -18,7 +18,7 @@ import java.util.Set;
 
 @Data
 @IdolDocument(Database.ROOT_FIELD)
-public final class Database implements IdolDatabase {
+public final class Database implements IdolDatabase, Comparable<Database> {
     private static final long serialVersionUID = -3966566623844850811L;
     static final String ROOT_FIELD = "database";
 
@@ -36,6 +36,11 @@ public final class Database implements IdolDatabase {
         this.isPublic = isPublic;
         this.domain = domain;
         this.fieldNames = fieldNames == null ? Collections.<String>emptySet() : fieldNames;
+    }
+
+    @Override
+    public int compareTo(final Database other) {
+        return name.compareTo(other.name);
     }
 
     @IdolBuilder
