@@ -8,7 +8,6 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.search.AbstractRelatedConceptsServiceIT;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
-import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
 import com.hp.autonomy.types.idol.QsElement;
 import org.junit.runner.RunWith;
@@ -17,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = HavenSearchIdolConfiguration.class)
-public class IdolRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceIT<QsElement, String, SearchResult, AciErrorException> {
+public class IdolRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceIT<QsElement, String, IdolSearchResult, AciErrorException> {
     @Override
     protected RelatedConceptsRequest<String> createRelatedConceptsRequest() {
         return new IdolRelatedConceptsRequest.Builder()

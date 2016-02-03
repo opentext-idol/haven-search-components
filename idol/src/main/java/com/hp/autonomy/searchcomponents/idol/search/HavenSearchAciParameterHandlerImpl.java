@@ -14,7 +14,6 @@ import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.types.requests.idol.actions.query.params.*;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
@@ -60,7 +59,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.Predict.name(), false);
         aciParameters.add(QueryParams.Sort.name(), searchRequest.getSort());
         aciParameters.add(QueryParams.Print.name(), PrintParam.Fields);
-        aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(SearchResult.ALL_FIELDS));
+        aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(IdolSearchResult.ALL_FIELDS));
         aciParameters.add(QueryParams.TotalResults.name(), true);
         aciParameters.add(QueryParams.XMLMeta.name(), true);
 

@@ -10,41 +10,30 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-public class SearchResultTest {
+public abstract class SearchResultTest {
+    protected abstract SearchResult buildSearchResult(final String reference);
 
     @Test
     public void testWindowsFilePathReferenceUsedCorrectlyAsTitle() {
-        final SearchResult searchResult = new SearchResult.Builder()
-            .setReference("C:\\Documents\\file.txt")
-            .build();
-
+        final SearchResult searchResult = buildSearchResult("C:\\Documents\\file.txt");
         assertThat(searchResult.getTitle(), is("file.txt"));
     }
 
     @Test
     public void testUnixFilePathReferenceUsedCorrectlyAsTitle() {
-        final SearchResult searchResult = new SearchResult.Builder()
-            .setReference("/home/user/another-file.txt")
-            .build();
-
+        final SearchResult searchResult = buildSearchResult("/home/user/another-file.txt");
         assertThat(searchResult.getTitle(), is("another-file.txt"));
     }
 
     @Test
     public void testWholeReferenceUsedIfReferenceEndsWithASlash() {
-        final SearchResult searchResult = new SearchResult.Builder()
-            .setReference("http://example.com/main/")
-            .build();
-
+        final SearchResult searchResult = buildSearchResult("http://example.com/main/");
         assertThat(searchResult.getTitle(), is("http://example.com/main/"));
     }
 
     @Test
     public void testWholeReferenceUseIfReferenceEndsWithASlashFollowedByWhitespace() {
-        final SearchResult searchResult = new SearchResult.Builder()
-            .setReference("foo/   \n ")
-            .build();
-
+        final SearchResult searchResult = buildSearchResult("foo/   \n ");
         assertThat(searchResult.getTitle(), is("foo/   \n "));
     }
 
