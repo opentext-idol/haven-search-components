@@ -55,7 +55,7 @@ public final class Database implements IdolDatabase, Comparable<Database> {
 
         @IdolField("name")
         public Builder setName(final String name) {
-            this.name = name.toLowerCase();
+            this.name = name;
             return this;
         }
 
