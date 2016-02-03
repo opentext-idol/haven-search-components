@@ -42,7 +42,7 @@ import java.util.List;
 
 public class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
     // IOD limits max results to 2500
-    protected static final int HOD_MAX_RESULTS = 2500;
+    public static final int HOD_MAX_RESULTS = 2500;
 
     private static final ImmutableSet<String> PUBLIC_INDEX_NAMES = ImmutableSet.of(
             ResourceIdentifier.WIKI_CHI.getName(),

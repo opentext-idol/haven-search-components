@@ -51,31 +51,31 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class HodDocumentServiceTest {
     @Mock
-    private FindSimilarService<HodSearchResult> findSimilarService;
+    protected FindSimilarService<HodSearchResult> findSimilarService;
 
     @Mock
-    private ConfigService<? extends QueryManipulationCapable> configService;
+    protected ConfigService<? extends QueryManipulationCapable> configService;
 
     @Mock
-    private QueryManipulationCapable config;
+    protected QueryManipulationCapable config;
 
     @Mock
-    private QueryTextIndexService<HodSearchResult> queryTextIndexService;
+    protected QueryTextIndexService<HodSearchResult> queryTextIndexService;
 
     @Mock
-    private GetContentService<HodSearchResult> getContentService;
+    protected GetContentService<HodSearchResult> getContentService;
 
     @Mock
-    private AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
+    protected AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
 
     @Mock
-    private HodAuthentication hodAuthentication;
+    protected HodAuthentication hodAuthentication;
 
     @Mock
-    private HodAuthenticationPrincipal hodAuthenticationPrincipal;
+    protected HodAuthenticationPrincipal hodAuthenticationPrincipal;
 
-    private HodDocumentsService documentsService;
-    private final HodIntegrationTestUtils testUtils = new HodIntegrationTestUtils();
+    protected HodDocumentsService documentsService;
+    protected final HodIntegrationTestUtils testUtils = new HodIntegrationTestUtils();
 
     @Before
     public void setUp() {
