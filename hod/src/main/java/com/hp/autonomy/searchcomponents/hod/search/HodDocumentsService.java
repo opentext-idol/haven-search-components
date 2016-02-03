@@ -151,7 +151,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
                 .setMinDate(searchRequest.getQueryRestrictions().getMinDate())
                 .setMaxDate(searchRequest.getQueryRestrictions().getMaxDate())
                 .setPrint(Print.fields)
-                .setPrintFields(new ArrayList<>(SearchResult.ALL_FIELDS));
+                .setPrintFields(new ArrayList<>(HodSearchResult.ALL_FIELDS));
 
         if (searchRequest.isHighlight()) {
             queryRequestBuilder

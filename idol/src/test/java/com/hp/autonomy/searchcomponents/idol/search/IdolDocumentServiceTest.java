@@ -13,9 +13,9 @@ import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
+import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
-import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
@@ -85,7 +85,7 @@ public class IdolDocumentServiceTest {
         final QueryResponseData responseData = mockQueryResponse();
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final Documents<SearchResult> results = idolDocumentService.queryTextIndex(mockQueryParams());
+        final Documents<IdolSearchResult> results = idolDocumentService.queryTextIndex(mockQueryParams());
         assertThat(results.getDocuments(), is(not(empty())));
     }
 
@@ -95,13 +95,13 @@ public class IdolDocumentServiceTest {
         final QueryResponseData responseData = mockQueryResponse();
         when(qmsAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final Documents<SearchResult> results = idolDocumentService.queryTextIndex(mockQueryParams());
+        final Documents<IdolSearchResult> results = idolDocumentService.queryTextIndex(mockQueryParams());
         assertThat(results.getDocuments(), is(not(empty())));
     }
 
     @Test
     public void queryContentForPromotions() {
-        final Documents<SearchResult> results = idolDocumentService.queryTextIndexForPromotions(mockQueryParams());
+        final Documents<IdolSearchResult> results = idolDocumentService.queryTextIndexForPromotions(mockQueryParams());
         assertThat(results.getDocuments(), is(empty()));
     }
 
@@ -114,18 +114,26 @@ public class IdolDocumentServiceTest {
 
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
         final SearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, null, true, true, null);
-        final Documents<SearchResult> results = idolDocumentService.queryTextIndex(searchRequest);
+        final Documents<IdolSearchResult> results = idolDocumentService.queryTextIndex(searchRequest);
         assertThat(results.getDocuments(), is(not(empty())));
     }
 
     @Test
     public void queryQmsForPromotions() {
         when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setEnabled(true).build());
-        final QueryResponseData responseData = mockQueryResponse();
+        final QueryResponseData responseData = new QueryResponseData();
+        responseData.setTotalhits(2);
+        final Hit hit1 = mockHit();
+        hit1.setPromotionname("SomeName");
+        final Hit hit2 = mockInjectedPromotionHit();
+        responseData.getHit().addAll(Arrays.asList(hit1, hit2));
         when(qmsAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final Documents<SearchResult> results = idolDocumentService.queryTextIndexForPromotions(mockQueryParams());
+        final Documents<IdolSearchResult> results = idolDocumentService.queryTextIndexForPromotions(mockQueryParams());
         assertThat(results.getDocuments(), is(not(empty())));
+        assertEquals(PromotionCategory.STATIC_CONTENT_PROMOTION, results.getDocuments().get(0).getPromotionCategory());
+        assertEquals(PromotionCategory.CARDINAL_PLACEMENT, results.getDocuments().get(1).getPromotionCategory());
+
     }
 
     @Test
@@ -138,7 +146,7 @@ public class IdolDocumentServiceTest {
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
         final SuggestRequest<String> suggestRequest = new SuggestRequest<>("Some reference", new IdolQueryRestrictions.Builder().build(), 1, 30, "context", "relevance", true);
-        final Documents<SearchResult> results = idolDocumentService.findSimilar(suggestRequest);
+        final Documents<IdolSearchResult> results = idolDocumentService.findSimilar(suggestRequest);
         assertThat(results.getDocuments(), is(not(empty())));
     }
 
@@ -152,7 +160,7 @@ public class IdolDocumentServiceTest {
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
         final GetContentRequest<String> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference"))));
-        final List<SearchResult> results = idolDocumentService.getDocumentContent(getContentRequest);
+        final List<IdolSearchResult> results = idolDocumentService.getDocumentContent(getContentRequest);
         assertThat(results, hasSize(1));
     }
 
@@ -165,7 +173,7 @@ public class IdolDocumentServiceTest {
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
         final String stateToken = idolDocumentService.getStateToken(mockQueryParams().getQueryRestrictions(), 42);
-        assertEquals(stateToken, mockStateToken);
+        assertEquals(mockStateToken, stateToken);
     }
 
     protected SearchRequest<String> mockQueryParams() {
@@ -192,10 +200,31 @@ public class IdolDocumentServiceTest {
         when(childNodes.getLength()).thenReturn(1);
         final Element childNode = mock(Element.class);
         final Node textNode = mock(Node.class);
-        when(textNode.getNodeValue()).thenReturn("Some Value");
+        when(textNode.getNodeValue()).thenReturn("2016-02-03T11:42:00");
         when(childNode.getFirstChild()).thenReturn(textNode);
         when(childNodes.item(0)).thenReturn(childNode);
         when(element.getElementsByTagName(anyString())).thenReturn(childNodes);
+        content.getContent().add(element);
+        hit.setContent(content);
+
+        return hit;
+    }
+
+    private Hit mockInjectedPromotionHit() {
+        final Hit hit = new Hit();
+        hit.setTitle("Some Other Title");
+
+        final DocContent content = new DocContent();
+        final Element element = mock(Element.class);
+        final NodeList childNodes = mock(NodeList.class);
+        when(childNodes.getLength()).thenReturn(1);
+        final Element childNode = mock(Element.class);
+        final Node textNode = mock(Node.class);
+        when(textNode.getNodeValue()).thenReturn("true");
+        when(childNode.getFirstChild()).thenReturn(textNode);
+        when(childNodes.item(0)).thenReturn(childNode);
+        when(element.getElementsByTagName(anyString())).thenReturn(mock(NodeList.class));
+        when(element.getElementsByTagName(IdolSearchResult.INJECTED_PROMOTION_FIELD.toUpperCase())).thenReturn(childNodes);
         content.getContent().add(element);
         hit.setContent(content);
 

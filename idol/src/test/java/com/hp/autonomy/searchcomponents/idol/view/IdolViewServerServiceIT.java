@@ -6,14 +6,14 @@
 package com.hp.autonomy.searchcomponents.idol.view;
 
 import com.autonomy.aci.client.services.AciErrorException;
-import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.core.view.AbstractViewServerServiceIT;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
+import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = HavenSearchIdolConfiguration.class)
-public class IdolViewServerServiceIT extends AbstractViewServerServiceIT<String, SearchResult, AciErrorException> {
+public class IdolViewServerServiceIT extends AbstractViewServerServiceIT<String, IdolSearchResult, AciErrorException> {
 }
