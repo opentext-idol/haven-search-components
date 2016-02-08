@@ -55,7 +55,7 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
         if (fieldNames.isEmpty()) {
             results = Collections.emptySet();
         } else {
-            final ResourceIdentifier queryProfile = getQueryProfile();
+            final ResourceIdentifier queryProfile = parametricRequest.isModified() ? getQueryProfile() : null;
 
             final GetParametricValuesRequestBuilder parametricParams = new GetParametricValuesRequestBuilder()
                     .setQueryProfile(queryProfile)
