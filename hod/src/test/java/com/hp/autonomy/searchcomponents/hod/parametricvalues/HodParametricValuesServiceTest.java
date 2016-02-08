@@ -6,19 +6,30 @@
 package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 
 import com.google.common.collect.ImmutableSet;
+import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldNames;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.hod.sso.HodAuthentication;
+import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
+import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
+import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
+import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationConfig;
+import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -27,19 +38,54 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("ConstantConditions")
+@RunWith(MockitoJUnitRunner.class)
 public class HodParametricValuesServiceTest {
+    @Mock
+    protected GetParametricValuesService getParametricValuesService;
+
+    @Mock
+    protected FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
+
+    @Mock
+    protected ConfigService<? extends QueryManipulationCapable> configService;
+
+    @Mock
+    protected AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
+
+    @Mock
+    private HodAuthentication hodAuthentication;
+
+    @Mock
+    private HodAuthenticationPrincipal hodAuthenticationPrincipal;
+
+    @Mock
+    protected QueryManipulationCapable config;
+
+    protected HodParametricValuesService parametricValuesService;
+
+    @Before
+    public void setUp() throws HodErrorException {
+        parametricValuesService = new HodParametricValuesService(fieldsService, getParametricValuesService(), configService, authenticationInformationRetriever);
+    }
+
+    @Before
+    public void mocks() throws HodErrorException {
+        when(config.getQueryManipulation()).thenReturn(new QueryManipulationConfig("SomeProfile", "SomeIndex"));
+        when(configService.getConfig()).thenReturn(config);
+
+        when(hodAuthenticationPrincipal.getApplication()).thenReturn(new ResourceIdentifier("SomeDomain", "SomeIndex"));
+        when(hodAuthentication.getPrincipal()).thenReturn(hodAuthenticationPrincipal);
+        when(authenticationInformationRetriever.getAuthentication()).thenReturn(hodAuthentication);
+    }
 
     @Test
     public void getsParametricValues() throws HodErrorException {
-        final HodParametricValuesService parametricValuesServiceImpl = new HodParametricValuesService(getParametricValuesService());
-
         final List<ResourceIdentifier> indexes = Arrays.asList(ResourceIdentifier.WIKI_ENG, ResourceIdentifier.PATENTS);
 
         final Set<String> fieldNames = ImmutableSet.<String>builder()
@@ -48,13 +94,9 @@ public class HodParametricValuesServiceTest {
                 .add("football field")
                 .build();
 
-        final QueryRestrictions<ResourceIdentifier> queryRestrictions = new HodQueryRestrictions.Builder().setDatabases(indexes).build();
-        final HodParametricRequest testRequest = new HodParametricRequest.Builder()
-                .setFieldNames(fieldNames)
-                .setQueryRestrictions(queryRestrictions)
-                .build();
+        final HodParametricRequest testRequest = generateRequest(indexes, fieldNames);
 
-        final Set<QueryTagInfo> fieldNamesSet = parametricValuesServiceImpl.getAllParametricValues(testRequest);
+        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
 
         final Map<String, QueryTagInfo> fieldNamesMap = new HashMap<>();
 
@@ -75,24 +117,31 @@ public class HodParametricValuesServiceTest {
 
     @Test
     public void emptyFieldNamesReturnEmptyParametricValues() throws HodErrorException {
-        final HodParametricValuesService hodParametricValuesService = new HodParametricValuesService(getParametricValuesService());
-
         final List<ResourceIdentifier> indexes = Collections.singletonList(ResourceIdentifier.PATENTS);
-
-        final QueryRestrictions<ResourceIdentifier> queryRestrictions = new HodQueryRestrictions.Builder().setDatabases(indexes).build();
-        final HodParametricRequest testRequest = new HodParametricRequest.Builder()
-                .setFieldNames(Collections.<String>emptySet())
-                .setQueryRestrictions(queryRestrictions)
-                .build();
-
-        final Set<QueryTagInfo> fieldNamesSet = hodParametricValuesService.getAllParametricValues(testRequest);
-
+        final HodParametricRequest testRequest = generateRequest(indexes, Collections.<String>emptySet());
+        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
         assertThat(fieldNamesSet, is(empty()));
     }
 
-    private GetParametricValuesService getParametricValuesService() throws HodErrorException {
-        final GetParametricValuesService getParametricValuesService = mock(GetParametricValuesService.class);
+    @Test
+    public void lookupFieldNames() throws HodErrorException {
+        when(fieldsService.getParametricFields(any(HodFieldsRequest.class))).thenReturn(Collections.singletonList("grassy field"));
 
+        final List<ResourceIdentifier> indexes = Collections.singletonList(ResourceIdentifier.WIKI_ENG);
+        final HodParametricRequest testRequest = generateRequest(indexes, Collections.<String>emptySet());
+        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
+        assertThat(fieldNamesSet, is(not(empty())));
+    }
+
+    private HodParametricRequest generateRequest(final List<ResourceIdentifier> indexes, final Set<String> fieldNames) {
+        final QueryRestrictions<ResourceIdentifier> queryRestrictions = new HodQueryRestrictions.Builder().setDatabases(indexes).build();
+        return new HodParametricRequest.Builder()
+                .setFieldNames(fieldNames)
+                .setQueryRestrictions(queryRestrictions)
+                .build();
+    }
+
+    protected GetParametricValuesService getParametricValuesService() throws HodErrorException {
         final Map<String, Integer> fieldsOfFootball = new LinkedHashMap<>();
         fieldsOfFootball.put("worms", 100);
         fieldsOfFootball.put("slugs", 50);
@@ -112,11 +161,7 @@ public class HodParametricValuesServiceTest {
                 .addParametricValue("empty field", new LinkedHashMap<String, Integer>())
                 .build();
 
-        //noinspection unchecked
-        when(getParametricValuesService.getParametricValues(
-                argThat(any(Collection.class)),
-                argThat(any(Collection.class)),
-                argThat(any(GetParametricValuesRequestBuilder.class))
+        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class)
         )).thenReturn(everythingFieldNames);
 
         return getParametricValuesService;

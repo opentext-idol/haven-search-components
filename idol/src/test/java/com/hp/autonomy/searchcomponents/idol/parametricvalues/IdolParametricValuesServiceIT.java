@@ -8,7 +8,6 @@ package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametricValuesServiceIT;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
-import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -18,12 +17,12 @@ import java.util.HashSet;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = HavenSearchIdolConfiguration.class)
-public class IdolParametricValuesServiceIT extends AbstractParametricValuesServiceIT<IdolParametricRequest, String, IdolSearchResult, AciErrorException> {
+public class IdolParametricValuesServiceIT extends AbstractParametricValuesServiceIT<IdolParametricRequest, String, AciErrorException> {
     @Override
     protected IdolParametricRequest createParametricRequest() {
         return new IdolParametricRequest.Builder()
                 .setFieldNames(new HashSet<>(Arrays.asList("AUTHOR", "CATEGORY")))
-                .setQueryRestrictions(integrationTestUtils.buildQueryRestrictions())
+                .setQueryRestrictions(testUtils.buildQueryRestrictions())
                 .build();
     }
 }

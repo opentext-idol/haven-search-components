@@ -20,4 +20,14 @@ public interface ViewServerService<S extends Serializable, E extends Exception> 
      * @throws E any error
      */
     void viewDocument(String documentReference, S database, OutputStream outputStream) throws E, IOException;
+
+    /**
+     * View a static content promotion, writing the output to the given output stream.
+     *
+     * @param documentReference      The reference of the search result created by the promotion
+     * @param outputStream           The output stream to write the viewed document to
+     * @throws IOException
+     * @throws E any error
+     */
+    void viewStaticContentPromotion(String documentReference, OutputStream outputStream) throws IOException, E;
 }

@@ -17,6 +17,7 @@ import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
 import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.GetContentResponseData;
 import com.hp.autonomy.types.idol.Hit;
+import org.apache.commons.lang3.NotImplementedException;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 import static org.mockito.Matchers.any;
@@ -70,6 +72,11 @@ public class IdolViewServerServiceTest {
         idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", "SomeDatabase", mock(OutputStream.class));
 
         verify(viewAciService, times(1)).executeAction(argThat(AciParameterMatcher.aciParametersWith("Reference", "http://en.wikipedia.org/wiki/Car")), any(Processor.class));
+    }
+
+    @Test(expected = NotImplementedException.class)
+    public void viewStaticContentPromotion() throws IOException {
+        idolViewServerService.viewStaticContentPromotion("SomeReference", mock(OutputStream.class));
     }
 
     @Test(expected = ReferenceFieldBlankException.class)

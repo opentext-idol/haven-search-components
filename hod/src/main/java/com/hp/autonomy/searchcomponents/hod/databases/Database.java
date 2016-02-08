@@ -5,19 +5,16 @@
 
 package com.hp.autonomy.searchcomponents.hod.databases;
 
-import com.autonomy.aci.client.annotations.IdolBuilder;
 import com.autonomy.aci.client.annotations.IdolBuilderBuild;
-import com.autonomy.aci.client.annotations.IdolDocument;
-import com.autonomy.aci.client.annotations.IdolField;
 import com.hp.autonomy.types.IdolDatabase;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Data
-@IdolDocument(Database.ROOT_FIELD)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Database implements IdolDatabase, Comparable<Database> {
     private static final long serialVersionUID = -3966566623844850811L;
     static final String ROOT_FIELD = "database";
@@ -27,67 +24,25 @@ public final class Database implements IdolDatabase, Comparable<Database> {
     private final long documents;
     private final boolean isPublic;
     private final String domain;
-    private final Set<String> fieldNames;
-
-    private Database(final String name, final String displayName, final long documents, final boolean isPublic, final String domain, final Set<String> fieldNames) {
-        this.documents = documents;
-        this.name = name;
-        this.displayName = displayName;
-        this.isPublic = isPublic;
-        this.domain = domain;
-        this.fieldNames = fieldNames == null ? Collections.<String>emptySet() : fieldNames;
-    }
 
     @Override
     public int compareTo(final Database other) {
         return name.compareTo(other.name);
     }
 
-    @IdolBuilder
-    @IdolDocument(ROOT_FIELD)
+    @Accessors(chain = true)
+    @Setter
     public static class Builder {
         private String name;
         private String displayName;
         private long documents;
         private boolean isPublic;
+        @SuppressWarnings("FieldMayBeFinal")
         private String domain = "";
-        private Set<String> indexFields;
-
-        @IdolField("name")
-        public Builder setName(final String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder setDisplayName(final String displayName) {
-            this.displayName = displayName;
-            return this;
-        }
-
-        @IdolField("documents")
-        public Builder setDocuments(final long documents) {
-            this.documents = documents;
-            return this;
-        }
-
-        public Builder setIsPublic(final boolean isPublic) {
-            this.isPublic = isPublic;
-            return this;
-        }
-
-        public Builder setDomain(final String domain) {
-            this.domain = domain;
-            return this;
-        }
-
-        public Builder setIndexFields(final Set<String> indexFields) {
-            this.indexFields = new HashSet<>(indexFields);
-            return this;
-        }
 
         @IdolBuilderBuild
         public Database build() {
-            return new Database(name, displayName, documents, isPublic, domain, indexFields);
+            return new Database(name, displayName, documents, isPublic, domain);
         }
     }
 }

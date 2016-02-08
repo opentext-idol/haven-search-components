@@ -13,5 +13,9 @@ import java.util.Set;
 public interface ParametricRequest<S extends Serializable> extends Serializable {
     Set<String> getFieldNames();
 
+    Integer getMaxValues();
+
     QueryRestrictions<S> getQueryRestrictions();
+
+    boolean isModified();
 }
