@@ -92,7 +92,9 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
 
         parameterHandler.addSearchRestrictions(aciParameters, searchRequest.getQueryRestrictions());
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
-        parameterHandler.addQmsParameters(aciParameters, searchRequest.getQueryRestrictions());
+        if (searchRequest.getQueryType() != SearchRequest.QueryType.RAW) {
+            parameterHandler.addQmsParameters(aciParameters, searchRequest.getQueryRestrictions());
+        }
 
         if (searchRequest.isAutoCorrect()) {
             aciParameters.add(QueryParams.SpellCheck.name(), true);

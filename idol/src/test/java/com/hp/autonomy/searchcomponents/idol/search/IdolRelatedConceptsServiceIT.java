@@ -16,11 +16,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = HavenSearchIdolConfiguration.class)
-public class IdolRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceIT<QsElement, String, IdolSearchResult, AciErrorException> {
+public class IdolRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceIT<QsElement, String, AciErrorException> {
     @Override
     protected RelatedConceptsRequest<String> createRelatedConceptsRequest() {
         return new IdolRelatedConceptsRequest.Builder()
-                .setQueryRestrictions(integrationTestUtils.buildQueryRestrictions())
+                .setQueryRestrictions(testUtils.buildQueryRestrictions())
                 .setQuerySummaryLength(50)
                 .build();
     }

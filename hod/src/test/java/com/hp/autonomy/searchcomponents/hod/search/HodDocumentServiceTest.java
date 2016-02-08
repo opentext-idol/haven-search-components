@@ -23,7 +23,7 @@ import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationConfig;
-import com.hp.autonomy.searchcomponents.hod.test.HodIntegrationTestUtils;
+import com.hp.autonomy.searchcomponents.hod.test.HodTestUtils;
 import com.hp.autonomy.types.requests.Documents;
 import org.apache.commons.lang.NotImplementedException;
 import org.hamcrest.beans.HasPropertyWithValue;
@@ -75,7 +75,7 @@ public class HodDocumentServiceTest {
     protected HodAuthenticationPrincipal hodAuthenticationPrincipal;
 
     protected HodDocumentsService documentsService;
-    protected final HodIntegrationTestUtils testUtils = new HodIntegrationTestUtils();
+    protected final HodTestUtils testUtils = new HodTestUtils();
 
     @Before
     public void setUp() {

@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.search;
 
-import com.hp.autonomy.searchcomponents.core.test.IntegrationTestUtils;
+import com.hp.autonomy.searchcomponents.core.test.TestUtils;
 import com.hp.autonomy.types.requests.idol.actions.query.QuerySummaryElement;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,17 +16,15 @@ import java.io.Serializable;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public abstract class AbstractRelatedConceptsServiceIT<Q extends QuerySummaryElement, S extends Serializable, D extends SearchResult, E extends Exception> {
+public abstract class AbstractRelatedConceptsServiceIT<Q extends QuerySummaryElement, S extends Serializable, E extends Exception> {
     @Autowired
     private RelatedConceptsService<Q, S, E> relatedConceptsService;
 
     @Autowired
-    protected IntegrationTestUtils<S, D, E> integrationTestUtils;
+    protected TestUtils<S> testUtils;
 
     protected abstract RelatedConceptsRequest<S> createRelatedConceptsRequest();
 

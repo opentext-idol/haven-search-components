@@ -10,18 +10,17 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
+import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.types.idol.FlatField;
 import com.hp.autonomy.types.idol.GetQueryTagValuesResponseData;
-import com.hp.autonomy.types.idol.GetTagNamesResponseData;
 import com.hp.autonomy.types.idol.TagValue;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
-import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
-import com.hp.autonomy.types.requests.idol.actions.tags.params.GetTagNamesParams;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBElement;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,27 +38,26 @@ import java.util.Set;
 @Service
 public class IdolParametricValuesService implements ParametricValuesService<IdolParametricRequest, String, AciErrorException> {
     private static final String VALUE_NODE_NAME = "value";
-    private static final int MAX_VALUES = 10;
 
     private final HavenSearchAciParameterHandler parameterHandler;
+    private final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService;
     private final AciService contentAciService;
-    private final Processor<GetTagNamesResponseData> tagNamesResponseProcessor;
     private final Processor<GetQueryTagValuesResponseData> queryTagValuesResponseProcessor;
 
     @Autowired
-    public IdolParametricValuesService(final HavenSearchAciParameterHandler parameterHandler, final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    public IdolParametricValuesService(final HavenSearchAciParameterHandler parameterHandler, final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService, final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
         this.parameterHandler = parameterHandler;
+        this.fieldsService = fieldsService;
         this.contentAciService = contentAciService;
-        tagNamesResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(GetTagNamesResponseData.class);
         queryTagValuesResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(GetQueryTagValuesResponseData.class);
     }
 
     @Override
-    public Set<QueryTagInfo> getAllParametricValues(final IdolParametricRequest idolParametricRequest) throws AciErrorException {
+    public Set<QueryTagInfo> getAllParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
         final Collection<String> fieldNames = new HashSet<>();
-        fieldNames.addAll(idolParametricRequest.getFieldNames());
+        fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
-            fieldNames.addAll(getTagNames());
+            fieldNames.addAll(fieldsService.getParametricFields(new IdolFieldsRequest.Builder().build()));
         }
 
         final Set<QueryTagInfo> results;
@@ -68,9 +65,14 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
             results = Collections.emptySet();
         } else {
             final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
-            parameterHandler.addSearchRestrictions(aciParameters, idolParametricRequest.getQueryRestrictions());
+            parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
+
+            if (parametricRequest.isModified()) {
+                parameterHandler.addQmsParameters(aciParameters, parametricRequest.getQueryRestrictions());
+            }
+
             aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
-            aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), MAX_VALUES);
+            aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), parametricRequest.getMaxValues());
             aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
             aciParameters.add(GetQueryTagValuesParams.Sort.name(), SortParam.DocumentCount.name());
 
@@ -94,22 +96,6 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         }
 
         return results;
-    }
-
-    private Collection<String> getTagNames() {
-        final AciParameters aciParameters = new AciParameters(TagActions.GetTagNames.name());
-        aciParameters.add(GetTagNamesParams.FieldType.name(), FieldTypeParam.Parametric);
-
-        final GetTagNamesResponseData responseData = contentAciService.executeAction(aciParameters, tagNamesResponseProcessor);
-
-        final List<GetTagNamesResponseData.Name> names = responseData.getName();
-        final Collection<String> tagNames = new ArrayList<>(names.size());
-        for (final GetTagNamesResponseData.Name name : names) {
-            final String value = name.getValue();
-            tagNames.add(getFieldNameFromPath(value));
-        }
-
-        return tagNames;
     }
 
     private String getFieldNameFromPath(final String value) {

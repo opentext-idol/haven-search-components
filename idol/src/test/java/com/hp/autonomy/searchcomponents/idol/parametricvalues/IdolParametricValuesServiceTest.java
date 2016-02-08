@@ -5,11 +5,14 @@
 
 package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
+import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.types.idol.FlatField;
@@ -44,6 +47,9 @@ public class IdolParametricValuesServiceTest {
     private HavenSearchAciParameterHandler parameterHandler;
 
     @Mock
+    private FieldsService<IdolFieldsRequest, AciErrorException> fieldsService;
+
+    @Mock
     private AciService contentAciService;
 
     @Mock
@@ -56,7 +62,7 @@ public class IdolParametricValuesServiceTest {
 
     @Before
     public void setUp() {
-        parametricValuesService = new IdolParametricValuesService(parameterHandler, contentAciService, aciResponseProcessorFactory);
+        parametricValuesService = new IdolParametricValuesService(parameterHandler, fieldsService, contentAciService, aciResponseProcessorFactory);
     }
 
     @Test
@@ -75,10 +81,10 @@ public class IdolParametricValuesServiceTest {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).build();
         final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.<String>emptySet()).setQueryRestrictions(queryRestrictions).build();
 
-        final GetTagNamesResponseData tagNamesResponseData = mockTagNamesResponse();
+        when(fieldsService.getParametricFields(any(IdolFieldsRequest.class))).thenReturn(Collections.singletonList("CATEGORY"));
 
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(tagNamesResponseData).thenReturn(responseData);
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
         final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
@@ -93,14 +99,6 @@ public class IdolParametricValuesServiceTest {
 
         final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
         assertThat(results, is(empty()));
-    }
-
-    private GetTagNamesResponseData mockTagNamesResponse() {
-        final GetTagNamesResponseData responseData = new GetTagNamesResponseData();
-        final GetTagNamesResponseData.Name name = new GetTagNamesResponseData.Name();
-        name.setValue("DOCUMENT/CATEGORY");
-        responseData.getName().add(name);
-        return responseData;
     }
 
     private GetQueryTagValuesResponseData mockQueryResponse() {

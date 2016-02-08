@@ -18,11 +18,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {HodTestConfiguration.class, HavenSearchHodConfiguration.class})
-public class HodRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceIT<Entity, ResourceIdentifier, HodSearchResult, HodErrorException> {
+public class HodRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceIT<Entity, ResourceIdentifier, HodErrorException> {
     @Override
     protected RelatedConceptsRequest<ResourceIdentifier> createRelatedConceptsRequest() {
         return new HodRelatedConceptsRequest.Builder()
-                .setQueryRestrictions(integrationTestUtils.buildQueryRestrictions())
+                .setQueryRestrictions(testUtils.buildQueryRestrictions())
                 .setQuerySummaryLength(50)
                 .build();
     }

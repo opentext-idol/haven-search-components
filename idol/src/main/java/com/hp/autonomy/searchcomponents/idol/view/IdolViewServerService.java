@@ -29,11 +29,13 @@ import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -81,6 +83,11 @@ public class IdolViewServerService implements ViewServerService<String, AciError
         } catch (final AciServiceException e) {
             throw new ViewServerErrorException(documentReference, e);
         }
+    }
+
+    @Override
+    public void viewStaticContentPromotion(final String documentReference, final OutputStream outputStream) throws IOException, AciErrorException {
+        throw new NotImplementedException("Viewing static content promotions on premise is not yet possible");
     }
 
     private String getReferenceFieldValue(final String documentReference, final String database) throws ReferenceFieldBlankException, ViewDocumentNotFoundException, ViewNoReferenceFieldException {

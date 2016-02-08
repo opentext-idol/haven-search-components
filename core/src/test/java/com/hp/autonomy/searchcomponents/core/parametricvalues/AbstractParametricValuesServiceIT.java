@@ -5,8 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
-import com.hp.autonomy.searchcomponents.core.search.SearchResult;
-import com.hp.autonomy.searchcomponents.core.test.IntegrationTestUtils;
+import com.hp.autonomy.searchcomponents.core.test.TestUtils;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,17 +16,15 @@ import java.io.Serializable;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequest<S>, S extends Serializable, D extends SearchResult, E extends Exception> {
+public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequest<S>, S extends Serializable, E extends Exception> {
     @Autowired
     private ParametricValuesService<R, S, E> parametricValuesService;
 
     @Autowired
-    protected IntegrationTestUtils<S, D, E> integrationTestUtils;
+    protected TestUtils<S> testUtils;
 
     protected abstract R createParametricRequest();
 

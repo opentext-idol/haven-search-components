@@ -5,7 +5,10 @@
 
 package com.hp.autonomy.searchcomponents.core.caching;
 
-public class CacheNames {
-    public static final String RELATED_CONCEPTS = "related-concepts";
-    public static final String GET_DOCUMENT_CONTENT = "get-content";
+public interface CacheNames {
+    String DATABASES = "databases";
+    String RELATED_CONCEPTS = "related-concepts";
+    String GET_DOCUMENT_CONTENT = "get-content";
+    String PARAMETRIC_FIELDS = "parametric-fields";
+    String PARAMETRIC_VALUES = "parametric-values";
 }

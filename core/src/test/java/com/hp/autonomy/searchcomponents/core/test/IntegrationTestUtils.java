@@ -19,9 +19,16 @@ public abstract class IntegrationTestUtils<S extends Serializable, D extends Sea
     @Autowired
     protected DocumentsService<S, D, E> documentsService;
 
-    public abstract List<S> getDatabases();
+    @Autowired
+    protected TestUtils<S> testUtils;
 
-    public abstract QueryRestrictions<S> buildQueryRestrictions();
+    public List<S> getDatabases() {
+        return testUtils.getDatabases();
+    }
+
+    public QueryRestrictions<S> buildQueryRestrictions() {
+        return testUtils.buildQueryRestrictions();
+    }
 
     public String getValidReference() throws E {
         final QueryRestrictions<S> queryRestrictions = buildQueryRestrictions();

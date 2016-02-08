@@ -58,9 +58,16 @@ public class IdolRelatedConceptsServiceTest {
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("Some field text").setDatabases(Collections.singletonList("Database1")).setMaxDate(DateTime.now()).build();
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder()
+                .setQueryText("*")
+                .setFieldText("Some field text")
+                .setDatabases(Collections.singletonList("Database1"))
+                .setMaxDate(DateTime.now())
+                .build();
 
-        final IdolRelatedConceptsRequest idolRelatedConceptsRequest = new IdolRelatedConceptsRequest.Builder().setQueryRestrictions(queryRestrictions).build();
+        final IdolRelatedConceptsRequest idolRelatedConceptsRequest = new IdolRelatedConceptsRequest.Builder()
+                .setQueryRestrictions(queryRestrictions)
+                .build();
         final List<QsElement> results = idolRelatedConceptsService.findRelatedConcepts(idolRelatedConceptsRequest);
         assertThat(results, is(not(empty())));
     }
