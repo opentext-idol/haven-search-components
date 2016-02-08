@@ -66,6 +66,11 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         } else {
             final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
             parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
+
+            if (parametricRequest.isModified()) {
+                parameterHandler.addQmsParameters(aciParameters, parametricRequest.getQueryRestrictions());
+            }
+
             aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
             aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), parametricRequest.getMaxValues());
             aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
