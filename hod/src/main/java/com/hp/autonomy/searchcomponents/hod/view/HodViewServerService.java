@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.hod.view;
 
 import com.hp.autonomy.aci.content.fieldtext.FieldText;
 import com.hp.autonomy.aci.content.fieldtext.MATCH;
+import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.analysis.viewdocument.ViewDocumentRequestBuilder;
 import com.hp.autonomy.hod.client.api.analysis.viewdocument.ViewDocumentService;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
@@ -18,6 +19,10 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.QueryRequestBuilder
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
 import com.hp.autonomy.hod.client.error.HodErrorCode;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.hod.sso.HodAuthentication;
+import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
+import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
+import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
 import com.hp.autonomy.types.requests.Documents;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -40,10 +45,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Implementation of {@link HodViewService}, using the java HOD client.
+ * Implementation of {@link HodViewServerService}, using the java HOD client.
  */
 @Service
-public class HodViewServiceImpl implements HodViewService {
+public class HodViewServerService implements ViewServerService<ResourceIdentifier, HodErrorException> {
     // Field on text index documents which (when present) contains the view URL
     private static final String URL_FIELD = "url";
 
@@ -55,16 +60,20 @@ public class HodViewServiceImpl implements HodViewService {
     private final ViewDocumentService viewDocumentService;
     private final GetContentService<Document> getContentService;
     private final QueryTextIndexService<Document> queryTextIndexService;
+    private final ConfigService<? extends QueryManipulationCapable> configService;
+    private final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
 
     @Autowired
-    public HodViewServiceImpl(
+    public HodViewServerService(
             final ViewDocumentService viewDocumentService,
             final GetContentService<Document> viewGetContentService,
-            final QueryTextIndexService<Document> queryTextIndexService
-    ) {
+            final QueryTextIndexService<Document> queryTextIndexService,
+            final ConfigService<? extends QueryManipulationCapable> configService, final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever) {
         this.viewDocumentService = viewDocumentService;
         getContentService = viewGetContentService;
         this.queryTextIndexService = queryTextIndexService;
+        this.configService = configService;
+        this.authenticationInformationRetriever = authenticationInformationRetriever;
     }
 
     private String resolveTitle(final Document document) {
@@ -148,13 +157,16 @@ public class HodViewServiceImpl implements HodViewService {
     }
 
     @Override
-    public void viewStaticContentPromotion(final String documentReference, final ResourceIdentifier queryManipulationIndex, final OutputStream outputStream) throws IOException, HodErrorException {
+    public void viewStaticContentPromotion(final String documentReference, final OutputStream outputStream) throws IOException, HodErrorException {
         final FieldText fieldText = new MATCH(REFERENCE_FIELD, documentReference)
                 .AND(new MATCH("category", HOD_RULE_CATEGORY));
 
+        final String domain = authenticationInformationRetriever.getAuthentication().getPrincipal().getApplication().getDomain();
+        final String queryManipulationIndex = configService.getConfig().getQueryManipulation().getIndex();
+
         final QueryRequestBuilder queryParams = new QueryRequestBuilder()
                 .setFieldText(fieldText.toString())
-                .setIndexes(Collections.singletonList(queryManipulationIndex))
+                .setIndexes(Collections.singletonList(new ResourceIdentifier(domain, queryManipulationIndex)))
                 .setPrint(Print.all);
 
         final Documents<Document> documents = queryTextIndexService.queryTextIndexWithText("*", queryParams);

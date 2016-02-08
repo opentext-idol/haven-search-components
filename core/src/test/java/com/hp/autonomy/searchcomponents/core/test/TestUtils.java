@@ -3,17 +3,15 @@
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
-package com.hp.autonomy.searchcomponents.core.parametricvalues;
+package com.hp.autonomy.searchcomponents.core.test;
 
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
-public interface ParametricRequest<S extends Serializable> extends Serializable {
-    Set<String> getFieldNames();
+public interface TestUtils<S extends Serializable> {
+    List<S> getDatabases();
 
-    Integer getMaxValues();
-
-    QueryRestrictions<S> getQueryRestrictions();
+    QueryRestrictions<S> buildQueryRestrictions();
 }

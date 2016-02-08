@@ -24,15 +24,16 @@ import java.util.Set;
 public class HodParametricRequest implements ParametricRequest<ResourceIdentifier> {
     private static final long serialVersionUID = 2235023046934181036L;
 
-    private Set<String> fieldNames;
-    @SuppressWarnings("InstanceVariableOfConcreteClass")
-    private QueryRestrictions<ResourceIdentifier> queryRestrictions;
-    private ResourceIdentifier queryProfile;
+    public static final int MAX_VALUES_DEFAULT = 5;
 
-    private HodParametricRequest(final Set<String> fieldNames, final QueryRestrictions<ResourceIdentifier> queryRestrictions, final ResourceIdentifier queryProfile) {
+    private Set<String> fieldNames;
+    private Integer maxValues = MAX_VALUES_DEFAULT;
+    private QueryRestrictions<ResourceIdentifier> queryRestrictions;
+
+    private HodParametricRequest(final Set<String> fieldNames, final int maxValues, final QueryRestrictions<ResourceIdentifier> queryRestrictions) {
         this.fieldNames = fieldNames == null ? Collections.<String>emptySet() : fieldNames;
+        this.maxValues = maxValues;
         this.queryRestrictions = queryRestrictions;
-        this.queryProfile = queryProfile;
     }
 
     @JsonPOJOBuilder(withPrefix = "set")
@@ -41,18 +42,17 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
     @NoArgsConstructor
     public static class Builder {
         private Set<String> fieldNames;
-        private ResourceIdentifier queryProfile;
-        @SuppressWarnings("InstanceVariableOfConcreteClass")
+        private Integer maxValues = MAX_VALUES_DEFAULT;
         private QueryRestrictions<ResourceIdentifier> queryRestrictions;
 
-        public Builder(final HodParametricRequest hodParametricRequest) {
+        public Builder(final ParametricRequest<ResourceIdentifier> hodParametricRequest) {
             fieldNames = hodParametricRequest.getFieldNames();
+            maxValues = hodParametricRequest.getMaxValues();
             queryRestrictions = hodParametricRequest.getQueryRestrictions();
-            queryProfile = hodParametricRequest.getQueryProfile();
         }
 
         public HodParametricRequest build() {
-            return new HodParametricRequest(fieldNames, queryRestrictions, queryProfile);
+            return new HodParametricRequest(fieldNames, maxValues, queryRestrictions);
         }
     }
 }
