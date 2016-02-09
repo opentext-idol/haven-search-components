@@ -12,15 +12,10 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.aci.content.identifier.reference.Reference;
 import com.hp.autonomy.aci.content.identifier.reference.ReferencesBuilder;
+import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
-import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
-import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
+import com.hp.autonomy.searchcomponents.core.search.*;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.Hit;
@@ -29,11 +24,7 @@ import com.hp.autonomy.types.idol.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.Spelling;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
-import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
-import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
-import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
-import com.hp.autonomy.types.requests.idol.actions.query.params.SuggestParams;
-import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.*;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,12 +33,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class IdolDocumentService implements DocumentsService<String, IdolSearchResult, AciErrorException> {
@@ -154,6 +140,8 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
         final List<IdolSearchResult> results = new ArrayList<>(request.getIndexesAndReferences().size());
 
         for (final GetContentRequestIndex<String> indexAndReferences : request.getIndexesAndReferences()) {
+
+            // We use Query and not GetContent here so we can use Combine=simple to ensure returned references are unique
             final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
             aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(indexAndReferences.getReferences()));
             aciParameters.add(QueryParams.Summary.name(), SummaryParam.Concept);
@@ -161,6 +149,9 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
             aciParameters.add(QueryParams.Text.name(), GET_CONTENT_QUERY_TEXT);
             aciParameters.add(QueryParams.MaxResults.name(), 1);
             aciParameters.add(QueryParams.AnyLanguage.name(), true);
+            aciParameters.add(QueryParams.Print.name(), PrintParam.Fields);
+            aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(IdolSearchResult.ALL_FIELDS));
+            aciParameters.add(QueryParams.XMLMeta.name(), true);
 
             if (indexAndReferences.getIndex() != null) {
                 aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexAndReferences.getIndex()));
