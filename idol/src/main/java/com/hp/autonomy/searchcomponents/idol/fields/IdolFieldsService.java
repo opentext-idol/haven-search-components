@@ -15,8 +15,10 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.types.idol.GetTagNamesResponseData;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagResponse;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetTagNamesParams;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,11 @@ public class IdolFieldsService implements FieldsService<IdolFieldsRequest, AciEr
     @Cacheable(CacheNames.PARAMETRIC_FIELDS)
     public List<String> getParametricFields(final IdolFieldsRequest request) throws AciErrorException {
         return getTagNames(request, FieldTypeParam.Parametric);
+    }
+
+    @Override
+    public TagResponse getFields(IdolFieldsRequest request, String... fieldTypes) throws AciErrorException {
+        throw new NotImplementedException("Not yet supported for on premise implementations");
     }
 
     private List<String> getTagNames(final FieldsRequest request, final FieldTypeParam fieldType) {
