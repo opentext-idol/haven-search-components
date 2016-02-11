@@ -26,6 +26,7 @@ public class IdolSearchResult implements SearchResult {
     public static final String QMS_ID_FIELD = "qmsid";
     public static final String INJECTED_PROMOTION_FIELD = "injectedpromotion";
     public static final String THUMBNAIL = "HPSW_APP_NOINDEX_PREVIEWTHBNAILBASE64";
+    public static final String MMAP_URL = "HPSW_APP_NOINDEX_MMAPPROXY";
 
     public static final List<String> ALL_FIELDS = Arrays.asList(
             CONTENT_TYPE_FIELD,
@@ -40,7 +41,8 @@ public class IdolSearchResult implements SearchResult {
             MODIFIED_DATE_FIELD,
             QMS_ID_FIELD,
             INJECTED_PROMOTION_FIELD,
-            THUMBNAIL
+            THUMBNAIL,
+            MMAP_URL
     );
 
     private static final long serialVersionUID = 4767058593555545628L;
@@ -57,6 +59,7 @@ public class IdolSearchResult implements SearchResult {
     private final String url;
     private final String offset;
     private final String thumbnail;
+    private final String mmapUrl;
 
     private final List<String> authors;
     private final List<String> categories;
@@ -79,6 +82,7 @@ public class IdolSearchResult implements SearchResult {
         url = builder.url;
         offset = builder.offset;
         thumbnail = builder.thumbnail;
+        mmapUrl = builder.mmapUrl;
 
         // LinkedList so we can guarantee Serializable
         authors = builder.authors == null ? Collections.<String>emptyList() : new LinkedList<>(builder.authors);
@@ -118,6 +122,7 @@ public class IdolSearchResult implements SearchResult {
         private String url;
         private String offset;
         private String thumbnail;
+        private String mmapUrl;
 
         private List<String> authors;
 
@@ -142,6 +147,7 @@ public class IdolSearchResult implements SearchResult {
             url = document.url;
             offset = document.offset;
             thumbnail = document.thumbnail;
+            mmapUrl = document.mmapUrl;
             authors = document.authors;
             categories = document.categories;
             date = document.date;
