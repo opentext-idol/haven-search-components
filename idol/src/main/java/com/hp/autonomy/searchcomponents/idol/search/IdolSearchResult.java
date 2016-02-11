@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 public class IdolSearchResult implements SearchResult {
     public static final String QMS_ID_FIELD = "qmsid";
     public static final String INJECTED_PROMOTION_FIELD = "injectedpromotion";
+    public static final String THUMBNAIL = "HPSW_APP_NOINDEX_PREVIEWTHBNAILBASE64";
 
     public static final List<String> ALL_FIELDS = Arrays.asList(
             CONTENT_TYPE_FIELD,
@@ -38,7 +39,8 @@ public class IdolSearchResult implements SearchResult {
             DATE_MODIFIED_FIELD,
             MODIFIED_DATE_FIELD,
             QMS_ID_FIELD,
-            INJECTED_PROMOTION_FIELD
+            INJECTED_PROMOTION_FIELD,
+            THUMBNAIL
     );
 
     private static final long serialVersionUID = 4767058593555545628L;
@@ -54,6 +56,7 @@ public class IdolSearchResult implements SearchResult {
     private final String contentType;
     private final String url;
     private final String offset;
+    private final String thumbnail;
 
     private final List<String> authors;
     private final List<String> categories;
@@ -75,6 +78,7 @@ public class IdolSearchResult implements SearchResult {
         weight = builder.weight;
         url = builder.url;
         offset = builder.offset;
+        thumbnail = builder.thumbnail;
 
         // LinkedList so we can guarantee Serializable
         authors = builder.authors == null ? Collections.<String>emptyList() : new LinkedList<>(builder.authors);
@@ -113,6 +117,7 @@ public class IdolSearchResult implements SearchResult {
 
         private String url;
         private String offset;
+        private String thumbnail;
 
         private List<String> authors;
 
@@ -136,6 +141,7 @@ public class IdolSearchResult implements SearchResult {
             contentType = document.contentType;
             url = document.url;
             offset = document.offset;
+            thumbnail = document.thumbnail;
             authors = document.authors;
             categories = document.categories;
             date = document.date;
