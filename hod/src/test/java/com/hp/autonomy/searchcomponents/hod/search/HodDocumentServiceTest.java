@@ -126,8 +126,9 @@ public class HodDocumentServiceTest {
     public void findSimilar() throws HodErrorException {
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
         final SuggestRequest<ResourceIdentifier> suggestRequest = new SuggestRequest<>("SomeReference", queryRestrictions, 1, 30, "concept", null, true);
-        documentsService.findSimilar(suggestRequest);
-        verify(findSimilarService).findSimilarDocumentsToIndexReference(anyString(), any(QueryRequestBuilder.class));
+        when(findSimilarService.findSimilarDocumentsToIndexReference(anyString(), any(QueryRequestBuilder.class))).thenReturn(mockResults());
+        final Documents<HodSearchResult> results = documentsService.findSimilar(suggestRequest);
+        validateResults(results);
     }
 
     @Test
