@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
+import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.aci.content.identifier.reference.Reference;
@@ -15,16 +16,31 @@ import com.hp.autonomy.aci.content.identifier.reference.ReferencesBuilder;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.searchcomponents.core.search.*;
+import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
+import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
+import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequest;
+import com.hp.autonomy.types.idol.Database;
 import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.Hit;
 import com.hp.autonomy.types.idol.QueryResponseData;
 import com.hp.autonomy.types.idol.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.Spelling;
+import com.hp.autonomy.types.requests.Warnings;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
-import com.hp.autonomy.types.requests.idol.actions.query.params.*;
+import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
+import com.hp.autonomy.types.requests.idol.actions.query.params.SuggestParams;
+import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,10 +49,19 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class IdolDocumentService implements DocumentsService<String, IdolSearchResult, AciErrorException> {
+    static final String MISSING_DATABASE_WARNING = "At least one of the databases provided in the query does not exist";
+
     private static final Pattern SPELLING_SEPARATOR_PATTERN = Pattern.compile(", ");
     private static final String GET_CONTENT_QUERY_TEXT = "*";
 
@@ -46,12 +71,15 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
     protected final AciService qmsAciService;
     protected final Processor<QueryResponseData> queryResponseProcessor;
     protected final Processor<SuggestResponseData> suggestResponseProcessor;
+    private final DatabasesService<Database, IdolDatabasesRequest, AciErrorException> databasesService;
 
-    public IdolDocumentService(final ConfigService<? extends HavenSearchCapable> configService, final HavenSearchAciParameterHandler parameterHandler, final AciService contentAciService, final AciService qmsAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    @SuppressWarnings("ConstructorWithTooManyParameters")
+    public IdolDocumentService(final ConfigService<? extends HavenSearchCapable> configService, final HavenSearchAciParameterHandler parameterHandler, final AciService contentAciService, final AciService qmsAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory, final DatabasesService<Database, IdolDatabasesRequest, AciErrorException> databasesService) {
         this.configService = configService;
         this.parameterHandler = parameterHandler;
         this.contentAciService = contentAciService;
         this.qmsAciService = qmsAciService;
+        this.databasesService = databasesService;
 
         queryResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(QueryResponseData.class);
         suggestResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(SuggestResponseData.class);
@@ -70,7 +98,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
 
     @Override
     public Documents<IdolSearchResult> queryTextIndexForPromotions(final SearchRequest<String> searchRequest) throws AciErrorException {
-        return qmsEnabled() ? queryTextIndex(qmsAciService, searchRequest, true) : new Documents<>(Collections.<IdolSearchResult>emptyList(), 0, null, null, null);
+        return qmsEnabled() ? queryTextIndex(qmsAciService, searchRequest, true) : new Documents<>(Collections.<IdolSearchResult>emptyList(), 0, null, null, null, null);
     }
 
     private Documents<IdolSearchResult> queryTextIndex(final AciService aciService, final SearchRequest<String> searchRequest, final boolean promotions) {
@@ -90,36 +118,66 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
             aciParameters.add(QmsQueryParams.Promotions.name(), true);
         }
 
-        return executeQuery(aciService, aciParameters, searchRequest.isAutoCorrect());
+        final QueryResponseData responseData = executeQuery(aciService, aciParameters);
+        return parseResults(aciService, searchRequest, aciParameters, responseData);
     }
 
-    protected Documents<IdolSearchResult> executeQuery(final AciService aciService, final AciParameters aciParameters, final boolean autoCorrect) {
-        final QueryResponseData responseData = aciService.executeAction(aciParameters, queryResponseProcessor);
+    @SuppressWarnings("TypeMayBeWeakened")
+    protected QueryResponseData executeQuery(final AciService aciService, final AciParameters aciParameters) {
+        return aciService.executeAction(aciParameters, queryResponseProcessor);
+    }
+
+    private Documents<IdolSearchResult> parseResults(final AciService aciService, final AciSearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData) {
         final List<Hit> hits = responseData.getHit();
+
+        final Warnings warnings = parseWarnings(searchRequest, aciParameters, responseData);
 
         final String spellingQuery = responseData.getSpellingquery();
 
         // If IDOL has a spelling suggestion, retry query for auto correct
         final Documents<IdolSearchResult> documents;
-        if (autoCorrect && spellingQuery != null) {
-            documents = rerunQueryWithAdjustedSpelling(aciService, aciParameters, responseData, spellingQuery);
+        if (spellingQuery != null) {
+            documents = rerunQueryWithAdjustedSpelling(aciService, aciParameters, responseData, spellingQuery, warnings);
         } else {
             final List<IdolSearchResult> results = parseQueryHits(hits);
-            documents = new Documents<>(results, responseData.getTotalhits(), null, null, null);
+            documents = new Documents<>(results, responseData.getTotalhits(), null, null, null, warnings);
         }
 
         return documents;
     }
 
-    protected Documents<IdolSearchResult> rerunQueryWithAdjustedSpelling(final AciService aciService, final AciParameters aciParameters, final QueryResponseData responseData, final String spellingQuery) {
+    protected Warnings parseWarnings(final AciSearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData) {
+        Warnings warnings = null;
+        for (final String warning : responseData.getWarning()) {
+            if (MISSING_DATABASE_WARNING.equals(warning.trim())) {
+                final Set<Database> updatedDatabases = databasesService.getDatabases(new IdolDatabasesRequest());
+                final List<String> oldQueryRestrictionDatabases = searchRequest.getQueryRestrictions().getDatabases();
+                final Set<String> badDatabases = new LinkedHashSet<>(oldQueryRestrictionDatabases);
+                for (final Database database : updatedDatabases) {
+                    final String databaseName = database.getName();
+                    badDatabases.remove(databaseName);
+                }
+
+                warnings = new Warnings(badDatabases);
+
+                final Set<String> newQueryRestrictionDatabases = new LinkedHashSet<>(oldQueryRestrictionDatabases);
+                newQueryRestrictionDatabases.removeAll(badDatabases);
+                aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(newQueryRestrictionDatabases));
+            }
+        }
+        return warnings;
+    }
+
+    protected Documents<IdolSearchResult> rerunQueryWithAdjustedSpelling(final AciService aciService, final AciParameters aciParameters, final QueryResponseData responseData, final String spellingQuery, final Warnings warnings) {
         final AciParameters correctedParameters = new AciParameters(aciParameters);
         correctedParameters.put(QueryParams.Text.name(), spellingQuery);
 
-        final Documents<IdolSearchResult> correctedDocuments = executeQuery(aciService, correctedParameters, false);
+        final QueryResponseData correctedResponseData = executeQuery(aciService, aciParameters);
+        final List<IdolSearchResult> correctedResults = parseQueryHits(correctedResponseData.getHit());
 
         final Spelling spelling = new Spelling(Arrays.asList(SPELLING_SEPARATOR_PATTERN.split(responseData.getSpelling())), spellingQuery, aciParameters.get(QueryParams.Text.name()));
 
-        return new Documents<>(correctedDocuments.getDocuments(), correctedDocuments.getTotalResults(), correctedDocuments.getExpandedQuery(), null, spelling);
+        return new Documents<>(correctedResults, correctedResponseData.getTotalhits(), null, null, spelling, warnings);
     }
 
     @Override
@@ -132,7 +190,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
 
         final SuggestResponseData responseData = contentAciService.executeAction(aciParameters, suggestResponseProcessor);
         final List<Hit> hits = responseData.getHit();
-        return new Documents<>(parseQueryHits(hits), responseData.getTotalhits(), null, null, null);
+        return new Documents<>(parseQueryHits(hits), responseData.getTotalhits(), null, null, null, null);
     }
 
     @Override

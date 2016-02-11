@@ -155,9 +155,9 @@ public class HodDocumentServiceTest {
 
     @SuppressWarnings("CastToConcreteClass")
     private Documents<HodSearchResult> mockResults() {
-        final HodSearchResult resultWithIndexInQuery = (HodSearchResult) new HodSearchResult.Builder().setIndex(testUtils.getDatabases().get(0).getName()).build();
-        final HodSearchResult resultWithPublicIndex = (HodSearchResult) new HodSearchResult.Builder().setIndex(ResourceIdentifier.NEWS_ENG.getName()).build();
-        final HodSearchResult resultWithPrivateIndex = (HodSearchResult) new HodSearchResult.Builder().setIndex("SomeIndex").build();
-        return new Documents<>(Arrays.asList(resultWithIndexInQuery, resultWithPublicIndex, resultWithPrivateIndex), 3, null, null, null);
+        final HodSearchResult resultWithIndexInQuery = new HodSearchResult.Builder().setIndex(testUtils.getDatabases().get(0).getName()).build();
+        final HodSearchResult resultWithPublicIndex = new HodSearchResult.Builder().setIndex(ResourceIdentifier.NEWS_ENG.getName()).build();
+        final HodSearchResult resultWithPrivateIndex = new HodSearchResult.Builder().setIndex("SomeIndex").build();
+        return new Documents<>(Arrays.asList(resultWithIndexInQuery, resultWithPublicIndex, resultWithPrivateIndex), 3, null, null, null, null);
     }
 }

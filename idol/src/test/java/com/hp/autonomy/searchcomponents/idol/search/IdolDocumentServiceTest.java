@@ -5,11 +5,13 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
+import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
@@ -19,6 +21,8 @@ import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
+import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequest;
+import com.hp.autonomy.types.idol.Database;
 import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.Hit;
 import com.hp.autonomy.types.idol.QueryResponseData;
@@ -44,6 +48,7 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -71,13 +76,16 @@ public class IdolDocumentServiceTest {
     @Mock
     protected AciResponseJaxbProcessorFactory aciResponseProcessorFactory;
 
+    @Mock
+    protected DatabasesService<Database, IdolDatabasesRequest, AciErrorException> databasesService;
+
     protected IdolDocumentService idolDocumentService;
 
     @Before
     public void setUp() {
         when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().build());
         when(configService.getConfig()).thenReturn(havenSearchConfig);
-        idolDocumentService = new IdolDocumentService(configService, parameterHandler, contentAciService, qmsAciService, aciResponseProcessorFactory);
+        idolDocumentService = new IdolDocumentService(configService, parameterHandler, contentAciService, qmsAciService, aciResponseProcessorFactory, databasesService);
     }
 
     @Test
@@ -116,6 +124,25 @@ public class IdolDocumentServiceTest {
         final SearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, null, true, true, null);
         final Documents<IdolSearchResult> results = idolDocumentService.queryTextIndex(searchRequest);
         assertThat(results.getDocuments(), is(not(empty())));
+    }
+
+    @Test
+    public void invalidDatabaseWarning() {
+        final QueryResponseData responseData = mockQueryResponse();
+        responseData.getWarning().add(IdolDocumentService.MISSING_DATABASE_WARNING);
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+
+        final Database goodDatabase = new Database();
+        goodDatabase.setName("Database2");
+        when(databasesService.getDatabases(any(IdolDatabasesRequest.class))).thenReturn(Collections.singleton(goodDatabase));
+
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
+        final SearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, null, true, true, null);
+        final Documents<IdolSearchResult> results = idolDocumentService.queryTextIndex(searchRequest);
+        assertThat(results.getDocuments(), is(not(empty())));
+        assertNotNull(results.getWarnings());
+        assertThat(results.getWarnings().getInvalidDatabases(), hasSize(1));
+        assertEquals("Database1", results.getWarnings().getInvalidDatabases().iterator().next());
     }
 
     @Test
