@@ -31,8 +31,8 @@ import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
 import com.hp.autonomy.types.requests.Documents;
-import org.springframework.cache.annotation.Cacheable;
 import org.apache.commons.lang.NotImplementedException;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,7 +87,12 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     public Documents<HodSearchResult> findSimilar(final SuggestRequest<ResourceIdentifier> suggestRequest) throws HodErrorException {
         final QueryRequestBuilder requestBuilder = setQueryParams(suggestRequest, true);
 
-        return findSimilarService.findSimilarDocumentsToIndexReference(suggestRequest.getReference(), requestBuilder);
+        final Documents<HodSearchResult> results = findSimilarService.findSimilarDocumentsToIndexReference(suggestRequest.getReference(), requestBuilder);
+
+        final List<HodSearchResult> documentList = new LinkedList<>();
+        addDomainToSearchResults(documentList, suggestRequest.getQueryRestrictions().getDatabases(), results.getDocuments());
+
+        return new Documents<>(documentList, results.getTotalResults(), results.getExpandedQuery(), results.getSuggestion(), results.getAutoCorrection(), results.getWarnings());
     }
 
     @Cacheable(CacheNames.GET_DOCUMENT_CONTENT)
@@ -100,7 +105,8 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
                     .setPrintFields(new ArrayList<>(HodSearchResult.ALL_FIELDS))
                     .setSummary(Summary.concept);
 
-            contentResults.addAll(getContentService.getContent(new ArrayList<>(indexAndReferences.getReferences()), indexAndReferences.getIndex(), builder).getDocuments());
+            final List<HodSearchResult> documents = getContentService.getContent(new ArrayList<>(indexAndReferences.getReferences()), indexAndReferences.getIndex(), builder).getDocuments();
+            addDomainToSearchResults(contentResults, Collections.singleton(indexAndReferences.getIndex()), documents);
         }
 
         return contentResults;
@@ -125,11 +131,9 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
         }
 
         final Documents<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(searchRequest.getQueryRestrictions().getQueryText(), params);
-        final List<HodSearchResult> documentList = new LinkedList<>();
 
-        for (final HodSearchResult hodSearchResult : hodDocuments.getDocuments()) {
-            documentList.add(addDomain(searchRequest.getQueryRestrictions().getDatabases(), hodSearchResult));
-        }
+        final List<HodSearchResult> documentList = new LinkedList<>();
+        addDomainToSearchResults(documentList, searchRequest.getQueryRestrictions().getDatabases(), hodDocuments.getDocuments());
 
         final Integer totalResults = hodDocuments.getTotalResults() != null ? hodDocuments.getTotalResults() : 0;
         return new Documents<>(documentList, totalResults, hodDocuments.getExpandedQuery(), null, hodDocuments.getAutoCorrection(), null);
@@ -164,6 +168,12 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
         }
 
         return queryRequestBuilder;
+    }
+
+    private void addDomainToSearchResults(final List<HodSearchResult> documentList, final Iterable<ResourceIdentifier> indexIdentifiers, final List<HodSearchResult> documents) {
+        for (final HodSearchResult hodSearchResult : documents) {
+            documentList.add(addDomain(indexIdentifiers, hodSearchResult));
+        }
     }
 
     // Add a domain to a FindDocument, given the collection of indexes which were queried against to return it from HOD
