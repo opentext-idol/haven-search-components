@@ -262,6 +262,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
                         .setDateModified(parseDateField(docContent, Arrays.asList(IdolSearchResult.MODIFIED_DATE_FIELD, IdolSearchResult.DATE_MODIFIED_FIELD)))
                         .setQmsId(parseField(docContent, IdolSearchResult.QMS_ID_FIELD))
                         .setThumbnail(parseField(docContent, IdolSearchResult.THUMBNAIL))
+                        .setMmapUrl(parseField(docContent, IdolSearchResult.MMAP_URL))
                         .setPromotionCategory(determinePromotionCategory(docContent, hit.getPromotionname(), hit.getDatabase()));
             }
             results.add(searchResultBuilder.build());
