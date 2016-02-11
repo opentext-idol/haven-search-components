@@ -92,7 +92,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
         final List<HodSearchResult> documentList = new LinkedList<>();
         addDomainToSearchResults(documentList, suggestRequest.getQueryRestrictions().getDatabases(), results.getDocuments());
 
-        return new Documents<>(documentList, results.getTotalResults(), results.getExpandedQuery(), results.getSuggestion(), results.getAutoCorrection());
+        return new Documents<>(documentList, results.getTotalResults(), results.getExpandedQuery(), results.getSuggestion(), results.getAutoCorrection(), results.getWarnings());
     }
 
     @Cacheable(CacheNames.GET_DOCUMENT_CONTENT)
