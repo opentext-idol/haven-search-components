@@ -85,7 +85,9 @@ public class IdolDocumentServiceTest {
     public void setUp() {
         when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().build());
         when(configService.getConfig()).thenReturn(havenSearchConfig);
-        idolDocumentService = new IdolDocumentService(configService, parameterHandler, contentAciService, qmsAciService, aciResponseProcessorFactory, databasesService);
+
+        final QueryResponseParser queryResponseParser = new QueryResponseParserImpl(databasesService);
+        idolDocumentService = new IdolDocumentService(configService, parameterHandler, queryResponseParser, contentAciService, qmsAciService, aciResponseProcessorFactory);
     }
 
     @Test
@@ -129,7 +131,7 @@ public class IdolDocumentServiceTest {
     @Test
     public void invalidDatabaseWarning() {
         final QueryResponseData responseData = mockQueryResponse();
-        responseData.getWarning().add(IdolDocumentService.MISSING_DATABASE_WARNING);
+        responseData.getWarning().add(QueryResponseParserImpl.MISSING_DATABASE_WARNING);
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
         final Database goodDatabase = new Database();
