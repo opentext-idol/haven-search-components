@@ -86,7 +86,8 @@ public class IdolDocumentServiceTest {
         when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().build());
         when(configService.getConfig()).thenReturn(havenSearchConfig);
 
-        final QueryResponseParser queryResponseParser = new QueryResponseParserImpl(databasesService);
+        final FieldsParser fieldsParser = new FieldsParserImpl();
+        final QueryResponseParser queryResponseParser = new QueryResponseParserImpl(fieldsParser, databasesService);
         idolDocumentService = new IdolDocumentService(configService, parameterHandler, queryResponseParser, contentAciService, qmsAciService, aciResponseProcessorFactory);
     }
 
