@@ -121,7 +121,7 @@ public class IdolDocumentServiceTest {
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        final SearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, null, true, true, null);
+        final SearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
         final Documents<IdolSearchResult> results = idolDocumentService.queryTextIndex(searchRequest);
         assertThat(results.getDocuments(), is(not(empty())));
     }
@@ -137,7 +137,7 @@ public class IdolDocumentServiceTest {
         when(databasesService.getDatabases(any(IdolDatabasesRequest.class))).thenReturn(Collections.singleton(goodDatabase));
 
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        final SearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, null, true, true, null);
+        final SearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
         final Documents<IdolSearchResult> results = idolDocumentService.queryTextIndex(searchRequest);
         assertThat(results.getDocuments(), is(not(empty())));
         assertNotNull(results.getWarnings());
@@ -172,7 +172,7 @@ public class IdolDocumentServiceTest {
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final SuggestRequest<String> suggestRequest = new SuggestRequest<>("Some reference", new IdolQueryRestrictions.Builder().build(), 1, 30, "context", "relevance", true);
+        final SuggestRequest<String> suggestRequest = new SuggestRequest<>("Some reference", new IdolQueryRestrictions.Builder().build(), 1, 30, "context", 250, "relevance", true);
         final Documents<IdolSearchResult> results = idolDocumentService.findSimilar(suggestRequest);
         assertThat(results.getDocuments(), is(not(empty())));
     }
@@ -205,7 +205,7 @@ public class IdolDocumentServiceTest {
 
     protected SearchRequest<String> mockQueryParams() {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        return new SearchRequest<>(queryRestrictions, 0, 50, null, null, true, false, null);
+        return new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, false, null);
     }
 
     protected QueryResponseData mockQueryResponse() {

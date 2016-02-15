@@ -56,6 +56,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.Start.name(), searchRequest.getStart());
         aciParameters.add(QueryParams.MaxResults.name(), searchRequest.getMaxResults());
         aciParameters.add(QueryParams.Summary.name(), SummaryParam.fromValue(searchRequest.getSummary(), null));
+        aciParameters.add(QueryParams.Characters.name(), searchRequest.getSummaryCharacters());
         aciParameters.add(QueryParams.Predict.name(), false);
         aciParameters.add(QueryParams.Sort.name(), searchRequest.getSort());
         aciParameters.add(QueryParams.Print.name(), PrintParam.Fields);

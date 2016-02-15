@@ -9,6 +9,7 @@ import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
+import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
@@ -63,7 +64,7 @@ public class HavenSearchAciParameterHandlerTest {
     @Test
     public void addSearchOutputParameters() {
         final AciParameters aciParameters = new AciParameters();
-        final SearchRequest<String> searchRequest = new SearchRequest<>(null, 0, 50, "Context", null, true, false, null);
+        final AciSearchRequest<String> searchRequest = new SearchRequest<>(null, 0, 50, "Context", 250, null, true, false, null);
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
         assertThat(aciParameters, is(not(empty())));
     }

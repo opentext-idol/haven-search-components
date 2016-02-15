@@ -19,6 +19,8 @@ public interface AciSearchRequest<S extends Serializable> extends Serializable {
 
     String getSummary();
 
+    Integer getSummaryCharacters();
+
     String getSort();
 
     boolean isHighlight();
