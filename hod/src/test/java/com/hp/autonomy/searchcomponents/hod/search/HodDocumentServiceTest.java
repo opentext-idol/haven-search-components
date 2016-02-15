@@ -95,7 +95,7 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), any(QueryRequestBuilder.class))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>(queryRestrictions, 1, 30, "concept", null, true, false, SearchRequest.QueryType.MODIFIED);
+        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>(queryRestrictions, 1, 30, "concept", 250, null, true, false, SearchRequest.QueryType.MODIFIED);
         final Documents<HodSearchResult> results = documentsService.queryTextIndex(searchRequest);
         validateResults(results);
     }
@@ -106,7 +106,7 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<QueryRequestBuilder>("queryProfile", nullValue())))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>(queryRestrictions, 1, 30, "concept", null, true, false, SearchRequest.QueryType.RAW);
+        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>(queryRestrictions, 1, 30, "concept", 250, null, true, false, SearchRequest.QueryType.RAW);
         final Documents<HodSearchResult> results = documentsService.queryTextIndex(searchRequest);
         validateResults(results);
     }
@@ -117,7 +117,7 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<QueryRequestBuilder>("promotions", is(true))))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>(queryRestrictions, 1, 30, "concept", null, true, true, SearchRequest.QueryType.PROMOTIONS);
+        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>(queryRestrictions, 1, 30, "concept", 250, null, true, true, SearchRequest.QueryType.PROMOTIONS);
         final Documents<HodSearchResult> results = documentsService.queryTextIndexForPromotions(searchRequest);
         validateResults(results);
     }
@@ -125,7 +125,7 @@ public class HodDocumentServiceTest {
     @Test
     public void findSimilar() throws HodErrorException {
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SuggestRequest<ResourceIdentifier> suggestRequest = new SuggestRequest<>("SomeReference", queryRestrictions, 1, 30, "concept", null, true);
+        final SuggestRequest<ResourceIdentifier> suggestRequest = new SuggestRequest<>("SomeReference", queryRestrictions, 1, 30, "concept", 250, null, true);
         when(findSimilarService.findSimilarDocumentsToIndexReference(anyString(), any(QueryRequestBuilder.class))).thenReturn(mockResults());
         final Documents<HodSearchResult> results = documentsService.findSimilar(suggestRequest);
         validateResults(results);

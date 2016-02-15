@@ -22,6 +22,7 @@ public class SuggestRequest<S extends Serializable> implements AciSearchRequest<
     protected int start = DEFAULT_START;
     protected int maxResults = DEFAULT_MAX_RESULTS;
     protected String summary;
+    protected Integer summaryCharacters;
     protected String sort;
     protected boolean highlight;
 }
