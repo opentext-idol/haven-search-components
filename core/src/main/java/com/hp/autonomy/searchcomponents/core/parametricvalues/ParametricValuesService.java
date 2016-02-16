@@ -5,13 +5,17 @@
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
+import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 public interface ParametricValuesService<R extends ParametricRequest<S>, S extends Serializable, E extends Exception> {
 
     Set<QueryTagInfo> getAllParametricValues(R parametricRequest) throws E;
+
+    List<RecursiveField> getDependentParametricValues(R parametricRequest) throws E;
 
 }
