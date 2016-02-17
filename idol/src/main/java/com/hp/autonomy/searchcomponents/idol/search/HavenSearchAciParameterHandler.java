@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 
 /**
@@ -16,6 +17,8 @@ public interface HavenSearchAciParameterHandler {
     void addSearchRestrictions(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions);
 
     void addSearchOutputParameters(final AciParameters aciParameters, final AciSearchRequest<String> searchRequest);
+
+    void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences);
 
     void addLanguageRestriction(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions);
 

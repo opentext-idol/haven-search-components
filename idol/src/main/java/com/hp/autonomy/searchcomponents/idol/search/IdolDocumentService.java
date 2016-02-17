@@ -9,10 +9,7 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.aci.content.identifier.reference.Reference;
-import com.hp.autonomy.aci.content.identifier.reference.ReferencesBuilder;
-import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
@@ -21,17 +18,15 @@ import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
-import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.types.idol.Hit;
 import com.hp.autonomy.types.idol.QueryResponseData;
 import com.hp.autonomy.types.idol.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
-import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SuggestParams;
-import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 
 import java.util.ArrayList;
@@ -39,9 +34,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class IdolDocumentService implements DocumentsService<String, IdolSearchResult, AciErrorException> {
-    private static final String GET_CONTENT_QUERY_TEXT = "*";
-
-    protected final ConfigService<? extends HavenSearchCapable> configService;
+    protected final ConfigService<? extends IdolSearchCapable> configService;
     protected final HavenSearchAciParameterHandler parameterHandler;
     protected final QueryResponseParser queryResponseParser;
     protected final AciService contentAciService;
@@ -50,7 +43,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
     protected final Processor<SuggestResponseData> suggestResponseProcessor;
 
     @SuppressWarnings("ConstructorWithTooManyParameters")
-    public IdolDocumentService(final ConfigService<? extends HavenSearchCapable> configService, final HavenSearchAciParameterHandler parameterHandler, final QueryResponseParser queryResponseParser, final AciService contentAciService, final AciService qmsAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    public IdolDocumentService(final ConfigService<? extends IdolSearchCapable> configService, final HavenSearchAciParameterHandler parameterHandler, final QueryResponseParser queryResponseParser, final AciService contentAciService, final AciService qmsAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
         this.configService = configService;
         this.parameterHandler = parameterHandler;
         this.queryResponseParser = queryResponseParser;
@@ -98,19 +91,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
 
             // We use Query and not GetContent here so we can use Combine=simple to ensure returned references are unique
             final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
-            aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(indexAndReferences.getReferences()));
-            aciParameters.add(QueryParams.Summary.name(), SummaryParam.Concept);
-            aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
-            aciParameters.add(QueryParams.Text.name(), GET_CONTENT_QUERY_TEXT);
-            aciParameters.add(QueryParams.MaxResults.name(), 1);
-            aciParameters.add(QueryParams.AnyLanguage.name(), true);
-            aciParameters.add(QueryParams.Print.name(), PrintParam.Fields);
-            aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(IdolSearchResult.ALL_FIELDS));
-            aciParameters.add(QueryParams.XMLMeta.name(), true);
-
-            if (indexAndReferences.getIndex() != null) {
-                aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexAndReferences.getIndex()));
-            }
+            parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences);
 
             final QueryResponseData responseData = contentAciService.executeAction(aciParameters, queryResponseProcessor);
             final List<Hit> hits = responseData.getHit();

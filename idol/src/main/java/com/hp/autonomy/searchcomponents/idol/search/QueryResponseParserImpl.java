@@ -11,6 +11,7 @@ import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequest;
+import com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser;
 import com.hp.autonomy.types.idol.Database;
 import com.hp.autonomy.types.idol.Hit;
 import com.hp.autonomy.types.idol.QueryResponseData;
@@ -114,7 +115,7 @@ public class QueryResponseParserImpl implements QueryResponseParser {
                     .setWeight(hit.getWeight())
                     .setPromotionName(hit.getPromotionname());
 
-            fieldsParser.parseDocumentContent(hit, searchResultBuilder);
+            fieldsParser.parseDocumentFields(hit, searchResultBuilder);
             results.add(searchResultBuilder.build());
         }
         return results;

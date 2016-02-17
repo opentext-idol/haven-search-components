@@ -5,6 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
+import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import lombok.Data;
@@ -14,37 +15,13 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("InstanceVariableOfConcreteClass")
 @Data
 public class IdolSearchResult implements SearchResult {
-    public static final String QMS_ID_FIELD = "qmsid";
-    public static final String INJECTED_PROMOTION_FIELD = "injectedpromotion";
-    public static final String THUMBNAIL = "HPSW_APP_NOINDEX_PREVIEWTHBNAILBASE64";
-    public static final String MMAP_URL = "HPSW_APP_NOINDEX_MMAPPROXY";
-
-    public static final List<String> ALL_FIELDS = Arrays.asList(
-            CONTENT_TYPE_FIELD,
-            URL_FIELD,
-            OFFSET_FIELD,
-            AUTHOR_FIELD,
-            CATEGORY_FIELD,
-            DATE_FIELD,
-            DATE_CREATED_FIELD,
-            CREATED_DATE_FIELD,
-            DATE_MODIFIED_FIELD,
-            MODIFIED_DATE_FIELD,
-            QMS_ID_FIELD,
-            INJECTED_PROMOTION_FIELD,
-            THUMBNAIL,
-            MMAP_URL
-    );
-
     private static final long serialVersionUID = 4767058593555545628L;
 
     private static final Pattern PATH_SEPARATOR_REGEX = Pattern.compile("/|\\\\");
@@ -61,12 +38,9 @@ public class IdolSearchResult implements SearchResult {
     private final String thumbnail;
     private final String mmapUrl;
 
-    private final List<String> authors;
-    private final List<String> categories;
+    private final Map<String, FieldInfo<?>> fieldMap;
 
     private final DateTime date;
-    private final DateTime dateCreated;
-    private final DateTime dateModified;
 
     private final String qmsId;
     private final String promotionName;
@@ -84,13 +58,8 @@ public class IdolSearchResult implements SearchResult {
         thumbnail = builder.thumbnail;
         mmapUrl = builder.mmapUrl;
 
-        // LinkedList so we can guarantee Serializable
-        authors = builder.authors == null ? Collections.<String>emptyList() : new LinkedList<>(builder.authors);
-        categories = builder.categories == null ? Collections.<String>emptyList() : new LinkedList<>(builder.categories);
-
         date = builder.date;
-        dateCreated = builder.dateCreated;
-        dateModified = builder.dateModified;
+        fieldMap = builder.fieldMap;
 
         qmsId = builder.qmsId;
         promotionName = builder.promotionName;
@@ -106,6 +75,7 @@ public class IdolSearchResult implements SearchResult {
         }
     }
 
+    @SuppressWarnings("InstanceVariableOfConcreteClass")
     @Setter
     @NoArgsConstructor
     @Accessors(chain = true)
@@ -124,13 +94,9 @@ public class IdolSearchResult implements SearchResult {
         private String thumbnail;
         private String mmapUrl;
 
-        private List<String> authors;
-
-        private List<String> categories;
+        private Map<String, FieldInfo<?>> fieldMap;
 
         private DateTime date;
-        private DateTime dateCreated;
-        private DateTime dateModified;
 
         private String qmsId;
         private String promotionName;
@@ -148,11 +114,8 @@ public class IdolSearchResult implements SearchResult {
             offset = document.offset;
             thumbnail = document.thumbnail;
             mmapUrl = document.mmapUrl;
-            authors = document.authors;
-            categories = document.categories;
+            fieldMap = document.fieldMap;
             date = document.date;
-            dateCreated = document.dateCreated;
-            dateModified = document.dateModified;
             qmsId = document.qmsId;
             promotionName = document.promotionName;
             promotionCategory = document.promotionCategory;

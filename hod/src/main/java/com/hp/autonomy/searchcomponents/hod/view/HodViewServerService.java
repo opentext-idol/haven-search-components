@@ -22,7 +22,7 @@ import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthentication;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
-import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
+import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.types.requests.Documents;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -60,7 +60,7 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
     private final ViewDocumentService viewDocumentService;
     private final GetContentService<Document> getContentService;
     private final QueryTextIndexService<Document> queryTextIndexService;
-    private final ConfigService<? extends QueryManipulationCapable> configService;
+    private final ConfigService<? extends HodSearchCapable> configService;
     private final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
 
     @Autowired
@@ -68,7 +68,7 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
             final ViewDocumentService viewDocumentService,
             final GetContentService<Document> viewGetContentService,
             final QueryTextIndexService<Document> queryTextIndexService,
-            final ConfigService<? extends QueryManipulationCapable> configService, final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever) {
+            final ConfigService<? extends HodSearchCapable> configService, final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever) {
         this.viewDocumentService = viewDocumentService;
         getContentService = viewGetContentService;
         this.queryTextIndexService = queryTextIndexService;
