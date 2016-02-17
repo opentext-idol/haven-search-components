@@ -96,7 +96,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
 
     @Override
     public List<RecursiveField> getDependentParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
-        final Collection<String> fieldNames = new HashSet<>();
+        final List<String> fieldNames = new ArrayList<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
             fieldNames.addAll(fieldsService.getParametricFields(new IdolFieldsRequest.Builder().build()));
