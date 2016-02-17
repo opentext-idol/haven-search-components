@@ -22,7 +22,7 @@ public class HodParametricValuesServiceIT extends AbstractParametricValuesServic
     @Override
     protected HodParametricRequest createParametricRequest() {
         return new HodParametricRequest.Builder()
-                .setFieldNames(Collections.singleton("WIKIPEDIA_CATEGORY"))
+                .setFieldNames(Collections.singletonList("WIKIPEDIA_CATEGORY"))
                 .setQueryRestrictions(testUtils.buildQueryRestrictions())
                 .build();
     }
