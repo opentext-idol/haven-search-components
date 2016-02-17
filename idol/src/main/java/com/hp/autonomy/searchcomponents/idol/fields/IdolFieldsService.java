@@ -24,6 +24,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -44,7 +45,7 @@ public class IdolFieldsService implements FieldsService<IdolFieldsRequest, AciEr
     }
 
     @Override
-    public TagResponse getFields(IdolFieldsRequest request, String... fieldTypes) throws AciErrorException {
+    public TagResponse getFields(final IdolFieldsRequest request, final Collection<String> fieldTypes) throws AciErrorException {
         throw new NotImplementedException("Not yet supported for on premise implementations");
     }
 

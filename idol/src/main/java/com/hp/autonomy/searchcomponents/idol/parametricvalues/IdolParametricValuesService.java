@@ -53,7 +53,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         final Collection<String> fieldNames = new HashSet<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
-            fieldNames.addAll(fieldsService.getFields(new IdolFieldsRequest.Builder().build()).getParametricTypeFields());
+            fieldNames.addAll(fieldsService.getParametricFields(new IdolFieldsRequest.Builder().build()));
         }
 
         final Set<QueryTagInfo> results;

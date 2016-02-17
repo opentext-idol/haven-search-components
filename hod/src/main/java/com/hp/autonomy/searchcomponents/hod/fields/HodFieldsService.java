@@ -39,8 +39,8 @@ public class HodFieldsService implements FieldsService<HodFieldsRequest, HodErro
 
     @Override
     @Cacheable(CacheNames.FIELDS)
-    public TagResponse getFields(final HodFieldsRequest request, String... fieldTypes) throws HodErrorException {
-        final Collection<FieldType> fieldTypeList = new ArrayList<>(fieldTypes.length);
+    public TagResponse getFields(final HodFieldsRequest request, final Collection<String> fieldTypes) throws HodErrorException {
+        final Collection<FieldType> fieldTypeList = new ArrayList<>(fieldTypes.size());
         for (final String fieldType : fieldTypes) {
             fieldTypeList.add(FieldType.valueOf(fieldType));
         }
