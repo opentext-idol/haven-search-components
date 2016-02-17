@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldNames;
@@ -29,13 +29,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -88,7 +82,7 @@ public class HodParametricValuesServiceTest {
     public void getsParametricValues() throws HodErrorException {
         final List<ResourceIdentifier> indexes = Arrays.asList(ResourceIdentifier.WIKI_ENG, ResourceIdentifier.PATENTS);
 
-        final Set<String> fieldNames = ImmutableSet.<String>builder()
+        final List<String> fieldNames = ImmutableList.<String>builder()
                 .add("grassy field")
                 .add("wasteland")
                 .add("football field")
@@ -118,7 +112,7 @@ public class HodParametricValuesServiceTest {
     @Test
     public void emptyFieldNamesReturnEmptyParametricValues() throws HodErrorException {
         final List<ResourceIdentifier> indexes = Collections.singletonList(ResourceIdentifier.PATENTS);
-        final HodParametricRequest testRequest = generateRequest(indexes, Collections.<String>emptySet());
+        final HodParametricRequest testRequest = generateRequest(indexes, Collections.<String>emptyList());
         final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
         assertThat(fieldNamesSet, is(empty()));
     }
@@ -128,12 +122,12 @@ public class HodParametricValuesServiceTest {
         when(fieldsService.getParametricFields(any(HodFieldsRequest.class))).thenReturn(Collections.singletonList("grassy field"));
 
         final List<ResourceIdentifier> indexes = Collections.singletonList(ResourceIdentifier.WIKI_ENG);
-        final HodParametricRequest testRequest = generateRequest(indexes, Collections.<String>emptySet());
+        final HodParametricRequest testRequest = generateRequest(indexes, Collections.<String>emptyList());
         final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
         assertThat(fieldNamesSet, is(not(empty())));
     }
 
-    private HodParametricRequest generateRequest(final List<ResourceIdentifier> indexes, final Set<String> fieldNames) {
+    private HodParametricRequest generateRequest(final List<ResourceIdentifier> indexes, final List<String> fieldNames) {
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = new HodQueryRestrictions.Builder().setDatabases(indexes).build();
         return new HodParametricRequest.Builder()
                 .setFieldNames(fieldNames)

@@ -19,15 +19,13 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
+import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
+import org.apache.commons.lang.NotImplementedException;
 import org.springframework.cache.annotation.Cacheable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class HodParametricValuesService implements ParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> {
     private final FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
@@ -78,6 +76,11 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
         }
 
         return results;
+    }
+
+    @Override
+    public List<RecursiveField> getDependentParametricValues(HodParametricRequest parametricRequest) throws HodErrorException {
+        throw new NotImplementedException();
     }
 
     private ResourceIdentifier getQueryProfile() {

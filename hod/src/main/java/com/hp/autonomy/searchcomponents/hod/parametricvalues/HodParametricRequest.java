@@ -10,15 +10,11 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 @SuppressWarnings("FieldMayBeFinal")
 @Data
@@ -30,7 +26,7 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
 
     public static final int MAX_VALUES_DEFAULT = 5;
 
-    private Set<String> fieldNames = Collections.emptySet();
+    private List<String> fieldNames = Collections.emptyList();
     private Integer maxValues = MAX_VALUES_DEFAULT;
     private QueryRestrictions<ResourceIdentifier> queryRestrictions;
     private boolean modified = true;
@@ -40,7 +36,7 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
     @Accessors(chain = true)
     @NoArgsConstructor
     public static class Builder {
-        private Set<String> fieldNames = Collections.emptySet();
+        private List<String> fieldNames = Collections.emptyList();
         private Integer maxValues = MAX_VALUES_DEFAULT;
         private QueryRestrictions<ResourceIdentifier> queryRestrictions;
         private boolean modified = true;

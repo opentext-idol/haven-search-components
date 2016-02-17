@@ -8,10 +8,10 @@ package com.hp.autonomy.searchcomponents.core.parametricvalues;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 public interface ParametricRequest<S extends Serializable> extends Serializable {
-    Set<String> getFieldNames();
+    List<String> getFieldNames();
 
     Integer getMaxValues();
 

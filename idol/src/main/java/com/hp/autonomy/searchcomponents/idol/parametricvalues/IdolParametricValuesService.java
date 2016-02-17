@@ -16,6 +16,7 @@ import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.types.idol.FlatField;
 import com.hp.autonomy.types.idol.GetQueryTagValuesResponseData;
+import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.idol.TagValue;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
@@ -28,12 +29,7 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBElement;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class IdolParametricValuesService implements ParametricValuesService<IdolParametricRequest, String, AciErrorException> {
@@ -93,6 +89,38 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
                     results.add(new QueryTagInfo(fieldName, values));
                 }
             }
+        }
+
+        return results;
+    }
+
+    @Override
+    public List<RecursiveField> getDependentParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
+        final List<String> fieldNames = new ArrayList<>();
+        fieldNames.addAll(parametricRequest.getFieldNames());
+        if (fieldNames.isEmpty()) {
+            fieldNames.addAll(fieldsService.getParametricFields(new IdolFieldsRequest.Builder().build()));
+        }
+
+        final List<RecursiveField> results;
+        if (fieldNames.isEmpty()) {
+            results = Collections.emptyList();
+        } else {
+            final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
+            parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
+
+            if (parametricRequest.isModified()) {
+                parameterHandler.addQmsParameters(aciParameters, parametricRequest.getQueryRestrictions());
+            }
+
+            aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
+            aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
+            aciParameters.add(GetQueryTagValuesParams.FieldDependence.name(), true);
+            aciParameters.add(GetQueryTagValuesParams.FieldDependenceMultiLevel.name(), true);
+
+
+            final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
+            results = responseData.getValues().getField();
         }
 
         return results;

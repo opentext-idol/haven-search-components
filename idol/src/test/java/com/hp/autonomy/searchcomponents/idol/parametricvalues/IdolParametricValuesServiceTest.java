@@ -68,7 +68,7 @@ public class IdolParametricValuesServiceTest {
     @Test
     public void getAllParametricValues() {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).build();
-        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.singleton("Some field")).setQueryRestrictions(queryRestrictions).build();
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.singletonList("Some field")).setQueryRestrictions(queryRestrictions).build();
 
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
@@ -79,7 +79,7 @@ public class IdolParametricValuesServiceTest {
     @Test
     public void getFieldNamesFirst() {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).build();
-        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.<String>emptySet()).setQueryRestrictions(queryRestrictions).build();
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.<String>emptyList()).setQueryRestrictions(queryRestrictions).build();
 
         when(fieldsService.getParametricFields(any(IdolFieldsRequest.class))).thenReturn(Collections.singletonList("CATEGORY"));
 
@@ -93,7 +93,7 @@ public class IdolParametricValuesServiceTest {
     @Test
     public void parametricValuesNotConfigured() {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).setMaxDate(DateTime.now()).build();
-        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.<String>emptySet()).setQueryRestrictions(queryRestrictions).build();
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.<String>emptyList()).setQueryRestrictions(queryRestrictions).build();
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(new GetTagNamesResponseData());
 
