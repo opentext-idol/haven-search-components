@@ -7,28 +7,38 @@ package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.database.Databases;
+import com.hp.autonomy.aci.content.identifier.reference.ReferencesBuilder;
 import com.hp.autonomy.aci.content.identifier.stateid.StateIdsBuilder;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
-import com.hp.autonomy.types.requests.idol.actions.query.params.*;
+import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
+import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
+import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormat;
 
 public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
     private static final String IDOL_DATE_PARAMETER_FORMAT = "HH:mm:ss dd/MM/yyyy";
+    private static final String GET_CONTENT_QUERY_TEXT = "*";
 
-    protected final ConfigService<? extends HavenSearchCapable> configService;
+    protected final ConfigService<? extends IdolSearchCapable> configService;
     protected final LanguagesService languagesService;
+    protected final DocumentFieldsService documentFieldsService;
 
-    public HavenSearchAciParameterHandlerImpl(final ConfigService<? extends HavenSearchCapable> configService, final LanguagesService languagesService) {
+    public HavenSearchAciParameterHandlerImpl(final ConfigService<? extends IdolSearchCapable> configService, final LanguagesService languagesService, final DocumentFieldsService documentFieldsService) {
         this.configService = configService;
         this.languagesService = languagesService;
+        this.documentFieldsService = documentFieldsService;
     }
 
     @Override
@@ -60,7 +70,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.Predict.name(), false);
         aciParameters.add(QueryParams.Sort.name(), searchRequest.getSort());
         aciParameters.add(QueryParams.Print.name(), PrintParam.Fields);
-        aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(IdolSearchResult.ALL_FIELDS));
+        aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(documentFieldsService.getPrintFields()));
         aciParameters.add(QueryParams.TotalResults.name(), true);
         aciParameters.add(QueryParams.XMLMeta.name(), true);
 
@@ -68,6 +78,23 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
             aciParameters.add(QueryParams.Highlight.name(), HighlightParam.SummaryTerms);
             aciParameters.add(QueryParams.StartTag.name(), DocumentsService.HIGHLIGHT_START_TAG);
             aciParameters.add(QueryParams.EndTag.name(), DocumentsService.HIGHLIGHT_END_TAG);
+        }
+    }
+
+    @Override
+    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences) {
+        aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(indexAndReferences.getReferences()));
+        aciParameters.add(QueryParams.Summary.name(), SummaryParam.Concept);
+        aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
+        aciParameters.add(QueryParams.Text.name(), GET_CONTENT_QUERY_TEXT);
+        aciParameters.add(QueryParams.MaxResults.name(), 1);
+        aciParameters.add(QueryParams.AnyLanguage.name(), true);
+        aciParameters.add(QueryParams.Print.name(), PrintParam.Fields);
+        aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(documentFieldsService.getPrintFields()));
+        aciParameters.add(QueryParams.XMLMeta.name(), true);
+
+        if (indexAndReferences.getIndex() != null) {
+            aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexAndReferences.getIndex()));
         }
     }
 

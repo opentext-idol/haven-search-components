@@ -14,7 +14,7 @@ import com.autonomy.aci.client.transport.impl.AciHttpClientImpl;
 import com.hp.autonomy.frontend.configuration.AbstractConfigurableAciService;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import org.apache.http.client.HttpClient;
 import org.apache.http.config.SocketConfig;
@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan("com.hp.autonomy.searchcomponents.idol")
-public class HavenSearchIdolConfiguration<C extends HavenSearchCapable> {
+public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
     private static final int HTTP_SOCKET_TIMEOUT = 90000;
     private static final int HTTP_MAX_CONNECTIONS_PER_ROUTE = 20;
     private static final int HTTP_MAX_CONNECTIONS_TOTAL = 120;

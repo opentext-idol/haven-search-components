@@ -10,9 +10,11 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
-import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
+import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import org.joda.time.DateTime;
@@ -34,15 +36,19 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class HavenSearchAciParameterHandlerTest {
     @Mock
-    private ConfigService<? extends HavenSearchCapable> configService;
+    private ConfigService<? extends IdolSearchCapable> configService;
+
     @Mock
     private LanguagesService languagesService;
+
+    @Mock
+    private DocumentFieldsService documentFieldsService;
 
     private HavenSearchAciParameterHandler parameterHandler;
 
     @Before
     public void setUp() {
-        parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, languagesService);
+        parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, languagesService, documentFieldsService);
     }
 
     @Test
@@ -66,6 +72,14 @@ public class HavenSearchAciParameterHandlerTest {
         final AciParameters aciParameters = new AciParameters();
         final AciSearchRequest<String> searchRequest = new SearchRequest<>(null, 0, 50, "Context", 250, null, true, false, null);
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
+        assertThat(aciParameters, is(not(empty())));
+    }
+
+    @Test
+    public void addGetDocumentOutputParameters() {
+        final AciParameters aciParameters = new AciParameters();
+        final GetContentRequestIndex<String> indexAndReferences = new GetContentRequestIndex<>("Database1", Collections.singleton("SomeReference"));
+        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences);
         assertThat(aciParameters, is(not(empty())));
     }
 
@@ -97,7 +111,7 @@ public class HavenSearchAciParameterHandlerTest {
     @Test
     public void addQmsParameters() {
         final AciParameters aciParameters = new AciParameters();
-        final HavenSearchCapable config = mock(HavenSearchCapable.class);
+        final IdolSearchCapable config = mock(IdolSearchCapable.class);
         when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setBlacklist("ISO_BLACKLIST").setExpandQuery(true).build());
         when(configService.getConfig()).thenReturn(config);
         parameterHandler.addQmsParameters(aciParameters, null);

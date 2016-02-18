@@ -5,9 +5,8 @@
 
 package com.hp.autonomy.searchcomponents.hod.configuration;
 
-/**
- * Created by milleriv on 07/01/2016.
- */
-public interface QueryManipulationCapable {
+import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
+
+public interface HodSearchCapable extends HavenSearchCapable {
     QueryManipulationConfig getQueryManipulation();
 }

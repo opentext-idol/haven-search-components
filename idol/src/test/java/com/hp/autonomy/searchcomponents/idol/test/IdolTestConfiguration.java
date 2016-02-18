@@ -7,12 +7,17 @@ package com.hp.autonomy.searchcomponents.idol.test;
 
 import com.autonomy.aci.client.transport.AciServerDetails;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.idol.configuration.HavenSearchCapable;
+import com.hp.autonomy.searchcomponents.core.config.FieldAssociations;
+import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
+import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
+import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Collections;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -27,16 +32,18 @@ public class IdolTestConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(ConfigService.class)
-    public ConfigService<HavenSearchCapable> configService() {
-        @SuppressWarnings("unchecked") final ConfigService<HavenSearchCapable> configService = (ConfigService<HavenSearchCapable>) mock(ConfigService.class);
+    public ConfigService<IdolSearchCapable> configService() {
+        @SuppressWarnings("unchecked") final ConfigService<IdolSearchCapable> configService = (ConfigService<IdolSearchCapable>) mock(ConfigService.class);
 
-        final HavenSearchCapable config = mock(HavenSearchCapable.class);
+        final IdolSearchCapable config = mock(IdolSearchCapable.class);
 
         when(config.getContentAciServerDetails()).thenReturn(new AciServerDetails(IDOL_HOST, CONTENT_PORT));
         when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setEnabled(false).build());
 
         final ViewConfig viewConfig = new ViewConfig.Builder().setReferenceField(SAMPLE_REFERENCE_FIELD_NAME).setHost(IDOL_HOST).setPort(VIEW_SERVER_PORT).build();
         when(config.getViewConfig()).thenReturn(viewConfig);
+
+        when(config.getFieldsInfo()).thenReturn(new FieldsInfo(new FieldAssociations(), Collections.<FieldInfo<?>>emptySet()));
 
         when(configService.getConfig()).thenReturn(config);
 

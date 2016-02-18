@@ -5,6 +5,8 @@
 
 package com.hp.autonomy.searchcomponents.hod.beanconfiguration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.api.resource.ResourcesService;
@@ -20,7 +22,8 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
-import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
+import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.databases.Database;
 import com.hp.autonomy.searchcomponents.hod.databases.HodDatabasesRequest;
 import com.hp.autonomy.searchcomponents.hod.databases.HodDatabasesService;
@@ -30,12 +33,23 @@ import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricReques
 import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricValuesService;
 import com.hp.autonomy.searchcomponents.hod.search.HodDocumentsService;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
+import com.hp.autonomy.searchcomponents.hod.search.fields.HodSearchResultDeserializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 class DefaultHodConfiguration {
+    @Bean
+    public ObjectMapper hodSearchResultObjectMapper(final HodSearchResultDeserializer searchResultDeserializer) {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final SimpleModule customModule = new CustomModule();
+        customModule.addDeserializer(HodSearchResult.class, searchResultDeserializer);
+        objectMapper.registerModule(customModule);
+
+        return objectMapper;
+    }
+
     @Bean
     @ConditionalOnMissingBean(LanguagesService.class)
     public LanguagesService languagesService() {
@@ -48,15 +62,20 @@ class DefaultHodConfiguration {
         return new HodDatabasesService(resourcesService, authenticationInformationRetriever);
     }
 
+    @SuppressWarnings("MethodWithTooManyParameters")
     @Bean
     @ConditionalOnMissingBean(DocumentsService.class)
-    public DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> documentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends QueryManipulationCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService, final GetContentService<HodSearchResult> getContentService, final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever) {
-        return new HodDocumentsService(findSimilarService, configService, queryTextIndexService, getContentService, authenticationInformationRetriever);
+    public DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> documentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends HodSearchCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService, final GetContentService<HodSearchResult> getContentService, final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever, final DocumentFieldsService documentFieldsService) {
+        return new HodDocumentsService(findSimilarService, configService, queryTextIndexService, getContentService, authenticationInformationRetriever, documentFieldsService);
     }
 
     @Bean
     @ConditionalOnMissingBean(ParametricValuesService.class)
-    public ParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> parametricValuesService(final FieldsService<HodFieldsRequest, HodErrorException> fieldsService, final GetParametricValuesService getParametricValuesService, final ConfigService<? extends QueryManipulationCapable> configService, final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever) {
+    public ParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> parametricValuesService(final FieldsService<HodFieldsRequest, HodErrorException> fieldsService, final GetParametricValuesService getParametricValuesService, final ConfigService<? extends HodSearchCapable> configService, final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever) {
         return new HodParametricValuesService(fieldsService, getParametricValuesService, configService, authenticationInformationRetriever);
+    }
+
+    private static class CustomModule extends SimpleModule {
+        private static final long serialVersionUID = -7185088412606149305L;
     }
 }
