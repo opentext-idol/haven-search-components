@@ -46,11 +46,14 @@ public class FieldsParserImpl implements FieldsParser {
         final Set<FieldInfo<?>> customFields = fieldsInfo.getCustomFields();
 
         final DocContent content = hit.getContent();
+        Map<String, FieldInfo<?>> fieldMap = Collections.emptyMap();
+        String qmsId = null;
+        PromotionCategory promotionCategory = PromotionCategory.NONE;
         if (content != null) {
             final Element docContent = (Element) content.getContent().get(0);
             if (docContent.hasChildNodes()) {
                 final NodeList childNodes = docContent.getChildNodes();
-                final Map<String, FieldInfo<?>> fieldMap = new HashMap<>(childNodes.getLength());
+                fieldMap = new HashMap<>(childNodes.getLength());
 
                 for (final FieldInfo<?> customField : customFields) {
                     final List<?> values = parseFields(docContent, customField.getName(), customField.getType(), customField.getType().getType());
@@ -59,18 +62,21 @@ public class FieldsParserImpl implements FieldsParser {
                     }
                 }
 
-                searchResultBuilder
-                        .setFieldMap(fieldMap)
-                        .setContentType(readField(fieldAssociations.getMediaContentType(), fieldMap, String.class))
-                        .setUrl(readField(fieldAssociations.getMediaUrl(), fieldMap, String.class))
-                        .setOffset(readField(fieldAssociations.getMediaOffset(), fieldMap, String.class))
-                        .setAuthors(readFields(fieldAssociations.getAuthor(), fieldMap, String.class))
-                        .setMmapUrl(readField(fieldAssociations.getMmapUrl(), fieldMap, String.class))
-                        .setThumbnail(readField(fieldAssociations.getThumbnail(), fieldMap, String.class))
-                        .setQmsId(parseField(docContent, IdolDocumentFieldsService.QMS_ID_FIELD_INFO, String.class))
-                        .setPromotionCategory(determinePromotionCategory(docContent, hit.getPromotionname(), hit.getDatabase()));
+                qmsId = parseField(docContent, IdolDocumentFieldsService.QMS_ID_FIELD_INFO, String.class);
+                promotionCategory = determinePromotionCategory(docContent, hit.getPromotionname(), hit.getDatabase());
             }
         }
+
+        searchResultBuilder
+                .setFieldMap(fieldMap)
+                .setContentType(readField(fieldAssociations.getMediaContentType(), fieldMap, String.class))
+                .setUrl(readField(fieldAssociations.getMediaUrl(), fieldMap, String.class))
+                .setOffset(readField(fieldAssociations.getMediaOffset(), fieldMap, String.class))
+                .setAuthors(readFields(fieldAssociations.getAuthor(), fieldMap, String.class))
+                .setMmapUrl(readField(fieldAssociations.getMmapUrl(), fieldMap, String.class))
+                .setThumbnail(readField(fieldAssociations.getThumbnail(), fieldMap, String.class))
+                .setQmsId(qmsId)
+                .setPromotionCategory(promotionCategory);
     }
 
     private void addFieldToResultMap(final Map<String, FieldInfo<?>> fieldMap, final FieldInfo<?> fieldInfo, final List<?> values) {
