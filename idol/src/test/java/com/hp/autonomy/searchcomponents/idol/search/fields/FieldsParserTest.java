@@ -50,7 +50,7 @@ public class FieldsParserTest {
         fieldsParser = new FieldsParserImpl(configService);
 
         final FieldAssociations fieldAssociations = new FieldAssociations();
-        fieldAssociations.setMediaContentType("CUSTOM_ARRAY");
+        fieldAssociations.setAuthor("CUSTOM_ARRAY");
         final Set<FieldInfo<?>> customFields = new HashSet<>();
         customFields.add(new FieldInfo<DateTime>("CUSTOM_DATE", "A Date", FieldType.DATE));
         customFields.add(new FieldInfo<String>("CUSTOM_ARRAY", "An Array", FieldType.STRING));
@@ -64,7 +64,7 @@ public class FieldsParserTest {
         final IdolSearchResult.Builder builder = new IdolSearchResult.Builder();
         fieldsParser.parseDocumentFields(mockHit(), builder);
         final IdolSearchResult idolSearchResult = builder.build();
-        assertNotNull(idolSearchResult.getContentType());
+        assertThat(idolSearchResult.getAuthors(), hasSize(2));
         final Map<String, FieldInfo<?>> fieldMap = idolSearchResult.getFieldMap();
         assertNotNull(fieldMap.get("CUSTOM_DATE"));
         assertThat(fieldMap.get("CUSTOM_ARRAY").getValues(), hasSize(2));

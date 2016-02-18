@@ -15,6 +15,7 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -34,6 +35,7 @@ public class HodSearchResult implements SearchResult {
     private final String contentType;
     private final String url;
     private final String offset;
+    private final List<String> authors;
 
     private final Map<String, FieldInfo<?>> fieldMap;
 
@@ -52,6 +54,7 @@ public class HodSearchResult implements SearchResult {
         weight = builder.weight;
         url = builder.url;
         offset = builder.offset;
+        authors = builder.authors;
         fieldMap = builder.fieldMap;
 
         date = builder.date;
@@ -86,6 +89,7 @@ public class HodSearchResult implements SearchResult {
 
         private String url;
         private String offset;
+        private List<String> authors;
 
         private Map<String, FieldInfo<?>> fieldMap;
 
@@ -103,6 +107,8 @@ public class HodSearchResult implements SearchResult {
             weight = document.weight;
             contentType = document.contentType;
             url = document.url;
+            offset = document.offset;
+            authors = document.authors;
             fieldMap = document.fieldMap;
             date = document.date;
             promotionCategory = document.promotionCategory;

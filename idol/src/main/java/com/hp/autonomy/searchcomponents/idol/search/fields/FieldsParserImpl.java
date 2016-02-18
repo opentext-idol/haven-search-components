@@ -24,6 +24,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,7 @@ public class FieldsParserImpl implements FieldsParser {
                         .setContentType(readField(fieldAssociations.getMediaContentType(), fieldMap, String.class))
                         .setUrl(readField(fieldAssociations.getMediaUrl(), fieldMap, String.class))
                         .setOffset(readField(fieldAssociations.getMediaOffset(), fieldMap, String.class))
+                        .setAuthors(readFields(fieldAssociations.getAuthor(), fieldMap, String.class))
                         .setMmapUrl(readField(fieldAssociations.getMmapUrl(), fieldMap, String.class))
                         .setThumbnail(readField(fieldAssociations.getThumbnail(), fieldMap, String.class))
                         .setQmsId(parseField(docContent, IdolDocumentFieldsService.QMS_ID_FIELD_INFO, String.class))
@@ -77,6 +79,12 @@ public class FieldsParserImpl implements FieldsParser {
 
     private <T> T readField(final String name, final Map<String, FieldInfo<?>> fieldMap, final Class<T> type) {
         return fieldMap.containsKey(name) ? type.cast(fieldMap.get(name).getValues().iterator().next()) : null;
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    private <T> List<T> readFields(final String name, final Map<String, FieldInfo<?>> fieldMap, final Class<T> type) {
+        //noinspection unchecked
+        return fieldMap.containsKey(name) ? (List<T>) fieldMap.get(name).getValues() : Collections.<T>emptyList();
     }
 
     private PromotionCategory determinePromotionCategory(final Element docContent, final CharSequence promotionName, final CharSequence database) {

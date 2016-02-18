@@ -8,13 +8,9 @@ package com.hp.autonomy.searchcomponents.core.search;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
+import java.util.List;
 
 public interface SearchResult extends Serializable {
-    String CONTENT_TYPE_FIELD = "content_type";
-    String URL_FIELD = "url";
-    String OFFSET_FIELD = "offset";
-    String DATE_FIELD = "date";
-
     String getReference();
 
     String getIndex();
@@ -30,6 +26,8 @@ public interface SearchResult extends Serializable {
     String getUrl();
 
     String getOffset();
+
+    List<String> getAuthors();
 
     DateTime getDate();
 

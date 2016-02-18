@@ -16,6 +16,7 @@ public class FieldAssociations implements Serializable {
     private String mediaContentType;
     private String mediaUrl;
     private String mediaOffset;
+    private String author;
     private String mmapUrl;
     private String thumbnail;
 
@@ -24,6 +25,7 @@ public class FieldAssociations implements Serializable {
             mediaContentType = mediaContentType == null ? other.mediaContentType : mediaContentType;
             mediaUrl = mediaUrl == null ? other.mediaUrl : mediaUrl;
             mediaOffset = mediaOffset == null ? other.mediaOffset : mediaOffset;
+            author = author == null ? other.author : author;
             mmapUrl = mmapUrl == null ? other.mmapUrl : mmapUrl;
             thumbnail = thumbnail == null ? other.thumbnail : thumbnail;
         }

@@ -64,6 +64,7 @@ public class HodSearchResultDeserializerTest {
 
         final FieldAssociations fieldAssociations = new FieldAssociations();
         fieldAssociations.setMediaContentType("links");
+        fieldAssociations.setAuthor("links");
         final Set<FieldInfo<?>> customFields = new HashSet<>();
         customFields.add(new FieldInfo<DateTime>("modified_date", "Last Modified Date", FieldType.DATE));
         customFields.add(new FieldInfo<DateTime>("date_modified", "Last Modified Date", FieldType.DATE));
@@ -79,6 +80,7 @@ public class HodSearchResultDeserializerTest {
         final HodSearchResult firstResult = documents.get(0);
         assertNotNull(firstResult.getContentType());
         assertNull(firstResult.getUrl());
+        assertThat(firstResult.getAuthors(), is(not(empty())));
         assertThat(firstResult.getFieldMap().keySet(), hasSize(2));
     }
 

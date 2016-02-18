@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +76,7 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
                 .setContentType(readFieldValue(fieldMap, fieldAssociations.getMediaContentType(), String.class))
                 .setUrl(readFieldValue(fieldMap, fieldAssociations.getMediaUrl(), String.class))
                 .setOffset(readFieldValue(fieldMap, fieldAssociations.getMediaOffset(), String.class))
+                .setAuthors(readFieldValues(fieldMap, fieldAssociations.getAuthor(), String.class))
                 .setFieldMap(fieldMap)
                 .setDate(parseAsDateFromArray(node, "date"))
                 .setPromotionCategory(parsePromotionCategory(node, "promotion"))
@@ -83,6 +85,12 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
 
     private <T> T readFieldValue(final Map<String, FieldInfo<?>> fieldMap, final String name, final Class<T> type) {
         return fieldMap.containsKey(name) ? type.cast(fieldMap.get(name).getValues().get(0)) : null;
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    private <T> List<T> readFieldValues(final Map<String, FieldInfo<?>> fieldMap, final String name, final Class<T> type) {
+        //noinspection unchecked
+        return fieldMap.containsKey(name) ? (List<T>) fieldMap.get(name).getValues() : Collections.<T>emptyList();
     }
 
     private String parseAsString(@SuppressWarnings("TypeMayBeWeakened") final JsonNode node, final String fieldName) throws JsonProcessingException {

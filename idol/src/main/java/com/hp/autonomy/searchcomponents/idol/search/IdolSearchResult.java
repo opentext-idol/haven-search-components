@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -35,6 +36,7 @@ public class IdolSearchResult implements SearchResult {
     private final String contentType;
     private final String url;
     private final String offset;
+    private final List<String> authors;
     private final String thumbnail;
     private final String mmapUrl;
 
@@ -55,6 +57,7 @@ public class IdolSearchResult implements SearchResult {
         weight = builder.weight;
         url = builder.url;
         offset = builder.offset;
+        authors = builder.authors;
         thumbnail = builder.thumbnail;
         mmapUrl = builder.mmapUrl;
 
@@ -91,6 +94,7 @@ public class IdolSearchResult implements SearchResult {
 
         private String url;
         private String offset;
+        private List<String> authors;
         private String thumbnail;
         private String mmapUrl;
 
@@ -112,6 +116,7 @@ public class IdolSearchResult implements SearchResult {
             contentType = document.contentType;
             url = document.url;
             offset = document.offset;
+            authors = document.authors;
             thumbnail = document.thumbnail;
             mmapUrl = document.mmapUrl;
             fieldMap = document.fieldMap;
