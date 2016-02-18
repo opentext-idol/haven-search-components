@@ -9,6 +9,7 @@ public interface CacheNames {
     String DATABASES = "databases";
     String RELATED_CONCEPTS = "related-concepts";
     String GET_DOCUMENT_CONTENT = "get-content";
+    String FIELDS = "fields";
     String PARAMETRIC_FIELDS = "parametric-fields";
     String PARAMETRIC_VALUES = "parametric-values";
 }
