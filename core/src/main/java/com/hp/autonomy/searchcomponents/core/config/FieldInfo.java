@@ -36,7 +36,7 @@ public class FieldInfo<T> implements Serializable {
 
     public FieldInfo(final String name, final String displayName, final FieldType type, final Collection<T> values) {
         this.name = name;
-        this.displayName = displayName == null ? name : displayName;
+        this.displayName = displayName;
         this.type = type;
         this.values.addAll(values);
     }
