@@ -17,7 +17,7 @@ import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInform
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
-import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
+import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
@@ -30,10 +30,10 @@ import java.util.*;
 public class HodParametricValuesService implements ParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> {
     private final FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
     private final GetParametricValuesService getParametricValuesService;
-    private final ConfigService<? extends QueryManipulationCapable> configService;
+    private final ConfigService<? extends HodSearchCapable> configService;
     private final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
 
-    public HodParametricValuesService(final FieldsService<HodFieldsRequest, HodErrorException> fieldsService, final GetParametricValuesService getParametricValuesService, final ConfigService<? extends QueryManipulationCapable> configService, final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever) {
+    public HodParametricValuesService(final FieldsService<HodFieldsRequest, HodErrorException> fieldsService, final GetParametricValuesService getParametricValuesService, final ConfigService<? extends HodSearchCapable> configService, final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever) {
         this.fieldsService = fieldsService;
         this.getParametricValuesService = getParametricValuesService;
         this.configService = configService;

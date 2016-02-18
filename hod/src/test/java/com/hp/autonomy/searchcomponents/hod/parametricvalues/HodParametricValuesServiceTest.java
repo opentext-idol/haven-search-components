@@ -17,7 +17,7 @@ import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
+import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationConfig;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
@@ -47,7 +47,7 @@ public class HodParametricValuesServiceTest {
     protected FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
 
     @Mock
-    protected ConfigService<? extends QueryManipulationCapable> configService;
+    protected ConfigService<? extends HodSearchCapable> configService;
 
     @Mock
     protected AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
@@ -59,7 +59,7 @@ public class HodParametricValuesServiceTest {
     private HodAuthenticationPrincipal hodAuthenticationPrincipal;
 
     @Mock
-    protected QueryManipulationCapable config;
+    protected HodSearchCapable config;
 
     protected HodParametricValuesService parametricValuesService;
 

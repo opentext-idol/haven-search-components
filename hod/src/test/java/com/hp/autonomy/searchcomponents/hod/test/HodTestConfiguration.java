@@ -5,6 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.autonomy.frontend.configuration.Authentication;
 import com.hp.autonomy.frontend.configuration.AuthenticationConfig;
 import com.hp.autonomy.frontend.configuration.BCryptUsernameAndPassword;
@@ -26,7 +27,10 @@ import com.hp.autonomy.hod.sso.HodAuthentication;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.hod.sso.HodSsoConfig;
 import com.hp.autonomy.hod.sso.SpringSecurityTokenProxyService;
-import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
+import com.hp.autonomy.searchcomponents.core.config.FieldAssociations;
+import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
+import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
+import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationConfig;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
@@ -95,12 +99,13 @@ public class HodTestConfiguration {
 
     @Bean
     @Primary
-    public ConfigService<QueryManipulationCapable> configService() {
-        @SuppressWarnings("unchecked") final ConfigService<QueryManipulationCapable> configService = (ConfigService<QueryManipulationCapable>) mock(ConfigService.class);
+    public ConfigService<HodSearchCapable> configService() {
+        @SuppressWarnings("unchecked") final ConfigService<HodSearchCapable> configService = (ConfigService<HodSearchCapable>) mock(ConfigService.class);
 
-        final QueryManipulationCapable config = mock(QueryManipulationCapable.class);
+        final HodSearchCapable config = mock(HodSearchCapable.class);
 
         when(config.getQueryManipulation()).thenReturn(new QueryManipulationConfig(QUERY_PROFILE, QUERY_MANIPULATION_INDEX));
+        when(config.getFieldsInfo()).thenReturn(new FieldsInfo(new FieldAssociations(), Collections.<FieldInfo<?>>emptySet()));
 
         when(configService.getConfig()).thenReturn(config);
 
@@ -139,11 +144,15 @@ public class HodTestConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(HodServiceConfig.class)
-    public HodServiceConfig<EntityType.Combined, TokenType.Simple> hodServiceConfig(final TokenProxyService<EntityType.Combined, TokenType.Simple> tokenProxyService, final HttpClient httpClient, final TokenRepository tokenRepository) {
+    public HodServiceConfig<EntityType.Combined, TokenType.Simple> hodServiceConfig(
+            final TokenProxyService<EntityType.Combined, TokenType.Simple> tokenProxyService,
+            final HttpClient httpClient, final TokenRepository tokenRepository,
+            final ObjectMapper hodSearchResultObjectMapper) {
         return new HodServiceConfig.Builder<EntityType.Combined, TokenType.Simple>(HOD_URL)
                 .setTokenProxyService(tokenProxyService)
                 .setHttpClient(httpClient)
                 .setTokenRepository(tokenRepository)
+                .setObjectMapper(hodSearchResultObjectMapper)
                 .build();
     }
 

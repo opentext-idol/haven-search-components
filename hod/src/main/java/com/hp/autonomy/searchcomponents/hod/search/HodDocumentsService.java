@@ -29,12 +29,14 @@ import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
-import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
+import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.types.requests.Documents;
 import org.apache.commons.lang.NotImplementedException;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,17 +62,20 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     );
 
     private final FindSimilarService<HodSearchResult> findSimilarService;
-    private final ConfigService<? extends QueryManipulationCapable> configService;
+    private final ConfigService<? extends HodSearchCapable> configService;
     private final QueryTextIndexService<HodSearchResult> queryTextIndexService;
     private final GetContentService<HodSearchResult> getContentService;
     private final AuthenticationInformationRetriever<HodAuthentication> authenticationRetriever;
+    private final DocumentFieldsService documentFieldsService;
 
-    public HodDocumentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends QueryManipulationCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService, final GetContentService<HodSearchResult> getContentService, final AuthenticationInformationRetriever<HodAuthentication> authenticationRetriever) {
+    @SuppressWarnings("ConstructorWithTooManyParameters")
+    public HodDocumentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends HodSearchCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService, final GetContentService<HodSearchResult> getContentService, final AuthenticationInformationRetriever<HodAuthentication> authenticationRetriever, final DocumentFieldsService documentFieldsService) {
         this.findSimilarService = findSimilarService;
         this.configService = configService;
         this.queryTextIndexService = queryTextIndexService;
         this.getContentService = getContentService;
         this.authenticationRetriever = authenticationRetriever;
+        this.documentFieldsService = documentFieldsService;
     }
 
     @Override
@@ -102,7 +107,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
 
         for (final GetContentRequestIndex<ResourceIdentifier> indexAndReferences : request.getIndexesAndReferences()) {
             final GetContentRequestBuilder builder = new GetContentRequestBuilder()
-                    .setPrintFields(new ArrayList<>(HodSearchResult.ALL_FIELDS))
+                    .setPrintFields(documentFieldsService.getPrintFields())
                     .setSummary(Summary.concept);
 
             final List<HodSearchResult> documents = getContentService.getContent(new ArrayList<>(indexAndReferences.getReferences()), indexAndReferences.getIndex(), builder).getDocuments();
@@ -154,7 +159,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
                 .setMinDate(searchRequest.getQueryRestrictions().getMinDate())
                 .setMaxDate(searchRequest.getQueryRestrictions().getMaxDate())
                 .setPrint(Print.fields)
-                .setPrintFields(new ArrayList<>(HodSearchResult.ALL_FIELDS));
+                .setPrintFields(documentFieldsService.getPrintFields());
 
         if (searchRequest.isHighlight()) {
             queryRequestBuilder
@@ -170,7 +175,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
         return queryRequestBuilder;
     }
 
-    private void addDomainToSearchResults(final List<HodSearchResult> documentList, final Iterable<ResourceIdentifier> indexIdentifiers, final List<HodSearchResult> documents) {
+    private void addDomainToSearchResults(final Collection<HodSearchResult> documentList, final Iterable<ResourceIdentifier> indexIdentifiers, final Iterable<HodSearchResult> documents) {
         for (final HodSearchResult hodSearchResult : documents) {
             documentList.add(addDomain(indexIdentifiers, hodSearchResult));
         }

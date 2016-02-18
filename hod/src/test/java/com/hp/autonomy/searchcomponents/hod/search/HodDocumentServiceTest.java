@@ -21,7 +21,8 @@ import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
-import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationCapable;
+import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationConfig;
 import com.hp.autonomy.searchcomponents.hod.test.HodTestUtils;
 import com.hp.autonomy.types.requests.Documents;
@@ -54,10 +55,10 @@ public class HodDocumentServiceTest {
     protected FindSimilarService<HodSearchResult> findSimilarService;
 
     @Mock
-    protected ConfigService<? extends QueryManipulationCapable> configService;
+    protected ConfigService<? extends HodSearchCapable> configService;
 
     @Mock
-    protected QueryManipulationCapable config;
+    protected HodSearchCapable config;
 
     @Mock
     protected QueryTextIndexService<HodSearchResult> queryTextIndexService;
@@ -67,6 +68,9 @@ public class HodDocumentServiceTest {
 
     @Mock
     protected AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
+
+    @Mock
+    protected DocumentFieldsService documentFieldsService;
 
     @Mock
     protected HodAuthentication hodAuthentication;
@@ -79,7 +83,7 @@ public class HodDocumentServiceTest {
 
     @Before
     public void setUp() {
-        documentsService = new HodDocumentsService(findSimilarService, configService, queryTextIndexService, getContentService, authenticationInformationRetriever);
+        documentsService = new HodDocumentsService(findSimilarService, configService, queryTextIndexService, getContentService, authenticationInformationRetriever, documentFieldsService);
 
         when(config.getQueryManipulation()).thenReturn(new QueryManipulationConfig("SomeProfile", "SomeIndex"));
         when(configService.getConfig()).thenReturn(config);
