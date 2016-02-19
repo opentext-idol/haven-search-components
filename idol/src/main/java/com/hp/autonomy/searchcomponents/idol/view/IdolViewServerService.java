@@ -11,20 +11,16 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.AciServiceException;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.aci.content.database.Databases;
-import com.hp.autonomy.aci.content.identifier.reference.Reference;
-import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.idolutils.processors.CopyResponseProcessor;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
+import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.GetContentResponseData;
 import com.hp.autonomy.types.idol.Hit;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
-import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
-import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import org.apache.commons.collections4.CollectionUtils;
@@ -43,13 +39,15 @@ import java.util.List;
 public class IdolViewServerService implements ViewServerService<String, AciErrorException> {
     private final AciService contentAciService;
     private final AciService viewAciService;
+    private final HavenSearchAciParameterHandler parameterHandler;
     private final Processor<GetContentResponseData> getContentResponseProcessor;
     private final ConfigService<? extends ViewCapable> configService;
 
     @Autowired
-    public IdolViewServerService(final AciService contentAciService, final AciService viewAciService, final AciResponseJaxbProcessorFactory processorFactory, final ConfigService<? extends ViewCapable> configService) {
+    public IdolViewServerService(final AciService contentAciService, final AciService viewAciService, final AciResponseJaxbProcessorFactory processorFactory, final HavenSearchAciParameterHandler parameterHandler, final ConfigService<? extends ViewCapable> configService) {
         this.contentAciService = contentAciService;
         this.viewAciService = viewAciService;
+        this.parameterHandler = parameterHandler;
         this.configService = configService;
 
         getContentResponseProcessor = processorFactory.createAciResponseProcessor(GetContentResponseData.class);
@@ -97,12 +95,7 @@ public class IdolViewServerService implements ViewServerService<String, AciError
         }
 
         final AciParameters parameters = new AciParameters(QueryActions.GetContent.name());
-        if (database != null) {
-            parameters.add(GetContentParams.DatabaseMatch.name(), new Databases(database));
-        }
-        parameters.add(GetContentParams.Reference.name(), new Reference(documentReference));
-        parameters.add(GetContentParams.Print.name(), PrintParam.Fields);
-        parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField));
+        parameterHandler.addGetContentOutputParameters(parameters, database, documentReference, referenceField);
 
         final GetContentResponseData queryResponse;
         try {

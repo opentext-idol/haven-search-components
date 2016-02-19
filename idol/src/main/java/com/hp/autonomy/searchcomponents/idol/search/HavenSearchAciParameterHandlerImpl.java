@@ -9,6 +9,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.hp.autonomy.aci.content.database.Databases;
+import com.hp.autonomy.aci.content.identifier.reference.Reference;
 import com.hp.autonomy.aci.content.identifier.reference.ReferencesBuilder;
 import com.hp.autonomy.aci.content.identifier.stateid.StateIdsBuilder;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
@@ -23,6 +24,7 @@ import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
@@ -110,6 +112,18 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         if (indexAndReferences.getIndex() != null) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexAndReferences.getIndex()));
         }
+    }
+
+    @Override
+    public void addGetContentOutputParameters(final AciParameters parameters, final String database, final String documentReference, final String referenceField) {
+        parameters.add(GetContentParams.SecurityInfo.name(), getSecurityInfo());
+
+        if (database != null) {
+            parameters.add(GetContentParams.DatabaseMatch.name(), new Databases(database));
+        }
+        parameters.add(GetContentParams.Reference.name(), new Reference(documentReference));
+        parameters.add(GetContentParams.Print.name(), PrintParam.Fields);
+        parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField));
     }
 
     @Override
