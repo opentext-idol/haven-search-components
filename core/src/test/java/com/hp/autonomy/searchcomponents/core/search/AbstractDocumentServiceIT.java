@@ -60,7 +60,7 @@ public abstract class AbstractDocumentServiceIT<S extends Serializable, D extend
         final String reference = integrationTestUtils.getValidReference();
 
         final S database = integrationTestUtils.getDatabases().get(0);
-        final GetContentRequest<S> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>(database, Collections.singleton(reference))));
+        final GetContentRequest<S> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>(database, Collections.singleton(reference))), null);
         final List<D> results = documentsService.getDocumentContent(getContentRequest);
         assertThat(results, hasSize(1));
     }

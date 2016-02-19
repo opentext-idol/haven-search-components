@@ -70,7 +70,7 @@ public class HavenSearchAciParameterHandlerTest {
     @Test
     public void addSearchOutputParameters() {
         final AciParameters aciParameters = new AciParameters();
-        final AciSearchRequest<String> searchRequest = new SearchRequest<>(null, 0, 50, "Context", 250, null, true, false, null);
+        final AciSearchRequest<String> searchRequest = new SearchRequest<>("securityInfoString", null, 0, 50, "Context", 250, null, true, false, null);
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
         assertThat(aciParameters, is(not(empty())));
     }
@@ -79,7 +79,7 @@ public class HavenSearchAciParameterHandlerTest {
     public void addGetDocumentOutputParameters() {
         final AciParameters aciParameters = new AciParameters();
         final GetContentRequestIndex<String> indexAndReferences = new GetContentRequestIndex<>("Database1", Collections.singleton("SomeReference"));
-        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences);
+        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, "securityInfoString");
         assertThat(aciParameters, is(not(empty())));
     }
 

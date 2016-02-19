@@ -91,7 +91,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
 
             // We use Query and not GetContent here so we can use Combine=simple to ensure returned references are unique
             final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
-            parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences);
+            parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, request.getSecurityInfo());
 
             final QueryResponseData responseData = contentAciService.executeAction(aciParameters, queryResponseProcessor);
             final List<Hit> hits = responseData.getHit();

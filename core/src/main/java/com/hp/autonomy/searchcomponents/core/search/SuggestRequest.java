@@ -17,6 +17,7 @@ import java.io.Serializable;
 public class SuggestRequest<S extends Serializable> implements AciSearchRequest<S> {
     private static final long serialVersionUID = -6338199353489914631L;
 
+    protected String securityInfo;
     protected String reference;
     protected QueryRestrictions<S> queryRestrictions;
     protected int start = DEFAULT_START;

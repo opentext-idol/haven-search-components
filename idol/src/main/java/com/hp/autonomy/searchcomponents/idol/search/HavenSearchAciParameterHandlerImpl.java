@@ -63,6 +63,8 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
 
     @Override
     public void addSearchOutputParameters(final AciParameters aciParameters, final AciSearchRequest<String> searchRequest) {
+        aciParameters.add(QueryParams.SecurityInfo.name(), searchRequest.getSecurityInfo());
+
         aciParameters.add(QueryParams.Start.name(), searchRequest.getStart());
         aciParameters.add(QueryParams.MaxResults.name(), searchRequest.getMaxResults());
         aciParameters.add(QueryParams.Summary.name(), SummaryParam.fromValue(searchRequest.getSummary(), null));
@@ -82,7 +84,9 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
     }
 
     @Override
-    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences) {
+    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences, final String securityInfo) {
+        aciParameters.add(QueryParams.SecurityInfo.name(), securityInfo);
+
         aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(indexAndReferences.getReferences()));
         aciParameters.add(QueryParams.Summary.name(), SummaryParam.Concept);
         aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);

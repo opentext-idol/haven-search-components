@@ -119,7 +119,7 @@ public class IdolDocumentServiceTest {
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final SuggestRequest<String> suggestRequest = new SuggestRequest<>("Some reference", new IdolQueryRestrictions.Builder().build(), 1, 30, "context", 250, "relevance", true);
+        final SuggestRequest<String> suggestRequest = new SuggestRequest<>("securityInfoString", "Some reference", new IdolQueryRestrictions.Builder().build(), 1, 30, "context", 250, "relevance", true);
         idolDocumentService.findSimilar(suggestRequest);
         verify(queryResponseParser).parseQueryHits(responseData.getHit());
     }
@@ -133,7 +133,7 @@ public class IdolDocumentServiceTest {
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final GetContentRequest<String> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference"))));
+        final GetContentRequest<String> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference"))), "securityInfoString");
         idolDocumentService.getDocumentContent(getContentRequest);
         verify(queryResponseParser).parseQueryHits(responseData.getHit());
     }
@@ -152,6 +152,6 @@ public class IdolDocumentServiceTest {
 
     protected SearchRequest<String> mockQueryParams() {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        return new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
+        return new SearchRequest<>("securityInfoString", queryRestrictions, 0, 50, null, 250, null, true, true, null);
     }
 }
