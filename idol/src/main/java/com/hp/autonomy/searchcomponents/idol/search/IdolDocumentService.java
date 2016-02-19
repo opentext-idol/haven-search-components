@@ -43,7 +43,13 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
     protected final Processor<SuggestResponseData> suggestResponseProcessor;
 
     @SuppressWarnings("ConstructorWithTooManyParameters")
-    public IdolDocumentService(final ConfigService<? extends IdolSearchCapable> configService, final HavenSearchAciParameterHandler parameterHandler, final QueryResponseParser queryResponseParser, final AciService contentAciService, final AciService qmsAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    public IdolDocumentService(
+            final ConfigService<? extends IdolSearchCapable> configService,
+            final HavenSearchAciParameterHandler parameterHandler,
+            final QueryResponseParser queryResponseParser,
+            final AciService contentAciService,
+            final AciService qmsAciService,
+            final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
         this.configService = configService;
         this.parameterHandler = parameterHandler;
         this.queryResponseParser = queryResponseParser;

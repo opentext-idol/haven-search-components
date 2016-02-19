@@ -68,7 +68,7 @@ public class HodDocumentServiceTest {
     protected GetContentService<HodSearchResult> getContentService;
 
     @Mock
-    protected AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
+    protected AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Mock
     protected DocumentFieldsService documentFieldsService;
@@ -90,8 +90,7 @@ public class HodDocumentServiceTest {
         when(configService.getConfig()).thenReturn(config);
 
         when(hodAuthenticationPrincipal.getApplication()).thenReturn(new ResourceIdentifier("SomeDomain", "SomeIndex"));
-        when(hodAuthentication.getPrincipal()).thenReturn(hodAuthenticationPrincipal);
-        when(authenticationInformationRetriever.getAuthentication()).thenReturn(hodAuthentication);
+        when(authenticationInformationRetriever.getPrincipal()).thenReturn(hodAuthenticationPrincipal);
     }
 
     @Test

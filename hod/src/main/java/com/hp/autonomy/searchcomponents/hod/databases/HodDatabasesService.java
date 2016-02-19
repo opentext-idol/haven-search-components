@@ -13,7 +13,7 @@ import com.hp.autonomy.hod.client.api.resource.ResourceType;
 import com.hp.autonomy.hod.client.api.resource.Resources;
 import com.hp.autonomy.hod.client.api.resource.ResourcesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
-import com.hp.autonomy.hod.sso.HodAuthentication;
+import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
@@ -31,9 +31,9 @@ public class HodDatabasesService implements DatabasesService<Database, HodDataba
     protected static final Set<ResourceFlavour> CONTENT_FLAVOURS = ResourceFlavour.of(ResourceFlavour.EXPLORER, ResourceFlavour.STANDARD, ResourceFlavour.CUSTOM_FIELDS);
 
     protected final ResourcesService resourcesService;
-    private final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
+    private final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
 
-    public HodDatabasesService(final ResourcesService resourcesService, final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever) {
+    public HodDatabasesService(final ResourcesService resourcesService, final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever) {
         this.resourcesService = resourcesService;
         this.authenticationInformationRetriever = authenticationInformationRetriever;
     }
@@ -52,8 +52,7 @@ public class HodDatabasesService implements DatabasesService<Database, HodDataba
         // so we remove the public index duplicates here.
         final Collection<String> privateResourceNames = new HashSet<>();
 
-        final HodAuthentication auth = authenticationInformationRetriever.getAuthentication();
-        final String domain = auth.getPrincipal().getApplication().getDomain();
+        final String domain = authenticationInformationRetriever.getPrincipal().getApplication().getDomain();
 
         for (final Resource resource : resources.getResources()) {
             if (CONTENT_FLAVOURS.contains(resource.getFlavour())) {
