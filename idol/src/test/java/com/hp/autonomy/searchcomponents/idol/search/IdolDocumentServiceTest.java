@@ -23,6 +23,7 @@ import com.hp.autonomy.types.idol.Hit;
 import com.hp.autonomy.types.idol.QueryResponseData;
 import com.hp.autonomy.types.idol.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
+import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -133,7 +134,7 @@ public class IdolDocumentServiceTest {
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final GetContentRequest<String> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference"))));
+        final GetContentRequest<String> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference"))), PrintParam.Fields.name());
         idolDocumentService.getDocumentContent(getContentRequest);
         verify(queryResponseParser).parseQueryHits(responseData.getHit());
     }

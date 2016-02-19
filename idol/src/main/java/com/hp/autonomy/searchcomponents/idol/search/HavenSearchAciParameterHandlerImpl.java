@@ -92,7 +92,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
     }
 
     @Override
-    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences) {
+    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences, final PrintParam print) {
         aciParameters.add(QueryParams.SecurityInfo.name(), getSecurityInfo());
 
         aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(indexAndReferences.getReferences()));
@@ -101,8 +101,10 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.Text.name(), GET_CONTENT_QUERY_TEXT);
         aciParameters.add(QueryParams.MaxResults.name(), 1);
         aciParameters.add(QueryParams.AnyLanguage.name(), true);
-        aciParameters.add(QueryParams.Print.name(), PrintParam.Fields);
-        aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(documentFieldsService.getPrintFields()));
+        aciParameters.add(QueryParams.Print.name(), print);
+        if (print == PrintParam.Fields) {
+            aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(documentFieldsService.getPrintFields()));
+        }
         aciParameters.add(QueryParams.XMLMeta.name(), true);
 
         if (indexAndReferences.getIndex() != null) {

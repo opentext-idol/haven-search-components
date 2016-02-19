@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.core.config.FieldAssociations;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
@@ -27,14 +26,13 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -62,14 +60,11 @@ public class HodSearchResultDeserializerTest {
         objectMapper.registerModule(customModule);
         objectMapper.registerModule(new JodaModule());
 
-        final FieldAssociations fieldAssociations = new FieldAssociations();
-        fieldAssociations.setMediaContentType("links");
-        fieldAssociations.setAuthor("links");
-        final Set<FieldInfo<?>> customFields = new HashSet<>();
-        customFields.add(new FieldInfo<DateTime>("modified_date", "Last Modified Date", FieldType.DATE));
-        customFields.add(new FieldInfo<DateTime>("date_modified", "Last Modified Date", FieldType.DATE));
-        customFields.add(new FieldInfo<String>("links", null, FieldType.STRING));
-        when(config.getFieldsInfo()).thenReturn(new FieldsInfo(fieldAssociations, customFields));
+        final FieldsInfo fieldsInfo = new FieldsInfo.Builder()
+                .populateResponseMap("modifiedDate", new FieldInfo<DateTime>("modifiedDate", Arrays.asList("modified_date", "date_modified"), FieldType.DATE))
+                .populateResponseMap("links", new FieldInfo<String>("links", Collections.singletonList("links"), FieldType.STRING))
+                .build();
+        when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);
     }
 
@@ -78,9 +73,7 @@ public class HodSearchResultDeserializerTest {
         final List<HodSearchResult> documents = deserialize();
         assertThat(documents, is(not(empty())));
         final HodSearchResult firstResult = documents.get(0);
-        assertNotNull(firstResult.getContentType());
-        assertNull(firstResult.getUrl());
-        assertThat(firstResult.getAuthors(), is(not(empty())));
+        assertThat(firstResult.getFieldMap().get("links").getValues(), is(not(empty())));
         assertThat(firstResult.getFieldMap().keySet(), hasSize(2));
     }
 

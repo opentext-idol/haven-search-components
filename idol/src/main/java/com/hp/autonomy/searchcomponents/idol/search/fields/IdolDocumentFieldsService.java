@@ -21,8 +21,8 @@ import java.util.Collection;
 public class IdolDocumentFieldsService extends AbstractDocumentFieldsService implements DocumentFieldsService {
     public static final String QMS_ID_FIELD = "qmsid";
     public static final String INJECTED_PROMOTION_FIELD = "injectedpromotion";
-    public static final FieldInfo<String> QMS_ID_FIELD_INFO = new FieldInfo<>(QMS_ID_FIELD, null, FieldType.STRING);
-    public static final FieldInfo<Boolean> INJECTED_PROMOTION_FIELD_INFO = new FieldInfo<>(INJECTED_PROMOTION_FIELD, null, FieldType.BOOLEAN);
+    public static final FieldInfo<String> QMS_ID_FIELD_INFO = new FieldInfo<>(QMS_ID_FIELD, FieldType.STRING);
+    public static final FieldInfo<Boolean> INJECTED_PROMOTION_FIELD_INFO = new FieldInfo<>(INJECTED_PROMOTION_FIELD, FieldType.BOOLEAN);
 
     @SuppressWarnings("TypeMayBeWeakened")
     @Autowired

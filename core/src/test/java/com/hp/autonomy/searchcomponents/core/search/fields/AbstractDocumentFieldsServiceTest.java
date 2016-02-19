@@ -10,7 +10,6 @@ import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -34,22 +33,21 @@ public abstract class AbstractDocumentFieldsServiceTest {
     protected int numberOfHardCodedFields;
     protected FieldsInfo fieldsInfo;
 
-    @Before
-    public void setUp() {
-        fieldsInfo = new FieldsInfo();
-        when(config.getFieldsInfo()).thenReturn(fieldsInfo);
-        when(configService.getConfig()).thenReturn(config);
-    }
-
     @Test
     public void getPrintFieldsHardcodedOnly() {
-        fieldsInfo.setCustomFields(Collections.<FieldInfo<?>>emptySet());
+        fieldsInfo = new FieldsInfo.Builder().build();
+        when(config.getFieldsInfo()).thenReturn(fieldsInfo);
+        when(configService.getConfig()).thenReturn(config);
         assertThat(documentFieldsService.getPrintFields(), hasSize(numberOfHardCodedFields));
     }
 
     @Test
     public void getAllPrintFields() {
-        fieldsInfo.setCustomFields(Collections.<FieldInfo<?>>singleton(new FieldInfo<String>("SomeField", null, FieldType.STRING)));
+        fieldsInfo = new FieldsInfo.Builder()
+                .populateResponseMap("Some Id", new FieldInfo<String>("Some Id", Collections.singletonList("SomeField"), FieldType.STRING))
+                .build();
+        when(config.getFieldsInfo()).thenReturn(fieldsInfo);
+        when(configService.getConfig()).thenReturn(config);
         assertThat(documentFieldsService.getPrintFields(), hasSize(numberOfHardCodedFields + 1));
     }
 }

@@ -6,7 +6,6 @@
 package com.hp.autonomy.searchcomponents.idol.search.fields;
 
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.core.config.FieldAssociations;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
@@ -22,13 +21,13 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 public class FieldsParserImpl implements FieldsParser {
@@ -42,8 +41,7 @@ public class FieldsParserImpl implements FieldsParser {
     @Override
     public void parseDocumentFields(final Hit hit, final IdolSearchResult.Builder searchResultBuilder) {
         final FieldsInfo fieldsInfo = configService.getConfig().getFieldsInfo();
-        final FieldAssociations fieldAssociations = fieldsInfo.getFieldAssociations();
-        final Set<FieldInfo<?>> customFields = fieldsInfo.getCustomFields();
+        final Map<String, FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfigByName();
 
         final DocContent content = hit.getContent();
         Map<String, FieldInfo<?>> fieldMap = Collections.emptyMap();
@@ -55,12 +53,7 @@ public class FieldsParserImpl implements FieldsParser {
                 final NodeList childNodes = docContent.getChildNodes();
                 fieldMap = new HashMap<>(childNodes.getLength());
 
-                for (final FieldInfo<?> customField : customFields) {
-                    final List<?> values = parseFields(docContent, customField.getName(), customField.getType(), customField.getType().getType());
-                    if (CollectionUtils.isNotEmpty(values)) {
-                        addFieldToResultMap(fieldMap, customField, values);
-                    }
-                }
+                parseAllFields(fieldConfig, childNodes, fieldMap, docContent.getNodeName());
 
                 qmsId = parseField(docContent, IdolDocumentFieldsService.QMS_ID_FIELD_INFO, String.class);
                 promotionCategory = determinePromotionCategory(docContent, hit.getPromotionname(), hit.getDatabase());
@@ -69,28 +62,35 @@ public class FieldsParserImpl implements FieldsParser {
 
         searchResultBuilder
                 .setFieldMap(fieldMap)
-                .setContentType(readField(fieldAssociations.getMediaContentType(), fieldMap, String.class))
-                .setUrl(readField(fieldAssociations.getMediaUrl(), fieldMap, String.class))
-                .setOffset(readField(fieldAssociations.getMediaOffset(), fieldMap, String.class))
-                .setAuthors(readFields(fieldAssociations.getAuthor(), fieldMap, String.class))
-                .setMmapUrl(readField(fieldAssociations.getMmapUrl(), fieldMap, String.class))
-                .setThumbnail(readField(fieldAssociations.getThumbnail(), fieldMap, String.class))
                 .setQmsId(qmsId)
                 .setPromotionCategory(promotionCategory);
     }
 
-    private void addFieldToResultMap(final Map<String, FieldInfo<?>> fieldMap, final FieldInfo<?> fieldInfo, final List<?> values) {
-        fieldMap.put(fieldInfo.getName(), new FieldInfo<>(fieldInfo.getName(), fieldInfo.getDisplayName(), fieldInfo.getType(), values));
+    private void parseAllFields(final Map<String, FieldInfo<?>> fieldConfig, final NodeList childNodes, final Map<String, FieldInfo<?>> fieldMap, final String name) {
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            final Node node = childNodes.item(i);
+            if (node instanceof Text) {
+                final String stringValue = node.getNodeValue();
+                if (StringUtils.isNotBlank(stringValue)) {
+                    final FieldInfo<?> fieldInfo = getFieldInfo(fieldConfig, name);
+                    final String id = fieldInfo.getId();
+                    final FieldType fieldType = fieldInfo.getType();
+                    final Object value = fieldType.parseValue(fieldType.getType(), stringValue);
+                    if (fieldMap.containsKey(id)) {
+                        //noinspection unchecked,CastToConcreteClass
+                        ((FieldInfo<Object>) fieldMap.get(id)).getValues().add(value);
+                    } else {
+                        fieldMap.put(id, new FieldInfo<>(id, Collections.singletonList(name), fieldInfo.getType(), value));
+                    }
+                }
+            } else if (node.getChildNodes().getLength() > 0) {
+                parseAllFields(fieldConfig, node.getChildNodes(), fieldMap, node.getNodeName());
+            }
+        }
     }
 
-    private <T> T readField(final String name, final Map<String, FieldInfo<?>> fieldMap, final Class<T> type) {
-        return fieldMap.containsKey(name) ? type.cast(fieldMap.get(name).getValues().iterator().next()) : null;
-    }
-
-    @SuppressWarnings("UnusedParameters")
-    private <T> List<T> readFields(final String name, final Map<String, FieldInfo<?>> fieldMap, final Class<T> type) {
-        //noinspection unchecked
-        return fieldMap.containsKey(name) ? (List<T>) fieldMap.get(name).getValues() : Collections.<T>emptyList();
+    private FieldInfo<?> getFieldInfo(final Map<String, FieldInfo<?>> fieldConfig, final String name) {
+        return fieldConfig.containsKey(name) ? fieldConfig.get(name) : new FieldInfo<>(name, Collections.singletonList(name), FieldType.STRING);
     }
 
     private PromotionCategory determinePromotionCategory(final Element docContent, final CharSequence promotionName, final CharSequence database) {
@@ -122,7 +122,7 @@ public class FieldsParserImpl implements FieldsParser {
     }
 
     private <T> T parseField(final Element node, final FieldInfo<T> fieldInfo, final Class<T> type) {
-        final List<T> fields = parseFields(node, fieldInfo.getName(), fieldInfo.getType(), type);
+        final List<T> fields = parseFields(node, fieldInfo.getNames().get(0), fieldInfo.getType(), type);
         return CollectionUtils.isNotEmpty(fields) ? fields.get(0) : null;
     }
 }

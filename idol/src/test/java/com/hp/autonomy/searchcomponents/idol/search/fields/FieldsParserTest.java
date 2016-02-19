@@ -6,7 +6,6 @@
 package com.hp.autonomy.searchcomponents.idol.search.fields;
 
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.core.config.FieldAssociations;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
@@ -22,12 +21,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.*;
@@ -49,12 +47,10 @@ public class FieldsParserTest {
     public void setUp() {
         fieldsParser = new FieldsParserImpl(configService);
 
-        final FieldAssociations fieldAssociations = new FieldAssociations();
-        fieldAssociations.setAuthor("CUSTOM_ARRAY");
-        final Set<FieldInfo<?>> customFields = new HashSet<>();
-        customFields.add(new FieldInfo<DateTime>("CUSTOM_DATE", "A Date", FieldType.DATE));
-        customFields.add(new FieldInfo<String>("CUSTOM_ARRAY", "An Array", FieldType.STRING));
-        final FieldsInfo fieldsInfo = new FieldsInfo(fieldAssociations, customFields);
+        final FieldsInfo fieldsInfo = new FieldsInfo.Builder()
+                .populateResponseMap("Custom Date", new FieldInfo<DateTime>("Custom Date", Collections.singletonList("CUSTOM_DATE"), FieldType.DATE))
+                .populateResponseMap("author", new FieldInfo<String>("author", Collections.singletonList("CUSTOM_ARRAY"), FieldType.STRING))
+                .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);
     }
@@ -64,10 +60,9 @@ public class FieldsParserTest {
         final IdolSearchResult.Builder builder = new IdolSearchResult.Builder();
         fieldsParser.parseDocumentFields(mockHit(), builder);
         final IdolSearchResult idolSearchResult = builder.build();
-        assertThat(idolSearchResult.getAuthors(), hasSize(2));
         final Map<String, FieldInfo<?>> fieldMap = idolSearchResult.getFieldMap();
-        assertNotNull(fieldMap.get("CUSTOM_DATE"));
-        assertThat(fieldMap.get("CUSTOM_ARRAY").getValues(), hasSize(2));
+        assertNotNull(fieldMap.get("Custom Date"));
+        assertThat(fieldMap.get("author").getValues(), hasSize(2));
     }
 
     @Test
@@ -97,45 +92,41 @@ public class FieldsParserTest {
         final Element element = mock(Element.class);
         content.getContent().add(element);
 
-        mockField(element, IdolDocumentFieldsService.QMS_ID_FIELD.toUpperCase(), "123");
-        when(element.getElementsByTagName(IdolDocumentFieldsService.INJECTED_PROMOTION_FIELD.toUpperCase())).thenReturn(mock(NodeList.class));
-
-        mockField(element, "CUSTOM_DATE", "2016-02-03T11:42:00");
-        mockArrayField(element, "CUSTOM_ARRAY", "a", "b");
-
         when(element.hasChildNodes()).thenReturn(true);
         final NodeList childNodes = mock(NodeList.class);
-        when(childNodes.getLength()).thenReturn(3);
+        when(childNodes.getLength()).thenReturn(4);
+        mockNodeListEntry(childNodes, 0, "CUSTOM_DATE", "2016-02-03T11:42:00");
+        mockNodeListEntry(childNodes, 1, "CUSTOM_ARRAY", "a");
+        mockNodeListEntry(childNodes, 2, "CUSTOM_ARRAY", "b");
+        mockNodeListEntry(childNodes, 3, "UNKNOWN", "c");
         when(element.getChildNodes()).thenReturn(childNodes);
+
+        mockHardCodedField(element, IdolDocumentFieldsService.QMS_ID_FIELD.toUpperCase(), "123");
+        when(element.getElementsByTagName(IdolDocumentFieldsService.INJECTED_PROMOTION_FIELD.toUpperCase())).thenReturn(mock(NodeList.class));
 
         hit.setContent(content);
 
         return hit;
     }
 
-    private void mockField(final Element element, final String name, final String value) {
+    private void mockHardCodedField(final Element element, final String name, final String value) {
         final NodeList childNodes = mock(NodeList.class);
         when(childNodes.getLength()).thenReturn(1);
         mockNodeListEntry(childNodes, 0, name, value);
         when(element.getElementsByTagName(name)).thenReturn(childNodes);
     }
 
-    private void mockArrayField(final Element element, final String name, final String... values) {
-        final NodeList childNodes = mock(NodeList.class);
-        when(childNodes.getLength()).thenReturn(values.length);
-        for (int i = 0; i < values.length; i++) {
-            mockNodeListEntry(childNodes, i, name, values[i]);
-        }
-        when(element.getElementsByTagName(name)).thenReturn(childNodes);
-    }
-
     private void mockNodeListEntry(final NodeList nodes, final int i, final String name, final String value) {
-        final Element childNode = mock(Element.class);
-        when(childNode.getNodeName()).thenReturn(name);
-        final Node textNode = mock(Node.class);
+        final Element namedNode = mock(Element.class);
+        when(namedNode.getNodeName()).thenReturn(name);
+        final Text textNode = mock(Text.class);
         when(textNode.getNodeValue()).thenReturn(value);
-        when(childNode.getFirstChild()).thenReturn(textNode);
-        when(nodes.item(i)).thenReturn(childNode);
+        final NodeList textNodes = mock(NodeList.class);
+        when(namedNode.getChildNodes()).thenReturn(textNodes);
+        when(textNodes.getLength()).thenReturn(1);
+        when(textNodes.item(0)).thenReturn(textNode);
+        when(namedNode.getFirstChild()).thenReturn(textNode);
+        when(nodes.item(i)).thenReturn(namedNode);
     }
 
     private Hit mockInjectedPromotionHit() {
