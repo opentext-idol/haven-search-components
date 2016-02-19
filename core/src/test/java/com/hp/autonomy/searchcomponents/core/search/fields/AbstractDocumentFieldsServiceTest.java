@@ -10,11 +10,12 @@ import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -32,23 +33,21 @@ public abstract class AbstractDocumentFieldsServiceTest {
     protected int numberOfHardCodedFields;
     protected FieldsInfo fieldsInfo;
 
-    @Before
-    public void setUp() {
-        when(config.getFieldsInfo()).thenReturn(fieldsInfo);
-        when(configService.getConfig()).thenReturn(config);
-    }
-
     @Test
     public void getPrintFieldsHardcodedOnly() {
         fieldsInfo = new FieldsInfo.Builder().build();
+        when(config.getFieldsInfo()).thenReturn(fieldsInfo);
+        when(configService.getConfig()).thenReturn(config);
         assertThat(documentFieldsService.getPrintFields(), hasSize(numberOfHardCodedFields));
     }
 
     @Test
     public void getAllPrintFields() {
         fieldsInfo = new FieldsInfo.Builder()
-                .populateResponseMap("Some Id", new FieldInfo<String>("Some Id", "SomeField", null, FieldType.STRING))
+                .populateResponseMap("Some Id", new FieldInfo<String>("Some Id", Collections.singletonList("SomeField"), FieldType.STRING))
                 .build();
+        when(config.getFieldsInfo()).thenReturn(fieldsInfo);
+        when(configService.getConfig()).thenReturn(config);
         assertThat(documentFieldsService.getPrintFields(), hasSize(numberOfHardCodedFields + 1));
     }
 }

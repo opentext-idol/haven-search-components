@@ -26,9 +26,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -60,11 +60,9 @@ public class HodSearchResultDeserializerTest {
         objectMapper.registerModule(customModule);
         objectMapper.registerModule(new JodaModule());
 
-        final Set<FieldInfo<?>> customFields = new HashSet<>();
-//        customFields.add(new FieldInfo<DateTime>("date_modified", "Last Modified Date", FieldType.DATE));
         final FieldsInfo fieldsInfo = new FieldsInfo.Builder()
-                .populateResponseMap("modifiedDate", new FieldInfo<DateTime>("modifiedDate", "modified_date", "Last Modified Date", FieldType.DATE))
-                .populateResponseMap("links", new FieldInfo<String>("links", "links", null, FieldType.STRING))
+                .populateResponseMap("modifiedDate", new FieldInfo<DateTime>("modifiedDate", Arrays.asList("modified_date", "date_modified"), FieldType.DATE))
+                .populateResponseMap("links", new FieldInfo<String>("links", Collections.singletonList("links"), FieldType.STRING))
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);

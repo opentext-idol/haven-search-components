@@ -66,13 +66,22 @@ public class FieldsParserImpl implements FieldsParser {
                 .setPromotionCategory(promotionCategory);
     }
 
-    private void parseAllFields(final Map<String, FieldInfo<?>> fieldConfig, NodeList childNodes, Map<String, FieldInfo<?>> fieldMap, final String name) {
+    private void parseAllFields(final Map<String, FieldInfo<?>> fieldConfig, final NodeList childNodes, final Map<String, FieldInfo<?>> fieldMap, final String name) {
         for (int i = 0; i < childNodes.getLength(); i++) {
             final Node node = childNodes.item(i);
             if (node instanceof Text) {
-                final String value = node.getNodeValue();
-                if (StringUtils.isNotBlank(value)) {
-                    addUnknownFieldToResultMap(fieldConfig, fieldMap, name, value);
+                final String stringValue = node.getNodeValue();
+                if (StringUtils.isNotBlank(stringValue)) {
+                    final FieldInfo<?> fieldInfo = getFieldInfo(fieldConfig, name);
+                    final String id = fieldInfo.getId();
+                    final FieldType fieldType = fieldInfo.getType();
+                    final Object value = fieldType.parseValue(fieldType.getType(), stringValue);
+                    if (fieldMap.containsKey(id)) {
+                        //noinspection unchecked,CastToConcreteClass
+                        ((FieldInfo<Object>) fieldMap.get(id)).getValues().add(value);
+                    } else {
+                        fieldMap.put(id, new FieldInfo<>(id, Collections.singletonList(name), fieldInfo.getType(), value));
+                    }
                 }
             } else if (node.getChildNodes().getLength() > 0) {
                 parseAllFields(fieldConfig, node.getChildNodes(), fieldMap, node.getNodeName());
@@ -80,14 +89,8 @@ public class FieldsParserImpl implements FieldsParser {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> void addUnknownFieldToResultMap(final Map<String, FieldInfo<?>> fieldConfig, final Map<String, FieldInfo<?>> fieldMap, final String name, final T value) {
-        if (fieldMap.containsKey(name)) {
-            ((List<T>) fieldMap.get(name).getValues()).add(value);
-        } else {
-            final FieldInfo<?> fieldInfo = fieldConfig.get(name);
-            fieldMap.put(name, new FieldInfo<>(fieldInfo.getId(), name, fieldInfo.getDisplayName(), fieldInfo.getType(), value));
-        }
+    private FieldInfo<?> getFieldInfo(final Map<String, FieldInfo<?>> fieldConfig, final String name) {
+        return fieldConfig.containsKey(name) ? fieldConfig.get(name) : new FieldInfo<>(name, Collections.singletonList(name), FieldType.STRING);
     }
 
     private PromotionCategory determinePromotionCategory(final Element docContent, final CharSequence promotionName, final CharSequence database) {
@@ -119,7 +122,7 @@ public class FieldsParserImpl implements FieldsParser {
     }
 
     private <T> T parseField(final Element node, final FieldInfo<T> fieldInfo, final Class<T> type) {
-        final List<T> fields = parseFields(node, fieldInfo.getName(), fieldInfo.getType(), type);
+        final List<T> fields = parseFields(node, fieldInfo.getNames().get(0), fieldInfo.getType(), type);
         return CollectionUtils.isNotEmpty(fields) ? fields.get(0) : null;
     }
 }

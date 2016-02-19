@@ -21,28 +21,27 @@ import java.util.List;
 public class FieldInfo<T> implements Serializable {
     private static final long serialVersionUID = -5649457890413743332L;
     private String id;
-    private String name;
-    private String displayName;
     private FieldType type = FieldType.STRING;
+    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "NonSerializableFieldInSerializableClass", "TypeMayBeWeakened"})
+    private final List<String> names = new ArrayList<>();
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "NonSerializableFieldInSerializableClass", "TypeMayBeWeakened"})
     private final List<T> values = new ArrayList<>();
 
-    public FieldInfo(final String name, final FieldType type) {
-        this(null, name, null, type, Collections.<T>emptyList());
+    public FieldInfo(final String names, final FieldType type) {
+        this(null, Collections.singletonList(names), type, Collections.<T>emptyList());
     }
 
-    public FieldInfo(final String id, final String name, final String displayName, final FieldType type) {
-        this(id, name, displayName, type, Collections.<T>emptyList());
+    public FieldInfo(final String id, final Collection<String> names, final FieldType type) {
+        this(id, names, type, Collections.<T>emptyList());
     }
 
-    public FieldInfo(final String id, final String name, final String displayName, final FieldType type, final T value) {
-        this(id, name, displayName, type, Collections.singletonList(value));
+    public FieldInfo(final String id, final Collection<String> names, final FieldType type, final T value) {
+        this(id, names, type, Collections.singletonList(value));
     }
 
-    public FieldInfo(final String id, final String name, final String displayName, final FieldType type, final Collection<T> values) {
+    public FieldInfo(final String id, final Collection<String> names, final FieldType type, final Collection<T> values) {
         this.id = id;
-        this.name = name;
-        this.displayName = displayName;
+        this.names.addAll(names);
         this.type = type;
         this.values.addAll(values);
     }

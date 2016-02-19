@@ -48,13 +48,15 @@ public class FieldsInfo implements Serializable {
     @Accessors(chain = true)
     public static class Builder {
         private final Map<String, FieldInfo<?>> fieldConfig = new LinkedHashMap<>();
-        private Map<String, FieldInfo<?>> fieldConfigByName = new LinkedHashMap<>();
+        private final Map<String, FieldInfo<?>> fieldConfigByName = new LinkedHashMap<>();
 
         @JsonAnySetter
         public Builder populateResponseMap(final String key, final FieldInfo<?> value) {
             value.setId(key);
             fieldConfig.put(key, value);
-            fieldConfigByName.put(value.getName(), value);
+            for (final String name : value.getNames()) {
+                fieldConfigByName.put(name, value);
+            }
             return this;
         }
 

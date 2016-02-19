@@ -7,8 +7,6 @@ package com.hp.autonomy.searchcomponents.core.config;
 
 import org.joda.time.DateTime;
 
-import java.nio.charset.StandardCharsets;
-
 public enum FieldType {
     STRING(String.class, new FieldValueParser<String>() {
         @Override

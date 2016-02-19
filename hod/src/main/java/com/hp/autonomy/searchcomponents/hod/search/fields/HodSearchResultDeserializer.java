@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,16 +51,18 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
 
         final Map<String, FieldInfo<?>> fieldMap = new HashMap<>(fieldConfig.size());
         for (final FieldInfo<?> fieldInfo : fieldConfig.values()) {
-            final String[] stringValues = parseAsStringArray(node, fieldInfo.getName());
+            for (final String name : fieldInfo.getNames()) {
+                final String[] stringValues = parseAsStringArray(node, name);
 
-            if (ArrayUtils.isNotEmpty(stringValues)) {
-                final List<Object> values = new ArrayList<>(stringValues.length);
-                for (final String stringValue : stringValues) {
-                    final Object value = fieldInfo.getType().parseValue(fieldInfo.getType().getType(), stringValue);
-                    values.add(value);
+                if (ArrayUtils.isNotEmpty(stringValues)) {
+                    final List<Object> values = new ArrayList<>(stringValues.length);
+                    for (final String stringValue : stringValues) {
+                        final Object value = fieldInfo.getType().parseValue(fieldInfo.getType().getType(), stringValue);
+                        values.add(value);
+                    }
+
+                    fieldMap.put(fieldInfo.getId(), new FieldInfo<>(fieldInfo.getId(), Collections.singleton(name), fieldInfo.getType(), values));
                 }
-
-                fieldMap.put(fieldInfo.getName(), new FieldInfo<>(fieldInfo.getId(), fieldInfo.getName(), fieldInfo.getDisplayName(), fieldInfo.getType(), values));
             }
         }
 
