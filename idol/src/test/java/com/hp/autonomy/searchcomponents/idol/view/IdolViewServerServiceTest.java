@@ -12,6 +12,7 @@ import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
 import com.hp.autonomy.types.idol.DocContent;
@@ -48,6 +49,9 @@ public class IdolViewServerServiceTest {
     private AciResponseJaxbProcessorFactory processorFactory;
 
     @Mock
+    private HavenSearchAciParameterHandler parameterHandler;
+
+    @Mock
     private ConfigService<? extends ViewCapable> configService;
 
     @Mock
@@ -61,7 +65,7 @@ public class IdolViewServerServiceTest {
         when(viewCapableConfig.getViewConfig()).thenReturn(viewConfig);
         when(configService.getConfig()).thenReturn(viewCapableConfig);
 
-        idolViewServerService = new IdolViewServerService(contentAciService, viewAciService, processorFactory, configService);
+        idolViewServerService = new IdolViewServerService(contentAciService, viewAciService, processorFactory, parameterHandler, configService);
     }
 
     @Test

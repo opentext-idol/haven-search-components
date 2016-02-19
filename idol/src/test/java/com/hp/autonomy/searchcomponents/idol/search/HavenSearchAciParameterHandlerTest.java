@@ -90,6 +90,13 @@ public class HavenSearchAciParameterHandlerTest {
     }
 
     @Test
+    public void addGetContentOutputParameters() {
+        final AciParameters aciParameters = new AciParameters();
+        parameterHandler.addGetContentOutputParameters(aciParameters, "Database1", "ref", "field");
+        assertThat(aciParameters, is(not(empty())));
+    }
+
+    @Test
     public void addLanguageRestriction() {
         final AciParameters aciParameters = new AciParameters();
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setLanguageType("englishUTF8").build();

@@ -21,6 +21,8 @@ public interface HavenSearchAciParameterHandler {
 
     void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences, final PrintParam print);
 
+    void addGetContentOutputParameters(final AciParameters parameters, final String database, final String documentReference, final String referenceField);
+
     void addLanguageRestriction(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions);
 
     void addQmsParameters(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions);
