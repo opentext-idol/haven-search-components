@@ -19,7 +19,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.QueryRequestBuilder
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
 import com.hp.autonomy.hod.client.error.HodErrorCode;
 import com.hp.autonomy.hod.client.error.HodErrorException;
-import com.hp.autonomy.hod.sso.HodAuthentication;
+import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
@@ -61,14 +61,14 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
     private final GetContentService<Document> getContentService;
     private final QueryTextIndexService<Document> queryTextIndexService;
     private final ConfigService<? extends HodSearchCapable> configService;
-    private final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
+    private final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Autowired
     public HodViewServerService(
             final ViewDocumentService viewDocumentService,
             final GetContentService<Document> viewGetContentService,
             final QueryTextIndexService<Document> queryTextIndexService,
-            final ConfigService<? extends HodSearchCapable> configService, final AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever) {
+            final ConfigService<? extends HodSearchCapable> configService, final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever) {
         this.viewDocumentService = viewDocumentService;
         getContentService = viewGetContentService;
         this.queryTextIndexService = queryTextIndexService;
@@ -161,7 +161,7 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
         final FieldText fieldText = new MATCH(REFERENCE_FIELD, documentReference)
                 .AND(new MATCH("category", HOD_RULE_CATEGORY));
 
-        final String domain = authenticationInformationRetriever.getAuthentication().getPrincipal().getApplication().getDomain();
+        final String domain = authenticationInformationRetriever.getPrincipal().getApplication().getDomain();
         final String queryManipulationIndex = configService.getConfig().getQueryManipulation().getIndex();
 
         final QueryRequestBuilder queryParams = new QueryRequestBuilder()

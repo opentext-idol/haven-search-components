@@ -6,17 +6,22 @@
 package com.hp.autonomy.searchcomponents.hod.authentication;
 
 import com.hp.autonomy.hod.sso.HodAuthentication;
+import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AbstractAuthenticationInformationRetrieverTest;
 import org.junit.Before;
 import org.mockito.Mock;
 
-public class HodAuthenticationInformationRetrieverTest extends AbstractAuthenticationInformationRetrieverTest<HodAuthentication> {
+public class HodAuthenticationInformationRetrieverTest extends AbstractAuthenticationInformationRetrieverTest<HodAuthentication, HodAuthenticationPrincipal> {
     @Mock
     private HodAuthentication hodAuthentication;
+
+    @Mock
+    private HodAuthenticationPrincipal hodAuthenticationPrincipal;
 
     @Before
     public void setUp() {
         authenticationInformationRetriever = new HodAuthenticationInformationRetriever();
         authentication = hodAuthentication;
+        principal = hodAuthenticationPrincipal;
     }
 }

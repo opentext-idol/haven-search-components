@@ -7,6 +7,8 @@ package com.hp.autonomy.searchcomponents.core.authentication;
 
 import org.springframework.security.core.Authentication;
 
-public interface AuthenticationInformationRetriever<A extends Authentication> {
-    A getAuthentication();
+import java.security.Principal;
+
+public interface AuthenticationInformationRetriever<P extends Principal> {
+    P getPrincipal();
 }
