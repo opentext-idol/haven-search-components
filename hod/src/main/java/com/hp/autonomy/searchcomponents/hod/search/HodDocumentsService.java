@@ -19,7 +19,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexServi
 import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
-import com.hp.autonomy.hod.sso.HodAuthentication;
+import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
@@ -65,11 +65,11 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     private final ConfigService<? extends HodSearchCapable> configService;
     private final QueryTextIndexService<HodSearchResult> queryTextIndexService;
     private final GetContentService<HodSearchResult> getContentService;
-    private final AuthenticationInformationRetriever<HodAuthentication> authenticationRetriever;
+    private final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationRetriever;
     private final DocumentFieldsService documentFieldsService;
 
     @SuppressWarnings("ConstructorWithTooManyParameters")
-    public HodDocumentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends HodSearchCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService, final GetContentService<HodSearchResult> getContentService, final AuthenticationInformationRetriever<HodAuthentication> authenticationRetriever, final DocumentFieldsService documentFieldsService) {
+    public HodDocumentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends HodSearchCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService, final GetContentService<HodSearchResult> getContentService, final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationRetriever, final DocumentFieldsService documentFieldsService) {
         this.findSimilarService = findSimilarService;
         this.configService = configService;
         this.queryTextIndexService = queryTextIndexService;
@@ -207,6 +207,6 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     }
 
     private String getDomain() {
-        return authenticationRetriever.getAuthentication().getPrincipal().getApplication().getDomain();
+        return authenticationRetriever.getPrincipal().getApplication().getDomain();
     }
 }

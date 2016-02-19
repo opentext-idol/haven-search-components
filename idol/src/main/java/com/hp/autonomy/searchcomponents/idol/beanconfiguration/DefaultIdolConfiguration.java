@@ -8,7 +8,9 @@ package com.hp.autonomy.searchcomponents.idol.beanconfiguration;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.hp.autonomy.frontend.configuration.ConfigService;
+import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
@@ -26,8 +28,12 @@ import org.springframework.context.annotation.Configuration;
 class DefaultIdolConfiguration {
     @Bean
     @ConditionalOnMissingBean(HavenSearchAciParameterHandler.class)
-    public HavenSearchAciParameterHandler parameterHandler(final ConfigService<? extends IdolSearchCapable> configService, final LanguagesService languagesService, final DocumentFieldsService documentFieldsService) {
-        return new HavenSearchAciParameterHandlerImpl(configService, languagesService, documentFieldsService);
+    public HavenSearchAciParameterHandler parameterHandler(
+            final ConfigService<? extends IdolSearchCapable> configService,
+            final LanguagesService languagesService,
+            final DocumentFieldsService documentFieldsService,
+            final AuthenticationInformationRetriever<CommunityPrincipal> authenticationInformationRetriever) {
+        return new HavenSearchAciParameterHandlerImpl(configService, languagesService, documentFieldsService, authenticationInformationRetriever);
     }
 
     @SuppressWarnings("MethodWithTooManyParameters")

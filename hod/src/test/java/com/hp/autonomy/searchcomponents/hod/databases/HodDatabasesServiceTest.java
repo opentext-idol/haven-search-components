@@ -15,7 +15,6 @@ import com.hp.autonomy.hod.client.api.resource.Resources;
 import com.hp.autonomy.hod.client.api.resource.ResourcesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.token.TokenProxy;
-import com.hp.autonomy.hod.sso.HodAuthentication;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
@@ -42,10 +41,7 @@ public class HodDatabasesServiceTest {
     protected ResourcesService resourcesService;
 
     @Mock
-    protected AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
-
-    @Mock
-    private HodAuthentication hodAuthentication;
+    protected AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Mock
     private HodAuthenticationPrincipal hodAuthenticationPrincipal;
@@ -60,8 +56,7 @@ public class HodDatabasesServiceTest {
     @Before
     public void mocks() throws HodErrorException {
         when(hodAuthenticationPrincipal.getApplication()).thenReturn(new ResourceIdentifier("SomeDomain", "SomeIndex"));
-        when(hodAuthentication.getPrincipal()).thenReturn(hodAuthenticationPrincipal);
-        when(authenticationInformationRetriever.getAuthentication()).thenReturn(hodAuthentication);
+        when(authenticationInformationRetriever.getPrincipal()).thenReturn(hodAuthenticationPrincipal);
 
         mockListResourcesResponse();
     }

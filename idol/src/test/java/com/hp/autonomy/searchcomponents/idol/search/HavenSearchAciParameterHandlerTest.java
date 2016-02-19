@@ -8,6 +8,8 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
+import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
+import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
@@ -16,6 +18,7 @@ import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
+import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -44,11 +47,14 @@ public class HavenSearchAciParameterHandlerTest {
     @Mock
     private DocumentFieldsService documentFieldsService;
 
+    @Mock
+    private AuthenticationInformationRetriever<CommunityPrincipal> authenticationInformationRetriever;
+
     private HavenSearchAciParameterHandler parameterHandler;
 
     @Before
     public void setUp() {
-        parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, languagesService, documentFieldsService);
+        parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, languagesService, documentFieldsService, authenticationInformationRetriever);
     }
 
     @Test
@@ -79,7 +85,7 @@ public class HavenSearchAciParameterHandlerTest {
     public void addGetDocumentOutputParameters() {
         final AciParameters aciParameters = new AciParameters();
         final GetContentRequestIndex<String> indexAndReferences = new GetContentRequestIndex<>("Database1", Collections.singleton("SomeReference"));
-        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences);
+        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, PrintParam.Fields);
         assertThat(aciParameters, is(not(empty())));
     }
 

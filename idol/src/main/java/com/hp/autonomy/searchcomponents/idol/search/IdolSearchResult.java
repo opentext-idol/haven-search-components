@@ -16,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -33,12 +32,6 @@ public class IdolSearchResult implements SearchResult {
     private final String title;
     private final String summary;
     private final Double weight;
-    private final String contentType;
-    private final String url;
-    private final String offset;
-    private final List<String> authors;
-    private final String thumbnail;
-    private final String mmapUrl;
 
     private final Map<String, FieldInfo<?>> fieldMap;
 
@@ -53,13 +46,7 @@ public class IdolSearchResult implements SearchResult {
         index = builder.index;
 
         summary = builder.summary;
-        contentType = builder.contentType;
         weight = builder.weight;
-        url = builder.url;
-        offset = builder.offset;
-        authors = builder.authors;
-        thumbnail = builder.thumbnail;
-        mmapUrl = builder.mmapUrl;
 
         date = builder.date;
         fieldMap = builder.fieldMap;
@@ -90,14 +77,6 @@ public class IdolSearchResult implements SearchResult {
         private String summary;
         private Double weight;
 
-        private String contentType;
-
-        private String url;
-        private String offset;
-        private List<String> authors;
-        private String thumbnail;
-        private String mmapUrl;
-
         private Map<String, FieldInfo<?>> fieldMap;
 
         private DateTime date;
@@ -113,12 +92,6 @@ public class IdolSearchResult implements SearchResult {
             title = document.title;
             summary = document.summary;
             weight = document.weight;
-            contentType = document.contentType;
-            url = document.url;
-            offset = document.offset;
-            authors = document.authors;
-            thumbnail = document.thumbnail;
-            mmapUrl = document.mmapUrl;
             fieldMap = document.fieldMap;
             date = document.date;
             qmsId = document.qmsId;

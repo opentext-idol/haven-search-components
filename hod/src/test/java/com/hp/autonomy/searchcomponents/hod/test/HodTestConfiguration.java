@@ -27,7 +27,6 @@ import com.hp.autonomy.hod.sso.HodAuthentication;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.hod.sso.HodSsoConfig;
 import com.hp.autonomy.hod.sso.SpringSecurityTokenProxyService;
-import com.hp.autonomy.searchcomponents.core.config.FieldAssociations;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
@@ -105,7 +104,7 @@ public class HodTestConfiguration {
         final HodSearchCapable config = mock(HodSearchCapable.class);
 
         when(config.getQueryManipulation()).thenReturn(new QueryManipulationConfig(QUERY_PROFILE, QUERY_MANIPULATION_INDEX));
-        when(config.getFieldsInfo()).thenReturn(new FieldsInfo(new FieldAssociations(), Collections.<FieldInfo<?>>emptySet()));
+        when(config.getFieldsInfo()).thenReturn(new FieldsInfo.Builder().build());
 
         when(configService.getConfig()).thenReturn(config);
 

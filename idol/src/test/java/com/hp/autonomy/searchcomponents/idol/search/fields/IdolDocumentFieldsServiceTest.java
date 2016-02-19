@@ -9,11 +9,9 @@ import com.hp.autonomy.searchcomponents.core.search.fields.AbstractDocumentField
 import org.junit.Before;
 
 public class IdolDocumentFieldsServiceTest extends AbstractDocumentFieldsServiceTest {
-    @Override
     @Before
     public void setUp() {
         documentFieldsService = new IdolDocumentFieldsService(configService);
         numberOfHardCodedFields = 2;
-        super.setUp();
     }
 }
