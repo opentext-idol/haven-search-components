@@ -46,11 +46,6 @@
             <version>0.8.0</version>
         </dependency>
         <dependency>
-            <groupId>com.hp.autonomy.frontend</groupId>
-            <artifactId>idol-types</artifactId>
-            <version>0.1.2</version>
-        </dependency>
-        <dependency>
             <groupId>com.hp.autonomy.aci.client</groupId>
             <artifactId>aci-annotations-processor</artifactId>
             <version>1.0.0</version>
