@@ -5,15 +5,21 @@
 
 package com.hp.autonomy.searchcomponents.hod.authentication;
 
-import com.hp.autonomy.hod.sso.HodAuthentication;
+import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HodAuthenticationInformationRetriever implements AuthenticationInformationRetriever<HodAuthentication> {
+public class HodAuthenticationInformationRetriever implements AuthenticationInformationRetriever<HodAuthenticationPrincipal> {
     @Override
-    public HodAuthentication getAuthentication() {
-        return (HodAuthentication) SecurityContextHolder.getContext().getAuthentication();
+    public Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    @Override
+    public HodAuthenticationPrincipal getPrincipal() {
+        return (HodAuthenticationPrincipal) getAuthentication().getPrincipal();
     }
 }

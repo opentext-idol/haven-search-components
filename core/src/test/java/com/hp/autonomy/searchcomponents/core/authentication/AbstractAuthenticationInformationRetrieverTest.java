@@ -15,11 +15,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.security.Principal;
+
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public abstract class AbstractAuthenticationInformationRetrieverTest<A extends Authentication> {
+public abstract class AbstractAuthenticationInformationRetrieverTest<A extends Authentication, P extends Principal> {
     private static SecurityContext existingSecurityContext;
 
     @BeforeClass
@@ -35,14 +37,16 @@ public abstract class AbstractAuthenticationInformationRetrieverTest<A extends A
     @Mock
     private SecurityContext securityContext;
 
-    protected AuthenticationInformationRetriever<A> authenticationInformationRetriever;
+    protected AuthenticationInformationRetriever<P> authenticationInformationRetriever;
     protected A authentication;
+    protected P principal;
 
     @Test
-    public void getAuthentication() {
+    public void getPrincipal() {
+        when(authentication.getPrincipal()).thenReturn(principal);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        assertNotNull(authenticationInformationRetriever.getAuthentication());
+        assertNotNull(authenticationInformationRetriever.getPrincipal());
     }
 }

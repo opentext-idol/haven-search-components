@@ -22,8 +22,7 @@ public class GetContentRequest<S extends Serializable> implements Serializable {
     public GetContentRequest(
             @JsonDeserialize(contentAs = GetContentRequestIndex.class)
             @JsonProperty("indexesAndReferences")
-            final Set<GetContentRequestIndex<S>> indexesAndReferences
-    ) {
+            final Set<GetContentRequestIndex<S>> indexesAndReferences) {
         this.indexesAndReferences = new LinkedHashSet<>(indexesAndReferences);
     }
 }

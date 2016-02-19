@@ -12,7 +12,6 @@ import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldNames;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
-import com.hp.autonomy.hod.sso.HodAuthentication;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
@@ -29,7 +28,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -50,10 +55,7 @@ public class HodParametricValuesServiceTest {
     protected ConfigService<? extends HodSearchCapable> configService;
 
     @Mock
-    protected AuthenticationInformationRetriever<HodAuthentication> authenticationInformationRetriever;
-
-    @Mock
-    private HodAuthentication hodAuthentication;
+    protected AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Mock
     private HodAuthenticationPrincipal hodAuthenticationPrincipal;
@@ -74,8 +76,7 @@ public class HodParametricValuesServiceTest {
         when(configService.getConfig()).thenReturn(config);
 
         when(hodAuthenticationPrincipal.getApplication()).thenReturn(new ResourceIdentifier("SomeDomain", "SomeIndex"));
-        when(hodAuthentication.getPrincipal()).thenReturn(hodAuthenticationPrincipal);
-        when(authenticationInformationRetriever.getAuthentication()).thenReturn(hodAuthentication);
+        when(authenticationInformationRetriever.getPrincipal()).thenReturn(hodAuthenticationPrincipal);
     }
 
     @Test

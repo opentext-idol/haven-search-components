@@ -6,11 +6,15 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.aci.content.identifier.reference.ReferencesBuilder;
 import com.hp.autonomy.aci.content.identifier.stateid.StateIdsBuilder;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
+import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
+import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
@@ -34,11 +38,15 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
     protected final ConfigService<? extends IdolSearchCapable> configService;
     protected final LanguagesService languagesService;
     protected final DocumentFieldsService documentFieldsService;
+    protected final AuthenticationInformationRetriever<CommunityPrincipal> authenticationInformationRetriever;
 
-    public HavenSearchAciParameterHandlerImpl(final ConfigService<? extends IdolSearchCapable> configService, final LanguagesService languagesService, final DocumentFieldsService documentFieldsService) {
+    private final Escaper urlFragmentEscaper = UrlEscapers.urlFragmentEscaper();
+
+    public HavenSearchAciParameterHandlerImpl(final ConfigService<? extends IdolSearchCapable> configService, final LanguagesService languagesService, final DocumentFieldsService documentFieldsService, final AuthenticationInformationRetriever<CommunityPrincipal> authenticationInformationRetriever) {
         this.configService = configService;
         this.languagesService = languagesService;
         this.documentFieldsService = documentFieldsService;
+        this.authenticationInformationRetriever = authenticationInformationRetriever;
     }
 
     @Override
@@ -63,6 +71,8 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
 
     @Override
     public void addSearchOutputParameters(final AciParameters aciParameters, final AciSearchRequest<String> searchRequest) {
+        aciParameters.add(QueryParams.SecurityInfo.name(), getSecurityInfo());
+
         aciParameters.add(QueryParams.Start.name(), searchRequest.getStart());
         aciParameters.add(QueryParams.MaxResults.name(), searchRequest.getMaxResults());
         aciParameters.add(QueryParams.Summary.name(), SummaryParam.fromValue(searchRequest.getSummary(), null));
@@ -83,6 +93,8 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
 
     @Override
     public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences) {
+        aciParameters.add(QueryParams.SecurityInfo.name(), getSecurityInfo());
+
         aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(indexAndReferences.getReferences()));
         aciParameters.add(QueryParams.Summary.name(), SummaryParam.Concept);
         aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
@@ -112,6 +124,12 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
     public void addQmsParameters(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions) {
         aciParameters.add(QmsQueryParams.Blacklist.name(), configService.getConfig().getQueryManipulation().getBlacklist());
         aciParameters.add(QmsQueryParams.ExpandQuery.name(), configService.getConfig().getQueryManipulation().getExpandQuery());
+    }
+
+    private String getSecurityInfo() {
+        return authenticationInformationRetriever.getPrincipal() != null && authenticationInformationRetriever.getPrincipal().getSecurityInfo() != null
+                ? urlFragmentEscaper.escape(authenticationInformationRetriever.getPrincipal().getSecurityInfo())
+                : null;
     }
 
     protected String formatDate(final ReadableInstant date) {
