@@ -16,8 +16,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Collections;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
@@ -36,20 +34,21 @@ public abstract class AbstractDocumentFieldsServiceTest {
 
     @Before
     public void setUp() {
-        fieldsInfo = new FieldsInfo();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);
     }
 
     @Test
     public void getPrintFieldsHardcodedOnly() {
-        fieldsInfo.setCustomFields(Collections.<FieldInfo<?>>emptySet());
+        fieldsInfo = new FieldsInfo.Builder().build();
         assertThat(documentFieldsService.getPrintFields(), hasSize(numberOfHardCodedFields));
     }
 
     @Test
     public void getAllPrintFields() {
-        fieldsInfo.setCustomFields(Collections.<FieldInfo<?>>singleton(new FieldInfo<String>("SomeField", null, FieldType.STRING)));
+        fieldsInfo = new FieldsInfo.Builder()
+                .populateResponseMap("Some Id", new FieldInfo<String>("Some Id", "SomeField", null, FieldType.STRING))
+                .build();
         assertThat(documentFieldsService.getPrintFields(), hasSize(numberOfHardCodedFields + 1));
     }
 }

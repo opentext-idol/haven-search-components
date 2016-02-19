@@ -21,14 +21,6 @@ public interface SearchResult extends Serializable {
 
     Double getWeight();
 
-    String getContentType();
-
-    String getUrl();
-
-    String getOffset();
-
-    List<String> getAuthors();
-
     DateTime getDate();
 
     PromotionCategory getPromotionCategory();

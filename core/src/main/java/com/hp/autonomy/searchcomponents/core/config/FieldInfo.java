@@ -20,21 +20,27 @@ import java.util.List;
 @NoArgsConstructor
 public class FieldInfo<T> implements Serializable {
     private static final long serialVersionUID = -5649457890413743332L;
+    private String id;
     private String name;
     private String displayName;
     private FieldType type = FieldType.STRING;
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "NonSerializableFieldInSerializableClass", "TypeMayBeWeakened"})
     private final List<T> values = new ArrayList<>();
 
-    public FieldInfo(final String name, final String displayName, final FieldType type) {
-        this(name, displayName, type, Collections.<T>emptyList());
+    public FieldInfo(final String name, final FieldType type) {
+        this(null, name, null, type, Collections.<T>emptyList());
     }
 
-    public FieldInfo(final String name, final String displayName, final FieldType type, final T value) {
-        this(name, displayName, type, Collections.singletonList(value));
+    public FieldInfo(final String id, final String name, final String displayName, final FieldType type) {
+        this(id, name, displayName, type, Collections.<T>emptyList());
     }
 
-    public FieldInfo(final String name, final String displayName, final FieldType type, final Collection<T> values) {
+    public FieldInfo(final String id, final String name, final String displayName, final FieldType type, final T value) {
+        this(id, name, displayName, type, Collections.singletonList(value));
+    }
+
+    public FieldInfo(final String id, final String name, final String displayName, final FieldType type, final Collection<T> values) {
+        this.id = id;
         this.name = name;
         this.displayName = displayName;
         this.type = type;

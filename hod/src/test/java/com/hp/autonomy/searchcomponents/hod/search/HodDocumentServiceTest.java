@@ -10,6 +10,7 @@ import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindSimilarService;
+import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
@@ -140,7 +141,7 @@ public class HodDocumentServiceTest {
         final GetContentRequestIndex<ResourceIdentifier> getContentRequestIndex = new GetContentRequestIndex<>(new ResourceIdentifier("x", "y"), Collections.singleton("z"));
         final GetContentRequestIndex<ResourceIdentifier> getContentRequestIndex2 = new GetContentRequestIndex<>(new ResourceIdentifier("a", "b"), Collections.singleton("c"));
         when(getContentService.getContent(anyListOf(String.class), any(ResourceIdentifier.class), any(GetContentRequestBuilder.class))).thenReturn(mockResults());
-        documentsService.getDocumentContent(new GetContentRequest<>(new HashSet<>(Arrays.asList(getContentRequestIndex, getContentRequestIndex2))));
+        documentsService.getDocumentContent(new GetContentRequest<>(new HashSet<>(Arrays.asList(getContentRequestIndex, getContentRequestIndex2)), Print.fields.name()));
         verify(getContentService, times(2)).getContent(anyListOf(String.class), any(ResourceIdentifier.class), any(GetContentRequestBuilder.class));
     }
 

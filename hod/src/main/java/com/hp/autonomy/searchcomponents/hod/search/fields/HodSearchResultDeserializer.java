@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.PromotionType;
-import com.hp.autonomy.searchcomponents.core.config.FieldAssociations;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
@@ -27,11 +26,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResult> {
@@ -47,13 +44,12 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
     @Override
     public HodSearchResult deserialize(final JsonParser jsonParser, final DeserializationContext deserializationContext) throws IOException {
         final FieldsInfo fieldsInfo = configService.getConfig().getFieldsInfo();
-        final FieldAssociations fieldAssociations = fieldsInfo.getFieldAssociations();
-        final Set<FieldInfo<?>> customFields = fieldsInfo.getCustomFields();
+        final Map<String, FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfigByName();
 
         final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
-        final Map<String, FieldInfo<?>> fieldMap = new HashMap<>(customFields.size());
-        for (final FieldInfo<?> fieldInfo : customFields) {
+        final Map<String, FieldInfo<?>> fieldMap = new HashMap<>(fieldConfig.size());
+        for (final FieldInfo<?> fieldInfo : fieldConfig.values()) {
             final String[] stringValues = parseAsStringArray(node, fieldInfo.getName());
 
             if (ArrayUtils.isNotEmpty(stringValues)) {
@@ -63,7 +59,7 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
                     values.add(value);
                 }
 
-                fieldMap.put(fieldInfo.getName(), new FieldInfo<>(fieldInfo.getName(), fieldInfo.getDisplayName(), fieldInfo.getType(), values));
+                fieldMap.put(fieldInfo.getName(), new FieldInfo<>(fieldInfo.getId(), fieldInfo.getName(), fieldInfo.getDisplayName(), fieldInfo.getType(), values));
             }
         }
 
@@ -73,24 +69,10 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
                 .setTitle(parseAsString(node, "title"))
                 .setSummary(parseAsString(node, "summary"))
                 .setWeight(parseAsDouble(node, "weight"))
-                .setContentType(readFieldValue(fieldMap, fieldAssociations.getMediaContentType(), String.class))
-                .setUrl(readFieldValue(fieldMap, fieldAssociations.getMediaUrl(), String.class))
-                .setOffset(readFieldValue(fieldMap, fieldAssociations.getMediaOffset(), String.class))
-                .setAuthors(readFieldValues(fieldMap, fieldAssociations.getAuthor(), String.class))
                 .setFieldMap(fieldMap)
                 .setDate(parseAsDateFromArray(node, "date"))
                 .setPromotionCategory(parsePromotionCategory(node, "promotion"))
                 .build();
-    }
-
-    private <T> T readFieldValue(final Map<String, FieldInfo<?>> fieldMap, final String name, final Class<T> type) {
-        return fieldMap.containsKey(name) ? type.cast(fieldMap.get(name).getValues().get(0)) : null;
-    }
-
-    @SuppressWarnings("UnusedParameters")
-    private <T> List<T> readFieldValues(final Map<String, FieldInfo<?>> fieldMap, final String name, final Class<T> type) {
-        //noinspection unchecked
-        return fieldMap.containsKey(name) ? (List<T>) fieldMap.get(name).getValues() : Collections.<T>emptyList();
     }
 
     private String parseAsString(@SuppressWarnings("TypeMayBeWeakened") final JsonNode node, final String fieldName) throws JsonProcessingException {

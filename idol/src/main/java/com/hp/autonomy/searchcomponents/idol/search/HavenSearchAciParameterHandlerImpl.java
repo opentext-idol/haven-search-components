@@ -82,15 +82,17 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
     }
 
     @Override
-    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences) {
+    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences, final PrintParam print) {
         aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(indexAndReferences.getReferences()));
         aciParameters.add(QueryParams.Summary.name(), SummaryParam.Concept);
         aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
         aciParameters.add(QueryParams.Text.name(), GET_CONTENT_QUERY_TEXT);
         aciParameters.add(QueryParams.MaxResults.name(), 1);
         aciParameters.add(QueryParams.AnyLanguage.name(), true);
-        aciParameters.add(QueryParams.Print.name(), PrintParam.Fields);
-        aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(documentFieldsService.getPrintFields()));
+        aciParameters.add(QueryParams.Print.name(), print);
+        if (print == PrintParam.Fields) {
+            aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(documentFieldsService.getPrintFields()));
+        }
         aciParameters.add(QueryParams.XMLMeta.name(), true);
 
         if (indexAndReferences.getIndex() != null) {

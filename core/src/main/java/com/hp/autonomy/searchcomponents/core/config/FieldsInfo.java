@@ -6,36 +6,60 @@
 package com.hp.autonomy.searchcomponents.core.config;
 
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-@SuppressWarnings("InstanceVariableOfConcreteClass")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonDeserialize(builder = FieldsInfo.Builder.class)
+@SuppressWarnings("InstanceVariableOfConcreteClass")
 public class FieldsInfo implements Serializable {
     private static final long serialVersionUID = 7627012722603736269L;
 
-    private FieldAssociations fieldAssociations;
-    private Set<FieldInfo<?>> customFields;
+    private Map<String, FieldInfo<?>> fieldConfig;
+    private Map<String, FieldInfo<?>> fieldConfigByName;
 
     public FieldsInfo merge(final FieldsInfo other) {
         if (other != null) {
-            fieldAssociations = fieldAssociations == null ? other.fieldAssociations : fieldAssociations.merge(other.fieldAssociations);
-            if (customFields == null) {
-                customFields = other.customFields;
+            if (fieldConfig == null) {
+                fieldConfig = other.fieldConfig;
             } else {
-                final Set<FieldInfo<?>> mergedCustomFields = new HashSet<>(other.customFields);
-                mergedCustomFields.addAll(customFields);
-                customFields = mergedCustomFields;
+                final Map<String, FieldInfo<?>> mergedCustomFields = new LinkedHashMap<>(other.fieldConfig);
+                mergedCustomFields.putAll(fieldConfig);
+                fieldConfig = mergedCustomFields;
             }
         }
 
         return this;
+    }
+
+    @JsonPOJOBuilder(withPrefix = "set")
+    @Setter
+    @Accessors(chain = true)
+    public static class Builder {
+        private final Map<String, FieldInfo<?>> fieldConfig = new LinkedHashMap<>();
+        private Map<String, FieldInfo<?>> fieldConfigByName = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public Builder populateResponseMap(final String key, final FieldInfo<?> value) {
+            value.setId(key);
+            fieldConfig.put(key, value);
+            fieldConfigByName.put(value.getName(), value);
+            return this;
+        }
+
+        public FieldsInfo build() {
+            return new FieldsInfo(fieldConfig, fieldConfigByName);
+        }
     }
 }

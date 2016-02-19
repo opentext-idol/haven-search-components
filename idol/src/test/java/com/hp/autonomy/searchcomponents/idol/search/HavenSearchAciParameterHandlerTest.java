@@ -16,6 +16,7 @@ import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
+import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -79,7 +80,7 @@ public class HavenSearchAciParameterHandlerTest {
     public void addGetDocumentOutputParameters() {
         final AciParameters aciParameters = new AciParameters();
         final GetContentRequestIndex<String> indexAndReferences = new GetContentRequestIndex<>("Database1", Collections.singleton("SomeReference"));
-        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences);
+        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, PrintParam.Fields);
         assertThat(aciParameters, is(not(empty())));
     }
 

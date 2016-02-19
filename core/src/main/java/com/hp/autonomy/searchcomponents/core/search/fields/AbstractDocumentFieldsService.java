@@ -11,8 +11,8 @@ import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public abstract class AbstractDocumentFieldsService implements DocumentFieldsService {
     protected final ConfigService<? extends HavenSearchCapable> configService;
@@ -31,7 +31,7 @@ public abstract class AbstractDocumentFieldsService implements DocumentFieldsSer
             fields.add(field.getName());
         }
 
-        final Set<FieldInfo<?>> customFields = fieldsInfo.getCustomFields();
+        final Collection<FieldInfo<?>> customFields = fieldsInfo.getFieldConfig().values();
         for (final FieldInfo<?> customField : customFields) {
             fields.add(customField.getName());
         }
