@@ -10,7 +10,7 @@
     <parent>
         <artifactId>haven-search-components</artifactId>
         <groupId>com.hp.autonomy.frontend</groupId>
-        <version>0.11.0</version>
+        <version>0.11.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -44,11 +44,6 @@
             <groupId>com.hp.autonomy.frontend</groupId>
             <artifactId>aci-types</artifactId>
             <version>0.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hp.autonomy.frontend</groupId>
-            <artifactId>idol-types</artifactId>
-            <version>0.1.2</version>
         </dependency>
         <dependency>
             <groupId>com.hp.autonomy.aci.client</groupId>
