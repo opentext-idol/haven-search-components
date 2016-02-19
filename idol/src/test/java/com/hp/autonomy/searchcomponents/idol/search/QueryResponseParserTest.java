@@ -60,7 +60,7 @@ public class QueryResponseParserTest {
         final QueryResponseData responseData = mockQueryResponse();
 
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        final AciSearchRequest<String> searchRequest = new SearchRequest<>("securityInfoString", queryRestrictions, 0, 50, null, 250, null, true, true, null);
+        final AciSearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
         final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new AciParameters(), responseData, queryExecutor);
         assertThat(results.getDocuments(), is(not(empty())));
     }
@@ -74,7 +74,7 @@ public class QueryResponseParserTest {
         when(queryExecutor.execute(any(AciParameters.class))).thenReturn(mockQueryResponse());
 
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        final AciSearchRequest<String> searchRequest = new SearchRequest<>("securityInfoString", queryRestrictions, 0, 50, null, 250, null, true, true, null);
+        final AciSearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
         final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new AciParameters(), responseData, queryExecutor);
         assertThat(results.getDocuments(), is(not(empty())));
     }
@@ -89,7 +89,7 @@ public class QueryResponseParserTest {
         when(databasesService.getDatabases(any(IdolDatabasesRequest.class))).thenReturn(Collections.singleton(goodDatabase));
 
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        final AciSearchRequest<String> searchRequest = new SearchRequest<>("securityInfoString", queryRestrictions, 0, 50, null, 250, null, true, true, null);
+        final AciSearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
         final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new AciParameters(), responseData, queryExecutor);
         assertThat(results.getDocuments(), is(not(empty())));
         assertNotNull(results.getWarnings());

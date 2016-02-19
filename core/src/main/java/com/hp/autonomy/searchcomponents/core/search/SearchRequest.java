@@ -17,7 +17,6 @@ import java.io.Serializable;
 public class SearchRequest<S extends Serializable> implements AciSearchRequest<S> {
     private static final long serialVersionUID = -6338199353489914631L;
 
-    protected String securityInfo;
     protected QueryRestrictions<S> queryRestrictions;
     protected int start = DEFAULT_START;
     protected int maxResults = DEFAULT_MAX_RESULTS;

@@ -18,14 +18,11 @@ public class GetContentRequest<S extends Serializable> implements Serializable {
     private static final long serialVersionUID = -6655229692839205599L;
 
     private final Set<GetContentRequestIndex<S>> indexesAndReferences;
-    private final String securityInfo;
 
     public GetContentRequest(
             @JsonDeserialize(contentAs = GetContentRequestIndex.class)
             @JsonProperty("indexesAndReferences")
-            final Set<GetContentRequestIndex<S>> indexesAndReferences,
-            final String securityInfo) {
+            final Set<GetContentRequestIndex<S>> indexesAndReferences) {
         this.indexesAndReferences = new LinkedHashSet<>(indexesAndReferences);
-        this.securityInfo = securityInfo;
     }
 }

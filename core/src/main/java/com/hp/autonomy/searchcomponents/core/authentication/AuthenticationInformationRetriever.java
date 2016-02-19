@@ -10,5 +10,6 @@ import org.springframework.security.core.Authentication;
 import java.security.Principal;
 
 public interface AuthenticationInformationRetriever<P extends Principal> {
+    Authentication getAuthentication();
     P getPrincipal();
 }

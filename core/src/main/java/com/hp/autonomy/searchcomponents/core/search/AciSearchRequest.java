@@ -11,8 +11,6 @@ public interface AciSearchRequest<S extends Serializable> extends Serializable {
     int DEFAULT_START = 1;
     int DEFAULT_MAX_RESULTS = 30;
 
-    String getSecurityInfo();
-
     QueryRestrictions<S> getQueryRestrictions();
 
     int getStart();

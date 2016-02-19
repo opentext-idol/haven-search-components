@@ -98,7 +98,7 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), any(QueryRequestBuilder.class))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>("securityInfoString", queryRestrictions, 1, 30, "concept", 250, null, true, false, SearchRequest.QueryType.MODIFIED);
+        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>(queryRestrictions, 1, 30, "concept", 250, null, true, false, SearchRequest.QueryType.MODIFIED);
         final Documents<HodSearchResult> results = documentsService.queryTextIndex(searchRequest);
         validateResults(results);
     }
@@ -109,7 +109,7 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<QueryRequestBuilder>("queryProfile", nullValue())))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>("securityInfoString", queryRestrictions, 1, 30, "concept", 250, null, true, false, SearchRequest.QueryType.RAW);
+        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>(queryRestrictions, 1, 30, "concept", 250, null, true, false, SearchRequest.QueryType.RAW);
         final Documents<HodSearchResult> results = documentsService.queryTextIndex(searchRequest);
         validateResults(results);
     }
@@ -120,7 +120,7 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<QueryRequestBuilder>("promotions", is(true))))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>("securityInfoString", queryRestrictions, 1, 30, "concept", 250, null, true, true, SearchRequest.QueryType.PROMOTIONS);
+        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest<>(queryRestrictions, 1, 30, "concept", 250, null, true, true, SearchRequest.QueryType.PROMOTIONS);
         final Documents<HodSearchResult> results = documentsService.queryTextIndexForPromotions(searchRequest);
         validateResults(results);
     }
@@ -128,7 +128,7 @@ public class HodDocumentServiceTest {
     @Test
     public void findSimilar() throws HodErrorException {
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SuggestRequest<ResourceIdentifier> suggestRequest = new SuggestRequest<>("securityInfoString", "SomeReference", queryRestrictions, 1, 30, "concept", 250, null, true);
+        final SuggestRequest<ResourceIdentifier> suggestRequest = new SuggestRequest<>("SomeReference", queryRestrictions, 1, 30, "concept", 250, null, true);
         when(findSimilarService.findSimilarDocumentsToIndexReference(anyString(), any(QueryRequestBuilder.class))).thenReturn(mockResults());
         final Documents<HodSearchResult> results = documentsService.findSimilar(suggestRequest);
         validateResults(results);
@@ -139,7 +139,7 @@ public class HodDocumentServiceTest {
         final GetContentRequestIndex<ResourceIdentifier> getContentRequestIndex = new GetContentRequestIndex<>(new ResourceIdentifier("x", "y"), Collections.singleton("z"));
         final GetContentRequestIndex<ResourceIdentifier> getContentRequestIndex2 = new GetContentRequestIndex<>(new ResourceIdentifier("a", "b"), Collections.singleton("c"));
         when(getContentService.getContent(anyListOf(String.class), any(ResourceIdentifier.class), any(GetContentRequestBuilder.class))).thenReturn(mockResults());
-        documentsService.getDocumentContent(new GetContentRequest<>(new HashSet<>(Arrays.asList(getContentRequestIndex, getContentRequestIndex2)), "securityInfoString"));
+        documentsService.getDocumentContent(new GetContentRequest<>(new HashSet<>(Arrays.asList(getContentRequestIndex, getContentRequestIndex2))));
         verify(getContentService, times(2)).getContent(anyListOf(String.class), any(ResourceIdentifier.class), any(GetContentRequestBuilder.class));
     }
 

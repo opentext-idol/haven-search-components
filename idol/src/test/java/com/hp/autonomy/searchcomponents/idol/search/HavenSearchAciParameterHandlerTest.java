@@ -8,6 +8,8 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
+import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
+import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
@@ -44,11 +46,14 @@ public class HavenSearchAciParameterHandlerTest {
     @Mock
     private DocumentFieldsService documentFieldsService;
 
+    @Mock
+    private AuthenticationInformationRetriever<CommunityPrincipal> authenticationInformationRetriever;
+
     private HavenSearchAciParameterHandler parameterHandler;
 
     @Before
     public void setUp() {
-        parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, languagesService, documentFieldsService);
+        parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, languagesService, documentFieldsService, authenticationInformationRetriever);
     }
 
     @Test
@@ -70,7 +75,7 @@ public class HavenSearchAciParameterHandlerTest {
     @Test
     public void addSearchOutputParameters() {
         final AciParameters aciParameters = new AciParameters();
-        final AciSearchRequest<String> searchRequest = new SearchRequest<>("securityInfoString", null, 0, 50, "Context", 250, null, true, false, null);
+        final AciSearchRequest<String> searchRequest = new SearchRequest<>(null, 0, 50, "Context", 250, null, true, false, null);
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
         assertThat(aciParameters, is(not(empty())));
     }
@@ -79,7 +84,7 @@ public class HavenSearchAciParameterHandlerTest {
     public void addGetDocumentOutputParameters() {
         final AciParameters aciParameters = new AciParameters();
         final GetContentRequestIndex<String> indexAndReferences = new GetContentRequestIndex<>("Database1", Collections.singleton("SomeReference"));
-        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, "securityInfoString");
+        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences);
         assertThat(aciParameters, is(not(empty())));
     }
 
