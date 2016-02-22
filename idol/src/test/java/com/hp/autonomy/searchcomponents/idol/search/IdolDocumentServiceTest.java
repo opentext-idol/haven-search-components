@@ -16,6 +16,7 @@ import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
@@ -38,13 +39,15 @@ import java.util.Collections;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IdolDocumentServiceTest {
+    private static final String MOCK_STATE_TOKEN = "mock-state-token";
+    private static final int MOCK_TOTAL_HITS = 42;
+
     @Mock
     protected HavenSearchAciParameterHandler parameterHandler;
 
@@ -141,18 +144,30 @@ public class IdolDocumentServiceTest {
 
     @Test
     public void getStateToken() {
-        final String mockStateToken = "abc";
-        final QueryResponseData responseData = new QueryResponseData();
-        responseData.setState(mockStateToken);
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockStateTokenResponse());
 
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
-
-        final String stateToken = idolDocumentService.getStateToken(mockQueryParams().getQueryRestrictions(), 42);
-        assertEquals(mockStateToken, stateToken);
+        final String stateToken = idolDocumentService.getStateToken(mockQueryParams().getQueryRestrictions(), 3);
+        assertThat(stateToken, is(MOCK_STATE_TOKEN));
     }
 
-    protected SearchRequest<String> mockQueryParams() {
+    @Test
+    public void getStateTokenAndResultCount() {
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockStateTokenResponse());
+
+        final StateTokenAndResultCount stateTokenAndResultCount = idolDocumentService.getStateTokenAndResultCount(mockQueryParams().getQueryRestrictions(), 3);
+        assertThat(stateTokenAndResultCount.getStateToken(), is(MOCK_STATE_TOKEN));
+        assertThat(stateTokenAndResultCount.getResultCount(), is((long) MOCK_TOTAL_HITS));
+    }
+
+    private SearchRequest<String> mockQueryParams() {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
         return new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
+    }
+
+    private QueryResponseData mockStateTokenResponse() {
+        final QueryResponseData responseData = new QueryResponseData();
+        responseData.setState(MOCK_STATE_TOKEN);
+        responseData.setTotalhits(MOCK_TOTAL_HITS);
+        return responseData;
     }
 }

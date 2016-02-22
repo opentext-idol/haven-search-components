@@ -17,6 +17,7 @@ import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.types.idol.Hit;
@@ -109,17 +110,22 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
 
     @Override
     public String getStateToken(final QueryRestrictions<String> queryRestrictions, final int maxResults) throws AciErrorException {
+        return getStateTokenAndResultCount(queryRestrictions, maxResults).getStateToken();
+    }
+
+    @Override
+    public StateTokenAndResultCount getStateTokenAndResultCount(final QueryRestrictions<String> queryRestrictions, final int maxResults) throws AciErrorException {
         final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
         aciParameters.add(QueryParams.StoreState.name(), true);
-        parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
-
-        aciParameters.add(SuggestParams.Print.name(), PrintParam.NoResults);
-        aciParameters.add(SuggestParams.MaxResults.name(), maxResults);
+        aciParameters.add(QueryParams.TotalResults.name(), true);
+        aciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
+        aciParameters.add(QueryParams.MaxResults.name(), maxResults);
 
         // No promotion or QMS related parameters added; at the time of writing, QMS does not fully support stored state
+        parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
 
         final QueryResponseData responseData = contentAciService.executeAction(aciParameters, queryResponseProcessor);
-        return responseData.getState();
+        return new StateTokenAndResultCount(responseData.getState(), responseData.getTotalhits());
     }
 
     private Documents<IdolSearchResult> queryTextIndex(final AciService aciService, final SearchRequest<String> searchRequest, final boolean promotions) {
@@ -140,6 +146,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
         }
 
         final QueryResponseData responseData = executeQuery(aciService, aciParameters);
+
         return queryResponseParser.parseQueryResults(searchRequest, aciParameters, responseData, new QueryExecutor() {
             @Override
             public QueryResponseData execute(final AciParameters parameters) {
