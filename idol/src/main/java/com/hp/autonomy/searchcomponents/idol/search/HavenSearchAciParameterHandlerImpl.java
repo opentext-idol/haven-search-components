@@ -23,6 +23,7 @@ import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.view.IdolViewServerService;
 import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
@@ -123,7 +124,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         }
         parameters.add(GetContentParams.Reference.name(), new Reference(documentReference));
         parameters.add(GetContentParams.Print.name(), PrintParam.Fields);
-        parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField));
+        parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField, IdolViewServerService.AUTN_IDENTIFIER, IdolViewServerService.AUTN_GROUP));
     }
 
     @Override
