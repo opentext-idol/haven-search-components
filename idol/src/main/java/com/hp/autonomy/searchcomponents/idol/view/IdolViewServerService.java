@@ -6,26 +6,34 @@
 package com.hp.autonomy.searchcomponents.idol.view;
 
 
+import com.autonomy.aci.client.services.AciConstants;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.AciServiceException;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
+import com.hp.autonomy.frontend.configuration.ServerConfig;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.idolutils.processors.CopyResponseProcessor;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
+import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
+import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewingMode;
 import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.GetContentResponseData;
 import com.hp.autonomy.types.idol.Hit;
+import com.hp.autonomy.types.requests.idol.actions.connector.ConnectorActions;
+import com.hp.autonomy.types.requests.idol.actions.connector.params.ConnectorViewParams;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
+import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
@@ -33,10 +41,16 @@ import org.w3c.dom.NodeList;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Service
 public class IdolViewServerService implements ViewServerService<String, AciErrorException> {
+
+    public static final String AUTN_IDENTIFIER = "AUTN_IDENTIFIER";
+    public static final String AUTN_GROUP = "AUTN_GROUP";
+
     private final AciService contentAciService;
     private final AciService viewAciService;
     private final HavenSearchAciParameterHandler parameterHandler;
@@ -67,14 +81,19 @@ public class IdolViewServerService implements ViewServerService<String, AciError
      */
     @Override
     public void viewDocument(final String documentReference, final String database, final OutputStream outputStream) throws ViewDocumentNotFoundException, ViewNoReferenceFieldException, ReferenceFieldBlankException {
-        final String referenceFieldValue = getReferenceFieldValue(documentReference, database);
+        final String reference = getReferenceFieldValue(documentReference, database);
 
         final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
         viewParameters.add(ViewParams.NoACI.name(), true);
-        viewParameters.add(ViewParams.Reference.name(), referenceFieldValue);
+        viewParameters.add(ViewParams.Reference.name(), reference);
         viewParameters.add(ViewParams.EmbedImages.name(), true);
         viewParameters.add(ViewParams.StripScript.name(), true);
         viewParameters.add(ViewParams.OriginalBaseURL.name(), true);
+
+        if (configService.getConfig().getViewConfig().getViewingMode() == ViewingMode.CONNECTOR) {
+            // this prevents ViewServer from returning the raw file returned by the connector
+            viewParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
+        }
 
         try {
             viewAciService.executeAction(viewParameters, new CopyResponseProcessor(outputStream));
@@ -89,11 +108,15 @@ public class IdolViewServerService implements ViewServerService<String, AciError
     }
 
     private String getReferenceFieldValue(final String documentReference, final String database) throws ReferenceFieldBlankException, ViewDocumentNotFoundException, ViewNoReferenceFieldException {
-        final String referenceField = configService.getConfig().getViewConfig().getReferenceField();
-        if (StringUtils.isEmpty(referenceField)) {
+        final ViewConfig viewConfig = configService.getConfig().getViewConfig();
+        final String referenceField = viewConfig.getReferenceField();
+
+        // fail fast if there's a malconfiguration
+        if (viewConfig.getViewingMode() ==  ViewingMode.FIELD && StringUtils.isEmpty(referenceField)) {
             throw new ReferenceFieldBlankException();
         }
 
+        // do a GetContent to check for document visibility and to read out required fields
         final AciParameters parameters = new AciParameters(QueryActions.GetContent.name());
         parameterHandler.addGetContentOutputParameters(parameters, database, documentReference, referenceField);
 
@@ -109,14 +132,44 @@ public class IdolViewServerService implements ViewServerService<String, AciError
             throw new ViewDocumentNotFoundException(documentReference);
         }
 
-        final String referenceFieldValue = parseReferenceFieldValue(referenceField, documents);
-        if (referenceFieldValue == null) {
-            throw new ViewNoReferenceFieldException(documentReference, referenceField);
+        final String reference;
+
+        switch (viewConfig.getViewingMode()) {
+            case CONNECTOR:
+                final String identifier = parseFieldValue(AUTN_IDENTIFIER, documents);
+                final String group = parseFieldValue(AUTN_GROUP, documents);
+                final ServerConfig connectorConfig = viewConfig.getConnector();
+
+                try {
+                    final URI uri = new URIBuilder()
+                        .setScheme(connectorConfig.getProtocol().name().toLowerCase())
+                        .setHost(connectorConfig.getHost())
+                        .setPort(connectorConfig.getPort())
+                        // need to set the path because of ACI's weird format
+                        .setPath("/")
+                        .addParameter(AciConstants.PARAM_ACTION, ConnectorActions.View.name())
+                        .addParameter(ConnectorViewParams.Identifier.name(), identifier)
+                        .addParameter(ConnectorViewParams.Group.name(), group)
+                        .build();
+
+                    reference = uri.toString();
+                } catch (final URISyntaxException e) {
+                    // this should never happen
+                    throw new ConnectorUriSyntaxException("Error constructing Connector URI", e);
+                }
+                break;
+            case FIELD:
+            default:
+                reference = parseFieldValue(referenceField, documents);
+                if (reference == null) {
+                    throw new ViewNoReferenceFieldException(documentReference, referenceField);
+                }
         }
-        return referenceFieldValue;
+
+        return reference;
     }
 
-    private String parseReferenceFieldValue(final String referenceField, final List<Hit> documents) {
+    private String parseFieldValue(final String referenceField, final List<Hit> documents) {
         final Hit document = documents.get(0);
 
         String referenceFieldValue = null;
