@@ -16,23 +16,26 @@ import com.hp.autonomy.frontend.configuration.ConfigurationComponent;
 import com.hp.autonomy.frontend.configuration.ProductType;
 import com.hp.autonomy.frontend.configuration.ServerConfig;
 import com.hp.autonomy.frontend.configuration.ValidationResult;
-import java.util.Set;
+import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.Set;
+
+@Data
 @JsonDeserialize(builder = ViewConfig.Builder.class)
 public class ViewConfig implements ConfigurationComponent {
 
+    @Getter(AccessLevel.NONE)
     private final ServerConfig serverConfig;
 
-    @Getter
+    private final ServerConfig connector;
     private final String referenceField;
-
-    private ViewConfig(final ServerConfig serverConfig, final String referenceField) {
-        this.serverConfig = serverConfig;
-        this.referenceField = referenceField;
-    }
+    private final ViewingMode viewingMode;
 
     public ViewConfig merge(final ViewConfig other) {
         if(other != null) {
@@ -46,6 +49,8 @@ public class ViewConfig implements ConfigurationComponent {
                     .setServicePort(serverConfig.getServicePort())
                     .setProductType(serverConfig.getProductType())
                     .setReferenceField(referenceField == null ? other.referenceField : this.referenceField)
+                    .setViewingMode(viewingMode == null ? other.viewingMode : this.viewingMode)
+                    .setConnector(connector == null ? other.connector : this.connector)
                     .build();
         }
 
@@ -60,10 +65,16 @@ public class ViewConfig implements ConfigurationComponent {
         final ValidationResult<?> validationResult = serverConfig.validate(aciService, null, idolAnnotationsProcessorFactory);
 
         if(validationResult.isValid()) {
-            if(StringUtils.isBlank(referenceField)) {
-                return new ValidationResult<>(false, Validation.REFERENCE_FIELD_BLANK);
-            } else {
-                return validationResult;
+            switch (viewingMode) {
+                case CONNECTOR:
+                    return connector.validate(aciService, null, idolAnnotationsProcessorFactory);
+                case FIELD:
+                default:
+                    if(StringUtils.isBlank(referenceField)) {
+                        return new ValidationResult<>(false, Validation.REFERENCE_FIELD_BLANK);
+                    } else {
+                        return validationResult;
+                    }
             }
         } else {
             return validationResult;
@@ -106,13 +117,28 @@ public class ViewConfig implements ConfigurationComponent {
 
     @JsonPOJOBuilder(withPrefix = "set")
     @NoArgsConstructor
+    @Setter
+    @Accessors(chain = true)
     public static class Builder {
         private String referenceField;
 
         private final ServerConfig.Builder builder = new ServerConfig.Builder();
 
+        private ServerConfig connector;
+
+        private ViewingMode viewingMode;
+
         public ViewConfig build() {
-            return new ViewConfig(builder.build(), referenceField);
+            final ViewingMode viewingMode;
+
+            if (this.viewingMode != null) {
+                viewingMode = this.viewingMode;
+            }
+            else {
+                viewingMode = ViewingMode.FIELD;
+            }
+
+            return new ViewConfig(builder.build(), connector, referenceField, viewingMode);
         }
 
         public Builder setProtocol(final AciServerDetails.TransportProtocol protocol) {
