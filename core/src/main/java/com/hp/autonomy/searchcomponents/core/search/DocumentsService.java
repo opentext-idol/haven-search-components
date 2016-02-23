@@ -11,17 +11,20 @@ import java.io.Serializable;
 import java.util.List;
 
 public interface DocumentsService<S extends Serializable, D extends SearchResult, E extends Exception> {
+
     String HIGHLIGHT_START_TAG = "<HavenSearch-QueryText-Placeholder>";
     String HIGHLIGHT_END_TAG = "</HavenSearch-QueryText-Placeholder>";
 
-    Documents<D> queryTextIndex(final SearchRequest<S> searchRequest) throws E;
+    Documents<D> queryTextIndex(SearchRequest<S> searchRequest) throws E;
 
-    Documents<D> queryTextIndexForPromotions(final SearchRequest<S> searchRequest) throws E;
+    Documents<D> queryTextIndexForPromotions(SearchRequest<S> searchRequest) throws E;
 
-    Documents<D> findSimilar(final SuggestRequest<S> suggestRequest) throws E;
+    Documents<D> findSimilar(SuggestRequest<S> suggestRequest) throws E;
 
-    List<D> getDocumentContent(final GetContentRequest<S> request) throws E;
+    List<D> getDocumentContent(GetContentRequest<S> request) throws E;
 
-    String getStateToken(final QueryRestrictions<S> queryRestrictions, final int maxResults) throws E;
+    String getStateToken(QueryRestrictions<S> queryRestrictions, int maxResults) throws E;
+
+    StateTokenAndResultCount getStateTokenAndResultCount(QueryRestrictions<S> queryRestrictions, int maxResults) throws E;
 
 }

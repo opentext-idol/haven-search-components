@@ -3,9 +3,9 @@
 This library exposes components useful for performing Haven Search, whether through Haven on Demand, or on premise.
 
 It is designed primarily for use in
-[HP Find](https://github.com/hpautonomy/find).
+[HP Find](https://github.com/hpe-idol/find).
 
-[![Build Status](https://travis-ci.org/hpautonomy/haven-search-components.svg?branch=master)](https://travis-ci.org/hpautonomy/haven-search-components)
+[![Build Status](https://travis-ci.org/hpe-idol/haven-search-components.svg?branch=master)](https://travis-ci.org/hpe-idol/haven-search-components)
 
 ## Usage
 The haven search components library is available from maven.

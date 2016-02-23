@@ -28,6 +28,7 @@ import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
@@ -119,6 +120,11 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
 
     @Override
     public String getStateToken(final QueryRestrictions<ResourceIdentifier> queryRestrictions, final int maxResults) throws HodErrorException {
+        throw new NotImplementedException("State tokens are not yet retrievable from Haven OnDemand");
+    }
+
+    @Override
+    public StateTokenAndResultCount getStateTokenAndResultCount(final QueryRestrictions<ResourceIdentifier> queryRestrictions, final int maxResults) throws HodErrorException {
         throw new NotImplementedException("State tokens are not yet retrievable from Haven OnDemand");
     }
 
