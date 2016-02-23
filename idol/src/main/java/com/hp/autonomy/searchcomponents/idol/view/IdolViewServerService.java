@@ -154,8 +154,8 @@ public class IdolViewServerService implements ViewServerService<String, AciError
 
                     reference = uri.toString();
                 } catch (final URISyntaxException e) {
-                    // TODO: better handling
-                    throw new AssertionError("Should never happen", e);
+                    // this should never happen
+                    throw new ConnectorUriSyntaxException("Error constructing Connector URI", e);
                 }
                 break;
             case FIELD:
