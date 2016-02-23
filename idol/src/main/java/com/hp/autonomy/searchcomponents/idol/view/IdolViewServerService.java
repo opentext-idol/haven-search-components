@@ -28,6 +28,7 @@ import com.hp.autonomy.types.requests.idol.actions.connector.ConnectorActions;
 import com.hp.autonomy.types.requests.idol.actions.connector.params.ConnectorViewParams;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
+import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -88,6 +89,11 @@ public class IdolViewServerService implements ViewServerService<String, AciError
         viewParameters.add(ViewParams.EmbedImages.name(), true);
         viewParameters.add(ViewParams.StripScript.name(), true);
         viewParameters.add(ViewParams.OriginalBaseURL.name(), true);
+
+        if (configService.getConfig().getViewConfig().getViewingMode() == ViewingMode.CONNECTOR) {
+            // this prevents ViewServer from returning the raw file returned by the connector
+            viewParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
+        }
 
         try {
             viewAciService.executeAction(viewParameters, new CopyResponseProcessor(outputStream));
