@@ -159,12 +159,13 @@ public class IdolDocumentServiceTest {
         assertThat(stateTokenAndResultCount.getResultCount(), is((long) MOCK_TOTAL_HITS));
     }
 
-    private SearchRequest<String> mockQueryParams() {
+    // Used in Find's DocumentService test
+    protected SearchRequest<String> mockQueryParams() {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
         return new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
     }
 
-    private QueryResponseData mockStateTokenResponse() {
+    protected QueryResponseData mockStateTokenResponse() {
         final QueryResponseData responseData = new QueryResponseData();
         responseData.setState(MOCK_STATE_TOKEN);
         responseData.setTotalhits(MOCK_TOTAL_HITS);
