@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.view;
 
 
+import com.autonomy.aci.client.services.AciConstants;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.AciServiceException;
@@ -23,6 +24,8 @@ import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewingMode;
 import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.GetContentResponseData;
 import com.hp.autonomy.types.idol.Hit;
+import com.hp.autonomy.types.requests.idol.actions.connector.ConnectorActions;
+import com.hp.autonomy.types.requests.idol.actions.connector.params.ConnectorViewParams;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
@@ -136,11 +139,11 @@ public class IdolViewServerService implements ViewServerService<String, AciError
                         .setScheme(connectorConfig.getProtocol().name().toLowerCase())
                         .setHost(connectorConfig.getHost())
                         .setPort(connectorConfig.getPort())
+                        // need to set the path because of ACI's weird format
                         .setPath("/")
-                        // TODO: update aci-types
-                        .addParameter("Action", "View")
-                        .addParameter("Identifier", identifier)
-                        .addParameter("Group", group)
+                        .addParameter(AciConstants.PARAM_ACTION, ConnectorActions.View.name())
+                        .addParameter(ConnectorViewParams.Identifier.name(), identifier)
+                        .addParameter(ConnectorViewParams.Group.name(), group)
                         .build();
 
                     reference = uri.toString();
