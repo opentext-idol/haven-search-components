@@ -111,8 +111,10 @@ public class IdolViewServerService implements ViewServerService<String, AciError
         final ViewConfig viewConfig = configService.getConfig().getViewConfig();
         final String referenceField = viewConfig.getReferenceField();
 
+        final ViewingMode viewingMode = viewConfig.getViewingMode();
+
         // fail fast if there's a malconfiguration
-        if (viewConfig.getViewingMode() ==  ViewingMode.FIELD && StringUtils.isEmpty(referenceField)) {
+        if (viewingMode == ViewingMode.FIELD && StringUtils.isEmpty(referenceField)) {
             throw new ReferenceFieldBlankException();
         }
 
@@ -134,7 +136,7 @@ public class IdolViewServerService implements ViewServerService<String, AciError
 
         final String reference;
 
-        switch (viewConfig.getViewingMode()) {
+        switch (viewingMode) {
             case CONNECTOR:
                 final String identifier = parseFieldValue(AUTN_IDENTIFIER, documents);
                 final String group = parseFieldValue(AUTN_GROUP, documents);

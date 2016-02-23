@@ -129,6 +129,15 @@ public class ViewConfig implements ConfigurationComponent {
         private ViewingMode viewingMode;
 
         public ViewConfig build() {
+            final ViewingMode viewingMode;
+
+            if (this.viewingMode != null) {
+                viewingMode = this.viewingMode;
+            }
+            else {
+                viewingMode = ViewingMode.FIELD;
+            }
+
             return new ViewConfig(builder.build(), connector, referenceField, viewingMode);
         }
 
