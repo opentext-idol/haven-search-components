@@ -90,11 +90,9 @@ public class IdolViewServerService implements ViewServerService<String, AciError
         viewParameters.add(ViewParams.StripScript.name(), true);
         viewParameters.add(ViewParams.OriginalBaseURL.name(), true);
 
-        if (configService.getConfig().getViewConfig().getViewingMode() == ViewingMode.CONNECTOR) {
-            // this prevents ViewServer from returning the raw file returned by the connector
-            viewParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
-        }
-
+        // this prevents ViewServer from returning the raw file
+        viewParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
+        
         try {
             viewAciService.executeAction(viewParameters, new CopyResponseProcessor(outputStream));
         } catch (final AciServiceException e) {
