@@ -5,6 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.search;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,4 +17,9 @@ public class GetContentRequestIndex<S extends Serializable> implements Serializa
 
     private final S index;
     private final Set<String> references;
+
+    public GetContentRequestIndex(@JsonProperty("index") S index, @JsonProperty("references") Set<String> references) {
+        this.index = index;
+        this.references = references;
+    }
 }
