@@ -50,7 +50,7 @@ public class ViewConfig implements ConfigurationComponent {
                     .setProductType(serverConfig.getProductType())
                     .setReferenceField(referenceField == null ? other.referenceField : this.referenceField)
                     .setViewingMode(viewingMode == null ? other.viewingMode : this.viewingMode)
-                    .setConnector(connector == null ? other.connector : this.connector)
+                    .setConnector(connector == null ? other.connector : this.connector.merge(other.connector))
                     .build();
         }
 
