@@ -5,16 +5,20 @@
 
 package com.hp.autonomy.searchcomponents.idol.configuration;
 
+import com.autonomy.aci.client.annotations.IdolAnnotationsProcessorFactory;
+import com.autonomy.aci.client.services.AciService;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.frontend.configuration.ConfigException;
 import com.hp.autonomy.frontend.configuration.ConfigurationComponent;
 import com.hp.autonomy.frontend.configuration.ServerConfig;
+import com.hp.autonomy.frontend.configuration.ValidationResult;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.params.ModeParam;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
 
 @Data
@@ -60,6 +64,10 @@ public class QueryManipulation implements ConfigurationComponent {
             }
             server.basicValidate("QMS");
         }
+    }
+
+    public ValidationResult<?> validate(final AciService aciService, final IdolAnnotationsProcessorFactory processorFactory) {
+        return server.validate(aciService, null, processorFactory);
     }
 
     @Setter

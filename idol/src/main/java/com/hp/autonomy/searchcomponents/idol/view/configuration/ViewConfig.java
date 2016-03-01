@@ -50,7 +50,7 @@ public class ViewConfig implements ConfigurationComponent {
                     .setProductType(serverConfig.getProductType())
                     .setReferenceField(referenceField == null ? other.referenceField : this.referenceField)
                     .setViewingMode(viewingMode == null ? other.viewingMode : this.viewingMode)
-                    .setConnector(connector == null ? other.connector : this.connector)
+                    .setConnector(connector == null ? other.connector : this.connector.merge(other.connector))
                     .build();
         }
 
@@ -67,7 +67,14 @@ public class ViewConfig implements ConfigurationComponent {
         if(validationResult.isValid()) {
             switch (viewingMode) {
                 case CONNECTOR:
-                    return connector.validate(aciService, null, idolAnnotationsProcessorFactory);
+                    final ValidationResult<?> connectorValidation = connector.validate(aciService, null, idolAnnotationsProcessorFactory);
+
+                    if (connectorValidation.isValid()) {
+                        return validationResult;
+                    }
+                    else {
+                        return new ValidationResult<Object>(false, new ConnectorValidation(connectorValidation));
+                    }
                 case FIELD:
                 default:
                     if(StringUtils.isBlank(referenceField)) {
@@ -178,6 +185,13 @@ public class ViewConfig implements ConfigurationComponent {
     }
 
     private enum Validation {
-        REFERENCE_FIELD_BLANK
+        REFERENCE_FIELD_BLANK,
+        CONNECTOR_VALIDATION_ERROR
+    }
+
+    @Data
+    private static class ConnectorValidation {
+        private final Validation validation = Validation.CONNECTOR_VALIDATION_ERROR;
+        private final ValidationResult<?> connectorValidation;
     }
 }
