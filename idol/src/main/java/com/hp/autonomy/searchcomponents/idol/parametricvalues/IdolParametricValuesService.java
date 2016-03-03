@@ -120,7 +120,12 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
 
 
             final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
-            results = responseData.getValues().getField();
+
+            if(responseData.getValues() == null) {
+                results = Collections.emptyList();
+            } else {
+                results = responseData.getValues().getField();
+            }
         }
 
         return results;
