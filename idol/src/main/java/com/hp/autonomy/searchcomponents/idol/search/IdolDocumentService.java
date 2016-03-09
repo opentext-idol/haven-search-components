@@ -12,13 +12,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.identifier.reference.Reference;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
-import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
-import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
+import com.hp.autonomy.searchcomponents.core.search.*;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.types.idol.Hit;
 import com.hp.autonomy.types.idol.QueryResponseData;
@@ -118,15 +112,26 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
         final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
         aciParameters.add(QueryParams.StoreState.name(), true);
         aciParameters.add(QueryParams.StoredStateTokenLifetime.name(), -1);  // negative value means no expiry (DAH)
-        aciParameters.add(QueryParams.TotalResults.name(), true);
         aciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         aciParameters.add(QueryParams.MaxResults.name(), maxResults);
 
         // No promotion or QMS related parameters added; at the time of writing, QMS does not fully support stored state
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
 
+        // Unset combine=simple for state token generation
+        aciParameters.remove(QueryParams.Combine.name());
+
         final QueryResponseData responseData = contentAciService.executeAction(aciParameters, queryResponseProcessor);
-        return new StateTokenAndResultCount(responseData.getState(), responseData.getTotalhits());
+
+        // Now fetch result count with combine=simple
+        final AciParameters resultCountAciParameters = new AciParameters(QueryActions.Query.name());
+        resultCountAciParameters.add(QueryParams.TotalResults.name(), true);
+        resultCountAciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
+        resultCountAciParameters.add(QueryParams.Predict.name(), false);
+        parameterHandler.addSearchRestrictions(resultCountAciParameters, queryRestrictions);
+        final QueryResponseData resultCountResponseData = contentAciService.executeAction(resultCountAciParameters, queryResponseProcessor);
+
+        return new StateTokenAndResultCount(responseData.getState(), resultCountResponseData.getTotalhits());
     }
 
     private Documents<IdolSearchResult> queryTextIndex(final AciService aciService, final SearchRequest<String> searchRequest, final boolean promotions) {

@@ -20,7 +20,8 @@ public class ViewContentSecurityPolicy {
 
             // Allow CSS, fonts, images and media (video, audio etc) to come from any domain or inline
             "font-src * 'unsafe-inline'",
-            "img-src * 'unsafe-inline'",
+            // Firefox requires explicitly allowing data: scheme for base64 images.
+            "img-src * 'unsafe-inline' data:",
             "style-src * 'unsafe-inline'",
             "media-src * 'unsafe-inline'",
 
