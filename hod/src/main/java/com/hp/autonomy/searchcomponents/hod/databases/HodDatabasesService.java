@@ -28,7 +28,12 @@ import java.util.TreeSet;
 
 @Data
 public class HodDatabasesService implements DatabasesService<Database, HodDatabasesRequest, HodErrorException> {
-    protected static final Set<ResourceFlavour> CONTENT_FLAVOURS = ResourceFlavour.of(ResourceFlavour.EXPLORER, ResourceFlavour.STANDARD, ResourceFlavour.CUSTOM_FIELDS);
+    protected static final Set<ResourceFlavour> CONTENT_FLAVOURS = ResourceFlavour.of(
+        ResourceFlavour.EXPLORER,
+        ResourceFlavour.STANDARD,
+        ResourceFlavour.CUSTOM_FIELDS,
+        ResourceFlavour.JUMBO
+    );
 
     protected final ResourcesService resourcesService;
     private final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
