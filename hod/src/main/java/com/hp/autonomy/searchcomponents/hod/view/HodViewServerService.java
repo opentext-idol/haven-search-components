@@ -43,6 +43,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Implementation of {@link HodViewServerService}, using the java HOD client.
@@ -117,7 +118,13 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
 
         // This document will always exist because the GetContentService.getContent throws a HodErrorException if the
         // reference doesn't exist in the index
-        final Document document = documents.getDocuments().get(0);
+        Document document = null;
+        for (final Document document1 : documents.getDocuments()) {
+            if (Objects.equals(document1.getReference(), reference))
+            {
+                document = document1;
+            }
+        }
 
         final Map<String, Serializable> fields = document.getFields();
         final Object urlField = fields.get(URL_FIELD);
