@@ -120,9 +120,9 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
         // reference doesn't exist in the index
         Document document = null;
         for (final Document document1 : documents.getDocuments()) {
-            if (Objects.equals(document1.getReference(), reference))
-            {
+            if (Objects.equals(document1.getReference(), reference)) {
                 document = document1;
+                break;
             }
         }
 
