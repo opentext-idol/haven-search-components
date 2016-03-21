@@ -3,7 +3,7 @@
 This library exposes components useful for performing Haven Search, whether through Haven on Demand, or on premise.
 
 It is designed primarily for use in
-[HP Find](https://github.com/hpe-idol/find).
+[HPE Find](https://github.com/hpe-idol/find).
 
 [![Build Status](https://travis-ci.org/hpe-idol/haven-search-components.svg?branch=master)](https://travis-ci.org/hpe-idol/haven-search-components)
 
@@ -28,5 +28,6 @@ For use on premise, use:
 
 ## License
 Copyright 2014-2016 Hewlett-Packard Development Company, L.P.
+Copyright 2015-2016 Hewlett Packard Enterprise Development LP.
 
 Licensed under the MIT License (the "License"); you may not use this project except in compliance with the License.
