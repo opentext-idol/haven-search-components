@@ -31,7 +31,7 @@ public abstract class AbstractViewServerServiceIT<S extends Serializable, D exte
         final String reference = integrationTestUtils.getValidReference();
 
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        viewServerService.viewDocument(reference, integrationTestUtils.getDatabases().get(0), outputStream);
+        viewServerService.viewDocument(reference, integrationTestUtils.getDatabases().get(0), null, outputStream);
         assertNotNull(outputStream.toByteArray());
     }
 }

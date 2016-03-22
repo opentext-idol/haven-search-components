@@ -80,7 +80,7 @@ public class IdolViewServerService implements ViewServerService<String, AciError
      * @throws ViewServerErrorException      If ViewServer returns a status code outside the 200 range
      */
     @Override
-    public void viewDocument(final String documentReference, final String database, final OutputStream outputStream) throws ViewDocumentNotFoundException, ViewNoReferenceFieldException, ReferenceFieldBlankException {
+    public void viewDocument(final String documentReference, final String database, final String highlightExpression, final OutputStream outputStream) throws ViewDocumentNotFoundException, ViewNoReferenceFieldException, ReferenceFieldBlankException {
         final String reference = getReferenceFieldValue(documentReference, database);
 
         final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
@@ -89,6 +89,12 @@ public class IdolViewServerService implements ViewServerService<String, AciError
         viewParameters.add(ViewParams.EmbedImages.name(), true);
         viewParameters.add(ViewParams.StripScript.name(), true);
         viewParameters.add(ViewParams.OriginalBaseURL.name(), true);
+
+        if (highlightExpression != null) {
+            viewParameters.add(ViewParams.Links.name(), highlightExpression);
+            viewParameters.add(ViewParams.StartTag.name(), HIGHLIGHT_START_TAG);
+            viewParameters.add(ViewParams.EndTag.name(), HIGHLIGHT_END_TAG);
+        }
 
         // this prevents ViewServer from returning the raw file
         viewParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
