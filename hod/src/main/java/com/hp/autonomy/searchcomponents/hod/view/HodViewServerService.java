@@ -112,7 +112,7 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
     }
 
     @Override
-    public void viewDocument(final String reference, final ResourceIdentifier index, final OutputStream outputStream) throws IOException, HodErrorException {
+    public void viewDocument(final String reference, final ResourceIdentifier index, final String highlightExpression, final OutputStream outputStream) throws IOException, HodErrorException {
         final GetContentRequestBuilder getContentParams = new GetContentRequestBuilder().setPrint(Print.all);
         final Documents<Document> documents = getContentService.getContent(Collections.singletonList(reference), index, getContentParams);
 
@@ -141,7 +141,16 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
                 final String encodedUrl = uri.toASCIIString();
 
                 if (urlValidator.isValid(encodedUrl)) {
-                    inputStream = viewDocumentService.viewUrl(encodedUrl, new ViewDocumentRequestBuilder());
+                    final ViewDocumentRequestBuilder builder = new ViewDocumentRequestBuilder();
+
+                    if (highlightExpression != null) {
+                        builder
+                            .addHighlightExpressions(highlightExpression)
+                            .addEndTags(HIGHLIGHT_END_TAG)
+                            .addStartTags(HIGHLIGHT_START_TAG);
+                    }
+
+                    inputStream = viewDocumentService.viewUrl(encodedUrl, builder);
                 } else {
                     throw new URISyntaxException(encodedUrl, "Invalid URL");
                 }

@@ -73,7 +73,7 @@ public class IdolViewServerServiceTest {
         final GetContentResponseData responseData = mockResponseData();
         when(contentAciService.executeAction(any(AciParameters.class), any(Processor.class))).thenReturn(responseData);
 
-        idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", "SomeDatabase", mock(OutputStream.class));
+        idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", "SomeDatabase", null, mock(OutputStream.class));
 
         verify(viewAciService, times(1)).executeAction(argThat(AciParameterMatcher.aciParametersWith("Reference", "http://en.wikipedia.org/wiki/Car")), any(Processor.class));
     }
@@ -86,19 +86,19 @@ public class IdolViewServerServiceTest {
     @Test(expected = ReferenceFieldBlankException.class)
     public void noReference() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException {
         when(viewCapableConfig.getViewConfig()).thenReturn(new ViewConfig.Builder().build());
-        idolViewServerService.viewDocument(null, null, mock(OutputStream.class));
+        idolViewServerService.viewDocument(null, null, null, mock(OutputStream.class));
     }
 
     @Test(expected = ViewDocumentNotFoundException.class)
     public void errorGettingContent() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException {
         when(contentAciService.executeAction(any(AciParameters.class), any(Processor.class))).thenThrow(new AciErrorException());
-        idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", null, mock(OutputStream.class));
+        idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", null, null, mock(OutputStream.class));
     }
 
     @Test(expected = ViewDocumentNotFoundException.class)
     public void noDocumentFound() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException {
         when(contentAciService.executeAction(any(AciParameters.class), any(Processor.class))).thenReturn(new GetContentResponseData());
-        idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", null, mock(OutputStream.class));
+        idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", null, null, mock(OutputStream.class));
     }
 
     @Test(expected = ViewNoReferenceFieldException.class)
@@ -119,7 +119,7 @@ public class IdolViewServerServiceTest {
         when(node.getChildNodes()).thenReturn(childNodes);
 
         when(contentAciService.executeAction(any(AciParameters.class), any(Processor.class))).thenReturn(responseData);
-        idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", null, mock(OutputStream.class));
+        idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", null, null, mock(OutputStream.class));
     }
 
     @Test(expected = ViewServerErrorException.class)
@@ -128,7 +128,7 @@ public class IdolViewServerServiceTest {
         when(contentAciService.executeAction(any(AciParameters.class), any(Processor.class))).thenReturn(responseData);
         when(viewAciService.executeAction(any(AciParameters.class), any(Processor.class))).thenThrow(new AciServiceException());
 
-        idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", "SomeDatabase", mock(OutputStream.class));
+        idolViewServerService.viewDocument("dede952d-8a4d-4f54-ac1f-5187bf10a744", "SomeDatabase", null, mock(OutputStream.class));
     }
 
     private GetContentResponseData mockResponseData() {
