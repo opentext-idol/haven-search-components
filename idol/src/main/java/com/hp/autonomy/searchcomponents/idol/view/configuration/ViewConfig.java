@@ -37,6 +37,8 @@ public class ViewConfig implements ConfigurationComponent {
     private final String referenceField;
     private final ViewingMode viewingMode;
 
+    private final Boolean highlighting;
+
     public ViewConfig merge(final ViewConfig other) {
         if(other != null) {
             final ServerConfig serverConfig = this.serverConfig.merge(other.serverConfig);
@@ -51,6 +53,7 @@ public class ViewConfig implements ConfigurationComponent {
                     .setReferenceField(referenceField == null ? other.referenceField : this.referenceField)
                     .setViewingMode(viewingMode == null ? other.viewingMode : this.viewingMode)
                     .setConnector(connector == null ? other.connector : this.connector.merge(other.connector))
+                    .setHighlighting(highlighting == null ? other.highlighting : highlighting)
                     .build();
         }
 
@@ -134,6 +137,7 @@ public class ViewConfig implements ConfigurationComponent {
         private ServerConfig connector;
 
         private ViewingMode viewingMode;
+        private Boolean highlighting;
 
         public ViewConfig build() {
             final ViewingMode viewingMode;
@@ -145,7 +149,7 @@ public class ViewConfig implements ConfigurationComponent {
                 viewingMode = ViewingMode.FIELD;
             }
 
-            return new ViewConfig(builder.build(), connector, referenceField, viewingMode);
+            return new ViewConfig(builder.build(), connector, referenceField, viewingMode, highlighting);
         }
 
         public Builder setProtocol(final AciServerDetails.TransportProtocol protocol) {
@@ -180,6 +184,11 @@ public class ViewConfig implements ConfigurationComponent {
 
         public Builder setReferenceField(final String referenceField) {
             this.referenceField = referenceField;
+            return this;
+        }
+
+        public Builder setHighlighting(final Boolean highlighting) {
+            this.highlighting = highlighting;
             return this;
         }
     }
