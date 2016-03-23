@@ -94,6 +94,9 @@ public class IdolViewServerService implements ViewServerService<String, AciError
             viewParameters.add(ViewParams.Links.name(), highlightExpression);
             viewParameters.add(ViewParams.StartTag.name(), HIGHLIGHT_START_TAG);
             viewParameters.add(ViewParams.EndTag.name(), HIGHLIGHT_END_TAG);
+
+            // we need this because we're sending query text, not a csv of stemmed terms
+            viewParameters.add(ViewParams.Boolean.name(), true);
         }
 
         // this prevents ViewServer from returning the raw file
