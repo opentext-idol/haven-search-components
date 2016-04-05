@@ -34,6 +34,8 @@ import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormat;
 
+import java.util.Set;
+
 public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
     private static final String IDOL_DATE_PARAMETER_FORMAT = "HH:mm:ss dd/MM/yyyy";
     private static final String GET_CONTENT_QUERY_TEXT = "*";
@@ -98,11 +100,12 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
     public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences, final PrintParam print) {
         aciParameters.add(QueryParams.SecurityInfo.name(), getSecurityInfo());
 
-        aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(indexAndReferences.getReferences()));
+        final Set<String> references = indexAndReferences.getReferences();
+        aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(references));
         aciParameters.add(QueryParams.Summary.name(), SummaryParam.Concept);
         aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
         aciParameters.add(QueryParams.Text.name(), GET_CONTENT_QUERY_TEXT);
-        aciParameters.add(QueryParams.MaxResults.name(), 1);
+        aciParameters.add(QueryParams.MaxResults.name(), references.size());
         aciParameters.add(QueryParams.AnyLanguage.name(), true);
         aciParameters.add(QueryParams.Print.name(), print);
         if (print == PrintParam.Fields) {
