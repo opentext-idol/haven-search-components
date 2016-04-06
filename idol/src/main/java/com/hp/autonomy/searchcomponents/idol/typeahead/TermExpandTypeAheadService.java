@@ -5,11 +5,11 @@
 
 package com.hp.autonomy.searchcomponents.idol.typeahead;
 
+import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.searchcomponents.core.typeahead.GetSuggestionsFailedException;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadConstants;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import com.hp.autonomy.types.idol.TermExpandResponseData;
@@ -24,24 +24,21 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-class TermExpandTypeAheadService implements TypeAheadService {
-    private final GetSuggestionsAciExecutor executor;
+class TermExpandTypeAheadService implements TypeAheadService<AciErrorException> {
     private final AciService contentAciService;
     private final Processor<TermExpandResponseData> processor;
 
     @Autowired
     public TermExpandTypeAheadService(
-            final GetSuggestionsAciExecutor executor,
             final AciService contentAciService,
             final AciResponseJaxbProcessorFactory processorFactory
     ) {
-        this.executor = executor;
         this.contentAciService = contentAciService;
         processor = processorFactory.createAciResponseProcessor(TermExpandResponseData.class);
     }
 
     @Override
-    public List<String> getSuggestions(final String text) throws GetSuggestionsFailedException {
+    public List<String> getSuggestions(final String text) {
         final AciParameters parameters = new AciParameters(TermActions.TermExpand.name());
         parameters.put(TermExpandParams.Expansion.name(), ExpansionParam.Wild);
         parameters.put(TermExpandParams.Stemming.name(), false);
@@ -49,9 +46,9 @@ class TermExpandTypeAheadService implements TypeAheadService {
         parameters.put(TermExpandParams.Type.name(), ExpandTypeParam.DocOccs);
         parameters.put(TermExpandParams.Text.name(), text);
 
-        final TermExpandResponseData response = executor.executeAction(contentAciService, processor, parameters);
-        final List<String> output = new LinkedList<>();
+        final TermExpandResponseData response = contentAciService.executeAction(parameters, processor);
 
+        final List<String> output = new LinkedList<>();
         for (final TermExpandResponseData.Term term : response.getTerm()) {
             output.add(term.getValue().toLowerCase());
         }

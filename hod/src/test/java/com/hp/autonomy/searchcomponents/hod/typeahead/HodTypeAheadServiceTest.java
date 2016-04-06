@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.hod.typeahead;
 
 import com.hp.autonomy.hod.client.api.analysis.autocomplete.AutocompleteService;
-import com.hp.autonomy.searchcomponents.core.typeahead.GetSuggestionsFailedException;
+import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,16 +14,18 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
+import java.util.Collections;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HodTypeAheadServiceTest {
     @Mock
     private AutocompleteService autocompleteService;
 
-    private TypeAheadService typeAheadService;
+    private TypeAheadService<HodErrorException> typeAheadService;
 
     @Before
     public void setUp() {
@@ -31,7 +33,13 @@ public class HodTypeAheadServiceTest {
     }
 
     @Test
-    public void noText() throws GetSuggestionsFailedException {
+    public void getSuggestions() throws HodErrorException {
+        when(autocompleteService.getSuggestions("badge")).thenReturn(Collections.singletonList("badger"));
+        assertThat(typeAheadService.getSuggestions("badge"), hasItem(is("badger")));
+    }
+
+    @Test
+    public void getSuggestionsNoText() throws HodErrorException {
         assertThat(typeAheadService.getSuggestions(null), is(empty()));
     }
 }

@@ -9,7 +9,6 @@ import com.hp.autonomy.hod.caching.CachingConfiguration;
 import com.hp.autonomy.hod.client.api.analysis.autocomplete.AutocompleteService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
-import com.hp.autonomy.searchcomponents.core.typeahead.GetSuggestionsFailedException;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class HodTypeAheadService implements TypeAheadService {
+class HodTypeAheadService implements TypeAheadService<HodErrorException> {
     private final AutocompleteService autocompleteService;
 
     @Autowired
@@ -30,15 +29,7 @@ public class HodTypeAheadService implements TypeAheadService {
 
     @Override
     @Cacheable(cacheNames = CacheNames.TYPE_AHEAD, cacheResolver = CachingConfiguration.SIMPLE_CACHE_RESOLVER_NAME)
-    public List<String> getSuggestions(final String text) throws GetSuggestionsFailedException {
-        if (StringUtils.isBlank(text)) {
-            return Collections.emptyList();
-        } else {
-            try {
-                return autocompleteService.getSuggestions(text);
-            } catch (final HodErrorException e) {
-                throw new GetSuggestionsFailedException(e);
-            }
-        }
+    public List<String> getSuggestions(final String text) throws HodErrorException {
+        return StringUtils.isBlank(text) ? Collections.<String>emptyList() : autocompleteService.getSuggestions(text);
     }
 }

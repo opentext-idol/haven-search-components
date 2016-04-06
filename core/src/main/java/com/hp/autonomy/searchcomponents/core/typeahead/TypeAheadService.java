@@ -7,8 +7,8 @@ package com.hp.autonomy.searchcomponents.core.typeahead;
 
 import java.util.List;
 
-public interface TypeAheadService {
+public interface TypeAheadService<E extends Exception> {
 
-    List<String> getSuggestions(String text) throws GetSuggestionsFailedException;
+    List<String> getSuggestions(String text) throws E;
 
 }

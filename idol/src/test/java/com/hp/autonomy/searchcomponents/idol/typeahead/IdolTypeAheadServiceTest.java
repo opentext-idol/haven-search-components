@@ -5,8 +5,8 @@
 
 package com.hp.autonomy.searchcomponents.idol.typeahead;
 
+import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.core.typeahead.GetSuggestionsFailedException;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
@@ -25,15 +25,15 @@ public class IdolTypeAheadServiceTest {
     private ConfigService<? extends IdolSearchCapable> configService;
 
     @Mock
-    private TypeAheadService termExpandTypeAheadService;
+    private TypeAheadService<AciErrorException> termExpandTypeAheadService;
 
     @Mock
-    private TypeAheadService qmsTypeAheadService;
+    private TypeAheadService<AciErrorException> qmsTypeAheadService;
 
     @Mock
     private IdolSearchCapable config;
 
-    private TypeAheadService typeAheadService;
+    private TypeAheadService<AciErrorException> typeAheadService;
 
     @Before
     public void setUp() {
@@ -42,7 +42,7 @@ public class IdolTypeAheadServiceTest {
     }
 
     @Test
-    public void getQmsSuggestions() throws GetSuggestionsFailedException {
+    public void getQmsSuggestions() {
         when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setEnabled(true).build());
 
         final String text = "A";
@@ -51,7 +51,7 @@ public class IdolTypeAheadServiceTest {
     }
 
     @Test
-    public void getContentSuggestions() throws GetSuggestionsFailedException {
+    public void getContentSuggestions() {
         when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setEnabled(false).build());
 
         final String text = "A";

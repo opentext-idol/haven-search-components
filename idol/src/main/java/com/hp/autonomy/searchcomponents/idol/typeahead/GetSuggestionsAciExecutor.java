@@ -8,10 +8,9 @@ package com.hp.autonomy.searchcomponents.idol.typeahead;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
-import com.hp.autonomy.searchcomponents.core.typeahead.GetSuggestionsFailedException;
 
 import java.util.Set;
 
 interface GetSuggestionsAciExecutor {
-    <T> T executeAction(final AciService aciService, final Processor<T> processor, final Set<AciParameter> parameters) throws GetSuggestionsFailedException;
+    <T> T executeAction(final AciService aciService, final Processor<T> processor, final Set<AciParameter> parameters);
 }

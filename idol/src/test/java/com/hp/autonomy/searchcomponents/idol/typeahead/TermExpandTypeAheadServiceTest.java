@@ -9,7 +9,6 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.searchcomponents.core.typeahead.GetSuggestionsFailedException;
 import com.hp.autonomy.types.idol.TermExpandResponseData;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,9 +26,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TermExpandTypeAheadServiceTest {
     @Mock
-    private GetSuggestionsAciExecutor executor;
-
-    @Mock
     private AciService contentAciService;
 
     @Mock
@@ -39,12 +35,12 @@ public class TermExpandTypeAheadServiceTest {
 
     @Before
     public void setUp() {
-        termExpandTypeAheadService = new TermExpandTypeAheadService(executor, contentAciService, processorFactory);
+        termExpandTypeAheadService = new TermExpandTypeAheadService(contentAciService, processorFactory);
     }
 
     @Test
-    public void getSuggestions() throws GetSuggestionsFailedException {
-        when(executor.executeAction(any(AciService.class), any(Processor.class), anySetOf(AciParameter.class))).thenReturn(mockResponse());
+    public void getSuggestions() {
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockResponse());
         final List<String> suggestions = termExpandTypeAheadService.getSuggestions("A");
         assertEquals("ab", suggestions.get(0));
     }
