@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-class QmsTypeAheadService implements TypeAheadService<AciErrorException> {
+public class QmsTypeAheadService implements TypeAheadService<AciErrorException> {
     private final ConfigService<? extends IdolSearchCapable> configService;
     private final AciService qmsAciService;
     private final Processor<TypeAheadResponseData> processor;

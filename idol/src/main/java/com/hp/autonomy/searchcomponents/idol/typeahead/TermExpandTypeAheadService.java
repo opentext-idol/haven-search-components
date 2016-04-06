@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-class TermExpandTypeAheadService implements TypeAheadService<AciErrorException> {
+public class TermExpandTypeAheadService implements TypeAheadService<AciErrorException> {
     private final AciService contentAciService;
     private final Processor<TermExpandResponseData> processor;
 
