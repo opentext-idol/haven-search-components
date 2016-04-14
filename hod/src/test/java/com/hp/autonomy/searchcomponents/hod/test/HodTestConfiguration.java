@@ -16,6 +16,7 @@ import com.hp.autonomy.hod.client.api.authentication.AuthenticationService;
 import com.hp.autonomy.hod.client.api.authentication.AuthenticationServiceImpl;
 import com.hp.autonomy.hod.client.api.authentication.EntityType;
 import com.hp.autonomy.hod.client.api.authentication.TokenType;
+import com.hp.autonomy.hod.client.api.authentication.tokeninformation.UserStoreInformation;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.config.HodServiceConfig;
 import com.hp.autonomy.hod.client.error.HodErrorException;
@@ -27,7 +28,7 @@ import com.hp.autonomy.hod.sso.HodAuthentication;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.hod.sso.HodSsoConfig;
 import com.hp.autonomy.hod.sso.SpringSecurityTokenProxyService;
-import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
+import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationConfig;
@@ -45,8 +46,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.annotation.PostConstruct;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -72,6 +75,9 @@ public class HodTestConfiguration {
     @Autowired
     private HodServiceConfig<?, TokenType.Simple> hodServiceConfig;
 
+    private HodAuthenticationPrincipal mockPrincipal;
+    private HodAuthentication mockAuthentication;
+
     @PostConstruct
     public void init() throws HodErrorException {
         final String apiKey = environment.getProperty(API_KEY_PROPERTY);
@@ -81,19 +87,43 @@ public class HodTestConfiguration {
         final AuthenticationService authenticationService = new AuthenticationServiceImpl(hodServiceConfig);
         final TokenProxy<EntityType.Application, TokenType.Simple> tokenProxy = authenticationService.authenticateApplication(new ApiKey(apiKey), application, domain, TokenType.Simple.INSTANCE);
 
-        final HodAuthentication authentication = mock(HodAuthentication.class);
-        final HodAuthenticationPrincipal hodAuthenticationPrincipal = mock(HodAuthenticationPrincipal.class);
-        final ResourceIdentifier identifier = mock(ResourceIdentifier.class);
-        when(identifier.toString()).thenReturn(application);
-        when(identifier.getDomain()).thenReturn(domain);
-        when(hodAuthenticationPrincipal.getApplication()).thenReturn(identifier);
-        when(authentication.getPrincipal()).thenReturn(hodAuthenticationPrincipal);
-        //noinspection unchecked,rawtypes
-        when(authentication.getTokenProxy()).thenReturn((TokenProxy) tokenProxy);
+        final String userStoreName = "DEFAULT_USERSTORE";
 
+        final UserStoreInformation userStoreInformation = mock(UserStoreInformation.class);
+        when(userStoreInformation.getDomain()).thenReturn(domain);
+        when(userStoreInformation.getUuid()).thenReturn(UUID.randomUUID());
+        when(userStoreInformation.getName()).thenReturn(userStoreName);
+        when(userStoreInformation.getIdentifier()).thenReturn(new ResourceIdentifier(domain, userStoreName));
+
+        mockPrincipal = mock(HodAuthenticationPrincipal.class);
+        when(mockPrincipal.getApplication()).thenReturn(new ResourceIdentifier(domain, application));
+        when(mockPrincipal.getUserUuid()).thenReturn(UUID.randomUUID());
+        when(mockPrincipal.getUserStoreInformation()).thenReturn(userStoreInformation);
+        when(mockPrincipal.getTenantUuid()).thenReturn(UUID.randomUUID());
+        when(mockPrincipal.getUserMetadata()).thenReturn(Collections.<String, Serializable>emptyMap());
+
+        mockAuthentication = mock(HodAuthentication.class);
+        when(mockAuthentication.getPrincipal()).thenReturn(mockPrincipal);
+
+        //noinspection unchecked,rawtypes
+        when(mockAuthentication.getTokenProxy()).thenReturn((TokenProxy) tokenProxy);
+
+        // TODO: Remove this when everything can be mocked using the AuthenticationInformationRetriever
         final SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(securityContext.getAuthentication()).thenReturn(mockAuthentication);
         SecurityContextHolder.setContext(securityContext);
+    }
+
+    @Bean
+    @Primary
+    public AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever() {
+        @SuppressWarnings("unchecked")
+        final AuthenticationInformationRetriever<HodAuthenticationPrincipal> retriever = mock(AuthenticationInformationRetriever.class);
+
+        when(retriever.getAuthentication()).thenReturn(mockAuthentication);
+        when(retriever.getPrincipal()).thenReturn(mockPrincipal);
+
+        return retriever;
     }
 
     @Bean
