@@ -5,6 +5,8 @@
 
 package com.hp.autonomy.searchcomponents.hod.beanconfiguration;
 
+import com.hp.autonomy.hod.client.api.analysis.autocomplete.AutocompleteService;
+import com.hp.autonomy.hod.client.api.analysis.autocomplete.AutocompleteServiceImpl;
 import com.hp.autonomy.hod.client.api.analysis.viewdocument.ViewDocumentService;
 import com.hp.autonomy.hod.client.api.analysis.viewdocument.ViewDocumentServiceImpl;
 import com.hp.autonomy.hod.client.api.authentication.EntityType;
@@ -83,6 +85,11 @@ public class HavenSearchHodConfiguration {
     @Bean
     public FindRelatedConceptsService relatedConceptsService() {
         return new FindRelatedConceptsServiceImpl(hodServiceConfig);
+    }
+
+    @Bean
+    public AutocompleteService autocompleteService(final HodServiceConfig<EntityType.Combined, TokenType.Simple> hodServiceConfig) {
+        return new AutocompleteServiceImpl(hodServiceConfig);
     }
 
     @Bean

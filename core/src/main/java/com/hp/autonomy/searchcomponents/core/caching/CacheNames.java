@@ -12,4 +12,5 @@ public interface CacheNames {
     String FIELDS = "fields";
     String PARAMETRIC_FIELDS = "parametric-fields";
     String PARAMETRIC_VALUES = "parametric-values";
+    String TYPE_AHEAD = "type-ahead";
 }

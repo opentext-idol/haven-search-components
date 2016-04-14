@@ -20,6 +20,7 @@ public class IdolAuthenticationInformationRetriever implements AuthenticationInf
 
     @Override
     public CommunityPrincipal getPrincipal() {
-        return (CommunityPrincipal) getAuthentication().getPrincipal();
+        final Authentication authentication = getAuthentication();
+        return authentication != null ? (CommunityPrincipal) authentication.getPrincipal() : null;
     }
 }
