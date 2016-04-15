@@ -36,6 +36,7 @@ import org.joda.time.format.DateTimeFormat;
 
 import java.util.Set;
 
+@SuppressWarnings("WeakerAccess")
 public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
     private static final String IDOL_DATE_PARAMETER_FORMAT = "HH:mm:ss dd/MM/yyyy";
     private static final String GET_CONTENT_QUERY_TEXT = "*";
@@ -84,10 +85,9 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.Characters.name(), searchRequest.getSummaryCharacters());
         aciParameters.add(QueryParams.Predict.name(), false);
         aciParameters.add(QueryParams.Sort.name(), searchRequest.getSort());
-        aciParameters.add(QueryParams.Print.name(), PrintParam.Fields);
-        aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(documentFieldsService.getPrintFields()));
         aciParameters.add(QueryParams.TotalResults.name(), true);
         aciParameters.add(QueryParams.XMLMeta.name(), true);
+        addPrintParameters(aciParameters, PrintParam.fromValue(searchRequest.getPrint()));
 
         if (searchRequest.isHighlight()) {
             aciParameters.add(QueryParams.Highlight.name(), HighlightParam.SummaryTerms);
@@ -107,14 +107,18 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.Text.name(), GET_CONTENT_QUERY_TEXT);
         aciParameters.add(QueryParams.MaxResults.name(), references.size());
         aciParameters.add(QueryParams.AnyLanguage.name(), true);
-        aciParameters.add(QueryParams.Print.name(), print);
-        if (print == PrintParam.Fields) {
-            aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(documentFieldsService.getPrintFields()));
-        }
         aciParameters.add(QueryParams.XMLMeta.name(), true);
+        addPrintParameters(aciParameters, print);
 
         if (indexAndReferences.getIndex() != null) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexAndReferences.getIndex()));
+        }
+    }
+
+    private void addPrintParameters(final AciParameters aciParameters, final PrintParam print) {
+        aciParameters.add(QueryParams.Print.name(), print);
+        if (print == PrintParam.Fields) {
+            aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(documentFieldsService.getPrintFields()));
         }
     }
 

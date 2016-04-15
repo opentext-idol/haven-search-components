@@ -25,6 +25,7 @@ import com.hp.autonomy.types.idol.QueryResponseData;
 import com.hp.autonomy.types.idol.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +44,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("WeakerAccess")
 @RunWith(MockitoJUnitRunner.class)
 public class IdolDocumentServiceTest {
     private static final String MOCK_STATE_TOKEN = "mock-state-token";
@@ -123,7 +125,18 @@ public class IdolDocumentServiceTest {
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
-        final SuggestRequest<String> suggestRequest = new SuggestRequest<>("Some reference", new IdolQueryRestrictions.Builder().build(), 1, 30, "context", 250, "relevance", true);
+        final IdolQueryRestrictions queryRestrictions = new IdolQueryRestrictions.Builder().build();
+        final SuggestRequest<String> suggestRequest = new SuggestRequest.Builder<String>()
+                .setReference("Some reference")
+                .setQueryRestrictions(queryRestrictions)
+                .setStart(1)
+                .setMaxResults(50)
+                .setSummary(SummaryParam.Context.name())
+                .setSummaryCharacters(250)
+                .setSort(null)
+                .setHighlight(true)
+                .setPrint(PrintParam.Fields.name())
+                .build();
         idolDocumentService.findSimilar(suggestRequest);
         verify(queryResponseParser).parseQueryHits(responseData.getHit());
     }
@@ -162,7 +175,18 @@ public class IdolDocumentServiceTest {
     // Used in Find's DocumentService test
     protected SearchRequest<String> mockQueryParams() {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        return new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
+        return new SearchRequest.Builder<String>()
+                .setQueryRestrictions(queryRestrictions)
+                .setStart(1)
+                .setMaxResults(50)
+                .setSummary(SummaryParam.Concept.name())
+                .setSummaryCharacters(250)
+                .setSort(null)
+                .setHighlight(true)
+                .setAutoCorrect(true)
+                .setPrint(PrintParam.Fields.name())
+                .setQueryType(null)
+                .build();
     }
 
     protected QueryResponseData mockStateTokenResponse() {

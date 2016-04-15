@@ -5,15 +5,15 @@
 
 package com.hp.autonomy.searchcomponents.core.search;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class SuggestRequest<S extends Serializable> implements AciSearchRequest<S> {
     private static final long serialVersionUID = -6338199353489914631L;
 
@@ -25,4 +25,36 @@ public class SuggestRequest<S extends Serializable> implements AciSearchRequest<
     protected Integer summaryCharacters;
     protected String sort;
     protected boolean highlight;
+    protected String print = DEFAULT_PRINT;
+
+    private SuggestRequest(final Builder<S> builder) {
+        reference = builder.reference;
+        queryRestrictions = builder.queryRestrictions;
+        start = builder.start;
+        maxResults = builder.maxResults;
+        summary = builder.summary;
+        summaryCharacters = builder.summaryCharacters;
+        sort = builder.sort;
+        highlight = builder.highlight;
+        print = builder.print;
+    }
+
+    @SuppressWarnings("FieldMayBeFinal")
+    @Setter
+    @Accessors(chain = true)
+    public static class Builder<S extends Serializable> {
+        private String reference;
+        private QueryRestrictions<S> queryRestrictions;
+        private int start = DEFAULT_START;
+        private int maxResults = DEFAULT_MAX_RESULTS;
+        private String summary;
+        private Integer summaryCharacters;
+        private String sort;
+        private boolean highlight;
+        private String print = DEFAULT_PRINT;
+
+        public SuggestRequest<S> build() {
+            return new SuggestRequest<>(this);
+        }
+    }
 }
