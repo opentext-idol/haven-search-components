@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 public class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
     // IOD limits max results to 2500
     public static final int HOD_MAX_RESULTS = 2500;
@@ -153,6 +154,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     private QueryRequestBuilder setQueryParams(final AciSearchRequest<ResourceIdentifier> searchRequest, final boolean setQueryProfile) {
         final String profileName = configService.getConfig().getQueryManipulation().getProfile();
 
+        final Print print = Print.valueOf(searchRequest.getPrint().toLowerCase());
         final QueryRequestBuilder queryRequestBuilder = new QueryRequestBuilder()
                 .setAbsoluteMaxResults(Math.min(searchRequest.getMaxResults(), HOD_MAX_RESULTS))
                 .setSummary(searchRequest.getSummary() != null ? Summary.valueOf(searchRequest.getSummary()) : null)
@@ -164,8 +166,11 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
                 .setSort(searchRequest.getSort() != null ? Sort.valueOf(searchRequest.getSort()) : null)
                 .setMinDate(searchRequest.getQueryRestrictions().getMinDate())
                 .setMaxDate(searchRequest.getQueryRestrictions().getMaxDate())
-                .setPrint(Print.fields)
-                .setPrintFields(documentFieldsService.getPrintFields());
+                .setPrint(Print.fields);
+
+        if (print == Print.fields) {
+            queryRequestBuilder.setPrintFields(documentFieldsService.getPrintFields());
+        }
 
         if (searchRequest.isHighlight()) {
             queryRequestBuilder

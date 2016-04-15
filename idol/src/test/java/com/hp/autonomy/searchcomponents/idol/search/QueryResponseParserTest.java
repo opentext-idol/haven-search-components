@@ -17,6 +17,8 @@ import com.hp.autonomy.types.idol.Database;
 import com.hp.autonomy.types.idol.Hit;
 import com.hp.autonomy.types.idol.QueryResponseData;
 import com.hp.autonomy.types.requests.Documents;
+import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +39,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("WeakerAccess")
 @RunWith(MockitoJUnitRunner.class)
 public class QueryResponseParserTest {
     @Mock
@@ -60,7 +63,18 @@ public class QueryResponseParserTest {
         final QueryResponseData responseData = mockQueryResponse();
 
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        final AciSearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
+        final AciSearchRequest<String> searchRequest = new SearchRequest.Builder<String>()
+                .setQueryRestrictions(queryRestrictions)
+                .setStart(1)
+                .setMaxResults(50)
+                .setSummary(SummaryParam.Concept.name())
+                .setSummaryCharacters(250)
+                .setSort(null)
+                .setHighlight(true)
+                .setAutoCorrect(true)
+                .setPrint(PrintParam.Fields.name())
+                .setQueryType(null)
+                .build();
         final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new AciParameters(), responseData, queryExecutor);
         assertThat(results.getDocuments(), is(not(empty())));
     }
@@ -74,7 +88,18 @@ public class QueryResponseParserTest {
         when(queryExecutor.execute(any(AciParameters.class))).thenReturn(mockQueryResponse());
 
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        final AciSearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
+        final AciSearchRequest<String> searchRequest = new SearchRequest.Builder<String>()
+                .setQueryRestrictions(queryRestrictions)
+                .setStart(1)
+                .setMaxResults(50)
+                .setSummary(SummaryParam.Concept.name())
+                .setSummaryCharacters(250)
+                .setSort(null)
+                .setHighlight(true)
+                .setAutoCorrect(true)
+                .setPrint(PrintParam.Fields.name())
+                .setQueryType(null)
+                .build();
         final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new AciParameters(), responseData, queryExecutor);
         assertThat(results.getDocuments(), is(not(empty())));
     }
@@ -89,7 +114,18 @@ public class QueryResponseParserTest {
         when(databasesService.getDatabases(any(IdolDatabasesRequest.class))).thenReturn(Collections.singleton(goodDatabase));
 
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        final AciSearchRequest<String> searchRequest = new SearchRequest<>(queryRestrictions, 0, 50, null, 250, null, true, true, null);
+        final AciSearchRequest<String> searchRequest = new SearchRequest.Builder<String>()
+                .setQueryRestrictions(queryRestrictions)
+                .setStart(1)
+                .setMaxResults(50)
+                .setSummary(SummaryParam.Concept.name())
+                .setSummaryCharacters(250)
+                .setSort(null)
+                .setHighlight(true)
+                .setAutoCorrect(true)
+                .setPrint(PrintParam.Fields.name())
+                .setQueryType(null)
+                .build();
         final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new AciParameters(), responseData, queryExecutor);
         assertThat(results.getDocuments(), is(not(empty())));
         assertNotNull(results.getWarnings());

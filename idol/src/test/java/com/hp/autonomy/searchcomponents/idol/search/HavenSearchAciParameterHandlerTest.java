@@ -20,6 +20,7 @@ import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
+import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,7 +77,18 @@ public class HavenSearchAciParameterHandlerTest {
     @Test
     public void addSearchOutputParameters() {
         final AciParameters aciParameters = new AciParameters();
-        final AciSearchRequest<String> searchRequest = new SearchRequest<>(null, 0, 50, "Context", 250, null, true, false, null);
+        final AciSearchRequest<String> searchRequest = new SearchRequest.Builder<String>()
+                .setQueryRestrictions(null)
+                .setStart(1)
+                .setMaxResults(50)
+                .setSummary(SummaryParam.Concept.name())
+                .setSummaryCharacters(250)
+                .setSort(null)
+                .setHighlight(true)
+                .setAutoCorrect(true)
+                .setPrint(PrintParam.Fields.name())
+                .setQueryType(null)
+                .build();
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
         assertThat(aciParameters, is(not(empty())));
     }

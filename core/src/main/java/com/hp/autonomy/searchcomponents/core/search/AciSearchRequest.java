@@ -5,11 +5,14 @@
 
 package com.hp.autonomy.searchcomponents.core.search;
 
+import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
+
 import java.io.Serializable;
 
 public interface AciSearchRequest<S extends Serializable> extends Serializable {
     int DEFAULT_START = 1;
     int DEFAULT_MAX_RESULTS = 30;
+    String DEFAULT_PRINT = PrintParam.Fields.name();
 
     QueryRestrictions<S> getQueryRestrictions();
 
@@ -24,4 +27,6 @@ public interface AciSearchRequest<S extends Serializable> extends Serializable {
     String getSort();
 
     boolean isHighlight();
+
+    String getPrint();
 }
