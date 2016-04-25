@@ -55,7 +55,7 @@ public class HodParametricValuesServiceTest {
     protected ConfigService<? extends HodSearchCapable> configService;
 
     @Mock
-    protected AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
+    protected AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Mock
     private HodAuthenticationPrincipal hodAuthenticationPrincipal;

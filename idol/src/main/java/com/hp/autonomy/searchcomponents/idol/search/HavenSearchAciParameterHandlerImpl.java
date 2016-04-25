@@ -44,11 +44,16 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
     protected final ConfigService<? extends IdolSearchCapable> configService;
     protected final LanguagesService languagesService;
     protected final DocumentFieldsService documentFieldsService;
-    protected final AuthenticationInformationRetriever<CommunityPrincipal> authenticationInformationRetriever;
+    protected final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever;
 
     private final Escaper urlFragmentEscaper = UrlEscapers.urlFragmentEscaper();
 
-    public HavenSearchAciParameterHandlerImpl(final ConfigService<? extends IdolSearchCapable> configService, final LanguagesService languagesService, final DocumentFieldsService documentFieldsService, final AuthenticationInformationRetriever<CommunityPrincipal> authenticationInformationRetriever) {
+    public HavenSearchAciParameterHandlerImpl(
+            final ConfigService<? extends IdolSearchCapable> configService,
+            final LanguagesService languagesService,
+            final DocumentFieldsService documentFieldsService,
+            final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever
+    ) {
         this.configService = configService;
         this.languagesService = languagesService;
         this.documentFieldsService = documentFieldsService;

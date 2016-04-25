@@ -16,7 +16,6 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexServi
 import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
-import com.hp.autonomy.hod.sso.HodAuthentication;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
@@ -71,13 +70,10 @@ public class HodDocumentServiceTest {
     protected GetContentService<HodSearchResult> getContentService;
 
     @Mock
-    protected AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
+    protected AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Mock
     protected DocumentFieldsService documentFieldsService;
-
-    @Mock
-    protected HodAuthentication hodAuthentication;
 
     @Mock
     protected HodAuthenticationPrincipal hodAuthenticationPrincipal;

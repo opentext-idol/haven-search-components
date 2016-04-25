@@ -36,9 +36,9 @@ public class HodDatabasesService implements DatabasesService<Database, HodDataba
     );
 
     protected final ResourcesService resourcesService;
-    private final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
+    private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
-    public HodDatabasesService(final ResourcesService resourcesService, final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever) {
+    public HodDatabasesService(final ResourcesService resourcesService, final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever) {
         this.resourcesService = resourcesService;
         this.authenticationInformationRetriever = authenticationInformationRetriever;
     }

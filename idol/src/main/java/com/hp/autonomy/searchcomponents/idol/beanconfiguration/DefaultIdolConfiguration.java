@@ -11,6 +11,7 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
+import com.hp.autonomy.searchcomponents.core.authentication.SpringSecurityAuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
@@ -23,6 +24,7 @@ import com.hp.autonomy.searchcomponents.idol.search.QueryResponseParser;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 @Configuration
 class DefaultIdolConfiguration {
@@ -32,7 +34,7 @@ class DefaultIdolConfiguration {
             final ConfigService<? extends IdolSearchCapable> configService,
             final LanguagesService languagesService,
             final DocumentFieldsService documentFieldsService,
-            final AuthenticationInformationRetriever<CommunityPrincipal> authenticationInformationRetriever) {
+            final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever) {
         return new HavenSearchAciParameterHandlerImpl(configService, languagesService, documentFieldsService, authenticationInformationRetriever);
     }
 
@@ -41,5 +43,11 @@ class DefaultIdolConfiguration {
     @ConditionalOnMissingBean(DocumentsService.class)
     public DocumentsService<String, IdolSearchResult, AciErrorException> documentsService(final ConfigService<? extends IdolSearchCapable> configService, final HavenSearchAciParameterHandler parameterHandler, final QueryResponseParser queryResponseParser, final AciService contentAciService, final AciService qmsAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
         return new IdolDocumentService(configService, parameterHandler, queryResponseParser, contentAciService, qmsAciService, aciResponseProcessorFactory);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(AuthenticationInformationRetriever.class)
+    public AuthenticationInformationRetriever<UsernamePasswordAuthenticationToken, CommunityPrincipal> authenticationInformationRetriever() {
+        return new SpringSecurityAuthenticationInformationRetriever<>();
     }
 }

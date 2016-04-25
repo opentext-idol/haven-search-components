@@ -38,7 +38,7 @@ public class IdolTestConfiguration {
 
     @Bean
     @Primary
-    public AuthenticationInformationRetriever<CommunityPrincipal> authenticationInformationRetriever() {
+    public AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever() {
         final UsernamePasswordAuthenticationToken authentication = mock(UsernamePasswordAuthenticationToken.class);
         when(authentication.isAuthenticated()).thenReturn(true);
 
@@ -48,7 +48,7 @@ public class IdolTestConfiguration {
         when(authentication.getPrincipal()).thenReturn(communityPrincipal);
 
         @SuppressWarnings("unchecked")
-        final AuthenticationInformationRetriever<CommunityPrincipal> authenticationInformationRetriever = mock(AuthenticationInformationRetriever.class);
+        final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever = mock(AuthenticationInformationRetriever.class);
         when(authenticationInformationRetriever.getAuthentication()).thenReturn(authentication);
         when(authenticationInformationRetriever.getPrincipal()).thenReturn(communityPrincipal);
         return authenticationInformationRetriever;

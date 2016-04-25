@@ -41,7 +41,7 @@ public class HodDatabasesServiceTest {
     protected ResourcesService resourcesService;
 
     @Mock
-    protected AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
+    protected AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Mock
     private HodAuthenticationPrincipal hodAuthenticationPrincipal;
