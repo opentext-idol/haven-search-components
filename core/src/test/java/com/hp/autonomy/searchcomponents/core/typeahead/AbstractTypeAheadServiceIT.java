@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class AbstractTypeAheadServiceIT<E extends Exception> {
+public abstract class AbstractTypeAheadServiceIT<E extends Exception> {
     @SuppressWarnings("SpringJavaAutowiredMembersInspection")
     @Autowired
     protected TypeAheadService<E> typeAheadService;
