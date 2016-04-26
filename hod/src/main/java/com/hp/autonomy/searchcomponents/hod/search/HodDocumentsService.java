@@ -67,11 +67,18 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     private final ConfigService<? extends HodSearchCapable> configService;
     private final QueryTextIndexService<HodSearchResult> queryTextIndexService;
     private final GetContentService<HodSearchResult> getContentService;
-    private final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationRetriever;
+    private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationRetriever;
     private final DocumentFieldsService documentFieldsService;
 
     @SuppressWarnings("ConstructorWithTooManyParameters")
-    public HodDocumentsService(final FindSimilarService<HodSearchResult> findSimilarService, final ConfigService<? extends HodSearchCapable> configService, final QueryTextIndexService<HodSearchResult> queryTextIndexService, final GetContentService<HodSearchResult> getContentService, final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationRetriever, final DocumentFieldsService documentFieldsService) {
+    public HodDocumentsService(
+            final FindSimilarService<HodSearchResult> findSimilarService,
+            final ConfigService<? extends HodSearchCapable> configService,
+            final QueryTextIndexService<HodSearchResult> queryTextIndexService,
+            final GetContentService<HodSearchResult> getContentService,
+            final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationRetriever,
+            final DocumentFieldsService documentFieldsService
+    ) {
         this.findSimilarService = findSimilarService;
         this.configService = configService;
         this.queryTextIndexService = queryTextIndexService;

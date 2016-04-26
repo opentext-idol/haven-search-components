@@ -36,9 +36,14 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
     private final FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
     private final GetParametricValuesService getParametricValuesService;
     private final ConfigService<? extends HodSearchCapable> configService;
-    private final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
+    private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
-    public HodParametricValuesService(final FieldsService<HodFieldsRequest, HodErrorException> fieldsService, final GetParametricValuesService getParametricValuesService, final ConfigService<? extends HodSearchCapable> configService, final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever) {
+    public HodParametricValuesService(
+            final FieldsService<HodFieldsRequest, HodErrorException> fieldsService,
+            final GetParametricValuesService getParametricValuesService,
+            final ConfigService<? extends HodSearchCapable> configService,
+            final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever
+    ) {
         this.fieldsService = fieldsService;
         this.getParametricValuesService = getParametricValuesService;
         this.configService = configService;

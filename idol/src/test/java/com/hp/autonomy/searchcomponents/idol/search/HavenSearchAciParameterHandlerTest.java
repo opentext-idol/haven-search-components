@@ -49,7 +49,7 @@ public class HavenSearchAciParameterHandlerTest {
     private DocumentFieldsService documentFieldsService;
 
     @Mock
-    private AuthenticationInformationRetriever<CommunityPrincipal> authenticationInformationRetriever;
+    private AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever;
 
     private HavenSearchAciParameterHandler parameterHandler;
 

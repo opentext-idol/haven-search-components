@@ -62,14 +62,14 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
     private final GetContentService<Document> getContentService;
     private final QueryTextIndexService<Document> queryTextIndexService;
     private final ConfigService<? extends HodSearchCapable> configService;
-    private final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever;
+    private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Autowired
     public HodViewServerService(
             final ViewDocumentService viewDocumentService,
             final GetContentService<Document> viewGetContentService,
             final QueryTextIndexService<Document> queryTextIndexService,
-            final ConfigService<? extends HodSearchCapable> configService, final AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever) {
+            final ConfigService<? extends HodSearchCapable> configService, final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever) {
         this.viewDocumentService = viewDocumentService;
         getContentService = viewGetContentService;
         this.queryTextIndexService = queryTextIndexService;

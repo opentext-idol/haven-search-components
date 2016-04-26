@@ -27,7 +27,6 @@ import com.hp.autonomy.hod.client.token.TokenRepository;
 import com.hp.autonomy.hod.sso.HodAuthentication;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.hod.sso.HodSsoConfig;
-import com.hp.autonomy.hod.sso.SpringSecurityTokenProxyService;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
@@ -42,10 +41,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
@@ -72,22 +68,28 @@ public class HodTestConfiguration {
     @Autowired
     private Environment environment;
 
-    @Autowired
-    private HodServiceConfig<?, TokenType.Simple> hodServiceConfig;
-
-    private HodAuthenticationPrincipal mockPrincipal;
-    private HodAuthentication mockAuthentication;
-
-    @PostConstruct
-    public void init() throws HodErrorException {
+    @Bean
+    @Primary
+    public AuthenticationInformationRetriever<HodAuthentication<EntityType.Application>, HodAuthenticationPrincipal> authenticationInformationRetriever(
+            final HttpClient httpClient,
+            final TokenRepository tokenRepository,
+            final ObjectMapper hodSearchResultObjectMapper
+    ) throws HodErrorException {
         final String apiKey = environment.getProperty(API_KEY_PROPERTY);
         final String application = environment.getProperty(APPLICATION_PROPERTY);
         final String domain = environment.getProperty(DOMAIN_PROPERTY);
 
+        // We can't use the HodServiceConfig bean here since the AuthenticationInformationRetrieverTokenProxyService depends on this bean
+        final HodServiceConfig<?, TokenType.Simple> hodServiceConfig = new HodServiceConfig.Builder<EntityType.Combined, TokenType.Simple>(HOD_URL)
+                .setHttpClient(httpClient)
+                .setTokenRepository(tokenRepository)
+                .setObjectMapper(hodSearchResultObjectMapper)
+                .build();
+
         final AuthenticationService authenticationService = new AuthenticationServiceImpl(hodServiceConfig);
         final TokenProxy<EntityType.Application, TokenType.Simple> tokenProxy = authenticationService.authenticateApplication(new ApiKey(apiKey), application, domain, TokenType.Simple.INSTANCE);
 
-        final String userStoreName = "DEFAULT_USERSTORE";
+        final String userStoreName = "DEFAULT_USER_STORE";
 
         final UserStoreInformation userStoreInformation = mock(UserStoreInformation.class);
         when(userStoreInformation.getDomain()).thenReturn(domain);
@@ -95,30 +97,18 @@ public class HodTestConfiguration {
         when(userStoreInformation.getName()).thenReturn(userStoreName);
         when(userStoreInformation.getIdentifier()).thenReturn(new ResourceIdentifier(domain, userStoreName));
 
-        mockPrincipal = mock(HodAuthenticationPrincipal.class);
+        final HodAuthenticationPrincipal mockPrincipal = mock(HodAuthenticationPrincipal.class);
         when(mockPrincipal.getApplication()).thenReturn(new ResourceIdentifier(domain, application));
         when(mockPrincipal.getUserUuid()).thenReturn(UUID.randomUUID());
         when(mockPrincipal.getUserStoreInformation()).thenReturn(userStoreInformation);
         when(mockPrincipal.getTenantUuid()).thenReturn(UUID.randomUUID());
         when(mockPrincipal.getUserMetadata()).thenReturn(Collections.<String, Serializable>emptyMap());
 
-        mockAuthentication = mock(HodAuthentication.class);
+        final HodAuthentication<EntityType.Application> mockAuthentication = mock(HodAuthentication.class);
         when(mockAuthentication.getPrincipal()).thenReturn(mockPrincipal);
+        when(mockAuthentication.getTokenProxy()).thenReturn(tokenProxy);
 
-        //noinspection unchecked,rawtypes
-        when(mockAuthentication.getTokenProxy()).thenReturn((TokenProxy) tokenProxy);
-
-        // TODO: Remove this when everything can be mocked using the AuthenticationInformationRetriever
-        final SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(mockAuthentication);
-        SecurityContextHolder.setContext(securityContext);
-    }
-
-    @Bean
-    @Primary
-    public AuthenticationInformationRetriever<HodAuthenticationPrincipal> authenticationInformationRetriever() {
-        @SuppressWarnings("unchecked")
-        final AuthenticationInformationRetriever<HodAuthenticationPrincipal> retriever = mock(AuthenticationInformationRetriever.class);
+        final AuthenticationInformationRetriever<HodAuthentication<EntityType.Application>, HodAuthenticationPrincipal> retriever = mock(AuthenticationInformationRetriever.class);
 
         when(retriever.getAuthentication()).thenReturn(mockAuthentication);
         when(retriever.getPrincipal()).thenReturn(mockPrincipal);
@@ -148,7 +138,7 @@ public class HodTestConfiguration {
 
         final HodSsoConfig config = mock(HodSsoConfig.class);
 
-        when(config.getApiKey()).thenReturn(environment.getProperty(API_KEY_PROPERTY));
+        when(config.getApiKey()).thenReturn(new ApiKey(environment.getProperty(API_KEY_PROPERTY)));
         when(config.getAllowedOrigins()).thenReturn(ALLOWED_ORIGINS);
 
         when(configService.getConfig()).thenReturn(config);
@@ -175,20 +165,16 @@ public class HodTestConfiguration {
     @ConditionalOnMissingBean(HodServiceConfig.class)
     public HodServiceConfig<EntityType.Combined, TokenType.Simple> hodServiceConfig(
             final TokenProxyService<EntityType.Combined, TokenType.Simple> tokenProxyService,
-            final HttpClient httpClient, final TokenRepository tokenRepository,
-            final ObjectMapper hodSearchResultObjectMapper) {
+            final HttpClient httpClient,
+            final TokenRepository tokenRepository,
+            final ObjectMapper hodSearchResultObjectMapper
+    ) {
         return new HodServiceConfig.Builder<EntityType.Combined, TokenType.Simple>(HOD_URL)
                 .setTokenProxyService(tokenProxyService)
                 .setHttpClient(httpClient)
                 .setTokenRepository(tokenRepository)
                 .setObjectMapper(hodSearchResultObjectMapper)
                 .build();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(TokenProxyService.class)
-    public TokenProxyService<EntityType.Combined, TokenType.Simple> tokenProxyService() {
-        return new SpringSecurityTokenProxyService();
     }
 
     @Bean

@@ -9,7 +9,10 @@ import org.springframework.security.core.Authentication;
 
 import java.security.Principal;
 
-public interface AuthenticationInformationRetriever<P extends Principal> {
-    Authentication getAuthentication();
+public interface AuthenticationInformationRetriever<A extends Authentication, P extends Principal> {
+
+    A getAuthentication();
+
     P getPrincipal();
+
 }
