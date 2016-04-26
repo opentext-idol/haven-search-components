@@ -69,7 +69,7 @@ public class IdolTestConfiguration {
 
         final AciServerDetails contentAciServerDetails = new AciServerDetails(
                 environment.getProperty("test.content.host", DEFAULT_IDOL_HOST),
-                Integer.parseInt(environment.getProperty("test.view.port", String.valueOf(DEFAULT_CONTENT_PORT)))
+                Integer.parseInt(environment.getProperty("test.content.port", String.valueOf(DEFAULT_CONTENT_PORT)))
         );
 
         final IdolSearchCapable config = mock(IdolSearchCapable.class);
