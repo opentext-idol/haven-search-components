@@ -26,6 +26,7 @@ public class IdolQueryRestrictions implements QueryRestrictions<String> {
     private final List<String> databases;
     private final DateTime minDate;
     private final DateTime maxDate;
+    private final Integer minScore;
     private final String languageType;
     private final boolean anyLanguage;
     private final List<String> stateMatchId;
@@ -41,13 +42,14 @@ public class IdolQueryRestrictions implements QueryRestrictions<String> {
         private List<String> databases;
         private DateTime minDate;
         private DateTime maxDate;
+        private Integer minScore;
         private String languageType;
         private boolean anyLanguage;
         private List<String> stateMatchId = Collections.emptyList();
         private List<String> stateDontMatchId = Collections.emptyList();
 
         public IdolQueryRestrictions build() {
-            return new IdolQueryRestrictions(queryText, fieldText, databases, minDate, maxDate, languageType, anyLanguage, stateMatchId, stateDontMatchId);
+            return new IdolQueryRestrictions(queryText, fieldText, databases, minDate, maxDate, minScore, languageType, anyLanguage, stateMatchId, stateDontMatchId);
         }
     }
 }

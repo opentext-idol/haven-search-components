@@ -36,7 +36,8 @@ public class HodRelatedConceptsService implements RelatedConceptsService<Entity,
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = relatedConceptsRequest.getQueryRestrictions();
         final FindRelatedConceptsRequestBuilder params = new FindRelatedConceptsRequestBuilder()
                 .setIndexes(queryRestrictions.getDatabases())
-                .setFieldText(queryRestrictions.getFieldText());
+                .setFieldText(queryRestrictions.getFieldText())
+                .setMinScore(queryRestrictions.getMinScore());
 
         return findRelatedConceptsService.findRelatedConceptsWithText(queryRestrictions.getQueryText(), params);
     }
