@@ -11,13 +11,12 @@ import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.search.AbstractRelatedConceptsServiceIT;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConfiguration;
-import com.hp.autonomy.searchcomponents.hod.test.HodTestConfiguration;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {HodTestConfiguration.class, HavenSearchHodConfiguration.class})
+@ContextConfiguration(classes = HavenSearchHodConfiguration.class)
 public class HodRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceIT<Entity, ResourceIdentifier, HodErrorException> {
     @Override
     protected RelatedConceptsRequest<ResourceIdentifier> createRelatedConceptsRequest() {

@@ -7,8 +7,6 @@ package com.hp.autonomy.searchcomponents.idol.test;
 
 import com.autonomy.aci.client.transport.AciServerDetails;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
-import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
@@ -19,40 +17,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@ConditionalOnProperty(value = "mock.idol.authentication", matchIfMissing = true)
+@ConditionalOnProperty(value = "mock.idol.configuration", matchIfMissing = true)
 public class IdolTestConfiguration {
-    public static final String DEFAULT_IDOL_HOST = "iso-idol";
-    public static final int DEFAULT_CONTENT_PORT = 9000;
-    public static final int DEFAULT_VIEW_SERVER_PORT = 9080;
-
+    private static final String DEFAULT_IDOL_HOST = "iso-idol";
+    private static final int DEFAULT_CONTENT_PORT = 9000;
+    private static final int DEFAULT_VIEW_SERVER_PORT = 9080;
     private static final String REFERENCE_FIELD_NAME = "DREREFERENCE";
 
     @Autowired
     private Environment environment;
-
-    @Bean
-    @Primary
-    public AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever() {
-        final UsernamePasswordAuthenticationToken authentication = mock(UsernamePasswordAuthenticationToken.class);
-        when(authentication.isAuthenticated()).thenReturn(true);
-
-        final CommunityPrincipal communityPrincipal = mock(CommunityPrincipal.class);
-        when(communityPrincipal.getId()).thenReturn(1L);
-        when(communityPrincipal.getUsername()).thenReturn("user");
-        when(authentication.getPrincipal()).thenReturn(communityPrincipal);
-
-        @SuppressWarnings("unchecked")
-        final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever = mock(AuthenticationInformationRetriever.class);
-        when(authenticationInformationRetriever.getAuthentication()).thenReturn(authentication);
-        when(authenticationInformationRetriever.getPrincipal()).thenReturn(communityPrincipal);
-        return authenticationInformationRetriever;
-    }
 
     @Bean
     @Primary
