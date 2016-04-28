@@ -173,7 +173,8 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
                 .setSort(searchRequest.getSort() != null ? Sort.valueOf(searchRequest.getSort()) : null)
                 .setMinDate(searchRequest.getQueryRestrictions().getMinDate())
                 .setMaxDate(searchRequest.getQueryRestrictions().getMaxDate())
-                .setPrint(Print.fields);
+                .setPrint(Print.fields)
+                .setMinScore(searchRequest.getQueryRestrictions().getMinScore());
 
         if (print == Print.fields) {
             queryRequestBuilder.setPrintFields(documentFieldsService.getPrintFields());

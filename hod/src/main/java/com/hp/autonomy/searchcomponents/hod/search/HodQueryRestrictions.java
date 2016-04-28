@@ -27,6 +27,7 @@ public class HodQueryRestrictions implements QueryRestrictions<ResourceIdentifie
     private final List<ResourceIdentifier> databases;
     private final DateTime minDate;
     private final DateTime maxDate;
+    private final Integer minScore;
     private final String languageType;
     private final boolean anyLanguage;
 
@@ -44,11 +45,12 @@ public class HodQueryRestrictions implements QueryRestrictions<ResourceIdentifie
         private List<ResourceIdentifier> databases;
         private DateTime minDate;
         private DateTime maxDate;
+        private Integer minScore;
         private String languageType;
         private boolean anyLanguage;
 
         public HodQueryRestrictions build() {
-            return new HodQueryRestrictions(queryText, fieldText, databases, minDate, maxDate, languageType, anyLanguage);
+            return new HodQueryRestrictions(queryText, fieldText, databases, minDate, maxDate, minScore, languageType, anyLanguage);
         }
     }
 }

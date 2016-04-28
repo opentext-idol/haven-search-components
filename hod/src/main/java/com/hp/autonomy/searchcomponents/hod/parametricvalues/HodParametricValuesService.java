@@ -70,7 +70,8 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
                     .setSort(ParametricSort.document_count)
                     .setText(parametricRequest.getQueryRestrictions().getQueryText())
                     .setFieldText(parametricRequest.getQueryRestrictions().getFieldText())
-                    .setMaxValues(parametricRequest.getMaxValues());
+                    .setMaxValues(parametricRequest.getMaxValues())
+                    .setMinScore(parametricRequest.getQueryRestrictions().getMinScore());
 
             final FieldNames parametricFieldNames = getParametricValuesService.getParametricValues(fieldNames,
                     new ArrayList<>(parametricRequest.getQueryRestrictions().getDatabases()), parametricParams);

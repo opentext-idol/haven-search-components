@@ -21,6 +21,8 @@ public interface QueryRestrictions<S extends Serializable> extends Serializable 
 
     DateTime getMaxDate();
 
+    Integer getMinScore();
+
     String getLanguageType();
 
     List<String> getStateMatchId();

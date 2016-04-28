@@ -76,6 +76,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.MinDate.name(), formatDate(queryRestrictions.getMinDate()));
         aciParameters.add(QueryParams.MaxDate.name(), formatDate(queryRestrictions.getMaxDate()));
         aciParameters.add(QueryParams.FieldText.name(), queryRestrictions.getFieldText());
+        aciParameters.add(QueryParams.MinScore.name(), queryRestrictions.getMinScore());
 
         addLanguageRestriction(aciParameters, queryRestrictions);
     }
