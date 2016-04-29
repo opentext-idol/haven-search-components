@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 public class IdolDocumentService implements DocumentsService<String, IdolSearchResult, AciErrorException> {
     protected final ConfigService<? extends IdolSearchCapable> configService;
     protected final HavenSearchAciParameterHandler parameterHandler;
@@ -80,7 +81,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
         parameterHandler.addSearchOutputParameters(aciParameters, suggestRequest);
 
         final SuggestResponseData responseData = contentAciService.executeAction(aciParameters, suggestResponseProcessor);
-        final List<Hit> hits = responseData.getHit();
+        final List<Hit> hits = responseData.getHits();
         return new Documents<>(queryResponseParser.parseQueryHits(hits), responseData.getTotalhits(), null, null, null, null);
     }
 
@@ -95,7 +96,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
             parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, PrintParam.fromValue(request.getPrint()));
 
             final QueryResponseData responseData = contentAciService.executeAction(aciParameters, queryResponseProcessor);
-            final List<Hit> hits = responseData.getHit();
+            final List<Hit> hits = responseData.getHits();
             results.addAll(queryResponseParser.parseQueryHits(hits));
         }
 

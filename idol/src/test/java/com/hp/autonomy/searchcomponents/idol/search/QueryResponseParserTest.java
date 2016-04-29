@@ -137,7 +137,7 @@ public class QueryResponseParserTest {
         final QueryResponseData responseData = new QueryResponseData();
         responseData.setTotalhits(1);
         final Hit hit = mockHit();
-        responseData.getHit().add(hit);
+        responseData.getHits().add(hit);
 
         return responseData;
     }

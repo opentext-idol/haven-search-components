@@ -29,8 +29,15 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBElement;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
+@SuppressWarnings("WeakerAccess")
 @Service
 public class IdolParametricValuesService implements ParametricValuesService<IdolParametricRequest, String, AciErrorException> {
     private static final String VALUE_NODE_NAME = "value";
@@ -96,7 +103,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
 
     @Override
     public List<RecursiveField> getDependentParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
-        final List<String> fieldNames = new ArrayList<>();
+        final Collection<String> fieldNames = new ArrayList<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
             fieldNames.addAll(fieldsService.getParametricFields(new IdolFieldsRequest.Builder().build()));
@@ -121,11 +128,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
 
             final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
 
-            if(responseData.getValues() == null) {
-                results = Collections.emptyList();
-            } else {
-                results = responseData.getValues().getField();
-            }
+            results = responseData.getValues() == null ? Collections.<RecursiveField>emptyList() : responseData.getValues().getField();
         }
 
         return results;

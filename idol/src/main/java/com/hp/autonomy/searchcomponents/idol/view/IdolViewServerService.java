@@ -120,7 +120,7 @@ public class IdolViewServerService implements ViewServerService<String, AciError
 
         final ViewingMode viewingMode = viewConfig.getViewingMode();
 
-        // fail fast if there's a malconfiguration
+        // fail fast if there's a misconfiguration
         if (viewingMode == ViewingMode.FIELD && StringUtils.isEmpty(referenceField)) {
             throw new ReferenceFieldBlankException();
         }
@@ -136,11 +136,15 @@ public class IdolViewServerService implements ViewServerService<String, AciError
             throw new ViewDocumentNotFoundException(documentReference, e);
         }
 
-        final List<Hit> documents = queryResponse.getHit();
+        final List<Hit> documents = queryResponse.getHits();
         if (documents.isEmpty()) {
             throw new ViewDocumentNotFoundException(documentReference);
         }
 
+        return getReference(documentReference, viewConfig, referenceField, viewingMode, documents);
+    }
+
+    private String getReference(final String documentReference, final ViewConfig viewConfig, final String referenceField, final ViewingMode viewingMode, final List<Hit> documents) {
         final String reference;
 
         switch (viewingMode) {

@@ -18,6 +18,7 @@ import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
 import com.hp.autonomy.types.idol.DocContent;
 import com.hp.autonomy.types.idol.GetContentResponseData;
 import com.hp.autonomy.types.idol.Hit;
+import com.hp.autonomy.types.idol.QueryResponse;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -103,10 +104,10 @@ public class IdolViewServerServiceTest {
 
     @Test(expected = ViewNoReferenceFieldException.class)
     public void noMatchingField() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException {
-        final GetContentResponseData responseData = new GetContentResponseData();
+        final QueryResponse responseData = new GetContentResponseData();
 
         final Hit hit = new Hit();
-        responseData.getHit().add(hit);
+        responseData.getHits().add(hit);
 
         final DocContent content = new DocContent();
         hit.setContent(content);
@@ -135,7 +136,7 @@ public class IdolViewServerServiceTest {
         final GetContentResponseData responseData = new GetContentResponseData();
 
         final Hit hit = new Hit();
-        responseData.getHit().add(hit);
+        responseData.getHits().add(hit);
 
         final DocContent content = new DocContent();
         hit.setContent(content);

@@ -33,10 +33,13 @@ import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormat;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
 @SuppressWarnings("WeakerAccess")
+@Component("parameterHandler")
 public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
     private static final String IDOL_DATE_PARAMETER_FORMAT = "HH:mm:ss dd/MM/yyyy";
     private static final String GET_CONTENT_QUERY_TEXT = "*";
@@ -48,6 +51,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
 
     private final Escaper urlFragmentEscaper = UrlEscapers.urlFragmentEscaper();
 
+    @Autowired
     public HavenSearchAciParameterHandlerImpl(
             final ConfigService<? extends IdolSearchCapable> configService,
             final LanguagesService languagesService,
