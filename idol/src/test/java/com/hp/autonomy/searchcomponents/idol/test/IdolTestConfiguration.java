@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@ConditionalOnProperty(value = "mock.idol.configuration", matchIfMissing = true)
+@ConditionalOnProperty(value = "mock.configuration", matchIfMissing = true)
 public class IdolTestConfiguration {
     private static final String DEFAULT_IDOL_HOST = "iso-idol";
     private static final int DEFAULT_CONTENT_PORT = 9000;

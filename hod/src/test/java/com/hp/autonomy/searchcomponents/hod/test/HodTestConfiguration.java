@@ -12,12 +12,19 @@ import com.hp.autonomy.frontend.configuration.BCryptUsernameAndPassword;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.SingleUserAuthentication;
 import com.hp.autonomy.hod.client.api.authentication.ApiKey;
+import com.hp.autonomy.hod.client.api.authentication.AuthenticationService;
+import com.hp.autonomy.hod.client.api.authentication.AuthenticationServiceImpl;
 import com.hp.autonomy.hod.client.api.authentication.EntityType;
 import com.hp.autonomy.hod.client.api.authentication.TokenType;
+import com.hp.autonomy.hod.client.api.authentication.tokeninformation.UserStoreInformation;
+import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.config.HodServiceConfig;
+import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.token.InMemoryTokenRepository;
+import com.hp.autonomy.hod.client.token.TokenProxy;
 import com.hp.autonomy.hod.client.token.TokenProxyService;
 import com.hp.autonomy.hod.client.token.TokenRepository;
+import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.hod.sso.HodSsoConfig;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
@@ -33,14 +40,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@ConditionalOnProperty(value = "mock.hod.configuration", matchIfMissing = true)
+@ConditionalOnProperty(value = "mock.configuration", matchIfMissing = true)
 public class HodTestConfiguration {
     public static final String HOD_URL = "https://api.havenondemand.com";
     public static final String PROXY_HOST = "web-proxy.sdc.hpecorp.net";
@@ -51,6 +60,8 @@ public class HodTestConfiguration {
     public static final Set<String> ALLOWED_ORIGINS = Collections.singleton("http://localhost:8080");
 
     public static final String API_KEY_PROPERTY = "test.api.key";
+    public static final String APPLICATION_PROPERTY = "test.application";
+    public static final String DOMAIN_PROPERTY = "test.domain";
 
     @Autowired
     private Environment environment;
@@ -98,6 +109,50 @@ public class HodTestConfiguration {
         when(configService.getConfig()).thenReturn((AuthenticationConfig) config);
 
         return configService;
+    }
+
+
+    @Bean
+    public TokenProxy<EntityType.Application, TokenType.Simple> testTokenProxy(
+            final HttpClient httpClient,
+            final TokenRepository tokenRepository,
+            final ObjectMapper hodSearchResultObjectMapper
+    ) throws HodErrorException {
+        final String application = environment.getProperty(APPLICATION_PROPERTY);
+        final String domain = environment.getProperty(DOMAIN_PROPERTY);
+        final ApiKey apiKey = new ApiKey(environment.getProperty(API_KEY_PROPERTY));
+
+        // We can't use the HodServiceConfig bean here since the AuthenticationInformationRetrieverTokenProxyService depends on this bean
+        final HodServiceConfig<?, TokenType.Simple> hodServiceConfig = new HodServiceConfig.Builder<EntityType.Combined, TokenType.Simple>(HOD_URL)
+                .setHttpClient(httpClient)
+                .setTokenRepository(tokenRepository)
+                .setObjectMapper(hodSearchResultObjectMapper)
+                .build();
+
+        final AuthenticationService authenticationService = new AuthenticationServiceImpl(hodServiceConfig);
+        return authenticationService.authenticateApplication(apiKey, application, domain, TokenType.Simple.INSTANCE);
+    }
+
+    @Bean
+    public HodAuthenticationPrincipal testPrincipal() {
+        final String application = environment.getProperty(APPLICATION_PROPERTY);
+        final String domain = environment.getProperty(DOMAIN_PROPERTY);
+
+        final UserStoreInformation userStoreInformation = mock(UserStoreInformation.class);
+        when(userStoreInformation.getDomain()).thenReturn(domain);
+        when(userStoreInformation.getUuid()).thenReturn(UUID.randomUUID());
+
+        final String userStoreName = "DEFAULT_USER_STORE";
+        when(userStoreInformation.getName()).thenReturn(userStoreName);
+        when(userStoreInformation.getIdentifier()).thenReturn(new ResourceIdentifier(domain, userStoreName));
+
+        final HodAuthenticationPrincipal testPrincipal = mock(HodAuthenticationPrincipal.class);
+        when(testPrincipal.getApplication()).thenReturn(new ResourceIdentifier(domain, application));
+        when(testPrincipal.getUserUuid()).thenReturn(UUID.randomUUID());
+        when(testPrincipal.getUserStoreInformation()).thenReturn(userStoreInformation);
+        when(testPrincipal.getTenantUuid()).thenReturn(UUID.randomUUID());
+        when(testPrincipal.getUserMetadata()).thenReturn(Collections.<String, Serializable>emptyMap());
+        return testPrincipal;
     }
 
     @Bean

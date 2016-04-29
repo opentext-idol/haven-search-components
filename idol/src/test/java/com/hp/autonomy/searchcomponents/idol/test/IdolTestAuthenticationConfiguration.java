@@ -12,10 +12,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@ConditionalOnProperty(value = "mock.authenticationRetriever", matchIfMissing = true)
+@ConditionalOnProperty(value = "mock.configuration", matchIfMissing = true)
 public class IdolTestAuthenticationConfiguration {
     @Bean
     @Primary
+    @ConditionalOnProperty(value = "mock.authenticationRetriever", matchIfMissing = true)
     public AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever() {
         final UsernamePasswordAuthenticationToken authentication = mock(UsernamePasswordAuthenticationToken.class);
         when(authentication.isAuthenticated()).thenReturn(true);
