@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 /**
  * Default implementation of Idol QueryResponseParser
  */
+@SuppressWarnings("WeakerAccess")
 @Component
 public class QueryResponseParserImpl implements QueryResponseParser {
     private static final Pattern SPELLING_SEPARATOR_PATTERN = Pattern.compile(", ");
@@ -50,7 +51,7 @@ public class QueryResponseParserImpl implements QueryResponseParser {
 
     @Override
     public Documents<IdolSearchResult> parseQueryResults(final AciSearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData, final IdolDocumentService.QueryExecutor queryExecutor) {
-        final List<Hit> hits = responseData.getHit();
+        final List<Hit> hits = responseData.getHits();
 
         final Warnings warnings = parseWarnings(searchRequest, aciParameters, responseData);
 
@@ -94,7 +95,7 @@ public class QueryResponseParserImpl implements QueryResponseParser {
         aciParameters.put(QueryParams.Text.name(), spellingQuery);
 
         final QueryResponseData correctedResponseData = queryExecutor.execute(aciParameters);
-        final List<IdolSearchResult> correctedResults = parseQueryHits(correctedResponseData.getHit());
+        final List<IdolSearchResult> correctedResults = parseQueryHits(correctedResponseData.getHits());
 
         final Spelling spelling = new Spelling(Arrays.asList(SPELLING_SEPARATOR_PATTERN.split(responseData.getSpelling())), spellingQuery, aciParameters.get(QueryParams.Text.name()));
 

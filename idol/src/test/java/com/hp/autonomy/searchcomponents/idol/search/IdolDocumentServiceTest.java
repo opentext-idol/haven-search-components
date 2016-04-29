@@ -121,7 +121,7 @@ public class IdolDocumentServiceTest {
         final SuggestResponseData responseData = new SuggestResponseData();
         responseData.setTotalhits(1);
         final Hit hit = new Hit();
-        responseData.getHit().add(hit);
+        responseData.getHits().add(hit);
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
@@ -138,7 +138,7 @@ public class IdolDocumentServiceTest {
                 .setPrint(PrintParam.Fields.name())
                 .build();
         idolDocumentService.findSimilar(suggestRequest);
-        verify(queryResponseParser).parseQueryHits(responseData.getHit());
+        verify(queryResponseParser).parseQueryHits(responseData.getHits());
     }
 
     @Test
@@ -146,13 +146,13 @@ public class IdolDocumentServiceTest {
         final QueryResponseData responseData = new QueryResponseData();
         responseData.setTotalhits(1);
         final Hit hit = new Hit();
-        responseData.getHit().add(hit);
+        responseData.getHits().add(hit);
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
         final GetContentRequest<String> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference"))), PrintParam.Fields.name());
         idolDocumentService.getDocumentContent(getContentRequest);
-        verify(queryResponseParser).parseQueryHits(responseData.getHit());
+        verify(queryResponseParser).parseQueryHits(responseData.getHits());
     }
 
     @Test
