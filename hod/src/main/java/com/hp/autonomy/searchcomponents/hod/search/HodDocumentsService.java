@@ -99,7 +99,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
 
     @Override
     public Documents<HodSearchResult> findSimilar(final SuggestRequest<ResourceIdentifier> suggestRequest) throws HodErrorException {
-        final QueryRequestBuilder requestBuilder = setQueryParams(suggestRequest, true);
+        final QueryRequestBuilder requestBuilder = setQueryParams(suggestRequest, false);
 
         final Documents<HodSearchResult> results = findSimilarService.findSimilarDocumentsToIndexReference(suggestRequest.getReference(), requestBuilder);
 
