@@ -29,6 +29,13 @@ public class HodParametricValuesServiceIT extends AbstractParametricValuesServic
     }
 
     @Override
+    protected HodParametricRequest createNumericParametricRequest() {
+        return new HodParametricRequest.Builder()
+                .setQueryRestrictions(testUtils.buildQueryRestrictions())
+                .build();
+    }
+
+    @Override
     @Test(expected = NotImplementedException.class)
     public void getDependentParametricValues() throws HodErrorException {
         super.getDependentParametricValues();

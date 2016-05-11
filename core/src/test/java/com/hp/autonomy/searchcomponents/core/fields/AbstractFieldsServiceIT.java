@@ -37,7 +37,7 @@ public abstract class AbstractFieldsServiceIT<R extends FieldsRequest, S extends
 
     @Test
     public void getFields() throws E {
-        final TagResponse results = fieldsService.getFields(createFieldsRequest(), ImmutableList.of("Parametric"));
+        final TagResponse results = fieldsService.getFields(createFieldsRequest(), ImmutableList.of("parametric"));
         assertThat(results.getParametricTypeFields(), is(not(empty())));
     }
 }

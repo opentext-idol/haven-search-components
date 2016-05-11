@@ -13,7 +13,7 @@ import java.util.List;
 
 @Data
 @Builder(fluent = false)
-class IdolTagResponse implements TagResponse {
+public class IdolTagResponse implements TagResponse {
     private final List<String> indexTypeFields;
     private final List<String> parametricTypeFields;
     private final List<String> numericTypeFields;

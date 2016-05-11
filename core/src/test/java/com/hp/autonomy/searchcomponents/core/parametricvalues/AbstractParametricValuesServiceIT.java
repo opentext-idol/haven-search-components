@@ -29,11 +29,19 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
     protected TestUtils<S> testUtils;
 
     protected abstract R createParametricRequest();
+    protected abstract R createNumericParametricRequest();
 
     @Test
     public void getAllParametricValues() throws E {
         final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(createParametricRequest());
         assertThat(results, is(not(empty())));
+    }
+
+    @Test
+    public void getNumericParametricValues() throws E {
+        final Set<QueryTagInfo> results = parametricValuesService.getNumericParametricValues(createNumericParametricRequest());
+        // TODO: configure some numeric parametric fields to test against
+        assertThat(results, empty());
     }
 
     @Test

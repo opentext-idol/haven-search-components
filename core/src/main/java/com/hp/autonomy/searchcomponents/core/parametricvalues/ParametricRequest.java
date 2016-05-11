@@ -15,6 +15,8 @@ public interface ParametricRequest<S extends Serializable> extends Serializable 
 
     Integer getMaxValues();
 
+    String getSort();
+
     QueryRestrictions<S> getQueryRestrictions();
 
     boolean isModified();
