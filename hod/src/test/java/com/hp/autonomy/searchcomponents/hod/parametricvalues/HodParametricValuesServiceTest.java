@@ -22,6 +22,7 @@ import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +44,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("WeakerAccess")
 @RunWith(MockitoJUnitRunner.class)
 public class HodParametricValuesServiceTest {
     @Mock
@@ -126,6 +128,11 @@ public class HodParametricValuesServiceTest {
         final HodParametricRequest testRequest = generateRequest(indexes, Collections.<String>emptyList());
         final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
         assertThat(fieldNamesSet, is(not(empty())));
+    }
+
+    @Test(expected = NotImplementedException.class)
+    public void dependentParametricValues() throws HodErrorException {
+        parametricValuesService.getDependentParametricValues(new HodParametricRequest.Builder().build());
     }
 
     private HodParametricRequest generateRequest(final List<ResourceIdentifier> indexes, final List<String> fieldNames) {

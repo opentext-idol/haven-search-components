@@ -9,6 +9,8 @@ import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametricValuesServiceIT;
 import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConfiguration;
+import org.apache.commons.lang3.NotImplementedException;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -24,5 +26,11 @@ public class HodParametricValuesServiceIT extends AbstractParametricValuesServic
                 .setFieldNames(Collections.singletonList("WIKIPEDIA_CATEGORY"))
                 .setQueryRestrictions(testUtils.buildQueryRestrictions())
                 .build();
+    }
+
+    @Override
+    @Test(expected = NotImplementedException.class)
+    public void getDependentParametricValues() throws HodErrorException {
+        super.getDependentParametricValues();
     }
 }

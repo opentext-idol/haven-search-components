@@ -18,7 +18,9 @@ import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.types.idol.FlatField;
 import com.hp.autonomy.types.idol.GetQueryTagValuesResponseData;
 import com.hp.autonomy.types.idol.GetTagNamesResponseData;
+import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.idol.TagValue;
+import com.hp.autonomy.types.idol.Values;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -30,6 +32,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -101,6 +104,42 @@ public class IdolParametricValuesServiceTest {
         assertThat(results, is(empty()));
     }
 
+    @Test
+    public void getDependentParametricValues() {
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).build();
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.singletonList("Some field")).setQueryRestrictions(queryRestrictions).build();
+
+        final GetQueryTagValuesResponseData responseData = mockRecursiveResponse();
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        final Collection<RecursiveField> results = parametricValuesService.getDependentParametricValues(idolParametricRequest);
+        assertThat(results, is(not(empty())));
+    }
+
+    @Test
+    public void getDependentValuesFieldNamesFirst() {
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).build();
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.<String>emptyList()).setQueryRestrictions(queryRestrictions).build();
+
+        when(fieldsService.getParametricFields(any(IdolFieldsRequest.class))).thenReturn(Collections.singletonList("CATEGORY"));
+
+        final GetQueryTagValuesResponseData responseData = mockRecursiveResponse();
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+
+        final Collection<RecursiveField> results = parametricValuesService.getDependentParametricValues(idolParametricRequest);
+        assertThat(results, is(not(empty())));
+    }
+
+    @Test
+    public void dependentParametricValuesNotConfigured() {
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).setMaxDate(DateTime.now()).build();
+        final IdolParametricRequest idolParametricRequest = new IdolParametricRequest.Builder().setFieldNames(Collections.<String>emptyList()).setQueryRestrictions(queryRestrictions).build();
+
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(new GetTagNamesResponseData());
+
+        final Collection<RecursiveField> results = parametricValuesService.getDependentParametricValues(idolParametricRequest);
+        assertThat(results, is(empty()));
+    }
+
     private GetQueryTagValuesResponseData mockQueryResponse() {
         final GetQueryTagValuesResponseData responseData = new GetQueryTagValuesResponseData();
         final FlatField field = new FlatField();
@@ -112,6 +151,18 @@ public class IdolParametricValuesServiceTest {
         when(element.getValue()).thenReturn(tagValue);
         field.getValueOrSubvalueOrValues().add(element);
         responseData.getField().add(field);
+        return responseData;
+    }
+
+    private GetQueryTagValuesResponseData mockRecursiveResponse() {
+        final GetQueryTagValuesResponseData responseData = new GetQueryTagValuesResponseData();
+        final RecursiveField field = new RecursiveField();
+        field.setValue("Some field");
+        field.setCount("5");
+        final Values values = new Values();
+        values.getField().add(field);
+        responseData.setValues(values);
+
         return responseData;
     }
 }

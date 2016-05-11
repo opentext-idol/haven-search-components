@@ -22,7 +22,7 @@ import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
 
     @Override
     public List<RecursiveField> getDependentParametricValues(final HodParametricRequest parametricRequest) throws HodErrorException {
-        throw new NotImplementedException();
+        throw new NotImplementedException("Dependent parametric values not yet implemented for hod");
     }
 
     private ResourceIdentifier getQueryProfile() {
