@@ -14,6 +14,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,11 +43,13 @@ public class IdolParametricRequest implements ParametricRequest<String> {
         modified = builder.modified;
     }
 
+    @Component
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @JsonPOJOBuilder(withPrefix = "set")
     @Setter
     @Accessors(chain = true)
     @NoArgsConstructor
-    public static class Builder {
+    public static class Builder implements ParametricRequest.Builder<IdolParametricRequest, String> {
         private List<String> fieldNames = Collections.emptyList();
         private Integer maxValues = MAX_VALUES_DEFAULT;
         private String sort = SortParam.DocumentCount.name();
@@ -59,6 +64,7 @@ public class IdolParametricRequest implements ParametricRequest<String> {
             modified = parametricRequest.isModified();
         }
 
+        @Override
         public IdolParametricRequest build() {
             return new IdolParametricRequest(this);
         }

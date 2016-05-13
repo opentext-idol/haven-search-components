@@ -25,6 +25,7 @@ import com.hp.autonomy.types.idol.TagValue;
 import com.hp.autonomy.types.idol.Values;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,9 +46,7 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyCollectionOf;
-import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -186,7 +185,13 @@ public class IdolParametricValuesServiceTest {
 
     private IdolParametricRequest mockRequest(final List<String> fieldNames) {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).build();
-        return new IdolParametricRequest.Builder().setFieldNames(fieldNames).setQueryRestrictions(queryRestrictions).build();
+        return new IdolParametricRequest.Builder()
+                .setFieldNames(fieldNames)
+                .setQueryRestrictions(queryRestrictions)
+                .setMaxValues(30)
+                .setSort(SortParam.DocumentCount.name())
+                .setModified(true)
+                .build();
     }
 
     private GetQueryTagValuesResponseData mockQueryResponse() {

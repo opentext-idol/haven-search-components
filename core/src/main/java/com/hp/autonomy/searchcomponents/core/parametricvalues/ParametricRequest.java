@@ -20,4 +20,18 @@ public interface ParametricRequest<S extends Serializable> extends Serializable 
     QueryRestrictions<S> getQueryRestrictions();
 
     boolean isModified();
+
+    interface Builder<P extends ParametricRequest<S>, S extends Serializable> {
+        Builder<P, S> setFieldNames(List<String> fieldNames);
+
+        Builder<P, S> setMaxValues(Integer maxValues);
+
+        Builder<P, S> setSort(String sort);
+
+        Builder<P, S> setQueryRestrictions(QueryRestrictions<S> queryRestrictions);
+
+        Builder<P, S> setModified(boolean modified);
+
+        P build();
+    }
 }

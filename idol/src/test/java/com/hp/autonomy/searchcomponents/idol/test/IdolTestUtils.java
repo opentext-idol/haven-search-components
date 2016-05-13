@@ -29,6 +29,7 @@ public class IdolTestUtils implements TestUtils<String> {
                 .setDatabases(getDatabases())
                 .setMinDate(null)
                 .setMaxDate(DateTime.now())
+                .setMinScore(0)
                 .setLanguageType(null)
                 .setAnyLanguage(true)
                 .setStateMatchId(Collections.<String>emptyList())

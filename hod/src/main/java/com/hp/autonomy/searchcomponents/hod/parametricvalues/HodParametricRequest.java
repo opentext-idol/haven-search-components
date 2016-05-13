@@ -13,6 +13,9 @@ import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,11 +42,13 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
         modified = builder.modified;
     }
 
+    @Component
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @JsonPOJOBuilder(withPrefix = "set")
     @Setter
     @Accessors(chain = true)
     @NoArgsConstructor
-    public static class Builder {
+    public static class Builder implements ParametricRequest.Builder<HodParametricRequest, ResourceIdentifier> {
         private List<String> fieldNames = Collections.emptyList();
         private Integer maxValues = MAX_VALUES_DEFAULT;
         private String sort = ParametricSort.document_count.name();
@@ -58,6 +63,7 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
             modified = hodParametricRequest.isModified();
         }
 
+        @Override
         public HodParametricRequest build() {
             return new HodParametricRequest(this);
         }
