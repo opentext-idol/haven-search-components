@@ -30,4 +30,24 @@ public interface QueryRestrictions<S extends Serializable> extends Serializable 
     List<String> getStateDontMatchId();
 
     boolean isAnyLanguage();
+
+    interface Builder<Q extends QueryRestrictions<S>, S extends Serializable> {
+        Builder<Q, S> setQueryText(String queryText);
+
+        Builder<Q, S> setFieldText(String fieldText);
+
+        Builder<Q, S> setDatabases(List<S> databases);
+
+        Builder<Q, S> setMinDate(DateTime minDate);
+
+        Builder<Q, S> setMaxDate(DateTime maxDate);
+
+        Builder<Q, S> setMinScore(Integer minScore);
+
+        Builder<Q, S> setStateMatchId(List<String> stateMatchId);
+
+        Builder<Q, S> setStateDontMatchId(List<String> stateDontMatchId);
+
+        Q build();
+    }
 }

@@ -10,6 +10,8 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Entity;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindRelatedConceptsRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindRelatedConceptsService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
+import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
@@ -23,10 +25,14 @@ import java.util.List;
 @Component
 public class HodRelatedConceptsService implements RelatedConceptsService<Entity, ResourceIdentifier, HodErrorException> {
     private final FindRelatedConceptsService findRelatedConceptsService;
+    private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationRetriever;
 
     @Autowired
-    public HodRelatedConceptsService(final FindRelatedConceptsService findRelatedConceptsService) {
+    public HodRelatedConceptsService(
+            final FindRelatedConceptsService findRelatedConceptsService,
+            final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationRetriever) {
         this.findRelatedConceptsService = findRelatedConceptsService;
+        this.authenticationRetriever = authenticationRetriever;
     }
 
     @Override
@@ -37,7 +43,8 @@ public class HodRelatedConceptsService implements RelatedConceptsService<Entity,
         final FindRelatedConceptsRequestBuilder params = new FindRelatedConceptsRequestBuilder()
                 .setIndexes(queryRestrictions.getDatabases())
                 .setFieldText(queryRestrictions.getFieldText())
-                .setMinScore(queryRestrictions.getMinScore());
+                .setMinScore(queryRestrictions.getMinScore())
+                .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
 
         return findRelatedConceptsService.findRelatedConceptsWithText(queryRestrictions.getQueryText(), params);
     }

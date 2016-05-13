@@ -117,7 +117,8 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
         for (final GetContentRequestIndex<ResourceIdentifier> indexAndReferences : request.getIndexesAndReferences()) {
             final GetContentRequestBuilder builder = new GetContentRequestBuilder()
                     .setPrintFields(documentFieldsService.getPrintFields())
-                    .setSummary(Summary.concept);
+                    .setSummary(Summary.concept)
+                    .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
 
             final List<HodSearchResult> documents = getContentService.getContent(new ArrayList<>(indexAndReferences.getReferences()), indexAndReferences.getIndex(), builder).getDocuments();
             addDomainToSearchResults(contentResults, Collections.singleton(indexAndReferences.getIndex()), documents);
@@ -174,7 +175,8 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
                 .setMinDate(searchRequest.getQueryRestrictions().getMinDate())
                 .setMaxDate(searchRequest.getQueryRestrictions().getMaxDate())
                 .setPrint(Print.fields)
-                .setMinScore(searchRequest.getQueryRestrictions().getMinScore());
+                .setMinScore(searchRequest.getQueryRestrictions().getMinScore())
+                .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
 
         if (print == Print.fields) {
             queryRequestBuilder.setPrintFields(documentFieldsService.getPrintFields());

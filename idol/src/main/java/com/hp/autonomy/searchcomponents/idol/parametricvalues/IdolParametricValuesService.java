@@ -9,8 +9,10 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
+import com.google.common.collect.ImmutableList;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
@@ -21,8 +23,9 @@ import com.hp.autonomy.types.idol.TagValue;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagResponse;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
-import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,12 +38,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("WeakerAccess")
 @Service
 public class IdolParametricValuesService implements ParametricValuesService<IdolParametricRequest, String, AciErrorException> {
     private static final String VALUE_NODE_NAME = "value";
+    private static final Pattern CSV_SEPARATOR_PATTERN = Pattern.compile(",\\s*");
 
     private final HavenSearchAciParameterHandler parameterHandler;
     private final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService;
@@ -67,20 +74,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         if (fieldNames.isEmpty()) {
             results = Collections.emptySet();
         } else {
-            final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
-            parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
-
-            if (parametricRequest.isModified()) {
-                parameterHandler.addQmsParameters(aciParameters, parametricRequest.getQueryRestrictions());
-            }
-
-            aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
-            aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), parametricRequest.getMaxValues());
-            aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
-            aciParameters.add(GetQueryTagValuesParams.Sort.name(), SortParam.DocumentCount.name());
-
-            final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
-            final List<FlatField> fields = responseData.getField();
+            final List<FlatField> fields = getFlatFields(parametricRequest, fieldNames);
             results = new LinkedHashSet<>(fields.size());
             for (final FlatField field : fields) {
                 final List<JAXBElement<? extends Serializable>> valueElements = field.getValueOrSubvalueOrValues();
@@ -94,6 +88,42 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
                 final String fieldName = getFieldNameFromPath(field.getName().get(0));
                 if (!values.isEmpty()) {
                     results.add(new QueryTagInfo(fieldName, values));
+                }
+            }
+        }
+
+        return results;
+    }
+
+    @Override
+    public Set<QueryTagInfo> getNumericParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
+        final Collection<String> fieldNames = new HashSet<>();
+        fieldNames.addAll(parametricRequest.getFieldNames());
+        if (fieldNames.isEmpty()) {
+            final IdolFieldsRequest fieldsRequest = new IdolFieldsRequest.Builder().build();
+            final TagResponse response = fieldsService.getFields(fieldsRequest, ImmutableList.of(FieldTypeParam.Numeric.name(), FieldTypeParam.Parametric.name()));
+            if (response.getParametricTypeFields() != null && response.getNumericTypeFields() != null) {
+                fieldNames.addAll(response.getParametricTypeFields());
+                fieldNames.retainAll(response.getNumericTypeFields());
+            }
+        }
+
+        final Set<QueryTagInfo> results;
+        if (fieldNames.isEmpty()) {
+            results = Collections.emptySet();
+        } else {
+            final List<FlatField> fields = getFlatFields(parametricRequest, fieldNames);
+            results = new LinkedHashSet<>(fields.size());
+            for (final FlatField field : fields) {
+                final Map<Integer, Integer> values = parseNumericFieldValuesToMap(field);
+                final String fieldName = getFieldNameFromPath(field.getName().get(0));
+                if (!values.isEmpty()) {
+                    final Set<QueryTagCountInfo> countInfo = new LinkedHashSet<>(values.size());
+                    for (final Map.Entry<Integer, Integer> entry : values.entrySet()) {
+                        countInfo.add(new QueryTagCountInfo(entry.getKey().toString(), entry.getValue()));
+                    }
+
+                    results.add(new QueryTagInfo(fieldName, countInfo));
                 }
             }
         }
@@ -132,6 +162,45 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         }
 
         return results;
+    }
+
+    private List<FlatField> getFlatFields(final ParametricRequest<String> parametricRequest, final Collection<String> fieldNames) {
+        final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
+        parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
+
+        if (parametricRequest.isModified()) {
+            parameterHandler.addQmsParameters(aciParameters, parametricRequest.getQueryRestrictions());
+        }
+
+        aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
+        aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), parametricRequest.getMaxValues());
+        aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
+        aciParameters.add(GetQueryTagValuesParams.Sort.name(), parametricRequest.getSort());
+
+        final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
+        return responseData.getField();
+    }
+
+    private Map<Integer, Integer> parseNumericFieldValuesToMap(final FlatField field) {
+        final List<JAXBElement<? extends Serializable>> valueElements = field.getValueOrSubvalueOrValues();
+        final Map<Integer, Integer> values = new TreeMap<>();
+        for (final JAXBElement<?> element : valueElements) {
+            if (VALUE_NODE_NAME.equals(element.getName().getLocalPart())) {
+                final TagValue tagValue = (TagValue) element.getValue();
+                // Numeric fields are permitted to contain a csv of numbers as a value
+                final String[] csv = CSV_SEPARATOR_PATTERN.split(tagValue.getValue());
+                final Integer count = tagValue.getCount();
+                for (final String value : csv) {
+                    final int numericValue = Integer.parseInt(value);
+                    if (values.containsKey(numericValue)) {
+                        values.put(numericValue, values.get(numericValue) + count);
+                    } else {
+                        values.put(numericValue, count);
+                    }
+                }
+            }
+        }
+        return values;
     }
 
     private String getFieldNameFromPath(final String value) {

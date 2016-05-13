@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
+import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,10 +29,24 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
     protected TestUtils<S> testUtils;
 
     protected abstract R createParametricRequest();
+    protected abstract R createNumericParametricRequest();
 
     @Test
     public void getAllParametricValues() throws E {
         final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(createParametricRequest());
+        assertThat(results, is(not(empty())));
+    }
+
+    @Test
+    public void getNumericParametricValues() throws E {
+        final Set<QueryTagInfo> results = parametricValuesService.getNumericParametricValues(createNumericParametricRequest());
+        // TODO: configure some numeric parametric fields to test against
+        assertThat(results, empty());
+    }
+
+    @Test
+    public void getDependentParametricValues() throws E {
+        final Collection<RecursiveField> results = parametricValuesService.getDependentParametricValues(createParametricRequest());
         assertThat(results, is(not(empty())));
     }
 }
