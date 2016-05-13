@@ -130,7 +130,8 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
                 .setText(parametricRequest.getQueryRestrictions().getQueryText())
                 .setFieldText(parametricRequest.getQueryRestrictions().getFieldText())
                 .setMaxValues(parametricRequest.getMaxValues())
-                .setMinScore(parametricRequest.getQueryRestrictions().getMinScore());
+                .setMinScore(parametricRequest.getQueryRestrictions().getMinScore())
+                .setSecurityInfo(authenticationInformationRetriever.getPrincipal().getSecurityInfo());
 
         return getParametricValuesService.getParametricValues(fieldNames,
                 new ArrayList<>(parametricRequest.getQueryRestrictions().getDatabases()), parametricParams);
