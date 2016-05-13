@@ -6,8 +6,10 @@
 package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsResponse;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldNames;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
@@ -22,6 +24,9 @@ import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagResponse;
+import org.apache.commons.lang3.NotImplementedException;
+import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,18 +36,24 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("WeakerAccess")
 @RunWith(MockitoJUnitRunner.class)
 public class HodParametricValuesServiceTest {
     @Mock
@@ -128,11 +139,66 @@ public class HodParametricValuesServiceTest {
         assertThat(fieldNamesSet, is(not(empty())));
     }
 
+    @Test
+    public void getNumericParametricValues() throws HodErrorException {
+        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericField"));
+
+        final FieldNames responseData = mockNumericQueryResponse();
+        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
+        final Set<QueryTagInfo> results = parametricValuesService.getNumericParametricValues(parametricRequest);
+        MatcherAssert.assertThat(results, is(not(empty())));
+        final Set<QueryTagCountInfo> countInfo = results.iterator().next().getValues();
+        final Iterator<QueryTagCountInfo> iterator = countInfo.iterator();
+        assertEquals(new QueryTagCountInfo("0", 3), iterator.next());
+        assertEquals(new QueryTagCountInfo("4", 5), iterator.next());
+        assertEquals(new QueryTagCountInfo("5", 1), iterator.next());
+        assertEquals(new QueryTagCountInfo("12", 2), iterator.next());
+    }
+
+    @Test
+    public void getNumericFieldNamesFirst() throws HodErrorException {
+        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.<String>emptyList());
+
+        final TagResponse tagResponse = new RetrieveIndexFieldsResponse.Builder()
+                .setNumericTypeFields(ImmutableList.of("NumericField", "ParametricNumericField"))
+                .setParametricTypeFields(ImmutableList.of("ParametricField", "ParametricNumericField"))
+                .build();
+        when(fieldsService.getFields(any(HodFieldsRequest.class), anyCollectionOf(String.class))).thenReturn(tagResponse);
+
+        final FieldNames responseData = mockNumericQueryResponse();
+        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
+
+        final Set<QueryTagInfo> results = parametricValuesService.getNumericParametricValues(parametricRequest);
+        MatcherAssert.assertThat(results, is(not(empty())));
+    }
+
+    @Test
+    public void numericParametricValuesNotConfigured() throws HodErrorException {
+        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.<String>emptyList());
+
+        when(fieldsService.getFields(any(HodFieldsRequest.class), anyCollectionOf(String.class))).thenReturn(new RetrieveIndexFieldsResponse.Builder().build());
+        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(new FieldNames.Builder().build());
+
+        final Set<QueryTagInfo> results = parametricValuesService.getNumericParametricValues(parametricRequest);
+        MatcherAssert.assertThat(results, is(empty()));
+    }
+
+    @Test(expected = NotImplementedException.class)
+    public void dependentParametricValues() throws HodErrorException {
+        parametricValuesService.getDependentParametricValues(new HodParametricRequest.Builder().build());
+    }
+
     private HodParametricRequest generateRequest(final List<ResourceIdentifier> indexes, final List<String> fieldNames) {
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = new HodQueryRestrictions.Builder().setDatabases(indexes).build();
         return new HodParametricRequest.Builder()
                 .setFieldNames(fieldNames)
                 .setQueryRestrictions(queryRestrictions)
+                .build();
+    }
+
+    private FieldNames mockNumericQueryResponse() {
+        return new FieldNames.Builder()
+                .addParametricValue("numericParametricValue", ImmutableMap.of("0", 1, "0, 4, 12", 2, "4", 3, "5", 1))
                 .build();
     }
 

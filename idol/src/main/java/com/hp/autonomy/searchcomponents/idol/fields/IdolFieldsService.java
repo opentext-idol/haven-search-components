@@ -18,7 +18,6 @@ import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagResponse;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetTagNamesParams;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -27,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 @Service
 public class IdolFieldsService implements FieldsService<IdolFieldsRequest, AciErrorException> {
     private final AciService contentAciService;
@@ -46,7 +46,34 @@ public class IdolFieldsService implements FieldsService<IdolFieldsRequest, AciEr
 
     @Override
     public TagResponse getFields(final IdolFieldsRequest request, final Collection<String> fieldTypes) throws AciErrorException {
-        throw new NotImplementedException("Not yet supported for on premise implementations");
+        final IdolTagResponse.IdolTagResponseBuilder builder = IdolTagResponse.builder();
+        for (final String type : fieldTypes) {
+            final FieldTypeParam fieldType = FieldTypeParam.fromValue(type);
+            final List<String> tagNames = getTagNames(request, fieldType);
+            //noinspection EnumSwitchStatementWhichMissesCases
+            switch (fieldType) {
+                case Date:
+                    builder.setDateTypeFields(tagNames);
+                    break;
+                case Index:
+                    builder.setIndexTypeFields(tagNames);
+                    break;
+                case Numeric:
+                    builder.setNumericTypeFields(tagNames);
+                    break;
+                case Parametric:
+                    builder.setParametricTypeFields(tagNames);
+                    break;
+                case Reference:
+                    builder.setReferenceTypeFields(tagNames);
+                    break;
+                default:
+                    break;
+                // TODO figure out what to do with the other field types
+            }
+        }
+
+        return builder.build();
     }
 
     private List<String> getTagNames(final FieldsRequest request, final FieldTypeParam fieldType) {

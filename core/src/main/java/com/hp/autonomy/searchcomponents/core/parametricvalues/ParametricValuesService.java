@@ -16,6 +16,8 @@ public interface ParametricValuesService<R extends ParametricRequest<S>, S exten
 
     Set<QueryTagInfo> getAllParametricValues(R parametricRequest) throws E;
 
+    Set<QueryTagInfo> getNumericParametricValues(R parametricRequest) throws E;
+
     List<RecursiveField> getDependentParametricValues(R parametricRequest) throws E;
 
 }
