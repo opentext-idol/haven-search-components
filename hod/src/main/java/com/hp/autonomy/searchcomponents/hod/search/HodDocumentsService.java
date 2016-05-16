@@ -128,12 +128,12 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     }
 
     @Override
-    public String getStateToken(final QueryRestrictions<ResourceIdentifier> queryRestrictions, final int maxResults) throws HodErrorException {
+    public String getStateToken(final QueryRestrictions<ResourceIdentifier> queryRestrictions, final int maxResults, final boolean promotions) throws HodErrorException {
         throw new NotImplementedException("State tokens are not yet retrievable from Haven OnDemand");
     }
 
     @Override
-    public StateTokenAndResultCount getStateTokenAndResultCount(final QueryRestrictions<ResourceIdentifier> queryRestrictions, final int maxResults) throws HodErrorException {
+    public StateTokenAndResultCount getStateTokenAndResultCount(final QueryRestrictions<ResourceIdentifier> queryRestrictions, final int maxResults, final boolean promotions) throws HodErrorException {
         throw new NotImplementedException("State tokens are not yet retrievable from Haven OnDemand");
     }
 
