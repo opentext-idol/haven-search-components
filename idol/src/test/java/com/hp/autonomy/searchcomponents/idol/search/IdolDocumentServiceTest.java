@@ -159,7 +159,7 @@ public class IdolDocumentServiceTest {
     public void getStateToken() {
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockStateTokenResponse());
 
-        final String stateToken = idolDocumentService.getStateToken(mockQueryParams().getQueryRestrictions(), 3);
+        final String stateToken = idolDocumentService.getStateToken(mockQueryParams().getQueryRestrictions(), 3, false);
         assertThat(stateToken, is(MOCK_STATE_TOKEN));
     }
 
@@ -167,8 +167,8 @@ public class IdolDocumentServiceTest {
     public void getStateTokenAndResultCount() {
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockStateTokenResponse());
 
-        final StateTokenAndResultCount stateTokenAndResultCount = idolDocumentService.getStateTokenAndResultCount(mockQueryParams().getQueryRestrictions(), 3);
-        assertThat(stateTokenAndResultCount.getStateToken(), is(MOCK_STATE_TOKEN));
+        final StateTokenAndResultCount stateTokenAndResultCount = idolDocumentService.getStateTokenAndResultCount(mockQueryParams().getQueryRestrictions(), 3, false);
+        assertThat(stateTokenAndResultCount.getTypedStateToken().getStateToken(), is(MOCK_STATE_TOKEN));
         assertThat(stateTokenAndResultCount.getResultCount(), is((long) MOCK_TOTAL_HITS));
     }
 

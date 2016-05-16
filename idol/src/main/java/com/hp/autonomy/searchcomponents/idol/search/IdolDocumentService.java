@@ -104,25 +104,28 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
     }
 
     @Override
-    public String getStateToken(final QueryRestrictions<String> queryRestrictions, final int maxResults) throws AciErrorException {
-        return getStateTokenAndResultCount(queryRestrictions, maxResults).getStateToken();
+    public String getStateToken(final QueryRestrictions<String> queryRestrictions, final int maxResults, final boolean promotions) throws AciErrorException {
+        return getStateTokenAndResultCount(queryRestrictions, maxResults, promotions).getTypedStateToken().getStateToken();
     }
 
     @Override
-    public StateTokenAndResultCount getStateTokenAndResultCount(final QueryRestrictions<String> queryRestrictions, final int maxResults) throws AciErrorException {
+    public StateTokenAndResultCount getStateTokenAndResultCount(final QueryRestrictions<String> queryRestrictions, final int maxResults, final boolean promotions) throws AciErrorException {
         final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
         aciParameters.add(QueryParams.StoreState.name(), true);
         aciParameters.add(QueryParams.StoredStateTokenLifetime.name(), -1);  // negative value means no expiry (DAH)
         aciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         aciParameters.add(QueryParams.MaxResults.name(), maxResults);
 
-        // No promotion or QMS related parameters added; at the time of writing, QMS does not fully support stored state
+        if (promotions) {
+            aciParameters.add(QmsQueryParams.Promotions.name(), true);
+        }
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
 
         // Unset combine=simple for state token generation
         aciParameters.remove(QueryParams.Combine.name());
 
         final QueryResponseData responseData = contentAciService.executeAction(aciParameters, queryResponseProcessor);
+        final TypedStateToken tokenData = new TypedStateToken(responseData.getState(), promotions ? TypedStateToken.StateTokenType.PROMOTIONS : TypedStateToken.StateTokenType.QUERY);
 
         // Now fetch result count with combine=simple
         final AciParameters resultCountAciParameters = new AciParameters(QueryActions.Query.name());
@@ -132,7 +135,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
         parameterHandler.addSearchRestrictions(resultCountAciParameters, queryRestrictions);
         final QueryResponseData resultCountResponseData = contentAciService.executeAction(resultCountAciParameters, queryResponseProcessor);
 
-        return new StateTokenAndResultCount(responseData.getState(), resultCountResponseData.getTotalhits());
+        return new StateTokenAndResultCount(tokenData, resultCountResponseData.getTotalhits());
     }
 
     private Documents<IdolSearchResult> queryTextIndex(final AciService aciService, final SearchRequest<String> searchRequest, final boolean promotions) {

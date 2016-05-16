@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.search.AbstractDocumentServiceIT;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
+import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,8 +24,12 @@ import static org.junit.Assert.assertThat;
 public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<String, IdolSearchResult, AciErrorException> {
     @Test
     public void getStateTokenAndResultCount() {
-        final StateTokenAndResultCount stateTokenAndResultCount = documentsService.getStateTokenAndResultCount(integrationTestUtils.buildQueryRestrictions(), 3);
+        final StateTokenAndResultCount stateTokenAndResultCount = documentsService.getStateTokenAndResultCount(integrationTestUtils.buildQueryRestrictions(), 3, false);
         assertThat(stateTokenAndResultCount.getResultCount(), is(greaterThan(0L)));
-        assertThat(stateTokenAndResultCount.getStateToken(), not(isEmptyOrNullString()));
+
+        final TypedStateToken typedStateToken = stateTokenAndResultCount.getTypedStateToken();
+        assertThat(typedStateToken, notNullValue());
+        assertThat(typedStateToken.getStateToken(), is(not(isEmptyOrNullString())));
+        assertThat(typedStateToken.getType(), is(notNullValue()));
     }
 }

@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class StateTokenAndResultCount {
-    private final String stateToken;
+    private final TypedStateToken typedStateToken;
     private final long resultCount;
 }

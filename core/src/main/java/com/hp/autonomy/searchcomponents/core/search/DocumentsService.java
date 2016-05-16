@@ -23,8 +23,8 @@ public interface DocumentsService<S extends Serializable, D extends SearchResult
 
     List<D> getDocumentContent(GetContentRequest<S> request) throws E;
 
-    String getStateToken(QueryRestrictions<S> queryRestrictions, int maxResults) throws E;
+    String getStateToken(QueryRestrictions<S> queryRestrictions, int maxResults, boolean promotions) throws E;
 
-    StateTokenAndResultCount getStateTokenAndResultCount(QueryRestrictions<S> queryRestrictions, int maxResults) throws E;
+    StateTokenAndResultCount getStateTokenAndResultCount(QueryRestrictions<S> queryRestrictions, int maxResults, boolean promotions) throws E;
 
 }

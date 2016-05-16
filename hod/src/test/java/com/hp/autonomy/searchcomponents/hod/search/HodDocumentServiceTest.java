@@ -188,7 +188,7 @@ public class HodDocumentServiceTest {
 
     @Test(expected = NotImplementedException.class)
     public void getStateToken() throws HodErrorException {
-        documentsService.getStateToken(testUtils.buildQueryRestrictions(), 30);
+        documentsService.getStateToken(testUtils.buildQueryRestrictions(), 30, false);
     }
 
     private void validateResults(final Documents<HodSearchResult> results) {
