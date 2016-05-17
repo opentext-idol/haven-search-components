@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<autnresponse>
+    <action>GETSTATUS</action>
+    <response>SUCCESS</response>
+    <responsedata>
+        <name>Stats Server</name>
+        <aciport>19870</aciport>
+        <eventport>19871</eventport>
+        <version>10.8.0</version>
+        <build>1182474</build>
+        <eventfield>queryinfo/idolname</eventfield>
+        <idols>
+            <number>2</number>
+            <idol>
+                <name>Agentstore</name>
+                <numstats>1</numstats>
+                <stat>
+                    <name>DynamicAgentCount</name>
+                    <period>100</period>
+                    <type>Count</type>
+                    <dynamic>true</dynamic>
+                </stat>
+            </idol>
+            <idol>
+                <name>Content</name>
+                <numstats>2</numstats>
+                <stat>
+                    <name>ContentCount</name>
+                    <period>1000</period>
+                    <type>Count</type>
+                    <dynamic>false</dynamic>
+                </stat>
+                <stat>
+                    <name>ContentTopN</name>
+                    <period>86400</period>
+                    <type>TopN</type>
+                    <dynamic>false</dynamic>
+                </stat>
+            </idol>
+        </idols>
+        <time>1414421541</time>
+    </responsedata>
+</autnresponse>

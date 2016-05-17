@@ -28,7 +28,7 @@ public class StatisticProcessorTest {
 
     @Test
     public void processesXml() throws XMLStreamException {
-        final XMLStreamReader reader = XmlTestUtils.getResourceAsXMLStreamReader("/get-status-response.xml");
+        final XMLStreamReader reader = XmlTestUtils.getResourceAsXMLStreamReader("/stats-server-get-status-response.xml");
         final Set<Statistic> statistics = processor.process(reader);
 
         assertThat(statistics, hasSize(3));
