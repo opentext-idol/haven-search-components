@@ -5,7 +5,7 @@
     <parent>
         <artifactId>haven-search-components</artifactId>
         <groupId>com.hp.autonomy.frontend</groupId>
-        <version>0.17.0</version>
+        <version>0.18.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -67,6 +67,12 @@
             <artifactId>haven-search-components-core</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hp.autonomy.test.xml</groupId>
+            <artifactId>xml-test-utils</artifactId>
+            <version>1.0.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

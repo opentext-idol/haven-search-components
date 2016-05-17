@@ -45,7 +45,7 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
     @Override
     public HodSearchResult deserialize(final JsonParser jsonParser, final DeserializationContext deserializationContext) throws IOException {
         final FieldsInfo fieldsInfo = configService.getConfig().getFieldsInfo();
-        final Map<String, FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfigByName();
+        final Map<String, FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfig();
 
         final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
@@ -61,7 +61,15 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
                         values.add(value);
                     }
 
-                    fieldMap.put(fieldInfo.getId(), new FieldInfo<>(fieldInfo.getId(), Collections.singleton(name), fieldInfo.getType(), values));
+                    if (!fieldMap.containsKey(fieldInfo.getId())){
+                        fieldMap.put(fieldInfo.getId(), new FieldInfo<>(fieldInfo.getId(), Collections.singleton(name), fieldInfo.getType(), values));
+                    }
+                    else {
+                        final FieldInfo<?> existingFieldInfo = fieldMap.get(fieldInfo.getId());
+                        //noinspection unchecked
+                        ((List<Object>) existingFieldInfo.getValues()).addAll(values);
+                        existingFieldInfo.getNames().add(name);
+                    }
                 }
             }
         }

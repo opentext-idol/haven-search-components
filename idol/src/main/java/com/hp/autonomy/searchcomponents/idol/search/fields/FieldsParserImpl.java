@@ -24,7 +24,9 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,12 @@ public class FieldsParserImpl implements FieldsParser {
                 fieldMap = new HashMap<>(childNodes.getLength());
 
                 parseAllFields(fieldConfig, childNodes, fieldMap, docContent.getNodeName());
-
+                for (final FieldInfo<?> fieldInfo : fieldMap.values()) {
+                    //noinspection SuspiciousMethodCalls
+                    fieldInfo.getNames().removeAll(Collections.singleton(null));
+                    //noinspection SuspiciousMethodCalls
+                    fieldInfo.getValues().removeAll(Collections.singleton(null));
+                }
                 qmsId = parseField(docContent, IdolDocumentFieldsService.QMS_ID_FIELD_INFO, String.class);
                 promotionCategory = determinePromotionCategory(docContent, hit.getPromotionname(), hit.getDatabase());
             }
@@ -77,10 +84,15 @@ public class FieldsParserImpl implements FieldsParser {
                     final FieldType fieldType = fieldInfo.getType();
                     final Object value = fieldType.parseValue(fieldType.getType(), stringValue);
                     if (fieldMap.containsKey(id)) {
-                        //noinspection unchecked,CastToConcreteClass
-                        ((FieldInfo<Object>) fieldMap.get(id)).getValues().add(value);
+                        final List<String> names = fieldInfo.getNames();
+                        //noinspection unchecked
+                        final FieldInfo<Object> objectFieldInfo = (FieldInfo<Object>) fieldMap.get(id);
+                        objectFieldInfo.getValues().add(names.indexOf(name), value);
+                        objectFieldInfo.getNames().add(names.indexOf(name), name);
                     } else {
-                        fieldMap.put(id, new FieldInfo<>(id, Collections.singletonList(name), fieldInfo.getType(), value));
+                        final ArrayList<String> names = new ArrayList<>(fieldInfo.getNames().size());
+                        names.add(name);
+                        fieldMap.put(id, new FieldInfo<>(id, names, fieldInfo.getType(), value));
                     }
                 }
             } else if (node.getChildNodes().getLength() > 0) {
