@@ -77,8 +77,18 @@ public class FieldsParserImpl implements FieldsParser {
                     final FieldType fieldType = fieldInfo.getType();
                     final Object value = fieldType.parseValue(fieldType.getType(), stringValue);
                     if (fieldMap.containsKey(id)) {
-                        //noinspection unchecked,CastToConcreteClass
-                        ((FieldInfo<Object>) fieldMap.get(id)).getValues().add(value);
+                        final String savedName = fieldMap.get(id).getNames().get(0);
+                        final List<String> names = fieldInfo.getNames();
+                        //noinspection unchecked
+                        final FieldInfo<Object> objectFieldInfo = (FieldInfo<Object>) fieldMap.get(id);
+                        if (names.indexOf(savedName) > names.indexOf(name)) {
+                            objectFieldInfo.getValues().add(0, value);
+                            objectFieldInfo.getNames().set(0, name);
+                        }
+                        else {
+                            objectFieldInfo.getValues().add(value);
+                            objectFieldInfo.getNames().add(name);
+                        }
                     } else {
                         fieldMap.put(id, new FieldInfo<>(id, Collections.singletonList(name), fieldInfo.getType(), value));
                     }
