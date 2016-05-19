@@ -116,10 +116,10 @@ public class IdolParametricValuesServiceTest {
         assertThat(results, is(not(empty())));
         final Set<QueryTagCountInfo> countInfo = results.iterator().next().getValues();
         final Iterator<QueryTagCountInfo> iterator = countInfo.iterator();
-        assertEquals(new QueryTagCountInfo("0", 3), iterator.next());
-        assertEquals(new QueryTagCountInfo("4", 5), iterator.next());
-        assertEquals(new QueryTagCountInfo("5", 1), iterator.next());
-        assertEquals(new QueryTagCountInfo("12", 2), iterator.next());
+        assertEquals(new QueryTagCountInfo("0.0", 3), iterator.next());
+        assertEquals(new QueryTagCountInfo("4.0", 5), iterator.next());
+        assertEquals(new QueryTagCountInfo("5.1", 1), iterator.next());
+        assertEquals(new QueryTagCountInfo("12.0", 2), iterator.next());
     }
 
     @Test
@@ -214,7 +214,7 @@ public class IdolParametricValuesServiceTest {
         final TagValue tagValue1 = mockTagValue("0", 1);
         final TagValue tagValue2 = mockTagValue("0, 4, 12", 2);
         final TagValue tagValue3 = mockTagValue("4", 3);
-        final TagValue tagValue4 = mockTagValue("5", 1);
+        final TagValue tagValue4 = mockTagValue("5.1", 1);
         when(element.getValue()).thenReturn(tagValue1).thenReturn(tagValue2).thenReturn(tagValue3).thenReturn(tagValue4);
         final List<JAXBElement<? extends Serializable>> values = field.getValueOrSubvalueOrValues();
         values.add(element);
