@@ -115,11 +115,11 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
             final List<FlatField> fields = getFlatFields(parametricRequest, fieldNames);
             results = new LinkedHashSet<>(fields.size());
             for (final FlatField field : fields) {
-                final Map<Integer, Integer> values = parseNumericFieldValuesToMap(field);
+                final Map<Double, Integer> values = parseNumericFieldValuesToMap(field);
                 final String fieldName = getFieldNameFromPath(field.getName().get(0));
                 if (!values.isEmpty()) {
                     final Set<QueryTagCountInfo> countInfo = new LinkedHashSet<>(values.size());
-                    for (final Map.Entry<Integer, Integer> entry : values.entrySet()) {
+                    for (final Map.Entry<Double, Integer> entry : values.entrySet()) {
                         countInfo.add(new QueryTagCountInfo(entry.getKey().toString(), entry.getValue()));
                     }
 
@@ -181,9 +181,9 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         return responseData.getField();
     }
 
-    private Map<Integer, Integer> parseNumericFieldValuesToMap(final FlatField field) {
+    private Map<Double, Integer> parseNumericFieldValuesToMap(final FlatField field) {
         final List<JAXBElement<? extends Serializable>> valueElements = field.getValueOrSubvalueOrValues();
-        final Map<Integer, Integer> values = new TreeMap<>();
+        final Map<Double, Integer> values = new TreeMap<>();
         for (final JAXBElement<?> element : valueElements) {
             if (VALUE_NODE_NAME.equals(element.getName().getLocalPart())) {
                 final TagValue tagValue = (TagValue) element.getValue();
@@ -191,7 +191,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
                 final String[] csv = CSV_SEPARATOR_PATTERN.split(tagValue.getValue());
                 final Integer count = tagValue.getCount();
                 for (final String value : csv) {
-                    final int numericValue = Integer.parseInt(value);
+                    final double numericValue = Double.parseDouble(value);
                     if (values.containsKey(numericValue)) {
                         values.put(numericValue, values.get(numericValue) + count);
                     } else {

@@ -149,10 +149,10 @@ public class HodParametricValuesServiceTest {
         MatcherAssert.assertThat(results, is(not(empty())));
         final Set<QueryTagCountInfo> countInfo = results.iterator().next().getValues();
         final Iterator<QueryTagCountInfo> iterator = countInfo.iterator();
-        assertEquals(new QueryTagCountInfo("0", 3), iterator.next());
-        assertEquals(new QueryTagCountInfo("4", 5), iterator.next());
-        assertEquals(new QueryTagCountInfo("5", 1), iterator.next());
-        assertEquals(new QueryTagCountInfo("12", 2), iterator.next());
+        assertEquals(new QueryTagCountInfo("0.0", 3), iterator.next());
+        assertEquals(new QueryTagCountInfo("4.0", 5), iterator.next());
+        assertEquals(new QueryTagCountInfo("5.1", 1), iterator.next());
+        assertEquals(new QueryTagCountInfo("12.0", 2), iterator.next());
     }
 
     @Test
@@ -198,7 +198,7 @@ public class HodParametricValuesServiceTest {
 
     private FieldNames mockNumericQueryResponse() {
         return new FieldNames.Builder()
-                .addParametricValue("numericParametricValue", ImmutableMap.of("0", 1, "0, 4, 12", 2, "4", 3, "5", 1))
+                .addParametricValue("numericParametricValue", ImmutableMap.of("0", 1, "0, 4, 12", 2, "4", 3, "5.1", 1))
                 .build();
     }
 
