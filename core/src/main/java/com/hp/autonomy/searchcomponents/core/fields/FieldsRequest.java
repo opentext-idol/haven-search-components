@@ -9,4 +9,8 @@ import java.io.Serializable;
 
 public interface FieldsRequest extends Serializable {
     Integer getMaxValues();
+
+    interface Builder<F extends FieldsRequest> {
+        F build();
+    }
 }

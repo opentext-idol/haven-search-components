@@ -5,10 +5,8 @@
 
 package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 
-import com.google.common.collect.ImmutableList;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
-import com.hp.autonomy.hod.client.api.textindex.query.fields.FieldType;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldNames;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
@@ -25,7 +23,7 @@ import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagResponse;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -35,6 +33,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class HodParametricValuesService implements ParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> {
@@ -61,7 +60,7 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
         final Collection<String> fieldNames = new HashSet<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
-            fieldNames.addAll(fieldsService.getParametricFields(new HodFieldsRequest.Builder().setDatabases(parametricRequest.getQueryRestrictions().getDatabases()).build()));
+            fieldNames.addAll(fieldsService.getFields(new HodFieldsRequest.Builder().setDatabases(parametricRequest.getQueryRestrictions().getDatabases()).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric));
         }
 
         final Set<QueryTagInfo> results;
@@ -90,11 +89,9 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
             final HodFieldsRequest fieldsRequest = new HodFieldsRequest.Builder().setDatabases(parametricRequest.getQueryRestrictions().getDatabases()).build();
-            final TagResponse response = fieldsService.getFields(fieldsRequest, ImmutableList.of(FieldType.numeric.name(), FieldType.parametric.name()));
-            if (response.getParametricTypeFields() != null && response.getNumericTypeFields() != null) {
-                fieldNames.addAll(response.getParametricTypeFields());
-                fieldNames.retainAll(response.getNumericTypeFields());
-            }
+            final Map<FieldTypeParam, List<String>> response = fieldsService.getFields(fieldsRequest, FieldTypeParam.Numeric, FieldTypeParam.Parametric);
+            fieldNames.addAll(response.get(FieldTypeParam.Parametric));
+            fieldNames.retainAll(response.get(FieldTypeParam.Numeric));
         }
 
         final Set<QueryTagInfo> results;
@@ -107,6 +104,37 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
             results = new LinkedHashSet<>();
             for (final String name : fieldNamesSet) {
                 final Set<QueryTagCountInfo> values = new LinkedHashSet<>(parametricFieldNames.getValuesAndCountsForNumericField(name));
+                if (!values.isEmpty()) {
+                    results.add(new QueryTagInfo(name, values));
+                }
+            }
+        }
+
+        return results;
+    }
+
+    @Override
+    @Cacheable(CacheNames.DATE_PARAMETRIC_VALUES)
+    public Set<QueryTagInfo> getDateParametricValues(final HodParametricRequest parametricRequest) throws HodErrorException {
+        final Collection<String> fieldNames = new HashSet<>();
+        fieldNames.addAll(parametricRequest.getFieldNames());
+        if (fieldNames.isEmpty()) {
+            final HodFieldsRequest fieldsRequest = new HodFieldsRequest.Builder().setDatabases(parametricRequest.getQueryRestrictions().getDatabases()).build();
+            final Map<FieldTypeParam, List<String>> response = fieldsService.getFields(fieldsRequest, FieldTypeParam.NumericDate, FieldTypeParam.Parametric);
+            fieldNames.addAll(response.get(FieldTypeParam.Parametric));
+            fieldNames.retainAll(response.get(FieldTypeParam.NumericDate));
+        }
+
+        final Set<QueryTagInfo> results;
+        if (fieldNames.isEmpty()) {
+            results = Collections.emptySet();
+        } else {
+            final FieldNames parametricFieldNames = getParametricValues(parametricRequest, fieldNames);
+            final Set<String> fieldNamesSet = parametricFieldNames.getFieldNames();
+
+            results = new LinkedHashSet<>();
+            for (final String name : fieldNamesSet) {
+                final Set<QueryTagCountInfo> values = new LinkedHashSet<>(parametricFieldNames.getValuesAndCountsForDateField(name));
                 if (!values.isEmpty()) {
                     results.add(new QueryTagInfo(name, values));
                 }
