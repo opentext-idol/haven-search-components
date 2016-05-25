@@ -15,6 +15,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -30,11 +33,13 @@ public class HodFieldsRequest implements FieldsRequest {
     private Collection<ResourceIdentifier> databases = Collections.emptySet();
     private Integer maxValues;
 
+    @Component
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @JsonPOJOBuilder(withPrefix = "set")
     @Setter
     @Accessors(chain = true)
     @NoArgsConstructor
-    public static class Builder {
+    public static class Builder implements FieldsRequest.Builder<HodFieldsRequest> {
         private Collection<ResourceIdentifier> databases = Collections.emptySet();
         private Integer maxValues;
 
@@ -43,6 +48,7 @@ public class HodFieldsRequest implements FieldsRequest {
             maxValues = fieldsRequest.getMaxValues();
         }
 
+        @Override
         public HodFieldsRequest build() {
             return new HodFieldsRequest(databases, maxValues);
         }

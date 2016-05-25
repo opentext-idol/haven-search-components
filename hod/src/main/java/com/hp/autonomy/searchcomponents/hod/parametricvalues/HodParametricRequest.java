@@ -8,10 +8,12 @@ package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
-import com.hp.autonomy.hod.client.api.textindex.query.parametric.ParametricSort;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import lombok.*;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -30,7 +32,7 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
 
     private final List<String> fieldNames;
     private final Integer maxValues;
-    private final String sort;
+    private final SortParam sort;
     private final QueryRestrictions<ResourceIdentifier> queryRestrictions;
     private final boolean modified;
 
@@ -51,7 +53,7 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
     public static class Builder implements ParametricRequest.Builder<HodParametricRequest, ResourceIdentifier> {
         private List<String> fieldNames = Collections.emptyList();
         private Integer maxValues = MAX_VALUES_DEFAULT;
-        private String sort = ParametricSort.document_count.name();
+        private SortParam sort = SortParam.DocumentCount;
         private QueryRestrictions<ResourceIdentifier> queryRestrictions;
         private boolean modified = true;
 

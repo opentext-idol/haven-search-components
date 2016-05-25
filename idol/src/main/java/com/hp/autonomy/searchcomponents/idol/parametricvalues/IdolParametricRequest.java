@@ -31,7 +31,7 @@ public class IdolParametricRequest implements ParametricRequest<String> {
 
     private final List<String> fieldNames;
     private final Integer maxValues;
-    private final String sort;
+    private final SortParam sort;
     private final QueryRestrictions<String> queryRestrictions;
     private final boolean modified;
 
@@ -52,7 +52,7 @@ public class IdolParametricRequest implements ParametricRequest<String> {
     public static class Builder implements ParametricRequest.Builder<IdolParametricRequest, String> {
         private List<String> fieldNames = Collections.emptyList();
         private Integer maxValues = MAX_VALUES_DEFAULT;
-        private String sort = SortParam.DocumentCount.name();
+        private SortParam sort = SortParam.DocumentCount;
         private QueryRestrictions<String> queryRestrictions;
         private boolean modified = true;
 

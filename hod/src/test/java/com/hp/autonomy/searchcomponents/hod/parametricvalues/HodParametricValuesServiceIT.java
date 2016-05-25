@@ -9,30 +9,19 @@ import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametricValuesServiceIT;
 import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConfiguration;
+import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Collections;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = HavenSearchHodConfiguration.class)
-public class HodParametricValuesServiceIT extends AbstractParametricValuesServiceIT<HodParametricRequest, ResourceIdentifier, HodErrorException> {
+public class HodParametricValuesServiceIT extends AbstractParametricValuesServiceIT<HodParametricRequest, HodFieldsRequest, HodFieldsRequest.Builder, ResourceIdentifier, HodErrorException> {
     @Override
-    protected HodParametricRequest createParametricRequest() {
-        return new HodParametricRequest.Builder()
-                .setFieldNames(Collections.singletonList("WIKIPEDIA_CATEGORY"))
-                .setQueryRestrictions(testUtils.buildQueryRestrictions())
-                .build();
-    }
-
-    @Override
-    protected HodParametricRequest createNumericParametricRequest() {
-        return new HodParametricRequest.Builder()
-                .setQueryRestrictions(testUtils.buildQueryRestrictions())
-                .build();
+    protected HodFieldsRequest.Builder fieldsRequestParams(final HodFieldsRequest.Builder fieldsRequestBuilder) {
+        return fieldsRequestBuilder.setDatabases(testUtils.getDatabases());
     }
 
     @Override

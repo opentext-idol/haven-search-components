@@ -14,9 +14,13 @@ import java.util.Set;
 
 public interface ParametricValuesService<R extends ParametricRequest<S>, S extends Serializable, E extends Exception> {
 
+    String AUTN_DATE_FIELD = "AUTN_DATE";
+
     Set<QueryTagInfo> getAllParametricValues(R parametricRequest) throws E;
 
     Set<QueryTagInfo> getNumericParametricValues(R parametricRequest) throws E;
+
+    Set<QueryTagInfo> getDateParametricValues(R parametricRequest) throws E;
 
     List<RecursiveField> getDependentParametricValues(R parametricRequest) throws E;
 

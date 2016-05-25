@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,7 +16,7 @@ public interface ParametricRequest<S extends Serializable> extends Serializable 
 
     Integer getMaxValues();
 
-    String getSort();
+    SortParam getSort();
 
     QueryRestrictions<S> getQueryRestrictions();
 
@@ -26,7 +27,7 @@ public interface ParametricRequest<S extends Serializable> extends Serializable 
 
         Builder<P, S> setMaxValues(Integer maxValues);
 
-        Builder<P, S> setSort(String sort);
+        Builder<P, S> setSort(SortParam sort);
 
         Builder<P, S> setQueryRestrictions(QueryRestrictions<S> queryRestrictions);
 

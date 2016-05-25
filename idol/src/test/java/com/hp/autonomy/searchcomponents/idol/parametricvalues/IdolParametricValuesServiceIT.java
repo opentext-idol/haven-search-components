@@ -6,32 +6,19 @@
 package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
 import com.autonomy.aci.client.services.AciErrorException;
+import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametricValuesServiceIT;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
+import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = HavenSearchIdolConfiguration.class)
-public class IdolParametricValuesServiceIT extends AbstractParametricValuesServiceIT<IdolParametricRequest, String, AciErrorException> {
+public class IdolParametricValuesServiceIT extends AbstractParametricValuesServiceIT<IdolParametricRequest, IdolFieldsRequest, IdolFieldsRequest.Builder, String, AciErrorException> {
     @Override
-    protected IdolParametricRequest createParametricRequest() {
-        return new IdolParametricRequest.Builder()
-                .setFieldNames(new ArrayList<>(Arrays.asList("AUTHOR", "CATEGORY")))
-                .setQueryRestrictions(testUtils.buildQueryRestrictions())
-                .build();
-    }
-
-    @Override
-    protected IdolParametricRequest createNumericParametricRequest() {
-        return new IdolParametricRequest.Builder()
-                .setFieldNames(new ArrayList<>(Collections.<String>emptyList()))
-                .setQueryRestrictions(testUtils.buildQueryRestrictions())
-                .build();
+    protected FieldsRequest.Builder<IdolFieldsRequest> fieldsRequestParams(final IdolFieldsRequest.Builder fieldsRequestBuilder) {
+        return fieldsRequestBuilder;
     }
 }

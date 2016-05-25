@@ -9,7 +9,6 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.google.common.collect.ImmutableList;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
@@ -23,10 +22,11 @@ import com.hp.autonomy.types.idol.TagValue;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagResponse;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +48,7 @@ import java.util.regex.Pattern;
 public class IdolParametricValuesService implements ParametricValuesService<IdolParametricRequest, String, AciErrorException> {
     private static final String VALUE_NODE_NAME = "value";
     private static final Pattern CSV_SEPARATOR_PATTERN = Pattern.compile(",\\s*");
+    private static final String IDOL_PARAMETRIC_DATE_FORMAT = "hh:mm:ss dd/MM/yyyy";
 
     private final HavenSearchAciParameterHandler parameterHandler;
     private final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService;
@@ -67,7 +68,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         final Collection<String> fieldNames = new HashSet<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
-            fieldNames.addAll(fieldsService.getParametricFields(new IdolFieldsRequest.Builder().build()));
+            fieldNames.addAll(fieldsService.getFields(new IdolFieldsRequest.Builder().build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric));
         }
 
         final Set<QueryTagInfo> results;
@@ -101,11 +102,9 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
             final IdolFieldsRequest fieldsRequest = new IdolFieldsRequest.Builder().build();
-            final TagResponse response = fieldsService.getFields(fieldsRequest, ImmutableList.of(FieldTypeParam.Numeric.name(), FieldTypeParam.Parametric.name()));
-            if (response.getParametricTypeFields() != null && response.getNumericTypeFields() != null) {
-                fieldNames.addAll(response.getParametricTypeFields());
-                fieldNames.retainAll(response.getNumericTypeFields());
-            }
+            final Map<FieldTypeParam, List<String>> response = fieldsService.getFields(fieldsRequest, FieldTypeParam.Numeric, FieldTypeParam.Parametric);
+            fieldNames.addAll(response.get(FieldTypeParam.Parametric));
+            fieldNames.retainAll(response.get(FieldTypeParam.Numeric));
         }
 
         final Set<QueryTagInfo> results;
@@ -132,11 +131,50 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
     }
 
     @Override
+    public Set<QueryTagInfo> getDateParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
+        final Collection<String> fieldNames = new HashSet<>();
+        fieldNames.addAll(parametricRequest.getFieldNames());
+        if (fieldNames.isEmpty()) {
+            final IdolFieldsRequest fieldsRequest = new IdolFieldsRequest.Builder().build();
+            final Map<FieldTypeParam, List<String>> response = fieldsService.getFields(fieldsRequest, FieldTypeParam.NumericDate, FieldTypeParam.Parametric);
+            fieldNames.addAll(response.get(FieldTypeParam.Parametric));
+            fieldNames.retainAll(response.get(FieldTypeParam.NumericDate));
+            fieldNames.add(AUTN_DATE_FIELD);
+        }
+
+        final Set<QueryTagInfo> results;
+        if (fieldNames.isEmpty()) {
+            results = Collections.emptySet();
+        } else {
+            final List<FlatField> fields = getFlatFields(parametricRequest, fieldNames);
+            results = new LinkedHashSet<>(fields.size());
+            for (final FlatField field : fields) {
+                final List<JAXBElement<? extends Serializable>> valueElements = field.getValueOrSubvalueOrValues();
+                final LinkedHashSet<QueryTagCountInfo> values = new LinkedHashSet<>(valueElements.size());
+                for (final JAXBElement<?> element : valueElements) {
+                    if (VALUE_NODE_NAME.equals(element.getName().getLocalPart())) {
+                        final TagValue tagValue = (TagValue) element.getValue();
+                        final String stringDate = tagValue.getDate();
+                        final DateTime date = DateTime.parse(stringDate, DateTimeFormat.forPattern(IDOL_PARAMETRIC_DATE_FORMAT).withZoneUTC());
+                        values.add(new QueryTagCountInfo(String.valueOf(date.getMillis()), tagValue.getCount()));
+                    }
+                }
+                final String fieldName = getFieldNameFromPath(field.getName().get(0));
+                if (!values.isEmpty()) {
+                    results.add(new QueryTagInfo(fieldName, values));
+                }
+            }
+        }
+
+        return results;
+    }
+
+    @Override
     public List<RecursiveField> getDependentParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
         final Collection<String> fieldNames = new ArrayList<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
-            fieldNames.addAll(fieldsService.getParametricFields(new IdolFieldsRequest.Builder().build()));
+            fieldNames.addAll(fieldsService.getFields(new IdolFieldsRequest.Builder().build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric));
         }
 
         final List<RecursiveField> results;
