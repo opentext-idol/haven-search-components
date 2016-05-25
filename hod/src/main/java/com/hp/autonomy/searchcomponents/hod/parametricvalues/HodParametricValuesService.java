@@ -154,7 +154,7 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
 
         final GetParametricValuesRequestBuilder parametricParams = new GetParametricValuesRequestBuilder()
                 .setQueryProfile(queryProfile)
-                .setSort(ParametricSort.valueOf(parametricRequest.getSort()))
+                .setSort(ParametricSort.fromParam(parametricRequest.getSort()))
                 .setText(parametricRequest.getQueryRestrictions().getQueryText())
                 .setFieldText(parametricRequest.getQueryRestrictions().getFieldText())
                 .setMaxValues(parametricRequest.getMaxValues())

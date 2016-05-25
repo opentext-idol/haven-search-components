@@ -233,7 +233,7 @@ public class IdolParametricValuesServiceTest {
                 .setFieldNames(fieldNames)
                 .setQueryRestrictions(queryRestrictions)
                 .setMaxValues(30)
-                .setSort(SortParam.DocumentCount.name())
+                .setSort(SortParam.DocumentCount)
                 .setModified(true)
                 .build();
     }
