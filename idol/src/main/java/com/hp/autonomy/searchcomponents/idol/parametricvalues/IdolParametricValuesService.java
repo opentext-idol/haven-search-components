@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
 public class IdolParametricValuesService implements ParametricValuesService<IdolParametricRequest, String, AciErrorException> {
     private static final String VALUE_NODE_NAME = "value";
     private static final Pattern CSV_SEPARATOR_PATTERN = Pattern.compile(",\\s*");
-    private static final String IDOL_PARAMETRIC_DATE_FORMAT = "hh:mm:ss dd/MM/yyyy";
+    private static final String IDOL_PARAMETRIC_DATE_FORMAT = "HH:mm:ss dd/MM/yyyy";
 
     private final HavenSearchAciParameterHandler parameterHandler;
     private final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService;
