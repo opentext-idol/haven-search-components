@@ -5,9 +5,8 @@
 
 package com.hp.autonomy.searchcomponents.core.fields;
 
-import com.google.common.collect.ImmutableList;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagResponse;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -30,14 +30,8 @@ public abstract class AbstractFieldsServiceIT<R extends FieldsRequest, S extends
     protected abstract R createFieldsRequest();
 
     @Test
-    public void getParametricFields() throws E {
-        final List<String> results = fieldsService.getParametricFields(createFieldsRequest());
-        assertThat(results, is(not(empty())));
-    }
-
-    @Test
     public void getFields() throws E {
-        final TagResponse results = fieldsService.getFields(createFieldsRequest(), ImmutableList.of("parametric"));
-        assertThat(results.getParametricTypeFields(), is(not(empty())));
+        final Map<FieldTypeParam, List<String>> results = fieldsService.getFields(createFieldsRequest(), FieldTypeParam.Parametric);
+        assertThat(results.get(FieldTypeParam.Parametric), is(not(empty())));
     }
 }

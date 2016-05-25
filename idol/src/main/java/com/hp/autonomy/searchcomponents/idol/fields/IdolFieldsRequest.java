@@ -14,6 +14,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings("FieldMayBeFinal")
 @Data
@@ -25,17 +28,20 @@ public class IdolFieldsRequest implements FieldsRequest {
 
     private Integer maxValues;
 
+    @Component
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @JsonPOJOBuilder(withPrefix = "set")
     @Setter
     @Accessors(chain = true)
     @NoArgsConstructor
-    public static class Builder {
+    public static class Builder implements FieldsRequest.Builder<IdolFieldsRequest> {
         private Integer maxValues;
 
         public Builder(final FieldsRequest fieldsRequest) {
             maxValues = fieldsRequest.getMaxValues();
         }
 
+        @Override
         public IdolFieldsRequest build() {
             return new IdolFieldsRequest(maxValues);
         }

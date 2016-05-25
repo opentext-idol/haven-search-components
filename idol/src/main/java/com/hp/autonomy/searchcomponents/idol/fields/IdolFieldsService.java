@@ -15,7 +15,6 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.types.idol.GetTagNamesResponseData;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagResponse;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetTagNamesParams;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
 @Service
@@ -39,41 +39,14 @@ public class IdolFieldsService implements FieldsService<IdolFieldsRequest, AciEr
     }
 
     @Override
-    @Cacheable(CacheNames.PARAMETRIC_FIELDS)
-    public List<String> getParametricFields(final IdolFieldsRequest request) throws AciErrorException {
-        return getTagNames(request, FieldTypeParam.Parametric);
-    }
-
-    @Override
-    public TagResponse getFields(final IdolFieldsRequest request, final Collection<String> fieldTypes) throws AciErrorException {
-        final IdolTagResponse.IdolTagResponseBuilder builder = IdolTagResponse.builder();
-        for (final String type : fieldTypes) {
-            final FieldTypeParam fieldType = FieldTypeParam.fromValue(type);
-            final List<String> tagNames = getTagNames(request, fieldType);
-            //noinspection EnumSwitchStatementWhichMissesCases
-            switch (fieldType) {
-                case Date:
-                    builder.setDateTypeFields(tagNames);
-                    break;
-                case Index:
-                    builder.setIndexTypeFields(tagNames);
-                    break;
-                case Numeric:
-                    builder.setNumericTypeFields(tagNames);
-                    break;
-                case Parametric:
-                    builder.setParametricTypeFields(tagNames);
-                    break;
-                case Reference:
-                    builder.setReferenceTypeFields(tagNames);
-                    break;
-                default:
-                    break;
-                // TODO figure out what to do with the other field types
-            }
+    @Cacheable(CacheNames.FIELDS)
+    public Map<FieldTypeParam, List<String>> getFields(final IdolFieldsRequest request, final FieldTypeParam... fieldTypes) throws AciErrorException {
+        final Map<FieldTypeParam, List<String>> results = new EnumMap<>(FieldTypeParam.class);
+        for (final FieldTypeParam fieldType : fieldTypes) {
+            results.put(fieldType, getTagNames(request, fieldType));
         }
 
-        return builder.build();
+        return results;
     }
 
     private List<String> getTagNames(final FieldsRequest request, final FieldTypeParam fieldType) {

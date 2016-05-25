@@ -63,7 +63,7 @@ public class QueryResponseParserImpl implements QueryResponseParser {
             documents = rerunQueryWithAdjustedSpelling(aciParameters, responseData, spellingQuery, warnings, queryExecutor);
         } else {
             final List<IdolSearchResult> results = parseQueryHits(hits);
-            documents = new Documents<>(results, responseData.getTotalhits(), null, null, null, warnings);
+            documents = new Documents<>(results, responseData.getTotalhits(), responseData.getExpandedQuery(), null, null, warnings);
         }
 
         return documents;

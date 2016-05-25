@@ -10,6 +10,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFields
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsResponse;
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -40,10 +42,10 @@ public class HodFieldsServiceTest {
     }
 
     @Test
-    public void getParametricFields() throws HodErrorException {
+    public void getFields() throws HodErrorException {
         final RetrieveIndexFieldsResponse response = new RetrieveIndexFieldsResponse.Builder().setParametricTypeFields(Collections.singletonList("CATEGORY")).build();
         when(retrieveIndexFieldsService.retrieveIndexFields(anyListOf(ResourceIdentifier.class), any(RetrieveIndexFieldsRequestBuilder.class))).thenReturn(response);
-        final List<String> results = fieldsService.getParametricFields(new HodFieldsRequest.Builder().setDatabases(Collections.singletonList(ResourceIdentifier.WIKI_ENG)).setMaxValues(null).build());
-        assertThat(results, is(not(empty())));
+        final Map<FieldTypeParam, List<String>> results = fieldsService.getFields(new HodFieldsRequest.Builder().setDatabases(Collections.singletonList(ResourceIdentifier.WIKI_ENG)).setMaxValues(null).build(), FieldTypeParam.Parametric);
+        assertThat(results.get(FieldTypeParam.Parametric), is(not(empty())));
     }
 }

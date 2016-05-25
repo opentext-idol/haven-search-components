@@ -5,15 +5,13 @@
 
 package com.hp.autonomy.searchcomponents.core.fields;
 
-import com.hp.autonomy.types.requests.idol.actions.tags.TagResponse;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface FieldsService<R extends FieldsRequest, E extends Exception> {
 
-    List<String> getParametricFields(final R request) throws E;
-
-    TagResponse getFields(final R request, final Collection<String> fieldTypes) throws E;
+    Map<FieldTypeParam, List<String>> getFields(final R request, final FieldTypeParam... fieldTypes) throws E;
 
 }
