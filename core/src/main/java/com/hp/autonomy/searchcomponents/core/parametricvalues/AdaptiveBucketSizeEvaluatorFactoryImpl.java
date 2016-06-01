@@ -13,7 +13,8 @@ public class AdaptiveBucketSizeEvaluatorFactoryImpl implements AdaptiveBucketSiz
     public BucketSizeEvaluator getBucketSizeEvaluator(final double maxValue, final double minValue, final int targetNumberOfBuckets) {
         BucketSizeEvaluator bucketSizeEvaluator = new IntegerBucketSizeEvaluator(maxValue, minValue, targetNumberOfBuckets);
         final double numberOfBuckets = (bucketSizeEvaluator.adjustMax(maxValue) - bucketSizeEvaluator.adjustMin(minValue)) / bucketSizeEvaluator.getBucketSize();
-        if (numberOfBuckets < targetNumberOfBuckets / 2) {
+        final int minimumAcceptableNumberOfBuckets = targetNumberOfBuckets / 2;
+        if (numberOfBuckets < minimumAcceptableNumberOfBuckets) {
             bucketSizeEvaluator = new ContinuousBucketSizeEvaluator(maxValue, minValue, targetNumberOfBuckets);
         }
 
