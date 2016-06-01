@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Configuration;
  * Defines Spring beans required for using this module
  */
 @Configuration
-@ComponentScan("com.hp.autonomy.searchcomponents.hod")
+@ComponentScan({"com.hp.autonomy.searchcomponents.core", "com.hp.autonomy.searchcomponents.hod"})
 public class HavenSearchHodConfiguration {
     @Autowired
     private HodServiceConfig<EntityType.Combined, TokenType.Simple> hodServiceConfig;

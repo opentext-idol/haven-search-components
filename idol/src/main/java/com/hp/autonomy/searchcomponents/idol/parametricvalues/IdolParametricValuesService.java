@@ -14,6 +14,8 @@ import com.hp.autonomy.aci.content.ranges.Ranges;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.AdaptiveBucketSizeEvaluatorFactory;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketSizeEvaluator;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
@@ -60,13 +62,19 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
     private final HavenSearchAciParameterHandler parameterHandler;
     private final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService;
     private final AciService contentAciService;
+    private final AdaptiveBucketSizeEvaluatorFactory bucketSizeEvaluatorFactory;
     private final Processor<GetQueryTagValuesResponseData> queryTagValuesResponseProcessor;
 
     @Autowired
-    public IdolParametricValuesService(final HavenSearchAciParameterHandler parameterHandler, final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService, final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    public IdolParametricValuesService(final HavenSearchAciParameterHandler parameterHandler,
+                                       final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService,
+                                       final AciService contentAciService,
+                                       final AciResponseJaxbProcessorFactory aciResponseProcessorFactory,
+                                       final AdaptiveBucketSizeEvaluatorFactory bucketSizeEvaluatorFactory) {
         this.parameterHandler = parameterHandler;
         this.fieldsService = fieldsService;
         this.contentAciService = contentAciService;
+        this.bucketSizeEvaluatorFactory = bucketSizeEvaluatorFactory;
         queryTagValuesResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(GetQueryTagValuesResponseData.class);
     }
 
@@ -184,8 +192,8 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
                 }
             }
 
-            final double bucketSize = Math.ceil((maxValue - minValue + 1) / targetNumberOfBuckets);
-            responseMap.put(fieldName, new RangeInfo(fieldName, count, minValue, maxValue, bucketSize, null));
+            final BucketSizeEvaluator bucketSizeEvaluator = bucketSizeEvaluatorFactory.getBucketSizeEvaluator(maxValue, minValue, targetNumberOfBuckets);
+            responseMap.put(fieldName, new RangeEvaluationMetadata(fieldName, count, minValue, maxValue, bucketSizeEvaluator));
         }
         return responseMap;
     }
@@ -193,7 +201,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
     private List<Range> generateRanges(final Map<String, RangeInfo> responseMap, final int targetNumberOfBuckets) {
         final List<Range> ranges = new ArrayList<>(responseMap.size());
         for (final RangeInfo rangeInfo : responseMap.values()) {
-            double value = Math.floor(rangeInfo.getMin());
+            double value = rangeInfo.getMin();
             final List<Double> boundaries = new ArrayList<>(targetNumberOfBuckets);
             boundaries.add(value);
             while ((value += rangeInfo.getBucketSize()) <= rangeInfo.getMax()) {
@@ -219,8 +227,6 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         for (final FlatField field : flatFields) {
             final String fieldName = getFieldNameFromPath(field.getName().get(0));
             final RangeInfo metadata = responseMap.get(fieldName);
-            final double roundedMin = Math.floor(metadata.getMin());
-            final double roundedMax = Math.floor(metadata.getMax()) + 1;
 
             final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
             final Map<Double, RangeInfo.Value> values = new TreeMap<>();
@@ -228,13 +234,13 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
                 if (VALUE_NODE_NAME.equals(element.getName().getLocalPart())) {
                     final TagValue tagValue = (TagValue) element.getValue();
                     final String[] rangeValues = tagValue.getValue().split(",");
-                    final double min = NumberUtils.toDouble(rangeValues[0], roundedMin);
-                    final double max = rangeValues.length > 1 ? Double.parseDouble(rangeValues[1]) : roundedMax;
+                    final double min = NumberUtils.toDouble(rangeValues[0], metadata.getMin());
+                    final double max = rangeValues.length > 1 ? Double.parseDouble(rangeValues[1]) : metadata.getMax();
                     values.put(min, new RangeInfo.Value(tagValue.getCount(), min, max));
                 }
             }
 
-            for (double d = roundedMin; d < roundedMax; d += metadata.getBucketSize()) {
+            for (double d = metadata.getMin(); d < metadata.getMax(); d += metadata.getBucketSize()) {
                 if (!values.containsKey(d)) {
                     values.put(d, new RangeInfo.Value(0, d, d + metadata.getBucketSize()));
                 }
@@ -267,5 +273,30 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
 
     private String getFieldNameFromPath(final String value) {
         return value.contains("/") ? value.substring(value.lastIndexOf('/') + 1) : value;
+    }
+
+    private static class RangeEvaluationMetadata extends RangeInfo {
+        private static final long serialVersionUID = 495955207236656362L;
+        @SuppressWarnings("TransientFieldNotInitialized")
+        protected final transient BucketSizeEvaluator bucketSizeEvaluator;
+
+        private RangeEvaluationMetadata(final String name,
+                                        final int count,
+                                        final double min,
+                                        final double max,
+                                        final BucketSizeEvaluator bucketSizeEvaluator) {
+            super(name, count, min, max, bucketSizeEvaluator.getBucketSize(), null);
+            this.bucketSizeEvaluator = bucketSizeEvaluator;
+        }
+
+        @Override
+        public double getMin() {
+            return bucketSizeEvaluator.adjustMin(super.getMin());
+        }
+
+        @Override
+        public double getMax() {
+            return bucketSizeEvaluator.adjustMax(super.getMax());
+        }
     }
 }

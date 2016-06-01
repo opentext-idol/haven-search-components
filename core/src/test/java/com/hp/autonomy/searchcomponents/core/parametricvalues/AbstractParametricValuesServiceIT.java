@@ -67,7 +67,7 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
 
     private R createParametricRequest() throws E {
         return parametricRequestBuilder
-                .setFieldNames(fieldsService.getFields(fieldsRequestParams(fieldsRequestBuilder).build()).get(FieldTypeParam.Parametric))
+                .setFieldNames(fieldsService.getFields(fieldsRequestParams(fieldsRequestBuilder).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric))
                 .setQueryRestrictions(testUtils.buildQueryRestrictions())
                 .build();
     }

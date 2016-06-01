@@ -16,6 +16,8 @@ import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.AdaptiveBucketSizeEvaluatorFactory;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketSizeEvaluator;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
@@ -42,17 +44,19 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
     private final GetParametricValuesService getParametricValuesService;
     private final ConfigService<? extends HodSearchCapable> configService;
     private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
+    private final AdaptiveBucketSizeEvaluatorFactory bucketSizeEvaluatorFactory;
 
     public HodParametricValuesService(
             final FieldsService<HodFieldsRequest, HodErrorException> fieldsService,
             final GetParametricValuesService getParametricValuesService,
             final ConfigService<? extends HodSearchCapable> configService,
-            final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever
-    ) {
+            final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever,
+            final AdaptiveBucketSizeEvaluatorFactory bucketSizeEvaluatorFactory) {
         this.fieldsService = fieldsService;
         this.getParametricValuesService = getParametricValuesService;
         this.configService = configService;
         this.authenticationInformationRetriever = authenticationInformationRetriever;
+        this.bucketSizeEvaluatorFactory = bucketSizeEvaluatorFactory;
     }
 
     @Override
@@ -91,44 +95,50 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
 
         final List<RangeInfo> ranges = new ArrayList<>(numericFieldInfo.size());
         for (final QueryTagInfo queryTagInfo : numericFieldInfo) {
-            final Set<QueryTagCountInfo> numericFieldValuesWithCount = queryTagInfo.getValues();
-            final double minContinuousValue = Double.parseDouble(numericFieldValuesWithCount.iterator().next().getValue());
-            final double minValue = Math.floor(minContinuousValue);
-            final double maxContinuousValue = Double.parseDouble(numericFieldValuesWithCount.toArray(new QueryTagCountInfo[numericFieldValuesWithCount.size()])[numericFieldValuesWithCount.size() - 1].getValue());
-            final double maxValue = Math.floor(maxContinuousValue) + 1;
-            final double bucketSize = Math.ceil((maxValue - minValue + 1) / targetNumberOfBuckets);
-
-            final List<RangeInfo.Value> buckets = new ArrayList<>(targetNumberOfBuckets);
-            final Iterator<QueryTagCountInfo> iterator = numericFieldValuesWithCount.iterator();
-
-            QueryTagCountInfo valueAndCount = null;
-            double boundaryValue = minValue;
-            int totalCount = 0;
-            for (int i = -1; i < targetNumberOfBuckets && (valueAndCount == null || Double.parseDouble(valueAndCount.getValue()) < maxContinuousValue); i++) {
-                while (iterator.hasNext() && Double.parseDouble((valueAndCount = iterator.next()).getValue()) < boundaryValue) {
-                    final int count = valueAndCount.getCount();
-                    totalCount += count;
-                    buckets.get(i).addData(count);
-                }
-
-                while (valueAndCount != null && Double.parseDouble(valueAndCount.getValue()) >= boundaryValue + bucketSize) {
-                    buckets.add(new RangeInfo.Value(0, boundaryValue, boundaryValue += bucketSize));
-                }
-
-                if (valueAndCount != null) {
-                    final double value = Double.parseDouble(valueAndCount.getValue());
-                    if (iterator.hasNext() || value >= boundaryValue) {
-                        final int count = valueAndCount.getCount();
-                        totalCount += count;
-                        buckets.add(new RangeInfo.Value(count, boundaryValue, Math.min(boundaryValue += bucketSize, maxValue)));
-                    }
-                }
-            }
-
-            ranges.add(new RangeInfo(queryTagInfo.getName(), totalCount, minContinuousValue, maxContinuousValue, bucketSize, buckets));
+            getNumericParametricValuesInBucketsForField(targetNumberOfBuckets, ranges, queryTagInfo);
         }
 
         return ranges;
+    }
+
+    private void getNumericParametricValuesInBucketsForField(final int targetNumberOfBuckets, final Collection<RangeInfo> ranges, final QueryTagInfo queryTagInfo) {
+        final Set<QueryTagCountInfo> numericFieldValuesWithCount = queryTagInfo.getValues();
+        final double maxContinuousValue = Double.parseDouble(numericFieldValuesWithCount.toArray(new QueryTagCountInfo[numericFieldValuesWithCount.size()])[numericFieldValuesWithCount.size() - 1].getValue());
+        final double minContinuousValue = Double.parseDouble(numericFieldValuesWithCount.iterator().next().getValue());
+
+        final BucketSizeEvaluator bucketSizeEvaluator = bucketSizeEvaluatorFactory.getBucketSizeEvaluator(maxContinuousValue, minContinuousValue, targetNumberOfBuckets);
+        final double maxValue = bucketSizeEvaluator.adjustMax(maxContinuousValue);
+        final double minValue = bucketSizeEvaluator.adjustMin(minContinuousValue);
+        final double bucketSize = bucketSizeEvaluator.getBucketSize();
+
+        final List<RangeInfo.Value> buckets = new ArrayList<>(targetNumberOfBuckets);
+        final Iterator<QueryTagCountInfo> iterator = numericFieldValuesWithCount.iterator();
+
+        QueryTagCountInfo valueAndCount = null;
+        double boundaryValue = minValue;
+        int totalCount = 0;
+        for (int i = -1; i < targetNumberOfBuckets && (valueAndCount == null || Double.parseDouble(valueAndCount.getValue()) < maxContinuousValue); i++) {
+            while (iterator.hasNext() && Double.parseDouble((valueAndCount = iterator.next()).getValue()) < boundaryValue) {
+                final int count = valueAndCount.getCount();
+                totalCount += count;
+                buckets.get(i).addData(count);
+            }
+
+            while (valueAndCount != null && Double.parseDouble(valueAndCount.getValue()) >= boundaryValue + bucketSize) {
+                buckets.add(new RangeInfo.Value(0, boundaryValue, boundaryValue += bucketSize));
+            }
+
+            if (valueAndCount != null) {
+                final double value = Double.parseDouble(valueAndCount.getValue());
+                if (iterator.hasNext() || value >= boundaryValue) {
+                    final int count = valueAndCount.getCount();
+                    totalCount += count;
+                    buckets.add(new RangeInfo.Value(count, boundaryValue, Math.min(boundaryValue += bucketSize, maxValue)));
+                }
+            }
+        }
+
+        ranges.add(new RangeInfo(queryTagInfo.getName(), totalCount, minValue, maxValue, bucketSize, buckets));
     }
 
     private Set<QueryTagInfo> getNumericParametricValues(final ParametricRequest<ResourceIdentifier> parametricRequest) throws HodErrorException {

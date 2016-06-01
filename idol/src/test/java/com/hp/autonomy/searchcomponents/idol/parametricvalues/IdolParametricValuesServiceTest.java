@@ -12,6 +12,7 @@ import com.autonomy.aci.client.transport.AciParameter;
 import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.AdaptiveBucketSizeEvaluatorFactoryImpl;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
@@ -71,7 +72,7 @@ public class IdolParametricValuesServiceTest {
 
     @Before
     public void setUp() {
-        parametricValuesService = new IdolParametricValuesService(parameterHandler, fieldsService, contentAciService, aciResponseProcessorFactory);
+        parametricValuesService = new IdolParametricValuesService(parameterHandler, fieldsService, contentAciService, aciResponseProcessorFactory, new AdaptiveBucketSizeEvaluatorFactoryImpl());
     }
 
     @Test
@@ -119,7 +120,7 @@ public class IdolParametricValuesServiceTest {
         final List<RangeInfo.Value> countInfo = info.getValues();
         assertEquals(8, info.getCount());
         assertEquals(1f, info.getMin(), 0);
-        assertEquals(21f, info.getMax(), 0);
+        assertEquals(22f, info.getMax(), 0);
         final Iterator<RangeInfo.Value> iterator = countInfo.iterator();
         assertEquals(new RangeInfo.Value(5, 1, 6), iterator.next());
         assertEquals(new RangeInfo.Value(2, 6, 11), iterator.next());
