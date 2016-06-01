@@ -10,16 +10,18 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
 import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -48,22 +50,13 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
     }
 
     @Test
-    public void getNumericParametricValues() throws E {
-        final Set<QueryTagInfo> results = parametricValuesService.getNumericParametricValues(parametricRequestBuilder
-                .setFieldNames(new ArrayList<>(Collections.<String>emptyList()))
-                .setQueryRestrictions(testUtils.buildQueryRestrictions())
-                .build());
-        // TODO: configure some numeric parametric fields to test against
-        assertThat(results, empty());
-    }
-
-    @Test
-    public void getDateParametricValues() throws E {
-        final Set<QueryTagInfo> results = parametricValuesService.getDateParametricValues(parametricRequestBuilder
+    public void ranges() throws E {
+        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(parametricRequestBuilder
                 .setFieldNames(Collections.singletonList(ParametricValuesService.AUTN_DATE_FIELD))
                 .setQueryRestrictions(testUtils.buildQueryRestrictions())
-                .build());
-        assertThat(results, not(empty()));
+                .setSort(SortParam.ReverseDate)
+                .build(), 35);
+        assertThat(ranges, not(empty()));
     }
 
     @Test

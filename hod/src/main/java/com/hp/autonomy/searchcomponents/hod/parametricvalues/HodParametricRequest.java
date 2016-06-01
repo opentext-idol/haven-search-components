@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
@@ -33,6 +34,7 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
     private final List<String> fieldNames;
     private final Integer maxValues;
     private final SortParam sort;
+    private final List<Range> ranges;
     private final QueryRestrictions<ResourceIdentifier> queryRestrictions;
     private final boolean modified;
 
@@ -40,6 +42,7 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
         fieldNames = builder.fieldNames;
         maxValues = builder.maxValues;
         sort = builder.sort;
+        ranges = builder.ranges;
         queryRestrictions = builder.queryRestrictions;
         modified = builder.modified;
     }
@@ -54,6 +57,7 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
         private List<String> fieldNames = Collections.emptyList();
         private Integer maxValues = MAX_VALUES_DEFAULT;
         private SortParam sort = SortParam.DocumentCount;
+        private List<Range> ranges;
         private QueryRestrictions<ResourceIdentifier> queryRestrictions;
         private boolean modified = true;
 
@@ -61,6 +65,7 @@ public class HodParametricRequest implements ParametricRequest<ResourceIdentifie
             fieldNames = hodParametricRequest.getFieldNames();
             maxValues = hodParametricRequest.getMaxValues();
             sort = hodParametricRequest.getSort();
+            ranges = hodParametricRequest.getRanges();
             queryRestrictions = hodParametricRequest.getQueryRestrictions();
             modified = hodParametricRequest.isModified();
         }

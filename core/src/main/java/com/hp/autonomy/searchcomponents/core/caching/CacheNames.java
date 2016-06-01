@@ -10,8 +10,7 @@ public interface CacheNames {
     String RELATED_CONCEPTS = "related-concepts";
     String GET_DOCUMENT_CONTENT = "get-content";
     String FIELDS = "fields";
-    String DATE_PARAMETRIC_VALUES = "date-parametric-values";
-    String NUMERIC_PARAMETRIC_VALUES = "numeric-parametric-values";
     String PARAMETRIC_VALUES = "parametric-values";
+    String PARAMETRIC_VALUES_IN_BUCKETS = "parametric-values-in-buckets";
     String TYPE_AHEAD = "type-ahead";
 }

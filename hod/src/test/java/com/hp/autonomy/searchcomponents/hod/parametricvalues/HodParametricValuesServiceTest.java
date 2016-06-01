@@ -23,6 +23,7 @@ import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hamcrest.MatcherAssert;
@@ -141,85 +142,54 @@ public class HodParametricValuesServiceTest {
     }
 
     @Test
-    public void getNumericParametricValues() throws HodErrorException {
-        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericField"));
-
-        final FieldNames responseData = mockNumericQueryResponse();
+    public void getNumericParametricValuesInBuckets() throws HodErrorException {
+        final HodParametricRequest idolParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
+        final FieldNames responseData = mockNumericQueryResponse(ImmutableMap.of("1", 1, "1,3", 2, "6,9", 1, "12", 1, "21", 1));
         when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
-        final Set<QueryTagInfo> results = parametricValuesService.getNumericParametricValues(parametricRequest);
+        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, 5);
         MatcherAssert.assertThat(results, is(not(empty())));
-        final Set<QueryTagCountInfo> countInfo = results.iterator().next().getValues();
-        final Iterator<QueryTagCountInfo> iterator = countInfo.iterator();
-        assertEquals(new QueryTagCountInfo("0.0", 3), iterator.next());
-        assertEquals(new QueryTagCountInfo("4.0", 5), iterator.next());
-        assertEquals(new QueryTagCountInfo("5.1", 1), iterator.next());
-        assertEquals(new QueryTagCountInfo("12.0", 2), iterator.next());
+        final RangeInfo info = results.iterator().next();
+        final List<RangeInfo.Value> countInfo = info.getValues();
+        assertEquals(9, info.getCount());
+        assertEquals(1f, info.getMin(), 0);
+        assertEquals(21f, info.getMax(), 0);
+        final Iterator<RangeInfo.Value> iterator = countInfo.iterator();
+        assertEquals(new RangeInfo.Value(5, 1, 6), iterator.next());
+        assertEquals(new RangeInfo.Value(2, 6, 11), iterator.next());
+        assertEquals(new RangeInfo.Value(1, 11, 16), iterator.next());
+        assertEquals(new RangeInfo.Value(0, 16, 21), iterator.next());
+        assertEquals(new RangeInfo.Value(1, 21, 22), iterator.next());
     }
 
     @Test
-    public void getNumericFieldNamesFirst() throws HodErrorException {
-        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.<String>emptyList());
-
-        final Map<FieldTypeParam, List<String>> response = ImmutableMap.<FieldTypeParam, List<String>>of(FieldTypeParam.Numeric, ImmutableList.of("NumericField", "ParametricNumericField"), FieldTypeParam.Parametric, ImmutableList.of("ParametricField", "ParametricNumericField"));
-        when(fieldsService.getFields(any(HodFieldsRequest.class), any(FieldTypeParam.class), any(FieldTypeParam.class))).thenReturn(response);
-
-        final FieldNames responseData = mockNumericQueryResponse();
+    public void getContinuousNumericParametricValuesInBuckets() throws HodErrorException {
+        final HodParametricRequest idolParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
+        final FieldNames responseData = mockNumericQueryResponse(ImmutableMap.of("1.1", 1, "1.4,3.5", 2, "6,9", 1, "12.9", 1, "21.7", 1));
         when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
-
-        final Set<QueryTagInfo> results = parametricValuesService.getNumericParametricValues(parametricRequest);
+        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, 5);
         MatcherAssert.assertThat(results, is(not(empty())));
+        final RangeInfo info = results.iterator().next();
+        final List<RangeInfo.Value> countInfo = info.getValues();
+        assertEquals(9, info.getCount());
+        assertEquals(1.1, info.getMin(), 0);
+        assertEquals(21.7, info.getMax(), 0);
+        final Iterator<RangeInfo.Value> iterator = countInfo.iterator();
+        assertEquals(new RangeInfo.Value(5, 1, 6), iterator.next());
+        assertEquals(new RangeInfo.Value(2, 6, 11), iterator.next());
+        assertEquals(new RangeInfo.Value(1, 11, 16), iterator.next());
+        assertEquals(new RangeInfo.Value(0, 16, 21), iterator.next());
+        assertEquals(new RangeInfo.Value(1, 21, 22), iterator.next());
     }
 
     @Test
-    public void numericParametricValuesNotConfigured() throws HodErrorException {
-        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.<String>emptyList());
-
-        final Map<FieldTypeParam, List<String>> response = ImmutableMap.of(FieldTypeParam.Numeric, Collections.<String>emptyList(), FieldTypeParam.Parametric, ImmutableList.of("ParametricField", "ParametricNumericField"));
-        when(fieldsService.getFields(any(HodFieldsRequest.class), any(FieldTypeParam.class), any(FieldTypeParam.class))).thenReturn(response);
-        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(new FieldNames.Builder().build());
-
-        final Set<QueryTagInfo> results = parametricValuesService.getNumericParametricValues(parametricRequest);
-        MatcherAssert.assertThat(results, is(empty()));
-    }
-
-    @Test
-    public void getDateParametricValues() throws HodErrorException {
-        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericField"));
-
-        final FieldNames responseData = mockDateQueryResponse();
+    public void getNumericParametricValuesInBucketsNoResults() throws HodErrorException {
+        final HodParametricRequest idolParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
+        final FieldNames responseData = new FieldNames.Builder()
+                .addParametricValue("numericParametricValue", Collections.<String, Integer>emptyMap())
+                .build();
         when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
-        final Set<QueryTagInfo> results = parametricValuesService.getDateParametricValues(parametricRequest);
-        MatcherAssert.assertThat(results, is(not(empty())));
-        final Set<QueryTagCountInfo> countInfo = results.iterator().next().getValues();
-        final Iterator<QueryTagCountInfo> iterator = countInfo.iterator();
-        assertEquals(new QueryTagCountInfo("1238223600000", 3), iterator.next());
-        assertEquals(new QueryTagCountInfo("1463997811000", 1), iterator.next());
-    }
-
-    @Test
-    public void getDateFieldNamesFirst() throws HodErrorException {
-        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.<String>emptyList());
-
-        final Map<FieldTypeParam, List<String>> response = ImmutableMap.<FieldTypeParam, List<String>>of(FieldTypeParam.NumericDate, ImmutableList.of("DateField", "ParametricDateField"), FieldTypeParam.Parametric, ImmutableList.of("ParametricField", "ParametricDateField"));
-        when(fieldsService.getFields(any(HodFieldsRequest.class), any(FieldTypeParam.class), any(FieldTypeParam.class))).thenReturn(response);
-
-        final FieldNames responseData = mockDateQueryResponse();
-        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
-
-        final Set<QueryTagInfo> results = parametricValuesService.getDateParametricValues(parametricRequest);
-        MatcherAssert.assertThat(results, is(not(empty())));
-    }
-
-    @Test
-    public void dateParametricValuesNotConfigured() throws HodErrorException {
-        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.<String>emptyList());
-
-        final Map<FieldTypeParam, List<String>> response = ImmutableMap.of(FieldTypeParam.NumericDate, Collections.<String>emptyList(), FieldTypeParam.Parametric, ImmutableList.of("ParametricField", "ParametricDateField"));
-        when(fieldsService.getFields(any(HodFieldsRequest.class), any(FieldTypeParam.class), any(FieldTypeParam.class))).thenReturn(response);
-        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(new FieldNames.Builder().build());
-
-        final Set<QueryTagInfo> results = parametricValuesService.getDateParametricValues(parametricRequest);
-        MatcherAssert.assertThat(results, is(empty()));
+        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, 3);
+        MatcherAssert.assertThat(results, empty());
     }
 
     @Test(expected = NotImplementedException.class)
@@ -235,15 +205,9 @@ public class HodParametricValuesServiceTest {
                 .build();
     }
 
-    private FieldNames mockNumericQueryResponse() {
+    private FieldNames mockNumericQueryResponse(final Map<String, Integer> map) {
         return new FieldNames.Builder()
-                .addParametricValue("numericParametricValue", ImmutableMap.of("0", 1, "0, 4, 12", 2, "4", 3, "5.1", 1))
-                .build();
-    }
-
-    private FieldNames mockDateQueryResponse() {
-        return new FieldNames.Builder()
-                .addParametricValue("dateParametricValue", ImmutableMap.of("1238223600", 3, "1463997811", 1))
+                .addParametricValue("numericParametricValue", map)
                 .build();
     }
 

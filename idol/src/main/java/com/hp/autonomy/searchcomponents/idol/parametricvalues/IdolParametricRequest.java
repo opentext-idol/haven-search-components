@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
@@ -32,6 +33,7 @@ public class IdolParametricRequest implements ParametricRequest<String> {
     private final List<String> fieldNames;
     private final Integer maxValues;
     private final SortParam sort;
+    private final List<Range> ranges;
     private final QueryRestrictions<String> queryRestrictions;
     private final boolean modified;
 
@@ -39,6 +41,7 @@ public class IdolParametricRequest implements ParametricRequest<String> {
         fieldNames = builder.fieldNames;
         maxValues = builder.maxValues;
         sort = builder.sort;
+        ranges = builder.ranges;
         queryRestrictions = builder.queryRestrictions;
         modified = builder.modified;
     }
@@ -53,6 +56,7 @@ public class IdolParametricRequest implements ParametricRequest<String> {
         private List<String> fieldNames = Collections.emptyList();
         private Integer maxValues = MAX_VALUES_DEFAULT;
         private SortParam sort = SortParam.DocumentCount;
+        private List<Range> ranges;
         private QueryRestrictions<String> queryRestrictions;
         private boolean modified = true;
 
@@ -60,6 +64,7 @@ public class IdolParametricRequest implements ParametricRequest<String> {
             fieldNames = parametricRequest.getFieldNames();
             maxValues = parametricRequest.getMaxValues();
             sort = parametricRequest.getSort();
+            ranges = parametricRequest.getRanges();
             queryRestrictions = parametricRequest.getQueryRestrictions();
             modified = parametricRequest.isModified();
         }
