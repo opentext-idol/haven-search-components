@@ -5,6 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
+import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 
@@ -17,6 +18,8 @@ public interface ParametricRequest<S extends Serializable> extends Serializable 
     Integer getMaxValues();
 
     SortParam getSort();
+
+    List<Range> getRanges();
 
     QueryRestrictions<S> getQueryRestrictions();
 

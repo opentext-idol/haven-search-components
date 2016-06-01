@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
  * @param <C> application config type
  */
 @Configuration
-@ComponentScan("com.hp.autonomy.searchcomponents.idol")
+@ComponentScan({"com.hp.autonomy.searchcomponents.core", "com.hp.autonomy.searchcomponents.idol"})
 public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
     private static final int HTTP_SOCKET_TIMEOUT = 90000;
     private static final int HTTP_MAX_CONNECTIONS_PER_ROUTE = 20;

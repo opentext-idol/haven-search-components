@@ -9,10 +9,16 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
+import com.hp.autonomy.aci.content.ranges.Range;
+import com.hp.autonomy.aci.content.ranges.Ranges;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
+import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.AdaptiveBucketSizeEvaluatorFactory;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketSizeEvaluator;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.types.idol.FlatField;
@@ -21,13 +27,15 @@ import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.idol.TagValue;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBElement;
@@ -35,31 +43,38 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
 
 @SuppressWarnings("WeakerAccess")
 @Service
 public class IdolParametricValuesService implements ParametricValuesService<IdolParametricRequest, String, AciErrorException> {
-    private static final String VALUE_NODE_NAME = "value";
-    private static final Pattern CSV_SEPARATOR_PATTERN = Pattern.compile(",\\s*");
-    private static final String IDOL_PARAMETRIC_DATE_FORMAT = "HH:mm:ss dd/MM/yyyy";
+    static final String VALUE_NODE_NAME = "value";
+    static final String VALUES_NODE_NAME = "values";
+    static final String VALUE_MIN_NODE_NAME = "valuemin";
+    static final String VALUE_MAX_NODE_NAME = "valuemax";
 
     private final HavenSearchAciParameterHandler parameterHandler;
     private final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService;
     private final AciService contentAciService;
+    private final AdaptiveBucketSizeEvaluatorFactory bucketSizeEvaluatorFactory;
     private final Processor<GetQueryTagValuesResponseData> queryTagValuesResponseProcessor;
 
     @Autowired
-    public IdolParametricValuesService(final HavenSearchAciParameterHandler parameterHandler, final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService, final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    public IdolParametricValuesService(final HavenSearchAciParameterHandler parameterHandler,
+                                       final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService,
+                                       final AciService contentAciService,
+                                       final AciResponseJaxbProcessorFactory aciResponseProcessorFactory,
+                                       final AdaptiveBucketSizeEvaluatorFactory bucketSizeEvaluatorFactory) {
         this.parameterHandler = parameterHandler;
         this.fieldsService = fieldsService;
         this.contentAciService = contentAciService;
+        this.bucketSizeEvaluatorFactory = bucketSizeEvaluatorFactory;
         queryTagValuesResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(GetQueryTagValuesResponseData.class);
     }
 
@@ -78,7 +93,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
             final List<FlatField> fields = getFlatFields(parametricRequest, fieldNames);
             results = new LinkedHashSet<>(fields.size());
             for (final FlatField field : fields) {
-                final List<JAXBElement<? extends Serializable>> valueElements = field.getValueOrSubvalueOrValues();
+                final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
                 final LinkedHashSet<QueryTagCountInfo> values = new LinkedHashSet<>(valueElements.size());
                 for (final JAXBElement<?> element : valueElements) {
                     if (VALUE_NODE_NAME.equals(element.getName().getLocalPart())) {
@@ -97,73 +112,17 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
     }
 
     @Override
-    public Set<QueryTagInfo> getNumericParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
-        final Collection<String> fieldNames = new HashSet<>();
-        fieldNames.addAll(parametricRequest.getFieldNames());
-        if (fieldNames.isEmpty()) {
-            final IdolFieldsRequest fieldsRequest = new IdolFieldsRequest.Builder().build();
-            final Map<FieldTypeParam, List<String>> response = fieldsService.getFields(fieldsRequest, FieldTypeParam.Numeric, FieldTypeParam.Parametric);
-            fieldNames.addAll(response.get(FieldTypeParam.Parametric));
-            fieldNames.retainAll(response.get(FieldTypeParam.Numeric));
-        }
-
-        final Set<QueryTagInfo> results;
-        if (fieldNames.isEmpty()) {
-            results = Collections.emptySet();
+    @Cacheable(CacheNames.PARAMETRIC_VALUES_IN_BUCKETS)
+    public List<RangeInfo> getNumericParametricValuesInBuckets(final IdolParametricRequest parametricRequest, final int targetNumberOfBuckets) throws AciErrorException {
+        final List<RangeInfo> results;
+        if (parametricRequest.getFieldNames().isEmpty()) {
+            results = Collections.emptyList();
         } else {
-            final List<FlatField> fields = getFlatFields(parametricRequest, fieldNames);
-            results = new LinkedHashSet<>(fields.size());
-            for (final FlatField field : fields) {
-                final Map<Double, Integer> values = parseNumericFieldValuesToMap(field);
-                final String fieldName = getFieldNameFromPath(field.getName().get(0));
-                if (!values.isEmpty()) {
-                    final Set<QueryTagCountInfo> countInfo = new LinkedHashSet<>(values.size());
-                    for (final Map.Entry<Double, Integer> entry : values.entrySet()) {
-                        countInfo.add(new QueryTagCountInfo(entry.getKey().toString(), entry.getValue()));
-                    }
+            final Map<String, RangeInfo> responseMap = getQueryMetadata(parametricRequest, targetNumberOfBuckets);
 
-                    results.add(new QueryTagInfo(fieldName, countInfo));
-                }
-            }
-        }
+            final List<Range> ranges = generateRanges(responseMap, targetNumberOfBuckets);
 
-        return results;
-    }
-
-    @Override
-    public Set<QueryTagInfo> getDateParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
-        final Collection<String> fieldNames = new HashSet<>();
-        fieldNames.addAll(parametricRequest.getFieldNames());
-        if (fieldNames.isEmpty()) {
-            final IdolFieldsRequest fieldsRequest = new IdolFieldsRequest.Builder().build();
-            final Map<FieldTypeParam, List<String>> response = fieldsService.getFields(fieldsRequest, FieldTypeParam.NumericDate, FieldTypeParam.Parametric);
-            fieldNames.addAll(response.get(FieldTypeParam.Parametric));
-            fieldNames.retainAll(response.get(FieldTypeParam.NumericDate));
-            fieldNames.add(AUTN_DATE_FIELD);
-        }
-
-        final Set<QueryTagInfo> results;
-        if (fieldNames.isEmpty()) {
-            results = Collections.emptySet();
-        } else {
-            final List<FlatField> fields = getFlatFields(parametricRequest, fieldNames);
-            results = new LinkedHashSet<>(fields.size());
-            for (final FlatField field : fields) {
-                final List<JAXBElement<? extends Serializable>> valueElements = field.getValueOrSubvalueOrValues();
-                final LinkedHashSet<QueryTagCountInfo> values = new LinkedHashSet<>(valueElements.size());
-                for (final JAXBElement<?> element : valueElements) {
-                    if (VALUE_NODE_NAME.equals(element.getName().getLocalPart())) {
-                        final TagValue tagValue = (TagValue) element.getValue();
-                        final String stringDate = tagValue.getDate();
-                        final DateTime date = DateTime.parse(stringDate, DateTimeFormat.forPattern(IDOL_PARAMETRIC_DATE_FORMAT).withZoneUTC());
-                        values.add(new QueryTagCountInfo(String.valueOf(date.getMillis()), tagValue.getCount()));
-                    }
-                }
-                final String fieldName = getFieldNameFromPath(field.getName().get(0));
-                if (!values.isEmpty()) {
-                    results.add(new QueryTagInfo(fieldName, values));
-                }
-            }
+            results = queryForRanges(parametricRequest, responseMap, ranges);
         }
 
         return results;
@@ -181,12 +140,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         if (fieldNames.isEmpty()) {
             results = Collections.emptyList();
         } else {
-            final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
-            parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
-
-            if (parametricRequest.isModified()) {
-                parameterHandler.addQmsParameters(aciParameters, parametricRequest.getQueryRestrictions());
-            }
+            final AciParameters aciParameters = createAciParameters(parametricRequest.getQueryRestrictions(), parametricRequest.isModified());
 
             aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
             aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
@@ -202,6 +156,103 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         return results;
     }
 
+    private AciParameters createAciParameters(final QueryRestrictions<String> queryRestrictions, final boolean modified) {
+        final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
+        parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
+        if (modified) {
+            parameterHandler.addQmsParameters(aciParameters, queryRestrictions);
+        }
+        return aciParameters;
+    }
+
+    private Map<String, RangeInfo> getQueryMetadata(final ParametricRequest<String> parametricRequest, final int targetNumberOfBuckets) {
+        final AciParameters aciParameters = createAciParameters(parametricRequest.getQueryRestrictions(), parametricRequest.isModified());
+
+        aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), 1);
+        aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(parametricRequest.getFieldNames().toArray(), ','));
+        aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
+
+        final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
+        final Collection<FlatField> fields = responseData.getField();
+        final Map<String, RangeInfo> responseMap = new HashMap<>(fields.size());
+        for (final FlatField field : fields) {
+            final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
+            final String fieldName = getFieldNameFromPath(field.getName().get(0));
+            int count = 0;
+            double minValue = 0.0;
+            double maxValue = 0.0;
+            for (final JAXBElement<?> element : valueElements) {
+                final String elementLocalName = element.getName().getLocalPart();
+                if (VALUES_NODE_NAME.equals(elementLocalName)) {
+                    count = (Integer) element.getValue();
+                } else if (VALUE_MIN_NODE_NAME.equals(elementLocalName)) {
+                    minValue = (Float) element.getValue();
+                } else if (VALUE_MAX_NODE_NAME.equals(elementLocalName)) {
+                    maxValue = (Float) element.getValue();
+                }
+            }
+
+            final BucketSizeEvaluator bucketSizeEvaluator = bucketSizeEvaluatorFactory.getBucketSizeEvaluator(maxValue, minValue, targetNumberOfBuckets);
+            responseMap.put(fieldName, new RangeEvaluationMetadata(fieldName, count, minValue, maxValue, bucketSizeEvaluator));
+        }
+        return responseMap;
+    }
+
+    private List<Range> generateRanges(final Map<String, RangeInfo> responseMap, final int targetNumberOfBuckets) {
+        final List<Range> ranges = new ArrayList<>(responseMap.size());
+        for (final RangeInfo rangeInfo : responseMap.values()) {
+            double value = rangeInfo.getMin();
+            final List<Double> boundaries = new ArrayList<>(targetNumberOfBuckets);
+            boundaries.add(value);
+            while ((value += rangeInfo.getBucketSize()) <= rangeInfo.getMax()) {
+                boundaries.add(value);
+            }
+
+            ranges.add(new Range(rangeInfo.getName(), ArrayUtils.toPrimitive(boundaries.toArray(new Double[boundaries.size()])), true));
+        }
+        return ranges;
+    }
+
+    private List<RangeInfo> queryForRanges(final ParametricRequest<String> parametricRequest, final Map<String, RangeInfo> responseMap, final List<Range> ranges) {
+        final IdolParametricRequest bucketingRequest = new IdolParametricRequest.Builder()
+                .setFieldNames(parametricRequest.getFieldNames())
+                .setMaxValues(null)
+                .setSort(parametricRequest.getSort())
+                .setRanges(ranges)
+                .setQueryRestrictions(parametricRequest.getQueryRestrictions())
+                .setModified(parametricRequest.isModified())
+                .build();
+        final List<FlatField> flatFields = getFlatFields(bucketingRequest, parametricRequest.getFieldNames());
+        final List<RangeInfo> results = new ArrayList<>(flatFields.size());
+        for (final FlatField field : flatFields) {
+            final String fieldName = getFieldNameFromPath(field.getName().get(0));
+            final RangeInfo metadata = responseMap.get(fieldName);
+
+            final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
+            final Map<Double, RangeInfo.Value> values = new TreeMap<>();
+            for (final JAXBElement<?> element : valueElements) {
+                if (VALUE_NODE_NAME.equals(element.getName().getLocalPart())) {
+                    final TagValue tagValue = (TagValue) element.getValue();
+                    final String[] rangeValues = tagValue.getValue().split(",");
+                    final double min = NumberUtils.toDouble(rangeValues[0], metadata.getMin());
+                    final double max = rangeValues.length > 1 ? Double.parseDouble(rangeValues[1]) : metadata.getMax();
+                    values.put(min, new RangeInfo.Value(tagValue.getCount(), min, max));
+                }
+            }
+
+            for (double d = metadata.getMin(); d < metadata.getMax(); d += metadata.getBucketSize()) {
+                if (!values.containsKey(d)) {
+                    values.put(d, new RangeInfo.Value(0, d, d + metadata.getBucketSize()));
+                }
+            }
+
+            if (!values.isEmpty()) {
+                results.add(new RangeInfo(fieldName, metadata.getCount(), metadata.getMin(), metadata.getMax(), metadata.getBucketSize(), new ArrayList<>(values.values())));
+            }
+        }
+        return results;
+    }
+
     private List<FlatField> getFlatFields(final ParametricRequest<String> parametricRequest, final Collection<String> fieldNames) {
         final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
         parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
@@ -214,34 +265,38 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), parametricRequest.getMaxValues());
         aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
         aciParameters.add(GetQueryTagValuesParams.Sort.name(), parametricRequest.getSort());
+        aciParameters.add(GetQueryTagValuesParams.Ranges.name(), new Ranges(parametricRequest.getRanges()));
 
         final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
         return responseData.getField();
     }
 
-    private Map<Double, Integer> parseNumericFieldValuesToMap(final FlatField field) {
-        final List<JAXBElement<? extends Serializable>> valueElements = field.getValueOrSubvalueOrValues();
-        final Map<Double, Integer> values = new TreeMap<>();
-        for (final JAXBElement<?> element : valueElements) {
-            if (VALUE_NODE_NAME.equals(element.getName().getLocalPart())) {
-                final TagValue tagValue = (TagValue) element.getValue();
-                // Numeric fields are permitted to contain a csv of numbers as a value
-                final String[] csv = CSV_SEPARATOR_PATTERN.split(tagValue.getValue());
-                final Integer count = tagValue.getCount();
-                for (final String value : csv) {
-                    final double numericValue = Double.parseDouble(value);
-                    if (values.containsKey(numericValue)) {
-                        values.put(numericValue, values.get(numericValue) + count);
-                    } else {
-                        values.put(numericValue, count);
-                    }
-                }
-            }
-        }
-        return values;
-    }
-
     private String getFieldNameFromPath(final String value) {
         return value.contains("/") ? value.substring(value.lastIndexOf('/') + 1) : value;
+    }
+
+    private static class RangeEvaluationMetadata extends RangeInfo {
+        private static final long serialVersionUID = 495955207236656362L;
+        @SuppressWarnings("TransientFieldNotInitialized")
+        protected final transient BucketSizeEvaluator bucketSizeEvaluator;
+
+        private RangeEvaluationMetadata(final String name,
+                                        final int count,
+                                        final double min,
+                                        final double max,
+                                        final BucketSizeEvaluator bucketSizeEvaluator) {
+            super(name, count, min, max, bucketSizeEvaluator.getBucketSize(), null);
+            this.bucketSizeEvaluator = bucketSizeEvaluator;
+        }
+
+        @Override
+        public double getMin() {
+            return bucketSizeEvaluator.adjustMin(super.getMin());
+        }
+
+        @Override
+        public double getMax() {
+            return bucketSizeEvaluator.adjustMax(super.getMax());
+        }
     }
 }
