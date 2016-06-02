@@ -79,7 +79,7 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
             for (final String name : fieldNamesSet) {
                 final Set<QueryTagCountInfo> values = new HashSet<>(parametricFieldNames.getValuesAndCountsForFieldName(name));
                 if (!values.isEmpty()) {
-                    results.add(new QueryTagInfo(name, values));
+                    results.add(new QueryTagInfo(name, name, values));
                 }
             }
         }
@@ -138,7 +138,7 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
             }
         }
 
-        ranges.add(new RangeInfo(queryTagInfo.getName(), totalCount, minValue, maxValue, bucketSize, buckets));
+        ranges.add(new RangeInfo(queryTagInfo.getName(), queryTagInfo.getName(), totalCount, minValue, maxValue, bucketSize, buckets));
     }
 
     private Set<QueryTagInfo> getNumericParametricValues(final ParametricRequest<ResourceIdentifier> parametricRequest) throws HodErrorException {
@@ -155,7 +155,7 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
             for (final String name : fieldNamesSet) {
                 final Set<QueryTagCountInfo> values = new LinkedHashSet<>(parametricFieldNames.getValuesAndCountsForNumericField(name));
                 if (!values.isEmpty()) {
-                    results.add(new QueryTagInfo(name, values));
+                    results.add(new QueryTagInfo(name, name, values));
                 }
             }
         }

@@ -101,9 +101,11 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
                         values.add(new QueryTagCountInfo(tagValue.getValue(), tagValue.getCount()));
                     }
                 }
-                final String fieldName = getFieldNameFromPath(field.getName().get(0));
+                final String fieldPath = field.getName().get(0);
+                final String fieldName = getFieldNameFromPath(fieldPath);
+                final String adjustedFieldPath = adjustFieldPath(fieldPath, fieldName);
                 if (!values.isEmpty()) {
-                    results.add(new QueryTagInfo(fieldName, values));
+                    results.add(new QueryTagInfo(adjustedFieldPath, fieldName, values));
                 }
             }
         }
@@ -177,7 +179,9 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         final Map<String, RangeInfo> responseMap = new HashMap<>(fields.size());
         for (final FlatField field : fields) {
             final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
-            final String fieldName = getFieldNameFromPath(field.getName().get(0));
+            final String fieldPath = field.getName().get(0);
+            final String fieldName = getFieldNameFromPath(fieldPath);
+            final String adjustedFieldPath = adjustFieldPath(fieldPath, fieldName);
             int count = 0;
             double minValue = 0.0;
             double maxValue = 0.0;
@@ -193,7 +197,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
             }
 
             final BucketSizeEvaluator bucketSizeEvaluator = bucketSizeEvaluatorFactory.getBucketSizeEvaluator(maxValue, minValue, targetNumberOfBuckets);
-            responseMap.put(fieldName, new RangeEvaluationMetadata(fieldName, count, minValue, maxValue, bucketSizeEvaluator));
+            responseMap.put(adjustedFieldPath, new RangeEvaluationMetadata(adjustedFieldPath, fieldName, count, minValue, maxValue, bucketSizeEvaluator));
         }
         return responseMap;
     }
@@ -204,18 +208,18 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
             double value = rangeInfo.getMin();
             final List<Double> boundaries = new ArrayList<>(targetNumberOfBuckets);
             boundaries.add(value);
-            while ((value += rangeInfo.getBucketSize()) <= rangeInfo.getMax()) {
+            while ((value += rangeInfo.getBucketSize()) < rangeInfo.getMax()) {
                 boundaries.add(value);
             }
 
-            ranges.add(new Range(rangeInfo.getName(), ArrayUtils.toPrimitive(boundaries.toArray(new Double[boundaries.size()])), true));
+            ranges.add(new Range(rangeInfo.getId(), ArrayUtils.toPrimitive(boundaries.toArray(new Double[boundaries.size()])), true));
         }
         return ranges;
     }
 
     private List<RangeInfo> queryForRanges(final ParametricRequest<String> parametricRequest, final Map<String, RangeInfo> responseMap, final List<Range> ranges) {
         final IdolParametricRequest bucketingRequest = new IdolParametricRequest.Builder()
-                .setFieldNames(parametricRequest.getFieldNames())
+                .setFieldNames(new ArrayList<>(responseMap.keySet()))
                 .setMaxValues(null)
                 .setSort(parametricRequest.getSort())
                 .setRanges(ranges)
@@ -225,8 +229,9 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         final List<FlatField> flatFields = getFlatFields(bucketingRequest, parametricRequest.getFieldNames());
         final List<RangeInfo> results = new ArrayList<>(flatFields.size());
         for (final FlatField field : flatFields) {
-            final String fieldName = getFieldNameFromPath(field.getName().get(0));
-            final RangeInfo metadata = responseMap.get(fieldName);
+            final String fieldPath = field.getName().get(0);
+            final String adjustedFieldPath = adjustFieldPath(fieldPath, getFieldNameFromPath(fieldPath));
+            final RangeInfo metadata = responseMap.get(adjustedFieldPath);
 
             final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
             final Map<Double, RangeInfo.Value> values = new TreeMap<>();
@@ -240,14 +245,14 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
                 }
             }
 
-            for (double d = metadata.getMin(); d < metadata.getMax(); d += metadata.getBucketSize()) {
-                if (!values.containsKey(d)) {
-                    values.put(d, new RangeInfo.Value(0, d, d + metadata.getBucketSize()));
-                }
-            }
-
             if (!values.isEmpty()) {
-                results.add(new RangeInfo(fieldName, metadata.getCount(), metadata.getMin(), metadata.getMax(), metadata.getBucketSize(), new ArrayList<>(values.values())));
+                for (double d = metadata.getMin(); d < metadata.getMax(); d += metadata.getBucketSize()) {
+                    if (!values.containsKey(d)) {
+                        values.put(d, new RangeInfo.Value(0, d, d + metadata.getBucketSize()));
+                    }
+                }
+
+                results.add(new RangeInfo(adjustedFieldPath, metadata.getName(), metadata.getCount(), metadata.getMin(), metadata.getMax(), metadata.getBucketSize(), new ArrayList<>(values.values())));
             }
         }
         return results;
@@ -275,17 +280,25 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         return value.contains("/") ? value.substring(value.lastIndexOf('/') + 1) : value;
     }
 
+    private String adjustFieldPath(final String fieldPath, final String fieldName) {
+        // Need an extra '/' to be able to query a field by its root path (since wildcards in Idol config file take the form */SOME_FIELD)
+        // However, for the special autn_date field which does not have a path, adding such a '/' would break the query
+        return fieldName.equals(fieldPath) ? fieldName : '/' + fieldPath;
+    }
+
     private static class RangeEvaluationMetadata extends RangeInfo {
         private static final long serialVersionUID = 495955207236656362L;
         @SuppressWarnings("TransientFieldNotInitialized")
         protected final transient BucketSizeEvaluator bucketSizeEvaluator;
 
-        private RangeEvaluationMetadata(final String name,
+        @SuppressWarnings("ConstructorWithTooManyParameters")
+        private RangeEvaluationMetadata(final String id,
+                                        final String name,
                                         final int count,
                                         final double min,
                                         final double max,
                                         final BucketSizeEvaluator bucketSizeEvaluator) {
-            super(name, count, min, max, bucketSizeEvaluator.getBucketSize(), null);
+            super(id, name, count, min, max, bucketSizeEvaluator.getBucketSize(), null);
             this.bucketSizeEvaluator = bucketSizeEvaluator;
         }
 
