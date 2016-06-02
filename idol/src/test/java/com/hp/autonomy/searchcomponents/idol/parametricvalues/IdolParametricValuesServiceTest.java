@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.OngoingStubbing;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -113,7 +114,7 @@ public class IdolParametricValuesServiceTest {
     @Test
     public void getNumericParametricValuesInBuckets() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        mockBucketResponses();
+        mockBucketResponses(8, 1f, 21f, mockTagValue("1,6", 5), mockTagValue("6,11", 2), mockTagValue("21,", 1));
         final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, 5);
         assertThat(results, is(not(empty())));
         final RangeInfo info = results.iterator().next();
@@ -194,9 +195,13 @@ public class IdolParametricValuesServiceTest {
         return responseData;
     }
 
-    private void mockBucketResponses() {
+    private void mockBucketResponses(final int count, final float min, final float max, final TagValue... tagValues) {
         when(element.getName()).thenReturn(new QName("", IdolParametricValuesService.VALUES_NODE_NAME), new QName("", IdolParametricValuesService.VALUE_MIN_NODE_NAME), new QName("", IdolParametricValuesService.VALUE_MAX_NODE_NAME), new QName("", IdolParametricValuesService.VALUE_NODE_NAME));
-        when(element.getValue()).thenReturn(8).thenReturn(1f).thenReturn(21f).thenReturn(mockTagValue("1,6", 5), mockTagValue("6,11", 2), mockTagValue("21,", 1));
+        OngoingStubbing<? extends Serializable> stub = when(element.getValue()).thenReturn(count).thenReturn(min).thenReturn(max);
+        for (final TagValue tagValue : tagValues) {
+            //noinspection unchecked,rawtypes
+            stub = ((OngoingStubbing) stub).thenReturn(tagValue);
+        }
 
         final GetQueryTagValuesResponseData responseData1 = new GetQueryTagValuesResponseData();
         final FlatField field1 = new FlatField();
@@ -209,9 +214,9 @@ public class IdolParametricValuesServiceTest {
         final GetQueryTagValuesResponseData responseData2 = new GetQueryTagValuesResponseData();
         final FlatField field2 = new FlatField();
         field2.getName().add("ParametricNumericDateField");
-        field2.getValueAndSubvalueOrValues().add(element);
-        field2.getValueAndSubvalueOrValues().add(element);
-        field2.getValueAndSubvalueOrValues().add(element);
+        for (final TagValue ignored : tagValues) {
+            field2.getValueAndSubvalueOrValues().add(element);
+        }
         responseData2.getField().add(field2);
 
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData1).thenReturn(responseData2);

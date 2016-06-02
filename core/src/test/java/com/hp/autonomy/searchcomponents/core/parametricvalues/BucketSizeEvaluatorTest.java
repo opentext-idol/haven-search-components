@@ -41,4 +41,12 @@ public class BucketSizeEvaluatorTest {
         assertEquals(0.1, bucketSizeEvaluator.adjustMin(0.1), 0.01);
         assertEquals(0.9, bucketSizeEvaluator.adjustMax(0.9), 0.01);
     }
+
+    @Test
+    public void singleDataPoint() {
+        final BucketSizeEvaluator bucketSizeEvaluator = factory.getBucketSizeEvaluator(1, 1, 35);
+        assertEquals(1, (int) bucketSizeEvaluator.getBucketSize());
+        assertEquals(1, (int) bucketSizeEvaluator.adjustMin(1));
+        assertEquals(2, (int) bucketSizeEvaluator.adjustMax(1));
+    }
 }
