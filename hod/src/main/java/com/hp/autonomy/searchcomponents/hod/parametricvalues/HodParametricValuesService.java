@@ -131,7 +131,7 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
         QueryTagCountInfo valueAndCount = null;
         double boundaryValue = minValue;
         int totalCount = 0;
-        for (int i = -1; i < bucketSizeEvaluator.getTargetNumberOfBuckets() && (valueAndCount == null || Double.parseDouble(valueAndCount.getValue()) < maxValue); i++) {
+        for (int i = -1; i < bucketSizeEvaluator.getTargetNumberOfBuckets() && (valueAndCount == null || Double.parseDouble(valueAndCount.getValue()) < maxValue || bucketSizeEvaluator.unboundedMax()); i++) {
             while (iterator.hasNext() && Double.parseDouble((valueAndCount = iterator.next()).getValue()) < boundaryValue) {
                 if (i >= 0) {
                     final int count = valueAndCount.getCount();
@@ -146,7 +146,7 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
 
             if (valueAndCount != null) {
                 final double value = Double.parseDouble(valueAndCount.getValue());
-                if (value >= boundaryValue && value < maxValue) {
+                if (value >= boundaryValue && (value < maxValue || bucketSizeEvaluator.unboundedMax())) {
                     final int count = valueAndCount.getCount();
                     totalCount += count;
                     buckets.add(new RangeInfo.Value(count, boundaryValue, Math.min(boundaryValue += bucketSize, maxValue)));

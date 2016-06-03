@@ -14,6 +14,7 @@ public class BucketingParams {
     private final int targetNumberOfBuckets;
     private Double min;
     private Double max;
+    private boolean unlimitedMax;
 
     public BucketingParams(final int targetNumberOfBuckets) {
         this.targetNumberOfBuckets = targetNumberOfBuckets;
@@ -28,9 +29,14 @@ public class BucketingParams {
         this.max = max;
     }
 
-    public BucketingParams(final BucketingParams bucketingParams, final double min, final double max) {
+    public BucketingParams(final BucketingParams bucketingParams, final double absoluteMin, final double absoluteMax) {
         targetNumberOfBuckets = bucketingParams.targetNumberOfBuckets;
-        this.min = bucketingParams.min != null ? bucketingParams.min : min;
-        this.max = bucketingParams.max != null ? bucketingParams.max : max;
+        min = bucketingParams.min != null ? bucketingParams.min : absoluteMin;
+        if (bucketingParams.max != null) {
+            max = bucketingParams.max;
+        } else {
+            max = absoluteMax;
+            unlimitedMax = true;
+        }
     }
 }

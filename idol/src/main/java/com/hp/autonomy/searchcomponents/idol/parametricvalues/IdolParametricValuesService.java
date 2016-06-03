@@ -229,9 +229,11 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
             while ((value += bucketSizeEvaluator.getBucketSize()) < bucketSizeEvaluator.getMax()) {
                 boundaries.add(value);
             }
-            boundaries.add(bucketSizeEvaluator.getMax());
+            if (!bucketSizeEvaluator.unboundedMax()) {
+                boundaries.add(bucketSizeEvaluator.getMax());
+            }
 
-            ranges.add(new Range(entry.getKey(), ArrayUtils.toPrimitive(boundaries.toArray(new Double[boundaries.size()]))));
+            ranges.add(new Range(entry.getKey(), ArrayUtils.toPrimitive(boundaries.toArray(new Double[boundaries.size()])), bucketSizeEvaluator.unboundedMax()));
         }
         return ranges;
     }

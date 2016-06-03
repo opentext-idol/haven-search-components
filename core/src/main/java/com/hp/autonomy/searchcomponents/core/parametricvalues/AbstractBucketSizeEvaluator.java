@@ -31,6 +31,11 @@ abstract class AbstractBucketSizeEvaluator implements BucketSizeEvaluator {
     }
 
     @Override
+    public boolean unboundedMax() {
+        return bucketingParams.isUnlimitedMax();
+    }
+
+    @Override
     public int getTargetNumberOfBuckets() {
         return bucketingParams.getTargetNumberOfBuckets();
     }

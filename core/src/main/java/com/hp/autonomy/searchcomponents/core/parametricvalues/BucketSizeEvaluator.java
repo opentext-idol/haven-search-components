@@ -14,6 +14,8 @@ public interface BucketSizeEvaluator {
 
     int getTargetNumberOfBuckets();
 
+    boolean unboundedMax();
+
     double adjustBucketMin(double min);
 
     double adjustBucketMax(double max);

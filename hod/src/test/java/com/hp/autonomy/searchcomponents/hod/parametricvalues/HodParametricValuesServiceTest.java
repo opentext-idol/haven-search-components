@@ -185,6 +185,19 @@ public class HodParametricValuesServiceTest {
     }
 
     @Test
+    public void getNumericParametricValuesInBucketsContinuousBucketing() throws HodErrorException {
+        final HodParametricRequest idolParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
+        final FieldNames responseData = mockNumericQueryResponse("ParametricNumericDateField", ImmutableMap.of("0.1", 1, "0.4,0.5", 2, "0.6,0.9", 1));
+        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
+        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of("ParametricNumericDateField", new BucketingParams(5)));
+        MatcherAssert.assertThat(results, is(not(empty())));
+        final RangeInfo info = results.iterator().next();
+        assertEquals(7, info.getCount());
+        assertEquals(0.1f, info.getMin(), 0.01);
+        assertEquals(0.9f, info.getMax(), 0.01);
+    }
+
+    @Test
     public void getNumericParametricValuesInBucketsCustomMinAndMax() throws HodErrorException {
         final HodParametricRequest idolParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
         final FieldNames responseData = mockNumericQueryResponse("ParametricNumericDateField", ImmutableMap.of("1", 1, "1,3", 2, "6,9", 1, "12", 1, "21", 1));
