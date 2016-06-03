@@ -10,6 +10,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFields
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsResponse;
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,9 +44,9 @@ public class HodFieldsServiceTest {
 
     @Test
     public void getFields() throws HodErrorException {
-        final RetrieveIndexFieldsResponse response = new RetrieveIndexFieldsResponse.Builder().setParametricTypeFields(Collections.singletonList("CATEGORY")).build();
+        final RetrieveIndexFieldsResponse response = new RetrieveIndexFieldsResponse.Builder().setParametricTypeFields(Collections.singletonList(new TagName("CATEGORY"))).build();
         when(retrieveIndexFieldsService.retrieveIndexFields(anyListOf(ResourceIdentifier.class), any(RetrieveIndexFieldsRequestBuilder.class))).thenReturn(response);
-        final Map<FieldTypeParam, List<String>> results = fieldsService.getFields(new HodFieldsRequest.Builder().setDatabases(Collections.singletonList(ResourceIdentifier.WIKI_ENG)).setMaxValues(null).build(), FieldTypeParam.Parametric);
+        final Map<FieldTypeParam, List<TagName>> results = fieldsService.getFields(new HodFieldsRequest.Builder().setDatabases(Collections.singletonList(ResourceIdentifier.WIKI_ENG)).setMaxValues(null).build(), FieldTypeParam.Parametric);
         assertThat(results.get(FieldTypeParam.Parametric), is(not(empty())));
     }
 }

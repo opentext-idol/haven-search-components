@@ -8,7 +8,13 @@ package com.hp.autonomy.searchcomponents.core.parametricvalues;
 public interface BucketSizeEvaluator {
     double getBucketSize();
 
-    double adjustMin(final double min);
+    double getMin();
 
-    double adjustMax(final double max);
+    double getMax();
+
+    int getTargetNumberOfBuckets();
+
+    double adjustBucketMin(double min);
+
+    double adjustBucketMax(double max);
 }

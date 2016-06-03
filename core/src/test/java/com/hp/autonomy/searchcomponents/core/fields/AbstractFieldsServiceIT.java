@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.core.fields;
 
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +32,7 @@ public abstract class AbstractFieldsServiceIT<R extends FieldsRequest, S extends
 
     @Test
     public void getFields() throws E {
-        final Map<FieldTypeParam, List<String>> results = fieldsService.getFields(createFieldsRequest(), FieldTypeParam.Parametric);
+        final Map<FieldTypeParam, List<TagName>> results = fieldsService.getFields(createFieldsRequest(), FieldTypeParam.Parametric);
         assertThat(results.get(FieldTypeParam.Parametric), is(not(empty())));
     }
 }

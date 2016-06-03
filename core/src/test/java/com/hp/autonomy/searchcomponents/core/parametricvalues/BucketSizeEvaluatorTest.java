@@ -20,33 +20,33 @@ public class BucketSizeEvaluatorTest {
 
     @Test
     public void discrete() {
-        final BucketSizeEvaluator bucketSizeEvaluator = factory.getBucketSizeEvaluator(100, 0, 35);
-        assertEquals(3, (int) bucketSizeEvaluator.getBucketSize());
-        assertEquals(0, (int) bucketSizeEvaluator.adjustMin(0));
-        assertEquals(101, (int) bucketSizeEvaluator.adjustMax(100));
+        final BucketSizeEvaluator bucketSizeEvaluator = factory.getBucketSizeEvaluator(new BucketingParams(35, 0.0, 100.0));
+        assertEquals(3, bucketSizeEvaluator.getBucketSize(), 0);
+        assertEquals(0, bucketSizeEvaluator.getMin(), 0);
+        assertEquals(101, bucketSizeEvaluator.getMax(), 0);
     }
 
     @Test
     public void continuous() {
-        final BucketSizeEvaluator bucketSizeEvaluator = factory.getBucketSizeEvaluator(99.7, 0.3, 35);
-        assertEquals(3, (int) bucketSizeEvaluator.getBucketSize());
-        assertEquals(0, (int) bucketSizeEvaluator.adjustMin(0.3));
-        assertEquals(100, (int) bucketSizeEvaluator.adjustMax(99.7));
+        final BucketSizeEvaluator bucketSizeEvaluator = factory.getBucketSizeEvaluator(new BucketingParams(35, 0.3, 99.7));
+        assertEquals(3, bucketSizeEvaluator.getBucketSize(), 0);
+        assertEquals(0, bucketSizeEvaluator.getMin(), 0);
+        assertEquals(100, (int) bucketSizeEvaluator.getMax(), 0);
     }
 
     @Test
     public void continuousSmallRange() {
-        final BucketSizeEvaluator bucketSizeEvaluator = factory.getBucketSizeEvaluator(0.9, 0.1, 35);
+        final BucketSizeEvaluator bucketSizeEvaluator = factory.getBucketSizeEvaluator(new BucketingParams(35, 0.1, 0.9));
         assertEquals(0.02, bucketSizeEvaluator.getBucketSize(), 0.005);
-        assertEquals(0.1, bucketSizeEvaluator.adjustMin(0.1), 0.01);
-        assertEquals(0.9, bucketSizeEvaluator.adjustMax(0.9), 0.01);
+        assertEquals(0.1, bucketSizeEvaluator.getMin(), 0.01);
+        assertEquals(0.9, bucketSizeEvaluator.getMax(), 0.01);
     }
 
     @Test
     public void singleDataPoint() {
-        final BucketSizeEvaluator bucketSizeEvaluator = factory.getBucketSizeEvaluator(1, 1, 35);
-        assertEquals(1, (int) bucketSizeEvaluator.getBucketSize());
-        assertEquals(1, (int) bucketSizeEvaluator.adjustMin(1));
-        assertEquals(2, (int) bucketSizeEvaluator.adjustMax(1));
+        final BucketSizeEvaluator bucketSizeEvaluator = factory.getBucketSizeEvaluator(new BucketingParams(35, 1.0, 1.0));
+        assertEquals(1, bucketSizeEvaluator.getBucketSize(), 0);
+        assertEquals(1, bucketSizeEvaluator.getMin(), 0);
+        assertEquals(2, bucketSizeEvaluator.getMax(), 0);
     }
 }

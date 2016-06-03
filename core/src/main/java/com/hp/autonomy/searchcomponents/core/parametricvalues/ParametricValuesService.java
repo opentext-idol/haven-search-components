@@ -11,15 +11,16 @@ import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface ParametricValuesService<R extends ParametricRequest<S>, S extends Serializable, E extends Exception> {
 
-    String AUTN_DATE_FIELD = "AUTN_DATE";
+    String AUTN_DATE_FIELD = "autn_date";
 
     Set<QueryTagInfo> getAllParametricValues(R parametricRequest) throws E;
 
-    List<RangeInfo> getNumericParametricValuesInBuckets(R parametricRequest, int targetNumberOfBuckets) throws E;
+    List<RangeInfo> getNumericParametricValuesInBuckets(R parametricRequest, final Map<String, BucketingParams> bucketingParamsPerField) throws E;
 
     List<RecursiveField> getDependentParametricValues(R parametricRequest) throws E;
 
