@@ -12,6 +12,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFields
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,7 +35,7 @@ public class HodFieldsService implements FieldsService<HodFieldsRequest, HodErro
 
     @Override
     @Cacheable(CacheNames.FIELDS)
-    public Map<FieldTypeParam, List<String>> getFields(final HodFieldsRequest request, final FieldTypeParam... fieldTypes) throws HodErrorException {
+    public Map<FieldTypeParam, List<TagName>> getFields(final HodFieldsRequest request, final FieldTypeParam... fieldTypes) throws HodErrorException {
         final Collection<FieldType> fieldTypeList = new ArrayList<>(fieldTypes.length);
         for (final FieldTypeParam fieldType : fieldTypes) {
             fieldTypeList.add(FieldType.fromParam(fieldType));

@@ -5,12 +5,14 @@
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
+import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
 import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.junit.Test;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -55,7 +58,7 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
                 .setFieldNames(Collections.singletonList(ParametricValuesService.AUTN_DATE_FIELD))
                 .setQueryRestrictions(testUtils.buildQueryRestrictions())
                 .setSort(SortParam.ReverseDate)
-                .build(), 35);
+                .build(), ImmutableMap.of(ParametricValuesService.AUTN_DATE_FIELD, new BucketingParams(35)));
         assertThat(ranges, not(empty()));
     }
 
@@ -66,8 +69,14 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
     }
 
     private R createParametricRequest() throws E {
+        final List<TagName> fields = fieldsService.getFields(fieldsRequestParams(fieldsRequestBuilder).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
+        final List<String> fieldIds = new ArrayList<>(fields.size());
+        for (final TagName field : fields) {
+            fieldIds.add(field.getId());
+        }
+
         return parametricRequestBuilder
-                .setFieldNames(fieldsService.getFields(fieldsRequestParams(fieldsRequestBuilder).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric))
+                .setFieldNames(fieldIds)
                 .setQueryRestrictions(testUtils.buildQueryRestrictions())
                 .build();
     }

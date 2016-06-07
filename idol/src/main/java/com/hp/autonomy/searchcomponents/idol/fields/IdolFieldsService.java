@@ -15,6 +15,7 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.types.idol.GetTagNamesResponseData;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetTagNamesParams;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,8 @@ public class IdolFieldsService implements FieldsService<IdolFieldsRequest, AciEr
 
     @Override
     @Cacheable(CacheNames.FIELDS)
-    public Map<FieldTypeParam, List<String>> getFields(final IdolFieldsRequest request, final FieldTypeParam... fieldTypes) throws AciErrorException {
-        final Map<FieldTypeParam, List<String>> results = new EnumMap<>(FieldTypeParam.class);
+    public Map<FieldTypeParam, List<TagName>> getFields(final IdolFieldsRequest request, final FieldTypeParam... fieldTypes) throws AciErrorException {
+        final Map<FieldTypeParam, List<TagName>> results = new EnumMap<>(FieldTypeParam.class);
         for (final FieldTypeParam fieldType : fieldTypes) {
             results.put(fieldType, getTagNames(request, fieldType));
         }
@@ -49,7 +50,7 @@ public class IdolFieldsService implements FieldsService<IdolFieldsRequest, AciEr
         return results;
     }
 
-    private List<String> getTagNames(final FieldsRequest request, final FieldTypeParam fieldType) {
+    private List<TagName> getTagNames(final FieldsRequest request, final FieldTypeParam fieldType) {
         final AciParameters aciParameters = new AciParameters(TagActions.GetTagNames.name());
         aciParameters.add(GetTagNamesParams.FieldType.name(), fieldType);
         aciParameters.add(GetTagNamesParams.MaxValues.name(), request.getMaxValues());
@@ -57,16 +58,12 @@ public class IdolFieldsService implements FieldsService<IdolFieldsRequest, AciEr
         final GetTagNamesResponseData responseData = contentAciService.executeAction(aciParameters, tagNamesResponseProcessor);
 
         final List<GetTagNamesResponseData.Name> names = responseData.getName();
-        final List<String> tagNames = new ArrayList<>(names.size());
+        final List<TagName> tagNames = new ArrayList<>(names.size());
         for (final GetTagNamesResponseData.Name name : names) {
             final String value = name.getValue();
-            tagNames.add(getFieldNameFromPath(value));
+            tagNames.add(new TagName(value));
         }
 
         return tagNames;
-    }
-
-    private String getFieldNameFromPath(final String value) {
-        return value.contains("/") ? value.substring(value.lastIndexOf('/') + 1) : value;
     }
 }

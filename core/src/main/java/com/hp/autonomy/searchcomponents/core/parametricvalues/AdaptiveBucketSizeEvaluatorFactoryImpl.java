@@ -10,12 +10,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class AdaptiveBucketSizeEvaluatorFactoryImpl implements AdaptiveBucketSizeEvaluatorFactory {
     @Override
-    public BucketSizeEvaluator getBucketSizeEvaluator(final double maxValue, final double minValue, final int targetNumberOfBuckets) {
-        BucketSizeEvaluator bucketSizeEvaluator = new IntegerBucketSizeEvaluator(maxValue, minValue, targetNumberOfBuckets);
-        final double numberOfBuckets = (bucketSizeEvaluator.adjustMax(maxValue) - bucketSizeEvaluator.adjustMin(minValue)) / bucketSizeEvaluator.getBucketSize();
-        final int minimumAcceptableNumberOfBuckets = targetNumberOfBuckets / 2;
+    public BucketSizeEvaluator getBucketSizeEvaluator(final BucketingParams bucketingParams) {
+        BucketSizeEvaluator bucketSizeEvaluator = new IntegerBucketSizeEvaluator(bucketingParams);
+        final double numberOfBuckets = (bucketSizeEvaluator.getMax() - bucketSizeEvaluator.getMin()) / bucketSizeEvaluator.getBucketSize();
+        final int minimumAcceptableNumberOfBuckets = bucketSizeEvaluator.getTargetNumberOfBuckets() / 2;
+
         if (numberOfBuckets < minimumAcceptableNumberOfBuckets) {
-            bucketSizeEvaluator = new ContinuousBucketSizeEvaluator(maxValue, minValue, targetNumberOfBuckets);
+            final BucketSizeEvaluator continuousBucketSizeEvaluator = new ContinuousBucketSizeEvaluator(bucketingParams);
+            final double revisedNumberOfBuckets = (continuousBucketSizeEvaluator.getMax() - continuousBucketSizeEvaluator.getMin()) / continuousBucketSizeEvaluator.getBucketSize();
+
+            if (revisedNumberOfBuckets > numberOfBuckets) {
+                bucketSizeEvaluator = continuousBucketSizeEvaluator;
+            }
         }
 
         return bucketSizeEvaluator;

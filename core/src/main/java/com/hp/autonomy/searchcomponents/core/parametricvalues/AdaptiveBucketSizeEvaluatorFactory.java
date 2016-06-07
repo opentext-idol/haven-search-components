@@ -6,5 +6,5 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 public interface AdaptiveBucketSizeEvaluatorFactory {
-    BucketSizeEvaluator getBucketSizeEvaluator(final double maxValue, final double minValue, final int targetNumberOfBuckets);
+    BucketSizeEvaluator getBucketSizeEvaluator(final BucketingParams bucketingParams);
 }

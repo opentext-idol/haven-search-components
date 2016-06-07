@@ -5,23 +5,23 @@
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
-import lombok.Getter;
-
-class ContinuousBucketSizeEvaluator implements BucketSizeEvaluator {
-    @Getter
-    private final double bucketSize;
-
-    ContinuousBucketSizeEvaluator(final double maxValue, final double minValue, final int targetNumberOfBuckets) {
-        bucketSize = (adjustMax(maxValue) - adjustMin(minValue)) / targetNumberOfBuckets;
+class ContinuousBucketSizeEvaluator extends AbstractBucketSizeEvaluator {
+    ContinuousBucketSizeEvaluator(final BucketingParams bucketingParams) {
+        super(bucketingParams);
     }
 
     @Override
-    public double adjustMin(final double min) {
+    protected double evaluateBucketSize() {
+        return (getMax() - getMin()) / getTargetNumberOfBuckets();
+    }
+
+    @Override
+    public double adjustBucketMin(final double min) {
         return min;
     }
 
     @Override
-    public double adjustMax(final double max) {
+    public double adjustBucketMax(final double max) {
         return max;
     }
 }
