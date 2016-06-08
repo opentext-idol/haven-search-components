@@ -92,12 +92,13 @@ public class QueryResponseParserImpl implements QueryResponseParser {
     }
 
     protected Documents<IdolSearchResult> rerunQueryWithAdjustedSpelling(final AciParameters aciParameters, final QueryResponseData responseData, final String spellingQuery, final Warnings warnings, final IdolDocumentService.QueryExecutor queryExecutor) {
+        final String originalQuery = aciParameters.get(QueryParams.Text.name());
         aciParameters.put(QueryParams.Text.name(), spellingQuery);
 
         final QueryResponseData correctedResponseData = queryExecutor.execute(aciParameters);
         final List<IdolSearchResult> correctedResults = parseQueryHits(correctedResponseData.getHits());
 
-        final Spelling spelling = new Spelling(Arrays.asList(SPELLING_SEPARATOR_PATTERN.split(responseData.getSpelling())), spellingQuery, aciParameters.get(QueryParams.Text.name()));
+        final Spelling spelling = new Spelling(Arrays.asList(SPELLING_SEPARATOR_PATTERN.split(responseData.getSpelling())), spellingQuery, originalQuery);
 
         return new Documents<>(correctedResults, correctedResponseData.getTotalhits(), null, null, spelling, warnings);
     }
