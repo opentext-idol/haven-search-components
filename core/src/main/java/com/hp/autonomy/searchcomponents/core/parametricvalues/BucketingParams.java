@@ -7,9 +7,13 @@ package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@EqualsAndHashCode
+@ToString
 public class BucketingParams {
     private final int targetNumberOfBuckets;
     private Double min;
@@ -32,6 +36,7 @@ public class BucketingParams {
     public BucketingParams(final BucketingParams bucketingParams, final double absoluteMin, final double absoluteMax) {
         targetNumberOfBuckets = bucketingParams.targetNumberOfBuckets;
         min = bucketingParams.min != null ? bucketingParams.min : absoluteMin;
+
         if (bucketingParams.max != null) {
             max = bucketingParams.max;
         } else {
