@@ -7,13 +7,19 @@ package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.search.AbstractDocumentServiceIT;
+import com.hp.autonomy.searchcomponents.core.search.AutoCorrectException;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Collections;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -31,5 +37,27 @@ public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<String, Ido
         assertThat(typedStateToken, notNullValue());
         assertThat(typedStateToken.getStateToken(), is(not(isEmptyOrNullString())));
         assertThat(typedStateToken.getType(), is(notNullValue()));
+    }
+
+    @Test(expected = AutoCorrectException.class)
+    public void queryWithInvalidAutoCorrect() throws AciErrorException {
+        final SearchRequest<String> searchRequest = new SearchRequest<>();
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder()
+                .setQueryText("XORBanana")
+                .setFieldText("")
+                .setDatabases(integrationTestUtils.getDatabases())
+                .setMinDate(null)
+                .setMaxDate(DateTime.now())
+                .setMinScore(0)
+                .setLanguageType(null)
+                .setAnyLanguage(true)
+                .setStateMatchId(Collections.<String>emptyList())
+                .setStateDontMatchId(Collections.<String>emptyList())
+                .build();
+
+        searchRequest.setQueryRestrictions(queryRestrictions);
+        searchRequest.setAutoCorrect(true);
+
+        documentsService.queryTextIndex(searchRequest);
     }
 }
