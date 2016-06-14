@@ -10,6 +10,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.AutoCorrectException;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequest;
 import com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser;
 import com.hp.autonomy.types.idol.Database;
@@ -95,12 +96,16 @@ public class QueryResponseParserImpl implements QueryResponseParser {
         final String originalQuery = aciParameters.get(QueryParams.Text.name());
         aciParameters.put(QueryParams.Text.name(), spellingQuery);
 
-        final QueryResponseData correctedResponseData = queryExecutor.execute(aciParameters);
-        final List<IdolSearchResult> correctedResults = parseQueryHits(correctedResponseData.getHits());
-
         final Spelling spelling = new Spelling(Arrays.asList(SPELLING_SEPARATOR_PATTERN.split(responseData.getSpelling())), spellingQuery, originalQuery);
 
-        return new Documents<>(correctedResults, correctedResponseData.getTotalhits(), null, null, spelling, warnings);
+        try {
+            final QueryResponseData correctedResponseData = queryExecutor.execute(aciParameters);
+            final List<IdolSearchResult> correctedResults = parseQueryHits(correctedResponseData.getHits());
+
+            return new Documents<>(correctedResults, correctedResponseData.getTotalhits(), null, null, spelling, warnings);
+        } catch (AciErrorException e) {
+            throw new AutoCorrectException(e.getMessage(), e, spelling);
+        }
     }
 
     @Override
