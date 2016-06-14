@@ -50,7 +50,7 @@ public class QueryResponseParserImpl implements QueryResponseParser {
     }
 
     @Override
-    public Documents<IdolSearchResult> parseQueryResults(final AciSearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData, final IdolDocumentService.QueryExecutor queryExecutor) {
+    public Documents<IdolSearchResult> parseQueryResults(final AciSearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData, final IdolDocumentService.QueryExecutor queryExecutor) throws SearchInvalidException {
         final List<Hit> hits = responseData.getHits();
 
         final Warnings warnings = parseWarnings(searchRequest, aciParameters, responseData);
@@ -91,16 +91,20 @@ public class QueryResponseParserImpl implements QueryResponseParser {
         return warnings;
     }
 
-    protected Documents<IdolSearchResult> rerunQueryWithAdjustedSpelling(final AciParameters aciParameters, final QueryResponseData responseData, final String spellingQuery, final Warnings warnings, final IdolDocumentService.QueryExecutor queryExecutor) {
+    protected Documents<IdolSearchResult> rerunQueryWithAdjustedSpelling(final AciParameters aciParameters, final QueryResponseData responseData, final String spellingQuery, final Warnings warnings, final IdolDocumentService.QueryExecutor queryExecutor) throws SearchInvalidException {
         final String originalQuery = aciParameters.get(QueryParams.Text.name());
         aciParameters.put(QueryParams.Text.name(), spellingQuery);
 
-        final QueryResponseData correctedResponseData = queryExecutor.execute(aciParameters);
-        final List<IdolSearchResult> correctedResults = parseQueryHits(correctedResponseData.getHits());
-
         final Spelling spelling = new Spelling(Arrays.asList(SPELLING_SEPARATOR_PATTERN.split(responseData.getSpelling())), spellingQuery, originalQuery);
 
-        return new Documents<>(correctedResults, correctedResponseData.getTotalhits(), null, null, spelling, warnings);
+        try {
+            final QueryResponseData correctedResponseData = queryExecutor.execute(aciParameters);
+            final List<IdolSearchResult> correctedResults = parseQueryHits(correctedResponseData.getHits());
+
+            return new Documents<>(correctedResults, correctedResponseData.getTotalhits(), null, null, spelling, warnings);
+        } catch (AciErrorException e) {
+            throw new SearchInvalidException(e.getMessage(), e, spelling);
+        }
     }
 
     @Override

@@ -18,7 +18,7 @@ import java.util.List;
  * Parsing of response data returned by IDOL in response to search/suggest queries
  */
 public interface QueryResponseParser {
-    Documents<IdolSearchResult> parseQueryResults(AciSearchRequest<String> searchRequest, AciParameters aciParameters, QueryResponseData responseData, IdolDocumentService.QueryExecutor queryExecutor);
+    Documents<IdolSearchResult> parseQueryResults(AciSearchRequest<String> searchRequest, AciParameters aciParameters, QueryResponseData responseData, IdolDocumentService.QueryExecutor queryExecutor) throws SearchInvalidException;
 
     List<IdolSearchResult> parseQueryHits(Collection<Hit> hits);
 }
