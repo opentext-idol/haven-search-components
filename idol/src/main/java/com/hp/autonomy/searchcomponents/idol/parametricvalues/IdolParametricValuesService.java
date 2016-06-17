@@ -116,27 +116,27 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
     @Override
     @Cacheable(CacheNames.PARAMETRIC_VALUES_IN_BUCKETS)
     public List<RangeInfo> getNumericParametricValuesInBuckets(final IdolParametricRequest parametricRequest, final Map<String, BucketingParams> bucketingParamsPerField) throws AciErrorException {
-        final List<RangeInfo> results;
-        if (parametricRequest.getFieldNames().isEmpty()) {
-            results = Collections.emptyList();
-        } else {
-            final Map<String, BucketSizeEvaluator> bucketSizeEvaluators = new HashMap<>(bucketingParamsPerField.size());
-            final Map<String, BucketingParams> fieldsNeedingMetadata = new HashMap<>(bucketingParamsPerField.size());
-            for (final Map.Entry<String, BucketingParams> entry : bucketingParamsPerField.entrySet()) {
-                if (entry.getValue().getMin() == null || entry.getValue().getMax() == null) {
-                    fieldsNeedingMetadata.put(entry.getKey(), entry.getValue());
-                } else {
-                    bucketSizeEvaluators.put(entry.getKey(), bucketSizeEvaluatorFactory.getBucketSizeEvaluator(entry.getValue()));
-                }
+        final int numberOfFields = bucketingParamsPerField.size();
+        final List<RangeInfo> results = new ArrayList<>(numberOfFields);
+        final Map<String, BucketSizeEvaluator> bucketSizeEvaluators = new HashMap<>(numberOfFields);
+        final Map<String, BucketingParams> fieldsNeedingMetadata = new HashMap<>(numberOfFields);
+        for (final Map.Entry<String, BucketingParams> entry : bucketingParamsPerField.entrySet()) {
+            final int targetNumberOfBuckets = entry.getValue().getTargetNumberOfBuckets();
+            if ((entry.getValue().getMin() == null || entry.getValue().getMax() == null) && targetNumberOfBuckets > 0) {
+                fieldsNeedingMetadata.put(entry.getKey(), entry.getValue());
+            } else if (targetNumberOfBuckets > 0) {
+                bucketSizeEvaluators.put(entry.getKey(), bucketSizeEvaluatorFactory.getBucketSizeEvaluator(entry.getValue()));
             }
+        }
 
-            if (!fieldsNeedingMetadata.isEmpty()) {
-                getMissingValueBounds(parametricRequest, fieldsNeedingMetadata, bucketSizeEvaluators);
-            }
+        if (!fieldsNeedingMetadata.isEmpty()) {
+            getMissingValueBounds(parametricRequest, fieldsNeedingMetadata, bucketSizeEvaluators);
+        }
 
+        if (!bucketSizeEvaluators.isEmpty()) {
             final List<Range> ranges = generateRanges(bucketSizeEvaluators);
 
-            results = queryForRanges(parametricRequest, bucketSizeEvaluators, ranges);
+            queryForRanges(results, parametricRequest, bucketSizeEvaluators, ranges);
         }
 
         return results;
@@ -238,7 +238,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         return ranges;
     }
 
-    private List<RangeInfo> queryForRanges(final ParametricRequest<String> parametricRequest, final Map<String, BucketSizeEvaluator> bucketSizeEvaluators, final List<Range> ranges) {
+    private void queryForRanges(final List<RangeInfo> results, final ParametricRequest<String> parametricRequest, final Map<String, BucketSizeEvaluator> bucketSizeEvaluators, final List<Range> ranges) {
         final IdolParametricRequest bucketingRequest = new IdolParametricRequest.Builder()
                 .setFieldNames(new ArrayList<>(bucketSizeEvaluators.keySet()))
                 .setMaxValues(null)
@@ -248,7 +248,6 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
                 .setModified(parametricRequest.isModified())
                 .build();
         final List<FlatField> flatFields = getFlatFields(bucketingRequest, parametricRequest.getFieldNames());
-        final List<RangeInfo> results = new ArrayList<>(flatFields.size());
         for (final FlatField field : flatFields) {
             final TagName tagName = new TagName(field.getName().get(0));
             final BucketSizeEvaluator bucketSizeEvaluator = bucketSizeEvaluators.get(tagName.getId());
@@ -277,7 +276,6 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
 
             results.add(new RangeInfo(tagName, count, bucketSizeEvaluator.getMin(), bucketSizeEvaluator.getMax(), bucketSizeEvaluator.getBucketSize(), new ArrayList<>(values.values())));
         }
-        return results;
     }
 
     private List<FlatField> getFlatFields(final ParametricRequest<String> parametricRequest, final Collection<String> fieldNames) {

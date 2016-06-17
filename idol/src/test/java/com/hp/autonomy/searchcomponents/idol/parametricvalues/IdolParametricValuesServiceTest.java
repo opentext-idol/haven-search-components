@@ -171,6 +171,13 @@ public class IdolParametricValuesServiceTest {
     }
 
     @Test
+    public void getNumericParametricValuesZeroBucketsDesired() {
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
+        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of("ParametricNumericDateField", new BucketingParams(0, 1.0, 5.0)));
+        assertThat(results, is(empty()));
+    }
+
+    @Test
     public void bucketParametricValuesNotConfigured() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.<String>emptyList());
         final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, Collections.<String, BucketingParams>emptyMap());

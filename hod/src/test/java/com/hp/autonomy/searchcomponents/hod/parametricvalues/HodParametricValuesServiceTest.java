@@ -235,6 +235,15 @@ public class HodParametricValuesServiceTest {
     }
 
     @Test
+    public void getNumericParametricValuesZeroBucketsDesired() throws HodErrorException {
+        final HodParametricRequest idolParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
+        final FieldNames responseData = mockNumericQueryResponse("ParametricNumericDateField", ImmutableMap.of("1", 1, "1,3", 2, "6,9", 1, "12", 1, "21", 1));
+        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
+        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of("ParametricNumericDateField", new BucketingParams(0, 10.0, 11.0)));
+        MatcherAssert.assertThat(results, is(empty()));
+    }
+
+    @Test
     public void getNumericParametricValuesInBucketsNoFields() throws HodErrorException {
         final HodParametricRequest idolParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
         final FieldNames responseData = new FieldNames.Builder()

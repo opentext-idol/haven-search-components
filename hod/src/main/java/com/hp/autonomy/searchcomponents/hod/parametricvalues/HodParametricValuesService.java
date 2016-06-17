@@ -99,7 +99,9 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
         final List<RangeInfo> ranges = new ArrayList<>(numericFieldInfo.size());
         for (final QueryTagInfo queryTagInfo : numericFieldInfo) {
             final BucketingParams bucketingParams = bucketingParamsPerField.get(queryTagInfo.getId());
-            getNumericParametricValuesInBucketsForField(ranges, queryTagInfo, bucketingParams);
+            if (bucketingParams.getTargetNumberOfBuckets() > 0) {
+                getNumericParametricValuesInBucketsForField(ranges, queryTagInfo, bucketingParams);
+            }
         }
 
         return ranges;
