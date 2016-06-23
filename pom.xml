@@ -23,7 +23,7 @@
 
     <groupId>com.hp.autonomy.frontend</groupId>
     <artifactId>haven-search-components</artifactId>
-    <version>0.21.4</version>
+    <version>0.21.5</version>
 
     <name>HP Haven Search Components</name>
     <description>Reusable components for HP Haven Search.</description>

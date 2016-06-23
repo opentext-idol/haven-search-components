@@ -8,11 +8,13 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -49,7 +51,6 @@ public class IdolQueryRestrictions implements QueryRestrictions<String> {
     }
 
     @Component
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @SuppressWarnings("FieldMayBeFinal")
     @JsonPOJOBuilder(withPrefix = "set")
     @Setter
