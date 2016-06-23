@@ -16,7 +16,6 @@ import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
-import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
@@ -45,7 +44,6 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
     private static final String GET_CONTENT_QUERY_TEXT = "*";
 
     protected final ConfigService<? extends IdolSearchCapable> configService;
-    protected final LanguagesService languagesService;
     protected final DocumentFieldsService documentFieldsService;
     protected final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever;
 
@@ -54,12 +52,10 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
     @Autowired
     public HavenSearchAciParameterHandlerImpl(
             final ConfigService<? extends IdolSearchCapable> configService,
-            final LanguagesService languagesService,
             final DocumentFieldsService documentFieldsService,
             final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever
     ) {
         this.configService = configService;
-        this.languagesService = languagesService;
         this.documentFieldsService = documentFieldsService;
         this.authenticationInformationRetriever = authenticationInformationRetriever;
     }
@@ -146,11 +142,17 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
 
     @Override
     public void addLanguageRestriction(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions) {
+        // If the AnyLanguage parameter is true, documents with any language can be returned, otherwise documents matching
+        // the MatchLanguage parameter are returned.
         if (queryRestrictions.isAnyLanguage()) {
             aciParameters.add(QueryParams.AnyLanguage.name(), true);
-        } else {
-            final String languageType = queryRestrictions.getLanguageType() != null ? queryRestrictions.getLanguageType() : languagesService.getDefaultLanguageId();
-            aciParameters.add(QueryParams.LanguageType.name(), languageType);
+        }
+
+        // The LanguageType parameter specifies the language and encoding of the query text. If no MatchLanguage or
+        // AnyLanguage parameter is set, this acts as a MatchLanguage restriction for the specified language. If no
+        // LanguageType is set, the query text is interpreted using the default language and encoding.
+        if (queryRestrictions.getLanguageType() != null) {
+            aciParameters.add(QueryParams.LanguageType.name(), queryRestrictions.getLanguageType());
         }
     }
 

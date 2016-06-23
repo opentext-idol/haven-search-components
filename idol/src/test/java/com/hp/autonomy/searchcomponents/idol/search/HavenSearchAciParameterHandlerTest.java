@@ -10,7 +10,6 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
-import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
@@ -21,6 +20,7 @@ import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
+import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,9 +43,6 @@ public class HavenSearchAciParameterHandlerTest {
     private ConfigService<? extends IdolSearchCapable> configService;
 
     @Mock
-    private LanguagesService languagesService;
-
-    @Mock
     private DocumentFieldsService documentFieldsService;
 
     @Mock
@@ -55,7 +52,7 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Before
     public void setUp() {
-        parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, languagesService, documentFieldsService, authenticationInformationRetriever);
+        parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, documentFieldsService, authenticationInformationRetriever);
     }
 
     @Test
@@ -109,7 +106,7 @@ public class HavenSearchAciParameterHandlerTest {
     }
 
     @Test
-    public void addLanguageRestriction() {
+    public void addLanguageType() {
         final AciParameters aciParameters = new AciParameters();
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setLanguageType("englishUTF8").build();
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
@@ -117,12 +114,11 @@ public class HavenSearchAciParameterHandlerTest {
     }
 
     @Test
-    public void addDefaultLanguageRestriction() {
+    public void defaultLanguageType() {
         final AciParameters aciParameters = new AciParameters();
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().build();
-        when(languagesService.getDefaultLanguageId()).thenReturn("englishUTF8");
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
-        assertThat(aciParameters, hasItem(new AciParameter(QueryParams.LanguageType.name(), "englishUTF8")));
+        assertThat(aciParameters, Matchers.<AciParameter>empty());
     }
 
     @Test
