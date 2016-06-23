@@ -44,6 +44,7 @@ public class HodRelatedConceptsService implements RelatedConceptsService<Entity,
                 .setIndexes(queryRestrictions.getDatabases())
                 .setFieldText(queryRestrictions.getFieldText())
                 .setMinScore(queryRestrictions.getMinScore())
+                .setMaxResults(queryRestrictions.getMaxResults())
                 .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
 
         return findRelatedConceptsService.findRelatedConceptsWithText(queryRestrictions.getQueryText(), params);
