@@ -25,7 +25,6 @@ import java.util.List;
 
 @Service
 public class IdolRelatedConceptsService implements RelatedConceptsService<QsElement, String, AciErrorException> {
-    private static final int MAX_RESULTS = 200;
 
     private final HavenSearchAciParameterHandler parameterHandler;
     private final AciService contentAciService;
@@ -42,7 +41,6 @@ public class IdolRelatedConceptsService implements RelatedConceptsService<QsElem
     public List<QsElement> findRelatedConcepts(final RelatedConceptsRequest<String> relatedConceptsRequest) throws AciErrorException {
         final AciParameters parameters = new AciParameters(QueryActions.Query.name());
         parameterHandler.addSearchRestrictions(parameters, relatedConceptsRequest.getQueryRestrictions());
-        parameters.add(QueryParams.MaxResults.name(), MAX_RESULTS);
         parameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         parameters.add(QueryParams.QuerySummary.name(), true);
         parameters.add(QueryParams.QuerySummaryLength.name(), relatedConceptsRequest.getQuerySummaryLength());

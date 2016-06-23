@@ -31,6 +31,8 @@ public interface QueryRestrictions<S extends Serializable> extends Serializable 
 
     boolean isAnyLanguage();
 
+    Integer getMaxResults();
+
     interface Builder<Q extends QueryRestrictions<S>, S extends Serializable> {
         Builder<Q, S> setQueryText(String queryText);
 
@@ -47,6 +49,8 @@ public interface QueryRestrictions<S extends Serializable> extends Serializable 
         Builder<Q, S> setStateMatchId(List<String> stateMatchId);
 
         Builder<Q, S> setStateDontMatchId(List<String> stateDontMatchId);
+
+        Builder<Q, S> setMaxResults(Integer maxResults);
 
         Q build();
     }

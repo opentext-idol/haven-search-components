@@ -32,6 +32,7 @@ public class HodQueryRestrictions implements QueryRestrictions<ResourceIdentifie
     private final Integer minScore;
     private final String languageType;
     private final boolean anyLanguage;
+    private final Integer maxResults;
 
     // State tokens not yet supported in HoD, so leaving these out of the builder for now
     private final List<String> stateMatchId;
@@ -48,6 +49,7 @@ public class HodQueryRestrictions implements QueryRestrictions<ResourceIdentifie
         anyLanguage = builder.anyLanguage;
         stateMatchId = builder.stateMatchId;
         stateDontMatchId = builder.stateDontMatchId;
+        maxResults = builder.maxResults;
     }
 
     @Component
@@ -67,6 +69,7 @@ public class HodQueryRestrictions implements QueryRestrictions<ResourceIdentifie
         private boolean anyLanguage;
         private List<String> stateMatchId = Collections.emptyList();
         private List<String> stateDontMatchId = Collections.emptyList();
+        private Integer maxResults;
 
         @Override
         public HodQueryRestrictions build() {
