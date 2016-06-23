@@ -14,8 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -53,7 +51,6 @@ public class HodQueryRestrictions implements QueryRestrictions<ResourceIdentifie
     }
 
     @Component
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @SuppressWarnings("FieldMayBeFinal")
     @JsonPOJOBuilder(withPrefix = "set")
     @Setter
