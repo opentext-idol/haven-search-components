@@ -67,6 +67,8 @@ public class IdolRelatedConceptsServiceTest {
 
         final IdolRelatedConceptsRequest idolRelatedConceptsRequest = new IdolRelatedConceptsRequest.Builder()
                 .setQueryRestrictions(queryRestrictions)
+                .setQuerySummaryLength(250)
+                .setMaxResults(200)
                 .build();
         final List<QsElement> results = idolRelatedConceptsService.findRelatedConcepts(idolRelatedConceptsRequest);
         assertThat(results, is(not(empty())));

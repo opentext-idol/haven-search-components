@@ -10,5 +10,17 @@ import java.io.Serializable;
 public interface RelatedConceptsRequest<S extends Serializable> extends Serializable {
     int getQuerySummaryLength();
 
+    Integer getMaxResults();
+
     QueryRestrictions<S> getQueryRestrictions();
+
+    interface Builder<R extends RelatedConceptsRequest<S>, S extends Serializable> {
+        Builder<R, S> setQuerySummaryLength(int querySummaryLength);
+
+        Builder<R, S> setMaxResults(Integer maxResults);
+
+        Builder<R, S> setQueryRestrictions(QueryRestrictions<S> queryRestrictions);
+
+        R build();
+    }
 }
