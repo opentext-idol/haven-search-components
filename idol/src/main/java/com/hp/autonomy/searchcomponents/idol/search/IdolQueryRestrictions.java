@@ -36,7 +36,6 @@ public class IdolQueryRestrictions implements QueryRestrictions<String> {
     private final boolean anyLanguage;
     private final List<String> stateMatchId;
     private final List<String> stateDontMatchId;
-    private final Integer maxResults;
 
     private IdolQueryRestrictions(final Builder builder) {
         queryText = builder.queryText;
@@ -49,7 +48,6 @@ public class IdolQueryRestrictions implements QueryRestrictions<String> {
         anyLanguage = builder.anyLanguage;
         stateMatchId = builder.stateMatchId;
         stateDontMatchId = builder.stateDontMatchId;
-        maxResults = builder.maxResults;
     }
 
     @Component
@@ -69,7 +67,6 @@ public class IdolQueryRestrictions implements QueryRestrictions<String> {
         private boolean anyLanguage;
         private List<String> stateMatchId = Collections.emptyList();
         private List<String> stateDontMatchId = Collections.emptyList();
-        private Integer maxResults;
 
         @Override
         public IdolQueryRestrictions build() {

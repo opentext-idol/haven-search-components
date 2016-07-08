@@ -23,6 +23,7 @@ public class HodRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceI
         return new HodRelatedConceptsRequest.Builder()
                 .setQueryRestrictions(testUtils.buildQueryRestrictions())
                 .setQuerySummaryLength(50)
+                .setMaxResults(200)
                 .build();
     }
 }
