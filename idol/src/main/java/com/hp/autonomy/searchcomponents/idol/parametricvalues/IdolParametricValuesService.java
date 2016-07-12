@@ -206,9 +206,9 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
             for (final JAXBElement<?> element : valueElements) {
                 final String elementLocalName = element.getName().getLocalPart();
                 if (VALUE_MIN_NODE_NAME.equals(elementLocalName)) {
-                    minValue = (Float) element.getValue();
+                    minValue = (Double) element.getValue();
                 } else if (VALUE_MAX_NODE_NAME.equals(elementLocalName)) {
-                    maxValue = (Float) element.getValue();
+                    maxValue = (Double) element.getValue();
                 }
             }
 

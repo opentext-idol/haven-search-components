@@ -69,7 +69,7 @@ public class IdolParametricValuesServiceTest {
     private AciResponseJaxbProcessorFactory aciResponseProcessorFactory;
 
     @Mock
-    private JAXBElement<? extends Serializable> element;
+    private JAXBElement<Serializable> element;
 
     private IdolParametricValuesService parametricValuesService;
 
@@ -116,14 +116,14 @@ public class IdolParametricValuesServiceTest {
     @Test
     public void getNumericParametricValuesInBuckets() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        mockBucketResponses(8, 1f, 21f, mockTagValue("1,6", 5), mockTagValue("6,11", 2), mockTagValue("21,", 1));
+        mockBucketResponses(8, 1d, 21d, mockTagValue("1,6", 5), mockTagValue("6,11", 2), mockTagValue("21,", 1));
         final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of("ParametricNumericDateField", new BucketingParams(5)));
         assertThat(results, is(not(empty())));
         final RangeInfo info = results.iterator().next();
         final List<RangeInfo.Value> countInfo = info.getValues();
         assertEquals(8, info.getCount());
-        assertEquals(1f, info.getMin(), 0);
-        assertEquals(22f, info.getMax(), 0);
+        assertEquals(1d, info.getMin(), 0);
+        assertEquals(22d, info.getMax(), 0);
         final Iterator<RangeInfo.Value> iterator = countInfo.iterator();
         assertEquals(new RangeInfo.Value(5, 1, 6), iterator.next());
         assertEquals(new RangeInfo.Value(2, 6, 11), iterator.next());
@@ -142,7 +142,7 @@ public class IdolParametricValuesServiceTest {
         final List<RangeInfo.Value> countInfo = info.getValues();
         assertEquals(7, info.getCount());
         assertEquals(1, info.getMin(), 0);
-        assertEquals(6f, info.getMax(), 0);
+        assertEquals(6d, info.getMax(), 0);
         final Iterator<RangeInfo.Value> iterator = countInfo.iterator();
         assertEquals(new RangeInfo.Value(0, 1, 2), iterator.next());
         assertEquals(new RangeInfo.Value(5, 2, 3), iterator.next());
@@ -161,7 +161,7 @@ public class IdolParametricValuesServiceTest {
         final List<RangeInfo.Value> countInfo = info.getValues();
         assertEquals(0, info.getCount());
         assertEquals(1, info.getMin(), 0);
-        assertEquals(6f, info.getMax(), 0);
+        assertEquals(6d, info.getMax(), 0);
         final Iterator<RangeInfo.Value> iterator = countInfo.iterator();
         assertEquals(new RangeInfo.Value(0, 1, 2), iterator.next());
         assertEquals(new RangeInfo.Value(0, 2, 3), iterator.next());
@@ -242,9 +242,16 @@ public class IdolParametricValuesServiceTest {
         return responseData;
     }
 
-    private void mockBucketResponses(final int count, final float min, final float max, final TagValue... tagValues) {
-        when(element.getName()).thenReturn(new QName("", IdolParametricValuesService.VALUE_MIN_NODE_NAME), new QName("", IdolParametricValuesService.VALUE_MAX_NODE_NAME), new QName("", IdolParametricValuesService.VALUES_NODE_NAME), new QName("", IdolParametricValuesService.VALUE_NODE_NAME));
-        OngoingStubbing<? extends Serializable> stub = when(element.getValue()).thenReturn(min).thenReturn(max).thenReturn(count);
+    private void mockBucketResponses(final int count, final double min, final double max, final TagValue... tagValues) {
+        when(element.getName()).thenReturn(
+                new QName("", IdolParametricValuesService.VALUE_MIN_NODE_NAME),
+                new QName("", IdolParametricValuesService.VALUE_MAX_NODE_NAME),
+                new QName("", IdolParametricValuesService.VALUES_NODE_NAME),
+                new QName("", IdolParametricValuesService.VALUE_NODE_NAME)
+        );
+
+        OngoingStubbing<Serializable> stub = when(element.getValue()).thenReturn(min).thenReturn(max).thenReturn(count);
+
         for (final TagValue tagValue : tagValues) {
             //noinspection unchecked,rawtypes
             stub = ((OngoingStubbing) stub).thenReturn(tagValue);
@@ -270,8 +277,13 @@ public class IdolParametricValuesServiceTest {
     }
 
     private void mockBucketResponses(final int count, final TagValue... tagValues) {
-        when(element.getName()).thenReturn(new QName("", IdolParametricValuesService.VALUES_NODE_NAME), new QName("", IdolParametricValuesService.VALUE_NODE_NAME));
-        OngoingStubbing<? extends Serializable> stub = when(element.getValue()).thenReturn(count);
+        when(element.getName()).thenReturn(
+                new QName("", IdolParametricValuesService.VALUES_NODE_NAME),
+                new QName("", IdolParametricValuesService.VALUE_NODE_NAME)
+        );
+
+        OngoingStubbing<Serializable> stub = when(element.getValue()).thenReturn(count);
+
         for (final TagValue tagValue : tagValues) {
             //noinspection unchecked,rawtypes
             stub = ((OngoingStubbing) stub).thenReturn(tagValue);
