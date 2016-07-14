@@ -30,6 +30,9 @@ import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
 public class IdolDocumentService implements DocumentsService<String, IdolSearchResult, AciErrorException> {
+    // fake token in a format that IDOL is happy with
+    private static final String EMPTY_RESULT_SET_TOKEN = "NULL-0";
+
     protected final ConfigService<? extends IdolSearchCapable> configService;
     protected final HavenSearchAciParameterHandler parameterHandler;
     protected final QueryResponseParser queryResponseParser;
@@ -125,7 +128,8 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
         aciParameters.remove(QueryParams.Combine.name());
 
         final QueryResponseData responseData = contentAciService.executeAction(aciParameters, queryResponseProcessor);
-        final TypedStateToken tokenData = new TypedStateToken(responseData.getState(), promotions ? TypedStateToken.StateTokenType.PROMOTIONS : TypedStateToken.StateTokenType.QUERY);
+        final String token = responseData.getState() != null ? responseData.getState() : EMPTY_RESULT_SET_TOKEN;
+        final TypedStateToken tokenData = new TypedStateToken(token, promotions ? TypedStateToken.StateTokenType.PROMOTIONS : TypedStateToken.StateTokenType.QUERY);
 
         // Now fetch result count with combine=simple
         final AciParameters resultCountAciParameters = new AciParameters(QueryActions.Query.name());
