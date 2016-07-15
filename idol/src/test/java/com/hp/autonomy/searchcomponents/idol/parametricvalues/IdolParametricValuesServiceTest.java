@@ -27,6 +27,7 @@ import com.hp.autonomy.types.idol.Values;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
+import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.junit.Before;
@@ -39,19 +40,24 @@ import org.mockito.stubbing.OngoingStubbing;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -111,6 +117,33 @@ public class IdolParametricValuesServiceTest {
 
         final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
         assertThat(results, is(empty()));
+    }
+
+    @Test
+    public void getValueDetailsNoFields() {
+        final IdolParametricRequest parametricRequest = mockRequest(Collections.<String>emptyList());
+        assertThat(parametricValuesService.getValueDetails(parametricRequest).size(), is(0));
+    }
+
+    @Test
+    public void getValueDetails() {
+        final String elevation = "DOCUMENT/ELEVATION";
+        final String age = "DOCUMENT/AGE";
+        final IdolParametricRequest parametricRequest = mockRequest(Arrays.asList(elevation, age));
+
+        final List<FlatField> responseFields = new LinkedList<>();
+        responseFields.add(mockFlatField(elevation, -50, 1242, 12314, 500.5));
+        responseFields.add(mockFlatField(age, 0, 96, 1314, 26));
+
+        final GetQueryTagValuesResponseData response = mock(GetQueryTagValuesResponseData.class);
+        when(response.getField()).thenReturn(responseFields);
+
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(response);
+
+        final Map<TagName, ValueDetails> valueDetails = parametricValuesService.getValueDetails(parametricRequest);
+        assertThat(valueDetails.size(), is(2));
+        assertThat(valueDetails, hasEntry(equalTo(new TagName(elevation)), equalTo(new ValueDetails(-50, 1242, 500.5, 12314))));
+        assertThat(valueDetails, hasEntry(equalTo(new TagName(age)), equalTo(new ValueDetails(0, 96, 26, 1314))));
     }
 
     @Test
@@ -240,6 +273,29 @@ public class IdolParametricValuesServiceTest {
         field.getValueAndSubvalueOrValues().add(element);
         responseData.getField().add(field);
         return responseData;
+    }
+
+    private JAXBElement<Serializable> mockJAXBElement(final String name, final double value) {
+        @SuppressWarnings("unchecked")
+        final JAXBElement<Serializable> jaxbElement = mock(JAXBElement.class);
+
+        when(jaxbElement.getName()).thenReturn(new QName("", name));
+        when(jaxbElement.getValue()).thenReturn(value);
+        return jaxbElement;
+    }
+
+    private FlatField mockFlatField(final String name, final double min, final double max, final double sum, final double average) {
+        final FlatField flatField = mock(FlatField.class);
+        when(flatField.getName()).thenReturn(Collections.singletonList(name));
+
+        final List<JAXBElement<? extends Serializable>> values = new LinkedList<>();
+        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_MIN_NODE_NAME, min));
+        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_MAX_NODE_NAME, max));
+        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_SUM_NODE_NAME, sum));
+        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_AVERAGE_NODE_NAME, average));
+
+        when(flatField.getValueAndSubvalueOrValues()).thenReturn(values);
+        return flatField;
     }
 
     private void mockBucketResponses(final int count, final double min, final double max, final TagValue... tagValues) {

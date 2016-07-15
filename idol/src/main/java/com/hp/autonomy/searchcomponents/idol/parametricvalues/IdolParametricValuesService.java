@@ -31,6 +31,7 @@ import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
+import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
 import org.apache.commons.lang.ArrayUtils;
@@ -47,6 +48,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,8 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
     static final String VALUES_NODE_NAME = "values";
     static final String VALUE_MIN_NODE_NAME = "valuemin";
     static final String VALUE_MAX_NODE_NAME = "valuemax";
+    static final String VALUE_AVERAGE_NODE_NAME = "valueaverage";
+    static final String VALUE_SUM_NODE_NAME = "valuesum";
 
     private final HavenSearchAciParameterHandler parameterHandler;
     private final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService;
@@ -120,6 +124,7 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         final List<RangeInfo> results = new ArrayList<>(numberOfFields);
         final Map<String, BucketSizeEvaluator> bucketSizeEvaluators = new HashMap<>(numberOfFields);
         final Map<String, BucketingParams> fieldsNeedingMetadata = new HashMap<>(numberOfFields);
+
         for (final Map.Entry<String, BucketingParams> entry : bucketingParamsPerField.entrySet()) {
             final int targetNumberOfBuckets = entry.getValue().getTargetNumberOfBuckets();
             if ((entry.getValue().getMin() == null || entry.getValue().getMax() == null) && targetNumberOfBuckets > 0) {
@@ -170,6 +175,49 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
         return results;
     }
 
+    @Override
+    public Map<TagName, ValueDetails> getValueDetails(final IdolParametricRequest parametricRequest) throws AciErrorException {
+        if (parametricRequest.getFieldNames().isEmpty()) {
+            return Collections.emptyMap();
+        } else {
+            final AciParameters aciParameters = createAciParameters(parametricRequest.getQueryRestrictions(), parametricRequest.isModified());
+
+            aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), 1);
+            aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(parametricRequest.getFieldNames(), ','));
+            aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
+
+            final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
+            final Collection<FlatField> fields = responseData.getField();
+
+            final Map<TagName, ValueDetails> output = new LinkedHashMap<>();
+
+            for (final FlatField field : fields) {
+                final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
+
+                final ValueDetails.Builder builder = new ValueDetails.Builder();
+
+                for (final JAXBElement<?> element : valueElements) {
+                    final String elementLocalName = element.getName().getLocalPart();
+
+                    if (VALUE_MIN_NODE_NAME.equals(elementLocalName)) {
+                        builder.setMin((Double) element.getValue());
+                    } else if (VALUE_MAX_NODE_NAME.equals(elementLocalName)) {
+                        builder.setMax((Double) element.getValue());
+                    } else if (VALUE_AVERAGE_NODE_NAME.equals(elementLocalName)) {
+                        builder.setAverage((Double) element.getValue());
+                    } else if (VALUE_SUM_NODE_NAME.equals(elementLocalName)) {
+                        builder.setSum((Double) element.getValue());
+                    }
+                }
+
+                final TagName tagName = new TagName(field.getName().get(0));
+                output.put(tagName, builder.build());
+            }
+
+            return output;
+        }
+    }
+
     private AciParameters createAciParameters(final QueryRestrictions<String> queryRestrictions, final boolean modified) {
         final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
@@ -198,11 +246,13 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
 
         final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
         final Collection<FlatField> fields = responseData.getField();
+
         for (final FlatField field : fields) {
             final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
             final TagName tagName = new TagName(field.getName().get(0));
             double minValue = 0.0;
             double maxValue = 0.0;
+
             for (final JAXBElement<?> element : valueElements) {
                 final String elementLocalName = element.getName().getLocalPart();
                 if (VALUE_MIN_NODE_NAME.equals(elementLocalName)) {

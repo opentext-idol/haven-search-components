@@ -28,6 +28,7 @@ import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
+import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,6 +38,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -184,6 +186,45 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
     @Override
     public List<RecursiveField> getDependentParametricValues(final HodParametricRequest parametricRequest) throws HodErrorException {
         throw new NotImplementedException("Dependent parametric values not yet implemented for hod");
+    }
+
+    @Override
+    public Map<TagName, ValueDetails> getValueDetails(final HodParametricRequest parametricRequest) throws HodErrorException {
+        if (parametricRequest.getFieldNames().isEmpty()) {
+            return Collections.emptyMap();
+        } else {
+            final FieldNames response = getParametricValues(parametricRequest, parametricRequest.getFieldNames());
+            final Map<TagName, ValueDetails> output = new LinkedHashMap<>();
+
+            for (final String fieldName : response.getFieldNames()) {
+                final List<QueryTagCountInfo> values = response.getValuesAndCountsForNumericField(fieldName);
+                final double firstValue = Double.parseDouble(values.get(0).getValue());
+
+                double min = firstValue;
+                double max = firstValue;
+                double sum = 0;
+                double totalCount = 0;
+
+                for (final QueryTagCountInfo countInfo : values) {
+                    final double value = Double.parseDouble(countInfo.getValue());
+                    totalCount += countInfo.getCount();
+                    sum += value * countInfo.getCount();
+                    min = Math.min(value, min);
+                    max = Math.max(value, max);
+                }
+
+                final ValueDetails valueDetails = new ValueDetails.Builder()
+                        .setMin(min)
+                        .setMax(max)
+                        .setSum(sum)
+                        .setAverage(sum / totalCount)
+                        .build();
+
+                output.put(new TagName(fieldName), valueDetails);
+            }
+
+            return output;
+        }
     }
 
     private FieldNames getParametricValues(final ParametricRequest<ResourceIdentifier> parametricRequest, final Collection<String> fieldNames) throws HodErrorException {
