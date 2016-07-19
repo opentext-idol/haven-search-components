@@ -30,17 +30,21 @@ public abstract class AbstractDocumentServiceIT<S extends Serializable, D extend
 
     @Test
     public void query() throws E {
-        final SearchRequest<S> searchRequest = new SearchRequest<>();
-        searchRequest.setQueryRestrictions(integrationTestUtils.buildQueryRestrictions());
+        final SearchRequest<S> searchRequest = new SearchRequest.Builder<S>()
+                .setQueryRestrictions(integrationTestUtils.buildQueryRestrictions())
+                .setQueryType(SearchRequest.QueryType.MODIFIED)
+                .build();
         final Documents<D> documents = documentsService.queryTextIndex(searchRequest);
         assertThat(documents.getDocuments(), is(not(empty())));
     }
 
     @Test
     public void queryForPromotions() throws E {
-        final SearchRequest<S> searchRequest = new SearchRequest<>();
-        searchRequest.setQueryRestrictions(integrationTestUtils.buildQueryRestrictions());
-        final Documents<D> documents = documentsService.queryTextIndexForPromotions(searchRequest);
+        final SearchRequest<S> searchRequest = new SearchRequest.Builder<S>()
+                .setQueryRestrictions(integrationTestUtils.buildQueryRestrictions())
+                .setQueryType(SearchRequest.QueryType.PROMOTIONS)
+                .build();
+        final Documents<D> documents = documentsService.queryTextIndex(searchRequest);
         assertThat(documents.getDocuments(), is(empty())); // TODO: configure this later
     }
 

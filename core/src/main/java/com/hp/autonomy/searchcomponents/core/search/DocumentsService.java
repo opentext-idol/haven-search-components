@@ -17,8 +17,6 @@ public interface DocumentsService<S extends Serializable, D extends SearchResult
 
     Documents<D> queryTextIndex(SearchRequest<S> searchRequest) throws E;
 
-    Documents<D> queryTextIndexForPromotions(SearchRequest<S> searchRequest) throws E;
-
     Documents<D> findSimilar(SuggestRequest<S> suggestRequest) throws E;
 
     List<D> getDocumentContent(GetContentRequest<S> request) throws E;
