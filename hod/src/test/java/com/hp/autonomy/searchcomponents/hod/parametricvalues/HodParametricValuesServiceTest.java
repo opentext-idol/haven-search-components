@@ -162,7 +162,7 @@ public class HodParametricValuesServiceTest {
 
         final Map<TagName, ValueDetails> valueDetails = parametricValuesService.getValueDetails(parametricRequest);
         assertThat(valueDetails.size(), is(1));
-        assertThat(valueDetails, hasEntry(new TagName(field), new ValueDetails(0.8, 21, 6, 54)));
+        assertThat(valueDetails, hasEntry(new TagName(field), new ValueDetails(0.8, 21, 6, 54, 6)));
     }
 
     @Test

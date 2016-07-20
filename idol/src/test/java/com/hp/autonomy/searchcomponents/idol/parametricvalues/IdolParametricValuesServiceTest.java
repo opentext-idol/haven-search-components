@@ -132,8 +132,8 @@ public class IdolParametricValuesServiceTest {
         final IdolParametricRequest parametricRequest = mockRequest(Arrays.asList(elevation, age));
 
         final List<FlatField> responseFields = new LinkedList<>();
-        responseFields.add(mockFlatField(elevation, -50, 1242, 12314, 500.5));
-        responseFields.add(mockFlatField(age, 0, 96, 1314, 26));
+        responseFields.add(mockFlatField(elevation, -50, 1242, 12314, 500.5, 3));
+        responseFields.add(mockFlatField(age, 0, 96, 1314, 26, 100));
 
         final GetQueryTagValuesResponseData response = mock(GetQueryTagValuesResponseData.class);
         when(response.getField()).thenReturn(responseFields);
@@ -142,8 +142,8 @@ public class IdolParametricValuesServiceTest {
 
         final Map<TagName, ValueDetails> valueDetails = parametricValuesService.getValueDetails(parametricRequest);
         assertThat(valueDetails.size(), is(2));
-        assertThat(valueDetails, hasEntry(equalTo(new TagName(elevation)), equalTo(new ValueDetails(-50, 1242, 500.5, 12314))));
-        assertThat(valueDetails, hasEntry(equalTo(new TagName(age)), equalTo(new ValueDetails(0, 96, 26, 1314))));
+        assertThat(valueDetails, hasEntry(equalTo(new TagName(elevation)), equalTo(new ValueDetails(-50, 1242, 500.5, 12314, 3))));
+        assertThat(valueDetails, hasEntry(equalTo(new TagName(age)), equalTo(new ValueDetails(0, 96, 26, 1314, 100))));
     }
 
     @Test
@@ -284,9 +284,10 @@ public class IdolParametricValuesServiceTest {
         return jaxbElement;
     }
 
-    private FlatField mockFlatField(final String name, final double min, final double max, final double sum, final double average) {
+    private FlatField mockFlatField(final String name, final double min, final double max, final double sum, final double average, final int totalValues) {
         final FlatField flatField = mock(FlatField.class);
         when(flatField.getName()).thenReturn(Collections.singletonList(name));
+        when(flatField.getTotalValues()).thenReturn(totalValues);
 
         final List<JAXBElement<? extends Serializable>> values = new LinkedList<>();
         values.add(mockJAXBElement(IdolParametricValuesService.VALUE_MIN_NODE_NAME, min));

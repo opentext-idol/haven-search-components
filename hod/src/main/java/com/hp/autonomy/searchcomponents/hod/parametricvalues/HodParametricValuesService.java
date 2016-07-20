@@ -218,6 +218,7 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
                         .setMax(max)
                         .setSum(sum)
                         .setAverage(sum / totalCount)
+                        .setTotalValues(values.size())
                         .build();
 
                 output.put(new TagName(fieldName), valueDetails);

@@ -194,7 +194,8 @@ public class IdolParametricValuesService implements ParametricValuesService<Idol
             for (final FlatField field : fields) {
                 final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
 
-                final ValueDetails.Builder builder = new ValueDetails.Builder();
+                final ValueDetails.Builder builder = new ValueDetails.Builder()
+                        .setTotalValues(field.getTotalValues());
 
                 for (final JAXBElement<?> element : valueElements) {
                     final String elementLocalName = element.getName().getLocalPart();
