@@ -16,11 +16,9 @@ import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.AdaptiveBucketSizeEvaluatorFactory;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketSizeEvaluator;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametricValuesService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.types.idol.RecursiveField;
@@ -28,6 +26,7 @@ import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
+import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.cache.annotation.Cacheable;
@@ -35,31 +34,31 @@ import org.springframework.cache.annotation.Cacheable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class HodParametricValuesService implements ParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> {
+public class HodParametricValuesService extends AbstractParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> {
     private final FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
     private final GetParametricValuesService getParametricValuesService;
     private final ConfigService<? extends HodSearchCapable> configService;
     private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
-    private final AdaptiveBucketSizeEvaluatorFactory bucketSizeEvaluatorFactory;
 
     public HodParametricValuesService(
             final FieldsService<HodFieldsRequest, HodErrorException> fieldsService,
             final GetParametricValuesService getParametricValuesService,
             final ConfigService<? extends HodSearchCapable> configService,
-            final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever,
-            final AdaptiveBucketSizeEvaluatorFactory bucketSizeEvaluatorFactory) {
+            final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever
+    ) {
         this.fieldsService = fieldsService;
         this.getParametricValuesService = getParametricValuesService;
         this.configService = configService;
         this.authenticationInformationRetriever = authenticationInformationRetriever;
-        this.bucketSizeEvaluatorFactory = bucketSizeEvaluatorFactory;
     }
 
     @Override
@@ -90,21 +89,25 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
         return results;
     }
 
+    //TODO use the same method as IDOL for bucketing, once HOD-2784 and HOD-2785 are complete
     @Override
     @Cacheable(CacheNames.PARAMETRIC_VALUES_IN_BUCKETS)
     public List<RangeInfo> getNumericParametricValuesInBuckets(final HodParametricRequest parametricRequest, final Map<String, BucketingParams> bucketingParamsPerField) throws HodErrorException {
-        //TODO use the same method as IDOL for bucketing, once HOD-2784 and HOD-2785 are complete
-        final Set<QueryTagInfo> numericFieldInfo = getNumericParametricValues(parametricRequest);
+        if (parametricRequest.getFieldNames().isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            validateBucketingParams(parametricRequest, bucketingParamsPerField);
 
-        final List<RangeInfo> ranges = new ArrayList<>(numericFieldInfo.size());
-        for (final QueryTagInfo queryTagInfo : numericFieldInfo) {
-            final BucketingParams bucketingParams = bucketingParamsPerField.get(queryTagInfo.getId());
-            if (bucketingParams.getTargetNumberOfBuckets() > 0) {
-                getNumericParametricValuesInBucketsForField(ranges, queryTagInfo, bucketingParams);
+            final Set<QueryTagInfo> numericFieldInfo = getNumericParametricValues(parametricRequest);
+            final List<RangeInfo> ranges = new ArrayList<>(numericFieldInfo.size());
+
+            for (final QueryTagInfo queryTagInfo : numericFieldInfo) {
+                final BucketingParams bucketingParams = bucketingParamsPerField.get(queryTagInfo.getId());
+                ranges.add(parseNumericParametricValuesInBuckets(queryTagInfo, bucketingParams));
             }
-        }
 
-        return ranges;
+            return ranges;
+        }
     }
 
     private Collection<String> lookupFieldIds(final Collection<ResourceIdentifier> databases) throws HodErrorException {
@@ -117,48 +120,60 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
         return fieldIds;
     }
 
-    private void getNumericParametricValuesInBucketsForField(final Collection<RangeInfo> ranges, final QueryTagInfo queryTagInfo, final BucketingParams bucketingParams) {
-        final Set<QueryTagCountInfo> numericFieldValuesWithCount = queryTagInfo.getValues();
-        final double maxContinuousValue = Double.parseDouble(numericFieldValuesWithCount.toArray(new QueryTagCountInfo[numericFieldValuesWithCount.size()])[numericFieldValuesWithCount.size() - 1].getValue());
-        final double minContinuousValue = Double.parseDouble(numericFieldValuesWithCount.iterator().next().getValue());
+    // Parse a list of numeric parametric values into buckets specified by the min, max and number of buckets in the BucketingParams
+    private RangeInfo parseNumericParametricValuesInBuckets(final QueryTagInfo queryTagInfo, final BucketingParams bucketingParams) {
+        final List<Double> boundaries = calculateBoundaries(bucketingParams);
 
-        final BucketSizeEvaluator bucketSizeEvaluator = bucketSizeEvaluatorFactory.getBucketSizeEvaluator(new BucketingParams(bucketingParams, minContinuousValue, maxContinuousValue));
-        final double maxValue = bucketSizeEvaluator.getMax();
-        final double minValue = bucketSizeEvaluator.getMin();
-        final double bucketSize = bucketSizeEvaluator.getBucketSize();
+        // Map of bucket minimum to count
+        final Map<Double, Integer> bucketCounts = new HashMap<>();
 
-        final List<RangeInfo.Value> buckets = new ArrayList<>(bucketSizeEvaluator.getTargetNumberOfBuckets());
-        final Iterator<QueryTagCountInfo> iterator = numericFieldValuesWithCount.iterator();
+        // Boundaries includes the min and the max values, so has a minimum size of 2
+        for (int i = 0; i < boundaries.size() - 1; i++) {
+            bucketCounts.put(boundaries.get(i), 0);
+        }
 
-        QueryTagCountInfo valueAndCount = null;
-        double boundaryValue = minValue;
         int totalCount = 0;
-        for (int i = -1; i < bucketSizeEvaluator.getTargetNumberOfBuckets() && (valueAndCount == null || Double.parseDouble(valueAndCount.getValue()) < maxValue || bucketSizeEvaluator.unboundedMax()); i++) {
-            while (iterator.hasNext() && Double.parseDouble((valueAndCount = iterator.next()).getValue()) < boundaryValue) {
-                if (i >= 0) {
-                    final int count = valueAndCount.getCount();
-                    totalCount += count;
-                    buckets.get(i).addData(count);
-                }
-            }
 
-            while (valueAndCount != null && Double.parseDouble(valueAndCount.getValue()) >= boundaryValue + bucketSize) {
-                buckets.add(new RangeInfo.Value(0, boundaryValue, boundaryValue += bucketSize));
-            }
+        // The index of the min value for the bucket we are currently counting
+        int currentBoundary = 0;
 
-            if (valueAndCount != null) {
-                final double value = Double.parseDouble(valueAndCount.getValue());
-                if (value >= boundaryValue && (value < maxValue || bucketSizeEvaluator.unboundedMax())) {
-                    final int count = valueAndCount.getCount();
-                    totalCount += count;
-                    buckets.add(new RangeInfo.Value(count, boundaryValue, Math.min(boundaryValue += bucketSize, maxValue)));
+        final Iterator<QueryTagCountInfo> iterator = queryTagInfo.getValues().iterator();
+
+        while (iterator.hasNext() && currentBoundary < boundaries.size()) {
+            final QueryTagCountInfo valueAndCount = iterator.next();
+            final double value = Double.parseDouble(valueAndCount.getValue());
+
+            // Ignore values less than the lowest bucket boundary
+            if (value >= boundaries.get(currentBoundary)) {
+                while (currentBoundary < boundaries.size() - 1) {
+                    // Check that the value is within the max boundary for the bucket, if not, check the next bucket
+                    if (value < boundaries.get(currentBoundary + 1)) {
+                        final Double min = boundaries.get(currentBoundary);
+                        totalCount += valueAndCount.getCount();
+                        bucketCounts.put(min, bucketCounts.get(min) + valueAndCount.getCount());
+
+                        break;
+                    } else {
+                        currentBoundary++;
+                    }
                 }
             }
         }
 
-        ranges.add(new RangeInfo(new TagName(queryTagInfo.getName()), totalCount, minValue, maxValue, bucketSize, buckets));
+        final List<RangeInfo.Value> buckets = new ArrayList<>(bucketingParams.getTargetNumberOfBuckets());
+
+        // Boundaries includes the min and the max values, so has a minimum size of 2
+        for (int i = 0; i < boundaries.size() - 1; i++) {
+            final double min = boundaries.get(i);
+            buckets.add(new RangeInfo.Value(bucketCounts.get(min), min, boundaries.get(i + 1)));
+        }
+
+        // All buckets have the same size, so just use the value from the first one
+        final double bucketSize = boundaries.get(1) - boundaries.get(0);
+        return new RangeInfo(new TagName(queryTagInfo.getId()), totalCount, bucketingParams.getMin(), bucketingParams.getMax(), bucketSize, buckets);
     }
 
+    // Get parametric values matching the given request from HOD and parse them as numeric CSVs
     private Set<QueryTagInfo> getNumericParametricValues(final ParametricRequest<ResourceIdentifier> parametricRequest) throws HodErrorException {
         final Collection<String> fieldNames = parametricRequest.getFieldNames();
 
@@ -184,6 +199,46 @@ public class HodParametricValuesService implements ParametricValuesService<HodPa
     @Override
     public List<RecursiveField> getDependentParametricValues(final HodParametricRequest parametricRequest) throws HodErrorException {
         throw new NotImplementedException("Dependent parametric values not yet implemented for hod");
+    }
+
+    @Override
+    public Map<TagName, ValueDetails> getValueDetails(final HodParametricRequest parametricRequest) throws HodErrorException {
+        if (parametricRequest.getFieldNames().isEmpty()) {
+            return Collections.emptyMap();
+        } else {
+            final FieldNames response = getParametricValues(parametricRequest, parametricRequest.getFieldNames());
+            final Map<TagName, ValueDetails> output = new LinkedHashMap<>();
+
+            for (final String fieldName : response.getFieldNames()) {
+                final List<QueryTagCountInfo> values = response.getValuesAndCountsForNumericField(fieldName);
+                final double firstValue = Double.parseDouble(values.get(0).getValue());
+
+                double min = firstValue;
+                double max = firstValue;
+                double sum = 0;
+                double totalCount = 0;
+
+                for (final QueryTagCountInfo countInfo : values) {
+                    final double value = Double.parseDouble(countInfo.getValue());
+                    totalCount += countInfo.getCount();
+                    sum += value * countInfo.getCount();
+                    min = Math.min(value, min);
+                    max = Math.max(value, max);
+                }
+
+                final ValueDetails valueDetails = new ValueDetails.Builder()
+                        .setMin(min)
+                        .setMax(max)
+                        .setSum(sum)
+                        .setAverage(sum / totalCount)
+                        .setTotalValues(values.size())
+                        .build();
+
+                output.put(new TagName(fieldName), valueDetails);
+            }
+
+            return output;
+        }
     }
 
     private FieldNames getParametricValues(final ParametricRequest<ResourceIdentifier> parametricRequest, final Collection<String> fieldNames) throws HodErrorException {
