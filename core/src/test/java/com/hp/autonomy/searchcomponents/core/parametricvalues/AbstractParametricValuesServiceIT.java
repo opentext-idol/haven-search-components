@@ -56,7 +56,9 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
 
     @Test
     public void ranges() throws E {
-        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(createNumericParametricRequest(), ImmutableMap.of(ParametricValuesService.AUTN_DATE_FIELD, new BucketingParams(35)));
+        final Map<TagName, ValueDetails> valueDetailsOutput = parametricValuesService.getValueDetails(createNumericParametricRequest());
+        final ValueDetails valueDetails = valueDetailsOutput.get(new TagName(ParametricValuesService.AUTN_DATE_FIELD));
+        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(createNumericParametricRequest(), ImmutableMap.of(ParametricValuesService.AUTN_DATE_FIELD, new BucketingParams(35, valueDetails.getMin(), valueDetails.getMax())));
         assertThat(ranges, not(empty()));
     }
 

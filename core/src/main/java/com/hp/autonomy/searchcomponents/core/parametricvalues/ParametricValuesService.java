@@ -22,6 +22,14 @@ public interface ParametricValuesService<R extends ParametricRequest<S>, S exten
 
     Set<QueryTagInfo> getAllParametricValues(R parametricRequest) throws E;
 
+    /**
+     * Get Numeric or NumericDate parametric values as ranges and counts. For each field in the parametricRequest, a
+     * BucketingParams must be specified in the bucketingParamsPerField map.
+     * @param parametricRequest Query restrictions and field names
+     * @param bucketingParamsPerField Map of fully qualified field name to min, max and number of buckets
+     * @return A list of ranges and counts for each field in the parametric request
+     * @throws E
+     */
     List<RangeInfo> getNumericParametricValuesInBuckets(R parametricRequest, final Map<String, BucketingParams> bucketingParamsPerField) throws E;
 
     List<RecursiveField> getDependentParametricValues(R parametricRequest) throws E;
