@@ -13,6 +13,7 @@ import com.hp.autonomy.types.idol.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
+import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -54,11 +56,9 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
 
     @Test
     public void ranges() throws E {
-        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(parametricRequestBuilder
-                .setFieldNames(Collections.singletonList(ParametricValuesService.AUTN_DATE_FIELD))
-                .setQueryRestrictions(testUtils.buildQueryRestrictions())
-                .setSort(SortParam.ReverseDate)
-                .build(), ImmutableMap.of(ParametricValuesService.AUTN_DATE_FIELD, new BucketingParams(35)));
+        final Map<TagName, ValueDetails> valueDetailsOutput = parametricValuesService.getValueDetails(createNumericParametricRequest());
+        final ValueDetails valueDetails = valueDetailsOutput.get(new TagName(ParametricValuesService.AUTN_DATE_FIELD));
+        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(createNumericParametricRequest(), ImmutableMap.of(ParametricValuesService.AUTN_DATE_FIELD, new BucketingParams(35, valueDetails.getMin(), valueDetails.getMax())));
         assertThat(ranges, not(empty()));
     }
 
@@ -68,9 +68,34 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
         assertThat(results, is(not(empty())));
     }
 
+    @Test
+    public void getValueDetails() throws E {
+        final Map<TagName, ValueDetails> valueDetailsMap = parametricValuesService.getValueDetails(createNumericParametricRequest());
+        assertThat(valueDetailsMap.size(), is(not(0)));
+
+        for (final Map.Entry<TagName, ValueDetails> entry : valueDetailsMap.entrySet()) {
+            assertThat(entry.getKey().getId(), not(nullValue()));
+
+            final ValueDetails valueDetails = entry.getValue();
+
+            // min <= average <= max
+            assertThat(valueDetails.getMin(), lessThanOrEqualTo(valueDetails.getAverage()));
+            assertThat(valueDetails.getAverage(), lessThanOrEqualTo(valueDetails.getMax()));
+        }
+    }
+
+    private R createNumericParametricRequest() {
+        return parametricRequestBuilder
+                .setFieldNames(Collections.singletonList(ParametricValuesService.AUTN_DATE_FIELD))
+                .setQueryRestrictions(testUtils.buildQueryRestrictions())
+                .setSort(SortParam.ReverseDate)
+                .build();
+    }
+
     private R createParametricRequest() throws E {
         final List<TagName> fields = fieldsService.getFields(fieldsRequestParams(fieldsRequestBuilder).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
         final List<String> fieldIds = new ArrayList<>(fields.size());
+
         for (final TagName field : fields) {
             fieldIds.add(field.getId());
         }

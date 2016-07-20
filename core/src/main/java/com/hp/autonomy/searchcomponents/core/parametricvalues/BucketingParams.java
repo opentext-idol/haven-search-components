@@ -16,32 +16,17 @@ import lombok.ToString;
 @ToString
 public class BucketingParams {
     private final int targetNumberOfBuckets;
-    private Double min;
-    private Double max;
-    private boolean unlimitedMax;
-
-    public BucketingParams(final int targetNumberOfBuckets) {
-        this.targetNumberOfBuckets = targetNumberOfBuckets;
-    }
+    private final double min;
+    private final double max;
 
     @JsonCreator
-    public BucketingParams(@JsonProperty final int targetNumberOfBuckets,
-                           @JsonProperty final Double min,
-                           @JsonProperty final Double max) {
+    public BucketingParams(
+            @JsonProperty final int targetNumberOfBuckets,
+            @JsonProperty final double min,
+            @JsonProperty final double max
+    ) {
         this.targetNumberOfBuckets = targetNumberOfBuckets;
         this.min = min;
         this.max = max;
-    }
-
-    public BucketingParams(final BucketingParams bucketingParams, final double absoluteMin, final double absoluteMax) {
-        targetNumberOfBuckets = bucketingParams.targetNumberOfBuckets;
-        min = bucketingParams.min != null ? bucketingParams.min : absoluteMin;
-
-        if (bucketingParams.max != null) {
-            max = bucketingParams.max;
-        } else {
-            max = absoluteMax;
-            unlimitedMax = true;
-        }
     }
 }

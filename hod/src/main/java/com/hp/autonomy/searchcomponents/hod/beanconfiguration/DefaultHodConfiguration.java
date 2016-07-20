@@ -23,7 +23,6 @@ import com.hp.autonomy.searchcomponents.core.authentication.SpringSecurityAuthen
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.AdaptiveBucketSizeEvaluatorFactory;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
@@ -89,10 +88,9 @@ class DefaultHodConfiguration {
             final FieldsService<HodFieldsRequest, HodErrorException> fieldsService,
             final GetParametricValuesService getParametricValuesService,
             final ConfigService<? extends HodSearchCapable> configService,
-            final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever,
-            final AdaptiveBucketSizeEvaluatorFactory bucketSizeEvaluatorFactory
+            final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever
     ) {
-        return new HodParametricValuesService(fieldsService, getParametricValuesService, configService, authenticationInformationRetriever, bucketSizeEvaluatorFactory);
+        return new HodParametricValuesService(fieldsService, getParametricValuesService, configService, authenticationInformationRetriever);
     }
 
     @Bean

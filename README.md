@@ -15,7 +15,7 @@ For use in Haven on Demand, use:
     <dependency>
         <groupId>com.hp.autonomy.frontend</groupId>
         <artifactId>haven-search-components-hod</artifactId>
-        <version>0.21.10</version>
+        <version>0.21.11</version>
     </dependency>
 
 For use on premise, use:
@@ -23,7 +23,7 @@ For use on premise, use:
     <dependency>
         <groupId>com.hp.autonomy.frontend</groupId>
         <artifactId>haven-search-components-idol</artifactId>
-        <version>0.21.10</version>
+        <version>0.21.11</version>
     </dependency>
 
 ## License
