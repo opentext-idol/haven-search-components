@@ -88,13 +88,26 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     }
 
     @Override
-    public Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> findQueryParams) throws HodErrorException {
-        return queryTextIndex(findQueryParams, findQueryParams.getQueryType() == SearchRequest.QueryType.PROMOTIONS);
-    }
+    public Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> searchRequest) throws HodErrorException {
+        final QueryRequestBuilder params = setQueryParams(searchRequest, searchRequest.getQueryType() != SearchRequest.QueryType.RAW);
 
-    @Override
-    public Documents<HodSearchResult> queryTextIndexForPromotions(final SearchRequest<ResourceIdentifier> findQueryParams) throws HodErrorException {
-        return queryTextIndex(findQueryParams, true);
+        if (searchRequest.isAutoCorrect()) {
+            params.setCheckSpelling(CheckSpelling.autocorrect);
+        }
+
+        if (searchRequest.getQueryType() == SearchRequest.QueryType.PROMOTIONS) {
+            params.setPromotions(true);
+            //TODO remove this when IOD have fixed the the default value of the indexes parameter (IOD-6168)
+            params.setIndexes(Collections.singletonList(ResourceIdentifier.WIKI_ENG));
+        }
+
+        final Documents<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(searchRequest.getQueryRestrictions().getQueryText(), params);
+
+        final List<HodSearchResult> documentList = new LinkedList<>();
+        addDomainToSearchResults(documentList, searchRequest.getQueryRestrictions().getDatabases(), hodDocuments.getDocuments());
+
+        final Integer totalResults = hodDocuments.getTotalResults() != null ? hodDocuments.getTotalResults() : 0;
+        return new Documents<>(documentList, totalResults, hodDocuments.getExpandedQuery(), null, hodDocuments.getAutoCorrection(), null);
     }
 
     @Override
@@ -135,28 +148,6 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     @Override
     public StateTokenAndResultCount getStateTokenAndResultCount(final QueryRestrictions<ResourceIdentifier> queryRestrictions, final int maxResults, final boolean promotions) throws HodErrorException {
         throw new NotImplementedException("State tokens are not yet retrievable from Haven OnDemand");
-    }
-
-    protected Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> searchRequest, final boolean fetchPromotions) throws HodErrorException {
-        final QueryRequestBuilder params = setQueryParams(searchRequest, searchRequest.getQueryType() != SearchRequest.QueryType.RAW);
-
-        if (searchRequest.isAutoCorrect()) {
-            params.setCheckSpelling(CheckSpelling.autocorrect);
-        }
-
-        if (fetchPromotions) {
-            params.setPromotions(true);
-            //TODO remove this when IOD have fixed the the default value of the indexes parameter (IOD-6168)
-            params.setIndexes(Collections.singletonList(ResourceIdentifier.WIKI_ENG));
-        }
-
-        final Documents<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(searchRequest.getQueryRestrictions().getQueryText(), params);
-
-        final List<HodSearchResult> documentList = new LinkedList<>();
-        addDomainToSearchResults(documentList, searchRequest.getQueryRestrictions().getDatabases(), hodDocuments.getDocuments());
-
-        final Integer totalResults = hodDocuments.getTotalResults() != null ? hodDocuments.getTotalResults() : 0;
-        return new Documents<>(documentList, totalResults, hodDocuments.getExpandedQuery(), null, hodDocuments.getAutoCorrection(), null);
     }
 
     private QueryRequestBuilder setQueryParams(final AciSearchRequest<ResourceIdentifier> searchRequest, final boolean setQueryProfile) {

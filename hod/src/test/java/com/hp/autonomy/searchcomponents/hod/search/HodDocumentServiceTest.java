@@ -154,7 +154,7 @@ public class HodDocumentServiceTest {
                 .setPrint(Print.fields.name())
                 .setQueryType(SearchRequest.QueryType.PROMOTIONS)
                 .build();
-        final Documents<HodSearchResult> results = documentsService.queryTextIndexForPromotions(searchRequest);
+        final Documents<HodSearchResult> results = documentsService.queryTextIndex(searchRequest);
         validateResults(results);
     }
 
