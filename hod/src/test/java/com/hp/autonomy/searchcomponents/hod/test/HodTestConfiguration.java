@@ -33,6 +33,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -48,6 +49,7 @@ import java.util.UUID;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("WeakerAccess")
 @Configuration
 @ConditionalOnProperty(value = "mock.configuration", matchIfMissing = true)
 public class HodTestConfiguration {
@@ -116,7 +118,7 @@ public class HodTestConfiguration {
     public TokenProxy<EntityType.Application, TokenType.Simple> testTokenProxy(
             final HttpClient httpClient,
             final TokenRepository tokenRepository,
-            final ObjectMapper hodSearchResultObjectMapper
+            @Qualifier("hodSearchResultObjectMapper") final ObjectMapper hodSearchResultObjectMapper
     ) throws HodErrorException {
         final String application = environment.getProperty(APPLICATION_PROPERTY);
         final String domain = environment.getProperty(DOMAIN_PROPERTY);

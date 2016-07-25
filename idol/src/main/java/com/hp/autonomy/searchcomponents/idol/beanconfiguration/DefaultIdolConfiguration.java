@@ -6,14 +6,12 @@
 package com.hp.autonomy.searchcomponents.idol.beanconfiguration;
 
 import com.autonomy.aci.client.services.AciErrorException;
-import com.autonomy.aci.client.services.AciService;
-import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.authentication.SpringSecurityAuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
-import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.search.IdolDocumentService;
 import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
@@ -28,8 +26,11 @@ class DefaultIdolConfiguration {
     @SuppressWarnings("MethodWithTooManyParameters")
     @Bean
     @ConditionalOnMissingBean(DocumentsService.class)
-    public DocumentsService<String, IdolSearchResult, AciErrorException> documentsService(final ConfigService<? extends IdolSearchCapable> configService, final HavenSearchAciParameterHandler parameterHandler, final QueryResponseParser queryResponseParser, final AciService contentAciService, final AciService qmsAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
-        return new IdolDocumentService(configService, parameterHandler, queryResponseParser, contentAciService, qmsAciService, aciResponseProcessorFactory);
+    public DocumentsService<String, IdolSearchResult, AciErrorException> documentsService(final HavenSearchAciParameterHandler parameterHandler,
+                                                                                          final QueryResponseParser queryResponseParser,
+                                                                                          final AciServiceRetriever aciServiceRetriever,
+                                                                                          final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+        return new IdolDocumentService(parameterHandler, queryResponseParser, aciServiceRetriever, aciResponseProcessorFactory);
     }
 
     @Bean

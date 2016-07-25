@@ -9,7 +9,6 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
@@ -18,8 +17,7 @@ import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
-import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
-import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
+import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.types.idol.Hit;
 import com.hp.autonomy.types.idol.QueryResponseData;
 import com.hp.autonomy.types.idol.SuggestResponseData;
@@ -54,19 +52,13 @@ public class IdolDocumentServiceTest {
     protected HavenSearchAciParameterHandler parameterHandler;
 
     @Mock
-    protected IdolSearchCapable havenSearchConfig;
-
-    @Mock
     protected QueryResponseParser queryResponseParser;
 
     @Mock
-    protected ConfigService<IdolSearchCapable> configService;
+    protected AciServiceRetriever aciServiceRetriever;
 
     @Mock
-    protected AciService contentAciService;
-
-    @Mock
-    protected AciService qmsAciService;
+    protected AciService aciService;
 
     @Mock
     protected AciResponseJaxbProcessorFactory aciResponseProcessorFactory;
@@ -75,44 +67,46 @@ public class IdolDocumentServiceTest {
 
     @Before
     public void setUp() {
-        when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().build());
-        when(configService.getConfig()).thenReturn(havenSearchConfig);
-
-        idolDocumentService = new IdolDocumentService(configService, parameterHandler, queryResponseParser, contentAciService, qmsAciService, aciResponseProcessorFactory);
+        when(aciServiceRetriever.getAciService(any(SearchRequest.QueryType.class))).thenReturn(aciService);
+        idolDocumentService = new IdolDocumentService(parameterHandler, queryResponseParser, aciServiceRetriever, aciResponseProcessorFactory);
     }
 
     @Test
     public void queryContent() {
-        final QueryResponseData responseData = new QueryResponseData();
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(aciServiceRetriever.qmsEnabled()).thenReturn(true);
 
-        idolDocumentService.queryTextIndex(mockQueryParams());
+        final QueryResponseData responseData = new QueryResponseData();
+        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+
+        idolDocumentService.queryTextIndex(mockQueryParams(SearchRequest.QueryType.RAW));
         verify(queryResponseParser).parseQueryResults(Matchers.<AciSearchRequest<String>>any(), any(AciParameters.class), eq(responseData), any(IdolDocumentService.QueryExecutor.class));
     }
 
     @Test
     public void queryQms() {
-        when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setEnabled(true).build());
-        final QueryResponseData responseData = new QueryResponseData();
-        when(qmsAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(aciServiceRetriever.qmsEnabled()).thenReturn(true);
 
-        idolDocumentService.queryTextIndex(mockQueryParams());
+        final QueryResponseData responseData = new QueryResponseData();
+        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+
+        idolDocumentService.queryTextIndex(mockQueryParams(SearchRequest.QueryType.MODIFIED));
         verify(queryResponseParser).parseQueryResults(Matchers.<AciSearchRequest<String>>any(), any(AciParameters.class), eq(responseData), any(IdolDocumentService.QueryExecutor.class));
     }
 
     @Test
     public void queryContentForPromotions() {
-        final Documents<IdolSearchResult> results = idolDocumentService.queryTextIndexForPromotions(mockQueryParams());
+        final Documents<IdolSearchResult> results = idolDocumentService.queryTextIndex(mockQueryParams(SearchRequest.QueryType.PROMOTIONS));
         assertThat(results.getDocuments(), is(empty()));
     }
 
     @Test
     public void queryQmsForPromotions() {
-        when(havenSearchConfig.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setEnabled(true).build());
-        final QueryResponseData responseData = new QueryResponseData();
-        when(qmsAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(aciServiceRetriever.qmsEnabled()).thenReturn(true);
 
-        idolDocumentService.queryTextIndexForPromotions(mockQueryParams());
+        final QueryResponseData responseData = new QueryResponseData();
+        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+
+        idolDocumentService.queryTextIndex(mockQueryParams(SearchRequest.QueryType.PROMOTIONS));
         verify(queryResponseParser).parseQueryResults(Matchers.<AciSearchRequest<String>>any(), any(AciParameters.class), eq(responseData), any(IdolDocumentService.QueryExecutor.class));
     }
 
@@ -123,7 +117,7 @@ public class IdolDocumentServiceTest {
         final Hit hit = new Hit();
         responseData.getHits().add(hit);
 
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
         final IdolQueryRestrictions queryRestrictions = new IdolQueryRestrictions.Builder().build();
         final SuggestRequest<String> suggestRequest = new SuggestRequest.Builder<String>()
@@ -148,7 +142,7 @@ public class IdolDocumentServiceTest {
         final Hit hit = new Hit();
         responseData.getHits().add(hit);
 
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
 
         final GetContentRequest<String> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference"))), PrintParam.Fields.name());
         idolDocumentService.getDocumentContent(getContentRequest);
@@ -157,23 +151,23 @@ public class IdolDocumentServiceTest {
 
     @Test
     public void getStateToken() {
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockStateTokenResponse());
+        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockStateTokenResponse());
 
-        final String stateToken = idolDocumentService.getStateToken(mockQueryParams().getQueryRestrictions(), 3, false);
+        final String stateToken = idolDocumentService.getStateToken(mockQueryParams(SearchRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
         assertThat(stateToken, is(MOCK_STATE_TOKEN));
     }
 
     @Test
     public void getStateTokenAndResultCount() {
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockStateTokenResponse());
+        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockStateTokenResponse());
 
-        final StateTokenAndResultCount stateTokenAndResultCount = idolDocumentService.getStateTokenAndResultCount(mockQueryParams().getQueryRestrictions(), 3, false);
+        final StateTokenAndResultCount stateTokenAndResultCount = idolDocumentService.getStateTokenAndResultCount(mockQueryParams(SearchRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
         assertThat(stateTokenAndResultCount.getTypedStateToken().getStateToken(), is(MOCK_STATE_TOKEN));
         assertThat(stateTokenAndResultCount.getResultCount(), is((long) MOCK_TOTAL_HITS));
     }
 
     // Used in Find's DocumentService test
-    protected SearchRequest<String> mockQueryParams() {
+    protected SearchRequest<String> mockQueryParams(final SearchRequest.QueryType queryType) {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
         return new SearchRequest.Builder<String>()
                 .setQueryRestrictions(queryRestrictions)
@@ -185,7 +179,7 @@ public class IdolDocumentServiceTest {
                 .setHighlight(true)
                 .setAutoCorrect(true)
                 .setPrint(PrintParam.Fields.name())
-                .setQueryType(null)
+                .setQueryType(queryType)
                 .build();
     }
 

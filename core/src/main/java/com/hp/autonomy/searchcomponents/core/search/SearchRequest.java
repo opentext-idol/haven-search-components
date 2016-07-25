@@ -26,7 +26,7 @@ public class SearchRequest<S extends Serializable> implements AciSearchRequest<S
     protected boolean highlight;
     protected boolean autoCorrect;
     protected String print = DEFAULT_PRINT;
-    protected QueryType queryType;
+    protected QueryType queryType = QueryType.MODIFIED;
 
     private SearchRequest(final Builder<S> builder) {
         queryRestrictions = builder.queryRestrictions;
@@ -58,7 +58,7 @@ public class SearchRequest<S extends Serializable> implements AciSearchRequest<S
         private boolean highlight;
         private boolean autoCorrect;
         private String print = DEFAULT_PRINT;
-        private QueryType queryType;
+        private QueryType queryType = QueryType.MODIFIED;
 
         public SearchRequest<S> build() {
             return new SearchRequest<>(this);
