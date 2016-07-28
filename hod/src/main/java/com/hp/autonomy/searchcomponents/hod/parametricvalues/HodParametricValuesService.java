@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 
 import com.hp.autonomy.frontend.configuration.ConfigService;
+import com.hp.autonomy.hod.caching.CachingConfiguration;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldNames;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesRequestBuilder;
@@ -62,7 +63,7 @@ public class HodParametricValuesService extends AbstractParametricValuesService<
     }
 
     @Override
-    @Cacheable(CacheNames.PARAMETRIC_VALUES)
+    @Cacheable(value = CacheNames.PARAMETRIC_VALUES, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
     public Set<QueryTagInfo> getAllParametricValues(final HodParametricRequest parametricRequest) throws HodErrorException {
         final Collection<String> fieldNames = new HashSet<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
@@ -91,7 +92,7 @@ public class HodParametricValuesService extends AbstractParametricValuesService<
 
     //TODO use the same method as IDOL for bucketing, once HOD-2784 and HOD-2785 are complete
     @Override
-    @Cacheable(CacheNames.PARAMETRIC_VALUES_IN_BUCKETS)
+    @Cacheable(value = CacheNames.PARAMETRIC_VALUES_IN_BUCKETS, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
     public List<RangeInfo> getNumericParametricValuesInBuckets(final HodParametricRequest parametricRequest, final Map<String, BucketingParams> bucketingParamsPerField) throws HodErrorException {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyList();
