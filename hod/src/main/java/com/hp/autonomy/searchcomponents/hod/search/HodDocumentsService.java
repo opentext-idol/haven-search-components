@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.hod.search;
 
 import com.google.common.collect.ImmutableSet;
 import com.hp.autonomy.frontend.configuration.ConfigService;
+import com.hp.autonomy.hod.caching.CachingConfiguration;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
@@ -122,7 +123,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
         return new Documents<>(documentList, results.getTotalResults(), results.getExpandedQuery(), results.getSuggestion(), results.getAutoCorrection(), results.getWarnings());
     }
 
-    @Cacheable(CacheNames.GET_DOCUMENT_CONTENT)
+    @Cacheable(value = CacheNames.GET_DOCUMENT_CONTENT, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
     @Override
     public List<HodSearchResult> getDocumentContent(final GetContentRequest<ResourceIdentifier> request) throws HodErrorException {
         final List<HodSearchResult> contentResults = new ArrayList<>();
