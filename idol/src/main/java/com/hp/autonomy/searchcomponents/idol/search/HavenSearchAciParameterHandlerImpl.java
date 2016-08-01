@@ -84,7 +84,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
 
     @Override
     public void addSearchOutputParameters(final AciParameters aciParameters, final AciSearchRequest<String> searchRequest) {
-        aciParameters.add(QueryParams.SecurityInfo.name(), getSecurityInfo());
+        addSecurityInfo(aciParameters);
 
         aciParameters.add(QueryParams.Start.name(), searchRequest.getStart());
         aciParameters.add(QueryParams.MaxResults.name(), searchRequest.getMaxResults());
@@ -105,7 +105,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
 
     @Override
     public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences, final PrintParam print) {
-        aciParameters.add(QueryParams.SecurityInfo.name(), getSecurityInfo());
+        addSecurityInfo(aciParameters);
 
         final Set<String> references = indexAndReferences.getReferences();
         aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(references));
@@ -131,7 +131,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
 
     @Override
     public void addGetContentOutputParameters(final AciParameters parameters, final String database, final String documentReference, final String referenceField) {
-        parameters.add(GetContentParams.SecurityInfo.name(), getSecurityInfo());
+        addSecurityInfo(parameters);
 
         if (database != null) {
             parameters.add(GetContentParams.DatabaseMatch.name(), new Databases(database));
@@ -163,10 +163,12 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QmsQueryParams.ExpandQuery.name(), configService.getConfig().getQueryManipulation().getExpandQuery());
     }
 
-    private String getSecurityInfo() {
-        return authenticationInformationRetriever.getPrincipal() != null && authenticationInformationRetriever.getPrincipal().getSecurityInfo() != null
+    @Override
+    public void addSecurityInfo(final AciParameters aciParameters) {
+        final String securityInfo = authenticationInformationRetriever.getPrincipal() != null && authenticationInformationRetriever.getPrincipal().getSecurityInfo() != null
                 ? urlFragmentEscaper.escape(authenticationInformationRetriever.getPrincipal().getSecurityInfo())
                 : null;
+        aciParameters.add(QueryParams.SecurityInfo.name(), securityInfo);
     }
 
     protected String formatDate(final ReadableInstant date) {

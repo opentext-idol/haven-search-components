@@ -26,4 +26,6 @@ public interface HavenSearchAciParameterHandler {
     void addLanguageRestriction(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions);
 
     void addQmsParameters(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions);
+
+    void addSecurityInfo(AciParameters aciParameters);
 }
