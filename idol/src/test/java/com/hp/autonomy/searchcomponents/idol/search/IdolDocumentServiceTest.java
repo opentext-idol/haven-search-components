@@ -6,11 +6,9 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciService;
-import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
@@ -28,7 +26,6 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -76,10 +73,10 @@ public class IdolDocumentServiceTest {
         when(aciServiceRetriever.qmsEnabled()).thenReturn(true);
 
         final QueryResponseData responseData = new QueryResponseData();
-        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(aciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
         idolDocumentService.queryTextIndex(mockQueryParams(SearchRequest.QueryType.RAW));
-        verify(queryResponseParser).parseQueryResults(Matchers.<AciSearchRequest<String>>any(), any(AciParameters.class), eq(responseData), any(IdolDocumentService.QueryExecutor.class));
+        verify(queryResponseParser).parseQueryResults(any(), any(AciParameters.class), eq(responseData), any());
     }
 
     @Test
@@ -87,10 +84,10 @@ public class IdolDocumentServiceTest {
         when(aciServiceRetriever.qmsEnabled()).thenReturn(true);
 
         final QueryResponseData responseData = new QueryResponseData();
-        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(aciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
         idolDocumentService.queryTextIndex(mockQueryParams(SearchRequest.QueryType.MODIFIED));
-        verify(queryResponseParser).parseQueryResults(Matchers.<AciSearchRequest<String>>any(), any(AciParameters.class), eq(responseData), any(IdolDocumentService.QueryExecutor.class));
+        verify(queryResponseParser).parseQueryResults(any(), any(AciParameters.class), eq(responseData), any());
     }
 
     @Test
@@ -104,10 +101,10 @@ public class IdolDocumentServiceTest {
         when(aciServiceRetriever.qmsEnabled()).thenReturn(true);
 
         final QueryResponseData responseData = new QueryResponseData();
-        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(aciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
         idolDocumentService.queryTextIndex(mockQueryParams(SearchRequest.QueryType.PROMOTIONS));
-        verify(queryResponseParser).parseQueryResults(Matchers.<AciSearchRequest<String>>any(), any(AciParameters.class), eq(responseData), any(IdolDocumentService.QueryExecutor.class));
+        verify(queryResponseParser).parseQueryResults(any(), any(AciParameters.class), eq(responseData), any());
     }
 
     @Test
@@ -117,7 +114,7 @@ public class IdolDocumentServiceTest {
         final Hit hit = new Hit();
         responseData.getHits().add(hit);
 
-        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(aciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
         final IdolQueryRestrictions queryRestrictions = new IdolQueryRestrictions.Builder().build();
         final SuggestRequest<String> suggestRequest = new SuggestRequest.Builder<String>()
@@ -142,7 +139,7 @@ public class IdolDocumentServiceTest {
         final Hit hit = new Hit();
         responseData.getHits().add(hit);
 
-        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(aciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
         final GetContentRequest<String> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference"))), PrintParam.Fields.name());
         idolDocumentService.getDocumentContent(getContentRequest);
@@ -151,7 +148,7 @@ public class IdolDocumentServiceTest {
 
     @Test
     public void getStateToken() {
-        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockStateTokenResponse());
+        when(aciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockStateTokenResponse());
 
         final String stateToken = idolDocumentService.getStateToken(mockQueryParams(SearchRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
         assertThat(stateToken, is(MOCK_STATE_TOKEN));
@@ -159,7 +156,7 @@ public class IdolDocumentServiceTest {
 
     @Test
     public void getStateTokenAndResultCount() {
-        when(aciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockStateTokenResponse());
+        when(aciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockStateTokenResponse());
 
         final StateTokenAndResultCount stateTokenAndResultCount = idolDocumentService.getStateTokenAndResultCount(mockQueryParams(SearchRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
         assertThat(stateTokenAndResultCount.getTypedStateToken().getStateToken(), is(MOCK_STATE_TOKEN));

@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@SuppressWarnings("WeakerAccess")
 @Service
 public class TermExpandTypeAheadService implements TypeAheadService<AciErrorException> {
     private final AciService contentAciService;
@@ -48,11 +50,6 @@ public class TermExpandTypeAheadService implements TypeAheadService<AciErrorExce
 
         final TermExpandResponseData response = contentAciService.executeAction(parameters, processor);
 
-        final List<String> output = new LinkedList<>();
-        for (final TermExpandResponseData.Term term : response.getTerm()) {
-            output.add(term.getValue().toLowerCase());
-        }
-
-        return output;
+        return response.getTerm().stream().map(term -> term.getValue().toLowerCase()).collect(Collectors.toCollection(LinkedList::new));
     }
 }

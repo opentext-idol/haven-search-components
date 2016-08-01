@@ -38,12 +38,16 @@ public class StatisticProcessorTest {
         Statistic contentTopN = null;
 
         for (final Statistic statistic : statistics) {
-            if (statistic.getName().equals("DynamicAgentCount")) {
-                dynamicAgents = statistic;
-            } else if (statistic.getName().equals("ContentCount")) {
-                contentCount = statistic;
-            } else if (statistic.getName().equals("ContentTopN")) {
-                contentTopN = statistic;
+            switch (statistic.getName()) {
+                case "DynamicAgentCount":
+                    dynamicAgents = statistic;
+                    break;
+                case "ContentCount":
+                    contentCount = statistic;
+                    break;
+                case "ContentTopN":
+                    contentTopN = statistic;
+                    break;
             }
         }
 

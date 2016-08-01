@@ -66,7 +66,7 @@ public class HodParametricValuesServiceTest {
     protected FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
 
     @Mock
-    protected ConfigService<? extends HodSearchCapable> configService;
+    protected ConfigService<HodSearchCapable> configService;
 
     @Mock
     protected AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
@@ -130,7 +130,7 @@ public class HodParametricValuesServiceTest {
         when(fieldsService.getFields(any(HodFieldsRequest.class), any(FieldTypeParam.class))).thenReturn(response);
 
         final List<ResourceIdentifier> indexes = Collections.singletonList(ResourceIdentifier.PATENTS);
-        final HodParametricRequest testRequest = generateRequest(indexes, Collections.<String>emptyList());
+        final HodParametricRequest testRequest = generateRequest(indexes, Collections.emptyList());
         final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
         assertThat(fieldNamesSet, is(empty()));
     }
@@ -140,14 +140,14 @@ public class HodParametricValuesServiceTest {
         when(fieldsService.getFields(any(HodFieldsRequest.class), eq(FieldTypeParam.Parametric))).thenReturn(ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(new TagName("grassy field"))));
 
         final List<ResourceIdentifier> indexes = Collections.singletonList(ResourceIdentifier.WIKI_ENG);
-        final HodParametricRequest testRequest = generateRequest(indexes, Collections.<String>emptyList());
+        final HodParametricRequest testRequest = generateRequest(indexes, Collections.emptyList());
         final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
         assertThat(fieldNamesSet, is(not(empty())));
     }
 
     @Test
     public void getValueDetailsNoFields() throws HodErrorException {
-        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.<String>emptyList());
+        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.emptyList());
         assertThat(parametricValuesService.getValueDetails(parametricRequest).size(), is(0));
     }
 
@@ -223,14 +223,14 @@ public class HodParametricValuesServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void getNumericParametricValuesNoParams() throws HodErrorException {
         final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
-        parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, Collections.<String, BucketingParams>emptyMap());
+        parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, Collections.emptyMap());
     }
 
     @Test
     public void getNumericParametricValuesInBucketsNoFields() throws HodErrorException {
         final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
         final FieldNames responseData = new FieldNames.Builder()
-                .addParametricValue("numericParametricValue", Collections.<String, Integer>emptyMap())
+                .addParametricValue("numericParametricValue", Collections.emptyMap())
                 .build();
         when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
         final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, ImmutableMap.of("ParametricNumericDateField", new BucketingParams(3, 1.5, 5.5)));
@@ -273,7 +273,7 @@ public class HodParametricValuesServiceTest {
                 .addParametricValue("football field", fieldsOfFootball)
                 .addParametricValue("grassy field", fieldsOfGrass)
                 .addParametricValue("wasteland", fieldsOfWaste)
-                .addParametricValue("empty field", new LinkedHashMap<String, Integer>())
+                .addParametricValue("empty field", new LinkedHashMap<>())
                 .build();
 
         when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class)

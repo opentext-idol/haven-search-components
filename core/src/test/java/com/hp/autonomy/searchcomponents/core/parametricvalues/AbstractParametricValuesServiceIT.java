@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -96,9 +97,7 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
         final List<TagName> fields = fieldsService.getFields(fieldsRequestParams(fieldsRequestBuilder).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
         final List<String> fieldIds = new ArrayList<>(fields.size());
 
-        for (final TagName field : fields) {
-            fieldIds.add(field.getId());
-        }
+        fieldIds.addAll(fields.stream().map(TagName::getId).collect(Collectors.toList()));
 
         return parametricRequestBuilder
                 .setFieldNames(fieldIds)

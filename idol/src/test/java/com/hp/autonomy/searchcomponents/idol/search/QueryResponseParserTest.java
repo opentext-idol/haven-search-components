@@ -28,6 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.function.Function;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -49,7 +50,7 @@ public class QueryResponseParserTest {
     private DatabasesService<Database, IdolDatabasesRequest, AciErrorException> databasesService;
 
     @Mock
-    private IdolDocumentService.QueryExecutor queryExecutor;
+    private Function<AciParameters, QueryResponseData> queryExecutor;
 
     private QueryResponseParser queryResponseParser;
 
@@ -85,7 +86,7 @@ public class QueryResponseParserTest {
         responseData.setSpellingquery("spelling");
         responseData.setSpelling("mm, mmh");
 
-        when(queryExecutor.execute(any(AciParameters.class))).thenReturn(mockQueryResponse());
+        when(queryExecutor.apply(any(AciParameters.class))).thenReturn(mockQueryResponse());
 
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
         final AciSearchRequest<String> searchRequest = new SearchRequest.Builder<String>()

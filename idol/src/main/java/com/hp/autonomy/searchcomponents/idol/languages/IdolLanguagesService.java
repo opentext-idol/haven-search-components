@@ -24,9 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("WeakerAccess")
 @Service
 public class IdolLanguagesService implements LanguagesService {
-    static final String IDOL_UTF8_ENCODING = "UTF8";
+    private static final String IDOL_UTF8_ENCODING = "UTF8";
 
     private final AciService contentAciService;
     private final Processor<GetStatusResponseData> getStatusProcessor;
@@ -58,12 +59,10 @@ public class IdolLanguagesService implements LanguagesService {
             }
         }
 
-        for (final Map.Entry<String, LanguageType> entry : nonUtf8Languages.entrySet()) {
-            if (languagesByName.containsKey(entry.getKey())) {
-                final LanguageType equivalentUtf8languageType = languages.get(languagesByName.get(entry.getKey()).getName());
-                equivalentUtf8languageType.setDocuments(equivalentUtf8languageType.getDocuments() + entry.getValue().getDocuments());
-            }
-        }
+        nonUtf8Languages.entrySet().stream().filter(entry -> languagesByName.containsKey(entry.getKey())).forEach(entry -> {
+            final LanguageType equivalentUtf8languageType = languages.get(languagesByName.get(entry.getKey()).getName());
+            equivalentUtf8languageType.setDocuments(equivalentUtf8languageType.getDocuments() + entry.getValue().getDocuments());
+        });
 
         return languages;
     }

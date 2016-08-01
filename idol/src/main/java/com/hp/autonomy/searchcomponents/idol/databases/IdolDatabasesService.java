@@ -21,7 +21,9 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+@SuppressWarnings("WeakerAccess")
 @Data
 @Service
 public class IdolDatabasesService implements DatabasesService<Database, IdolDatabasesRequest, AciErrorException> {
@@ -39,13 +41,7 @@ public class IdolDatabasesService implements DatabasesService<Database, IdolData
     public Set<Database> getDatabases(final IdolDatabasesRequest request) throws AciErrorException {
         final GetStatusResponseData responseData = contentAciService.executeAction(new AciParameters(StatusActions.GetStatus.name()), responseProcessor);
         final List<Database> allDatabases = responseData.getDatabases().getDatabase();
-        final Set<Database> publicDatabases = new LinkedHashSet<>();
-        for (final Database database : allDatabases) {
-            if (!database.isInternal()) {
-                publicDatabases.add(database);
-            }
-        }
 
-        return publicDatabases;
+        return allDatabases.stream().filter(database -> !database.isInternal()).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }

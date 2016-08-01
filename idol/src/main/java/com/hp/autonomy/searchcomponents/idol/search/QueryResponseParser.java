@@ -13,12 +13,13 @@ import com.hp.autonomy.types.requests.Documents;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Parsing of response data returned by IDOL in response to search/suggest queries
  */
 public interface QueryResponseParser {
-    Documents<IdolSearchResult> parseQueryResults(AciSearchRequest<String> searchRequest, AciParameters aciParameters, QueryResponseData responseData, IdolDocumentService.QueryExecutor queryExecutor);
+    Documents<IdolSearchResult> parseQueryResults(AciSearchRequest<String> searchRequest, AciParameters aciParameters, QueryResponseData responseData, Function<AciParameters, QueryResponseData> queryExecutor);
 
     List<IdolSearchResult> parseQueryHits(Collection<Hit> hits);
 }

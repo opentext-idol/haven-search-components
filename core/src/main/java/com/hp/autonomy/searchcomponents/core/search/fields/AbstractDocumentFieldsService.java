@@ -28,16 +28,12 @@ public abstract class AbstractDocumentFieldsService implements DocumentFieldsSer
         final List<String> fields = new ArrayList<>();
 
         for (final FieldInfo<?> field : getHardCodedFields()) {
-            for (final String name : field.getNames()) {
-                fields.add(name);
-            }
+            fields.addAll(field.getNames());
         }
 
         final Collection<FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfig().values();
         for (final FieldInfo<?> field : fieldConfig) {
-            for (final String name : field.getNames()) {
-                fields.add(name);
-            }
+            fields.addAll(field.getNames());
         }
 
         return fields;

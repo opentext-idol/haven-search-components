@@ -58,7 +58,7 @@ public class HodDocumentServiceTest {
     protected FindSimilarService<HodSearchResult> findSimilarService;
 
     @Mock
-    protected ConfigService<? extends HodSearchCapable> configService;
+    protected ConfigService<HodSearchCapable> configService;
 
     @Mock
     protected HodSearchCapable config;
@@ -117,7 +117,7 @@ public class HodDocumentServiceTest {
     @Test
     public void queryTextIndexRaw() throws HodErrorException {
         final Documents<HodSearchResult> mockedResults = mockResults();
-        when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<QueryRequestBuilder>("queryProfile", nullValue())))).thenReturn(mockedResults);
+        when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<>("queryProfile", nullValue())))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
         final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest.Builder<ResourceIdentifier>()
@@ -139,7 +139,7 @@ public class HodDocumentServiceTest {
     @Test
     public void queryTextIndexForPromotions() throws HodErrorException {
         final Documents<HodSearchResult> mockedResults = mockResults();
-        when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<QueryRequestBuilder>("promotions", is(true))))).thenReturn(mockedResults);
+        when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<>("promotions", is(true))))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
         final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest.Builder<ResourceIdentifier>()

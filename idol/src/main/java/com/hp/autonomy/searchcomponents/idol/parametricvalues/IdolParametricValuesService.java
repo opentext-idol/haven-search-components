@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 @Service
@@ -98,12 +99,10 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
             for (final FlatField field : fields) {
                 final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
                 final LinkedHashSet<QueryTagCountInfo> values = new LinkedHashSet<>(valueElements.size());
-                for (final JAXBElement<?> element : valueElements) {
-                    if (VALUE_NODE_NAME.equals(element.getName().getLocalPart())) {
-                        final TagValue tagValue = (TagValue) element.getValue();
-                        values.add(new QueryTagCountInfo(tagValue.getValue(), tagValue.getCount()));
-                    }
-                }
+                valueElements.stream().filter(element -> VALUE_NODE_NAME.equals(element.getName().getLocalPart())).forEach(element -> {
+                    final TagValue tagValue = (TagValue) element.getValue();
+                    values.add(new QueryTagCountInfo(tagValue.getValue(), tagValue.getCount()));
+                });
                 if (!values.isEmpty()) {
                     final TagName tagName = new TagName(field.getName().get(0));
                     results.add(new QueryTagInfo(tagName, values));
@@ -155,7 +154,7 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
 
             final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
 
-            results = responseData.getValues() == null ? Collections.<RecursiveField>emptyList() : responseData.getValues().getField();
+            results = responseData.getValues() == null ? Collections.emptyList() : responseData.getValues().getField();
         }
 
         return results;
@@ -218,9 +217,7 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
     private Collection<String> lookupFieldIds() {
         final List<TagName> fields = fieldsService.getFields(new IdolFieldsRequest.Builder().build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
         final Collection<String> fieldIds = new ArrayList<>(fields.size());
-        for (final TagName field : fields) {
-            fieldIds.add(field.getId());
-        }
+        fieldIds.addAll(fields.stream().map(TagName::getId).collect(Collectors.toList()));
 
         return fieldIds;
     }

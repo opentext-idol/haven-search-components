@@ -43,6 +43,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class HodParametricValuesService extends AbstractParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> {
     private final FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
@@ -114,9 +115,7 @@ public class HodParametricValuesService extends AbstractParametricValuesService<
     private Collection<String> lookupFieldIds(final Collection<ResourceIdentifier> databases) throws HodErrorException {
         final List<TagName> fields = fieldsService.getFields(new HodFieldsRequest.Builder().setDatabases(databases).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
         final Collection<String> fieldIds = new ArrayList<>(fields.size());
-        for (final TagName field : fields) {
-            fieldIds.add(field.getId());
-        }
+        fieldIds.addAll(fields.stream().map(TagName::getId).collect(Collectors.toList()));
 
         return fieldIds;
     }
