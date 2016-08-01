@@ -7,16 +7,11 @@ package com.hp.autonomy.searchcomponents.core.config;
 
 import org.joda.time.DateTime;
 
+import java.util.function.Function;
+
 public enum FieldType {
-    STRING(String.class, new FieldValueParser<String>() {
-        @Override
-        public String parse(final String value) {
-            return value;
-        }
-    }),
-    DATE(DateTime.class, new FieldValueParser<DateTime>() {
-        @Override
-        public DateTime parse(final String value) {
+    STRING(String.class, value -> value),
+    DATE(DateTime.class, value -> {
             try {
                 final long epoch = Long.parseLong(value) * 1000;
                 return new DateTime(epoch);
@@ -28,26 +23,15 @@ public enum FieldType {
                     return null;
                 }
             }
-        }
     }),
-    NUMBER(Number.class, new FieldValueParser<Number>() {
-        @Override
-        public Number parse(final String value) {
-            return Double.parseDouble(value);
-        }
-    }),
-    BOOLEAN(Boolean.class, new FieldValueParser<Boolean>() {
-        @Override
-        public Boolean parse(final String value) {
-            return Boolean.parseBoolean(value);
-        }
-    });
+    NUMBER(Number.class, Double::parseDouble),
+    BOOLEAN(Boolean.class, Boolean::parseBoolean);
 
     private final Class<?> type;
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
-    private final FieldValueParser<?> parser;
+    private final Function<String, ?> parser;
 
-    FieldType(final Class<?> type, final FieldValueParser<?> parser) {
+    FieldType(final Class<?> type, final Function<String, ?> parser) {
         this.type = type;
         this.parser = parser;
     }
@@ -57,6 +41,6 @@ public enum FieldType {
     }
 
     public <T> T parseValue(final Class<T> type, final String stringValue) {
-        return type.cast(parser.parse(stringValue));
+        return type.cast(parser.apply(stringValue));
     }
 }

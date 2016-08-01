@@ -84,12 +84,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
         final AciService aciService = aciServiceRetriever.getAciService(searchRequest.getQueryType());
         final QueryResponseData responseData = executeQuery(aciService, aciParameters);
 
-        return queryResponseParser.parseQueryResults(searchRequest, aciParameters, responseData, new QueryExecutor() {
-            @Override
-            public QueryResponseData execute(final AciParameters parameters) {
-                return executeQuery(aciService, parameters);
-            }
-        });
+        return queryResponseParser.parseQueryResults(searchRequest, aciParameters, responseData, parameters -> executeQuery(aciService, parameters));
     }
 
     @Override
@@ -167,10 +162,5 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
     @SuppressWarnings("TypeMayBeWeakened")
     protected QueryResponseData executeQuery(final AciService aciService, final AciParameters aciParameters) {
         return aciService.executeAction(aciParameters, queryResponseProcessor);
-    }
-
-    //TODO replace with method reference or similar once we upgrade to java 8
-    public interface QueryExecutor {
-        QueryResponseData execute(final AciParameters parameters);
     }
 }

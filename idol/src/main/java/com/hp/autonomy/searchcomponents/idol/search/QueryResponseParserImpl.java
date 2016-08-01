@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
@@ -51,7 +52,7 @@ public class QueryResponseParserImpl implements QueryResponseParser {
     }
 
     @Override
-    public Documents<IdolSearchResult> parseQueryResults(final AciSearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData, final IdolDocumentService.QueryExecutor queryExecutor) {
+    public Documents<IdolSearchResult> parseQueryResults(final AciSearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData, final Function<AciParameters, QueryResponseData> queryExecutor) {
         final List<Hit> hits = responseData.getHits();
 
         final Warnings warnings = parseWarnings(searchRequest, aciParameters, responseData);
@@ -92,18 +93,18 @@ public class QueryResponseParserImpl implements QueryResponseParser {
         return warnings;
     }
 
-    protected Documents<IdolSearchResult> rerunQueryWithAdjustedSpelling(final AciParameters aciParameters, final QueryResponseData responseData, final String spellingQuery, final Warnings warnings, final IdolDocumentService.QueryExecutor queryExecutor) {
+    protected Documents<IdolSearchResult> rerunQueryWithAdjustedSpelling(final AciParameters aciParameters, final QueryResponseData responseData, final String spellingQuery, final Warnings warnings, final Function<AciParameters, QueryResponseData> queryExecutor) {
         final String originalQuery = aciParameters.get(QueryParams.Text.name());
         aciParameters.put(QueryParams.Text.name(), spellingQuery);
 
         final Spelling spelling = new Spelling(Arrays.asList(SPELLING_SEPARATOR_PATTERN.split(responseData.getSpelling())), spellingQuery, originalQuery);
 
         try {
-            final QueryResponseData correctedResponseData = queryExecutor.execute(aciParameters);
+            final QueryResponseData correctedResponseData = queryExecutor.apply(aciParameters);
             final List<IdolSearchResult> correctedResults = parseQueryHits(correctedResponseData.getHits());
 
             return new Documents<>(correctedResults, correctedResponseData.getTotalhits(), null, null, spelling, warnings);
-        } catch (AciErrorException e) {
+        } catch (final AciErrorException e) {
             throw new AutoCorrectException(e.getMessage(), e, spelling);
         }
     }
