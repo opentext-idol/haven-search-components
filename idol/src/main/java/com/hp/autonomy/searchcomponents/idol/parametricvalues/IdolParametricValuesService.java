@@ -146,6 +146,7 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
         } else {
             final AciParameters aciParameters = createAciParameters(parametricRequest.getQueryRestrictions(), parametricRequest.isModified());
 
+            parameterHandler.addSecurityInfo(aciParameters);
             aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
             aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
             aciParameters.add(GetQueryTagValuesParams.FieldDependence.name(), true);
@@ -167,6 +168,7 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
         } else {
             final AciParameters aciParameters = createAciParameters(parametricRequest.getQueryRestrictions(), parametricRequest.isModified());
 
+            parameterHandler.addSecurityInfo(aciParameters);
             aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), 1);
             aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(parametricRequest.getFieldNames(), ','));
             aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
@@ -293,6 +295,7 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
             parameterHandler.addQmsParameters(aciParameters, parametricRequest.getQueryRestrictions());
         }
 
+        parameterHandler.addSecurityInfo(aciParameters);
         aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
         aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), parametricRequest.getMaxValues());
         aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));

@@ -133,6 +133,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
     @Override
     public StateTokenAndResultCount getStateTokenAndResultCount(final QueryRestrictions<String> queryRestrictions, final int maxResults, final boolean promotions) throws AciErrorException {
         final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
+        parameterHandler.addSecurityInfo(aciParameters);
         aciParameters.add(QueryParams.StoreState.name(), true);
         aciParameters.add(QueryParams.StoredStateTokenLifetime.name(), -1);  // negative value means no expiry (DAH)
         aciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
@@ -153,6 +154,7 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
 
         // Now fetch result count with combine=simple
         final AciParameters resultCountAciParameters = new AciParameters(QueryActions.Query.name());
+        parameterHandler.addSecurityInfo(aciParameters);
         resultCountAciParameters.add(QueryParams.TotalResults.name(), true);
         resultCountAciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         resultCountAciParameters.add(QueryParams.Predict.name(), false);
