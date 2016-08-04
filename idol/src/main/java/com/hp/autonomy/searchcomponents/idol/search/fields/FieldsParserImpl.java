@@ -24,15 +24,13 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
-public class FieldsParserImpl implements FieldsParser {
+class FieldsParserImpl implements FieldsParser {
     private final ConfigService<? extends IdolSearchCapable> configService;
 
     @Autowired
@@ -85,14 +83,14 @@ public class FieldsParserImpl implements FieldsParser {
                     final Object value = fieldType.parseValue(fieldType.getType(), stringValue);
                     if (fieldMap.containsKey(id)) {
                         final List<String> names = fieldInfo.getNames();
-                        //noinspection unchecked
+                        @SuppressWarnings({"unchecked", "CastToConcreteClass"})
                         final FieldInfo<Object> objectFieldInfo = (FieldInfo<Object>) fieldMap.get(id);
                         objectFieldInfo.getValues().add(names.indexOf(name), value);
                         objectFieldInfo.getNames().add(names.indexOf(name), name);
                     } else {
                         final ArrayList<String> names = new ArrayList<>(fieldInfo.getNames().size());
                         names.add(name);
-                        fieldMap.put(id, new FieldInfo<>(id, names, fieldInfo.getType(), value));
+                        fieldMap.put(id, new FieldInfo<>(id, names, fieldInfo.getType(), fieldInfo.isAdvanced(), value));
                     }
                 }
             } else if (node.getChildNodes().getLength() > 0) {
@@ -102,7 +100,7 @@ public class FieldsParserImpl implements FieldsParser {
     }
 
     private FieldInfo<?> getFieldInfo(final Map<String, FieldInfo<?>> fieldConfig, final String name) {
-        return fieldConfig.containsKey(name) ? fieldConfig.get(name) : new FieldInfo<>(name, Collections.singletonList(name), FieldType.STRING);
+        return fieldConfig.containsKey(name) ? fieldConfig.get(name) : new FieldInfo<>(name, Collections.singletonList(name), FieldType.STRING, true);
     }
 
     private PromotionCategory determinePromotionCategory(final Element docContent, final CharSequence promotionName, final CharSequence database) {

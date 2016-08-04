@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -61,14 +62,14 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
                         values.add(value);
                     }
 
-                    if (!fieldMap.containsKey(fieldInfo.getId())){
-                        fieldMap.put(fieldInfo.getId(), new FieldInfo<>(fieldInfo.getId(), Collections.singleton(name), fieldInfo.getType(), values));
-                    }
-                    else {
+                    if (fieldMap.containsKey(fieldInfo.getId())) {
                         final FieldInfo<?> existingFieldInfo = fieldMap.get(fieldInfo.getId());
-                        //noinspection unchecked
-                        ((List<Object>) existingFieldInfo.getValues()).addAll(values);
+                        @SuppressWarnings("unchecked")
+                        final Collection<Object> existingValues = (Collection<Object>) existingFieldInfo.getValues();
+                        existingValues.addAll(values);
                         existingFieldInfo.getNames().add(name);
+                    } else {
+                        fieldMap.put(fieldInfo.getId(), new FieldInfo<>(fieldInfo.getId(), Collections.singleton(name), fieldInfo.getType(), true, values));
                     }
                 }
             }

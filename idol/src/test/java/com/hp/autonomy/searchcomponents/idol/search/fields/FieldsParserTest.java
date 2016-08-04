@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class FieldsParserTest {
     @Mock
-    private ConfigService<? extends IdolSearchCapable> configService;
+    private ConfigService<IdolSearchCapable> configService;
 
     @Mock
     private IdolSearchCapable config;
@@ -48,8 +48,8 @@ public class FieldsParserTest {
         fieldsParser = new FieldsParserImpl(configService);
 
         final FieldsInfo fieldsInfo = new FieldsInfo.Builder()
-                .populateResponseMap("Custom Date", new FieldInfo<DateTime>("Custom Date", Collections.singletonList("CUSTOM_DATE"), FieldType.DATE))
-                .populateResponseMap("author", new FieldInfo<String>("author", Collections.singletonList("CUSTOM_ARRAY"), FieldType.STRING))
+                .populateResponseMap("Custom Date", new FieldInfo<DateTime>("Custom Date", Collections.singletonList("CUSTOM_DATE"), FieldType.DATE, true))
+                .populateResponseMap("author", new FieldInfo<String>("author", Collections.singletonList("CUSTOM_ARRAY"), FieldType.STRING, false))
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);
