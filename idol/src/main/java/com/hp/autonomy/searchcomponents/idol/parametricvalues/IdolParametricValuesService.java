@@ -181,7 +181,7 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
                 final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
 
                 final ValueDetails.Builder builder = new ValueDetails.Builder()
-                        .setTotalValues(field.getTotalValues());
+                        .setTotalValues(field.getTotalValues() == null ? 0 : field.getTotalValues());
 
                 for (final JAXBElement<?> element : valueElements) {
                     final String elementLocalName = element.getName().getLocalPart();
