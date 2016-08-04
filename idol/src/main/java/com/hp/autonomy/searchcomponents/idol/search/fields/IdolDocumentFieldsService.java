@@ -19,10 +19,10 @@ import java.util.Collection;
 
 @Component
 public class IdolDocumentFieldsService extends AbstractDocumentFieldsService implements DocumentFieldsService {
-    public static final String QMS_ID_FIELD = "qmsid";
-    public static final String INJECTED_PROMOTION_FIELD = "injectedpromotion";
-    public static final FieldInfo<String> QMS_ID_FIELD_INFO = new FieldInfo<>(QMS_ID_FIELD, FieldType.STRING);
-    public static final FieldInfo<Boolean> INJECTED_PROMOTION_FIELD_INFO = new FieldInfo<>(INJECTED_PROMOTION_FIELD, FieldType.BOOLEAN);
+    static final String QMS_ID_FIELD = "qmsid";
+    static final String INJECTED_PROMOTION_FIELD = "injectedpromotion";
+    static final FieldInfo<String> QMS_ID_FIELD_INFO = new FieldInfo<>(QMS_ID_FIELD, FieldType.STRING, true);
+    static final FieldInfo<Boolean> INJECTED_PROMOTION_FIELD_INFO = new FieldInfo<>(INJECTED_PROMOTION_FIELD, FieldType.BOOLEAN, true);
 
     @SuppressWarnings("TypeMayBeWeakened")
     @Autowired
@@ -33,6 +33,6 @@ public class IdolDocumentFieldsService extends AbstractDocumentFieldsService imp
     @SuppressWarnings("CastToConcreteClass")
     @Override
     public Collection<FieldInfo<?>> getHardCodedFields() {
-        return Arrays.asList((FieldInfo<?>) QMS_ID_FIELD_INFO, INJECTED_PROMOTION_FIELD_INFO);
+        return Arrays.asList(QMS_ID_FIELD_INFO, INJECTED_PROMOTION_FIELD_INFO);
     }
 }

@@ -24,14 +24,14 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractDocumentFieldsServiceTest {
     @Mock
-    protected ConfigService<? extends HavenSearchCapable> configService;
+    protected ConfigService<HavenSearchCapable> configService;
 
     @Mock
     protected HavenSearchCapable config;
 
     protected AbstractDocumentFieldsService documentFieldsService;
     protected int numberOfHardCodedFields;
-    protected FieldsInfo fieldsInfo;
+    private FieldsInfo fieldsInfo;
 
     @Test
     public void getPrintFieldsHardcodedOnly() {
@@ -44,7 +44,7 @@ public abstract class AbstractDocumentFieldsServiceTest {
     @Test
     public void getAllPrintFields() {
         fieldsInfo = new FieldsInfo.Builder()
-                .populateResponseMap("Some Id", new FieldInfo<String>("Some Id", Collections.singletonList("SomeField"), FieldType.STRING))
+                .populateResponseMap("Some Id", new FieldInfo<String>("Some Id", Collections.singletonList("SomeField"), FieldType.STRING, false))
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);

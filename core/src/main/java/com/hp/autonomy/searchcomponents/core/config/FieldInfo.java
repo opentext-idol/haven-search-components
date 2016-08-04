@@ -22,27 +22,29 @@ public class FieldInfo<T> implements Serializable {
     private static final long serialVersionUID = -5649457890413743332L;
     private String id;
     private FieldType type = FieldType.STRING;
+    private boolean advanced = false;
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "NonSerializableFieldInSerializableClass", "TypeMayBeWeakened"})
     private final List<String> names = new ArrayList<>();
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "NonSerializableFieldInSerializableClass", "TypeMayBeWeakened"})
     private final List<T> values = new ArrayList<>();
 
-    public FieldInfo(final String names, final FieldType type) {
-        this(null, Collections.singletonList(names), type, Collections.<T>emptyList());
+    public FieldInfo(final String names, final FieldType type, final boolean advanced) {
+        this(null, Collections.singletonList(names), type, advanced, Collections.emptyList());
     }
 
-    public FieldInfo(final String id, final Collection<String> names, final FieldType type) {
-        this(id, names, type, Collections.<T>emptyList());
+    public FieldInfo(final String id, final Collection<String> names, final FieldType type, final boolean advanced) {
+        this(id, names, type, advanced, Collections.emptyList());
     }
 
-    public FieldInfo(final String id, final Collection<String> names, final FieldType type, final T value) {
-        this(id, names, type, Collections.singletonList(value));
+    public FieldInfo(final String id, final Collection<String> names, final FieldType type, final boolean advanced, final T value) {
+        this(id, names, type, advanced, Collections.singletonList(value));
     }
 
-    public FieldInfo(final String id, final Collection<String> names, final FieldType type, final Collection<T> values) {
+    public FieldInfo(final String id, final Collection<String> names, final FieldType type, final boolean advanced, final Collection<T> values) {
         this.id = id;
         this.names.addAll(names);
         this.type = type;
+        this.advanced = advanced;
         this.values.addAll(values);
     }
 

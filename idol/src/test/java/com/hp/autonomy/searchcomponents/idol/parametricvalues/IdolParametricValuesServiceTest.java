@@ -7,7 +7,6 @@ package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
-import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
@@ -88,19 +87,19 @@ public class IdolParametricValuesServiceTest {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("Some field"));
 
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
         final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
     }
 
     @Test
     public void getFieldNamesFirst() {
-        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.<String>emptyList());
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
         when(fieldsService.getFields(any(IdolFieldsRequest.class), eq(FieldTypeParam.Parametric))).thenReturn(ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(new TagName("CATEGORY"))));
 
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
         final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
@@ -108,11 +107,11 @@ public class IdolParametricValuesServiceTest {
 
     @Test
     public void parametricValuesNotConfigured() {
-        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.<String>emptyList());
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
-        final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.<TagName>emptyList());
+        final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptyList());
         when(fieldsService.getFields(any(IdolFieldsRequest.class), any(FieldTypeParam.class))).thenReturn(response);
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(new GetTagNamesResponseData());
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(new GetTagNamesResponseData());
 
         final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
         assertThat(results, is(empty()));
@@ -120,7 +119,7 @@ public class IdolParametricValuesServiceTest {
 
     @Test
     public void getValueDetailsNoFields() {
-        final IdolParametricRequest parametricRequest = mockRequest(Collections.<String>emptyList());
+        final IdolParametricRequest parametricRequest = mockRequest(Collections.emptyList());
         assertThat(parametricValuesService.getValueDetails(parametricRequest).size(), is(0));
     }
 
@@ -128,21 +127,24 @@ public class IdolParametricValuesServiceTest {
     public void getValueDetails() {
         final String elevation = "DOCUMENT/ELEVATION";
         final String age = "DOCUMENT/AGE";
-        final IdolParametricRequest parametricRequest = mockRequest(Arrays.asList(elevation, age));
+        final String notThere = "DOCUMENT/NOT_THERE";
+        final IdolParametricRequest parametricRequest = mockRequest(Arrays.asList(elevation, age, notThere));
 
         final List<FlatField> responseFields = new LinkedList<>();
         responseFields.add(mockFlatField(elevation, -50, 1242, 12314, 500.5, 3));
         responseFields.add(mockFlatField(age, 0, 96, 1314, 26, 100));
+        responseFields.add(mockFlatField(notThere, 0, 0, 0, 0, null));
 
         final GetQueryTagValuesResponseData response = mock(GetQueryTagValuesResponseData.class);
         when(response.getField()).thenReturn(responseFields);
 
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(response);
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(response);
 
         final Map<TagName, ValueDetails> valueDetails = parametricValuesService.getValueDetails(parametricRequest);
-        assertThat(valueDetails.size(), is(2));
+        assertThat(valueDetails.size(), is(3));
         assertThat(valueDetails, hasEntry(equalTo(new TagName(elevation)), equalTo(new ValueDetails(-50, 1242, 500.5, 12314, 3))));
         assertThat(valueDetails, hasEntry(equalTo(new TagName(age)), equalTo(new ValueDetails(0, 96, 26, 1314, 100))));
+        assertThat(valueDetails, hasEntry(equalTo(new TagName(notThere)), equalTo(new ValueDetails(0d, 0d, 0d, 0d, 0))));
     }
 
     @Test
@@ -192,13 +194,13 @@ public class IdolParametricValuesServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void getNumericParametricValuesNoParams() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, Collections.<String, BucketingParams>emptyMap());
+        parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, Collections.emptyMap());
     }
 
     @Test
     public void bucketParametricValuesNoFields() {
-        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.<String>emptyList());
-        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, Collections.<String, BucketingParams>emptyMap());
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
+        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, Collections.emptyMap());
         assertThat(results, is(empty()));
     }
 
@@ -207,19 +209,19 @@ public class IdolParametricValuesServiceTest {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("Some field"));
 
         final GetQueryTagValuesResponseData responseData = mockRecursiveResponse();
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
         final Collection<RecursiveField> results = parametricValuesService.getDependentParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
     }
 
     @Test
     public void getDependentValuesFieldNamesFirst() {
-        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.<String>emptyList());
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
         when(fieldsService.getFields(any(IdolFieldsRequest.class), eq(FieldTypeParam.Parametric))).thenReturn(ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(new TagName("CATEGORY"))));
 
         final GetQueryTagValuesResponseData responseData = mockRecursiveResponse();
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
         final Collection<RecursiveField> results = parametricValuesService.getDependentParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
@@ -227,18 +229,18 @@ public class IdolParametricValuesServiceTest {
 
     @Test
     public void dependentParametricValuesNotConfigured() {
-        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.<String>emptyList());
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
-        final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.<TagName>emptyList());
+        final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptyList());
         when(fieldsService.getFields(any(IdolFieldsRequest.class), any(FieldTypeParam.class))).thenReturn(response);
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(new GetTagNamesResponseData());
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(new GetTagNamesResponseData());
 
         final Collection<RecursiveField> results = parametricValuesService.getDependentParametricValues(idolParametricRequest);
         assertThat(results, is(empty()));
     }
 
     private IdolParametricRequest mockRequest(final List<String> fieldNames) {
-        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.<String>emptyList()).build();
+        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.emptyList()).build();
         return new IdolParametricRequest.Builder()
                 .setFieldNames(fieldNames)
                 .setQueryRestrictions(queryRestrictions)
@@ -269,7 +271,8 @@ public class IdolParametricValuesServiceTest {
         return jaxbElement;
     }
 
-    private FlatField mockFlatField(final String name, final double min, final double max, final double sum, final double average, final int totalValues) {
+    @SuppressWarnings("MethodWithTooManyParameters")
+    private FlatField mockFlatField(final String name, final double min, final double max, final double sum, final double average, final Integer totalValues) {
         final FlatField flatField = mock(FlatField.class);
         when(flatField.getName()).thenReturn(Collections.singletonList(name));
         when(flatField.getTotalValues()).thenReturn(totalValues);
@@ -306,7 +309,7 @@ public class IdolParametricValuesServiceTest {
         }
         responseData.getField().add(field2);
 
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
     }
 
     private TagValue mockTagValue(final String value, final int count) {

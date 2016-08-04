@@ -45,7 +45,7 @@ public class HodSearchResultDeserializerTest {
     }
 
     @Mock
-    private ConfigService<? extends HodSearchCapable> configService;
+    private ConfigService<HodSearchCapable> configService;
 
     @Mock
     private HodSearchCapable config;
@@ -61,8 +61,8 @@ public class HodSearchResultDeserializerTest {
         objectMapper.registerModule(new JodaModule());
 
         final FieldsInfo fieldsInfo = new FieldsInfo.Builder()
-                .populateResponseMap("modifiedDate", new FieldInfo<DateTime>("modifiedDate", Arrays.asList("modified_date", "date_modified"), FieldType.DATE))
-                .populateResponseMap("links", new FieldInfo<String>("links", Collections.singletonList("links"), FieldType.STRING))
+                .populateResponseMap("modifiedDate", new FieldInfo<DateTime>("modifiedDate", Arrays.asList("modified_date", "date_modified"), FieldType.DATE, true))
+                .populateResponseMap("links", new FieldInfo<String>("links", Collections.singletonList("links"), FieldType.STRING, true))
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);
