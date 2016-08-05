@@ -40,6 +40,7 @@ public class IdolRelatedConceptsService implements RelatedConceptsService<QsElem
     @Override
     public List<QsElement> findRelatedConcepts(final RelatedConceptsRequest<String> relatedConceptsRequest) throws AciErrorException {
         final AciParameters parameters = new AciParameters(QueryActions.Query.name());
+        parameterHandler.addSecurityInfo(parameters);
         parameterHandler.addSearchRestrictions(parameters, relatedConceptsRequest.getQueryRestrictions());
         parameters.add(QueryParams.MaxResults.name(), relatedConceptsRequest.getMaxResults());
         parameters.add(QueryParams.Print.name(), PrintParam.NoResults);
@@ -47,6 +48,6 @@ public class IdolRelatedConceptsService implements RelatedConceptsService<QsElem
         parameters.add(QueryParams.QuerySummaryLength.name(), relatedConceptsRequest.getQuerySummaryLength());
 
         final QueryResponseData responseData = contentAciService.executeAction(parameters, queryResponseProcessor);
-        return responseData.getQs() != null ? responseData.getQs().getElement() : Collections.<QsElement>emptyList();
+        return responseData.getQs() != null ? responseData.getQs().getElement() : Collections.emptyList();
     }
 }
