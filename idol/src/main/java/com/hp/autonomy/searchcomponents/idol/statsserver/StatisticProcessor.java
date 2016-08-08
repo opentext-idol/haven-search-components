@@ -22,7 +22,8 @@ import java.util.Set;
  * Implementation of {@link AbstractStAXProcessor} to process the output of StatsServer GetStatus into an {@link Set} of
  * {@link Statistic}.
  */
-class StatisticProcessor extends AbstractStAXProcessor<Set<Statistic>> {
+@SuppressWarnings("WeakerAccess")
+public class StatisticProcessor extends AbstractStAXProcessor<Set<Statistic>> {
     private static final long serialVersionUID = -5289889557164139830L;
 
     private final StAXProcessor<Statistic> statProcessor;
