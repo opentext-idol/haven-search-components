@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @Component
-public class IdolDocumentFieldsService extends AbstractDocumentFieldsService implements DocumentFieldsService {
+class IdolDocumentFieldsService extends AbstractDocumentFieldsService implements DocumentFieldsService {
     static final String QMS_ID_FIELD = "qmsid";
     static final String INJECTED_PROMOTION_FIELD = "injectedpromotion";
     static final FieldInfo<String> QMS_ID_FIELD_INFO = new FieldInfo<>(QMS_ID_FIELD, FieldType.STRING, true);
@@ -30,7 +30,6 @@ public class IdolDocumentFieldsService extends AbstractDocumentFieldsService imp
         super(configService);
     }
 
-    @SuppressWarnings("CastToConcreteClass")
     @Override
     public Collection<FieldInfo<?>> getHardCodedFields() {
         return Arrays.asList(QMS_ID_FIELD_INFO, INJECTED_PROMOTION_FIELD_INFO);

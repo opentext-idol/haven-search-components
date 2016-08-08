@@ -23,7 +23,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 @Configuration
 class DefaultIdolConfiguration {
-    @SuppressWarnings("MethodWithTooManyParameters")
     @Bean
     @ConditionalOnMissingBean(DocumentsService.class)
     public DocumentsService<String, IdolSearchResult, AciErrorException> documentsService(final HavenSearchAciParameterHandler parameterHandler,

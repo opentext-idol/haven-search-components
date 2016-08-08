@@ -10,7 +10,7 @@ import com.hp.autonomy.searchcomponents.core.test.IntegrationTestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import java.io.Serializable;
 
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 public abstract class AbstractViewServerServiceIT<S extends Serializable, D extends SearchResult, E extends Exception> {
     @Autowired
     protected ViewServerService<S, E> viewServerService;

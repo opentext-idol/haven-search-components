@@ -16,8 +16,8 @@ import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolCo
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
 
@@ -25,8 +25,8 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = HavenSearchIdolConfiguration.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = HavenSearchIdolConfiguration.class)
 public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<String, IdolSearchResult, AciErrorException> {
     @Test
     public void getStateTokenAndResultCount() {
@@ -43,7 +43,7 @@ public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<String, Ido
     public void queryWithInvalidAutoCorrect() throws AciErrorException {
         final SearchRequest<String> searchRequest = new SearchRequest<>();
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder()
-                .setQueryText("XORBanana")
+                .setQueryText("XORApple")
                 .setFieldText("")
                 .setDatabases(integrationTestUtils.getDatabases())
                 .setMinDate(null)
@@ -51,8 +51,8 @@ public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<String, Ido
                 .setMinScore(0)
                 .setLanguageType(null)
                 .setAnyLanguage(true)
-                .setStateMatchId(Collections.<String>emptyList())
-                .setStateDontMatchId(Collections.<String>emptyList())
+                .setStateMatchId(Collections.emptyList())
+                .setStateDontMatchId(Collections.emptyList())
                 .build();
 
         searchRequest.setQueryRestrictions(queryRestrictions);

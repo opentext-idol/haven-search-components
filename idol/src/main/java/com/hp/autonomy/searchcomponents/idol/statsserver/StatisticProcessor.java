@@ -14,6 +14,7 @@ import com.autonomy.aci.client.services.impl.ErrorProcessor;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,12 +22,12 @@ import java.util.Set;
  * Implementation of {@link AbstractStAXProcessor} to process the output of StatsServer GetStatus into an {@link Set} of
  * {@link Statistic}.
  */
-public class StatisticProcessor extends AbstractStAXProcessor<Set<Statistic>> {
+class StatisticProcessor extends AbstractStAXProcessor<Set<Statistic>> {
     private static final long serialVersionUID = -5289889557164139830L;
 
     private final StAXProcessor<Statistic> statProcessor;
 
-    public StatisticProcessor(final IdolAnnotationsProcessorFactory processorFactory) {
+    StatisticProcessor(final IdolAnnotationsProcessorFactory processorFactory) {
         statProcessor = processorFactory.forClass(Statistic.class);
     }
 
@@ -41,7 +42,7 @@ public class StatisticProcessor extends AbstractStAXProcessor<Set<Statistic>> {
             }
 
             while (xmlStreamReader.hasNext()) {
-                if (xmlStreamReader.next() == XMLEvent.START_ELEMENT && xmlStreamReader.getLocalName().equals("idol")) {
+                if (xmlStreamReader.next() == XMLEvent.START_ELEMENT && "idol".equals(xmlStreamReader.getLocalName())) {
                     statistics.addAll(processIdol(xmlStreamReader));
                 }
             }
@@ -52,8 +53,8 @@ public class StatisticProcessor extends AbstractStAXProcessor<Set<Statistic>> {
         return statistics;
     }
 
-    private Set<Statistic> processIdol(final XMLStreamReader xmlStreamReader) throws XMLStreamException {
-        final Set<Statistic> statistics = new HashSet<>();
+    private Collection<Statistic> processIdol(final XMLStreamReader xmlStreamReader) throws XMLStreamException {
+        final Collection<Statistic> statistics = new HashSet<>();
         String idol = null;
 
         while (xmlStreamReader.hasNext()) {
@@ -62,12 +63,12 @@ public class StatisticProcessor extends AbstractStAXProcessor<Set<Statistic>> {
             if (next == XMLEvent.START_ELEMENT) {
                 final String localName = xmlStreamReader.getLocalName();
 
-                if (localName.equals("name")) {
+                if ("name".equals(localName)) {
                     idol = xmlStreamReader.getElementText();
-                } else if (localName.equals("stat")) {
+                } else if ("stat".equals(localName)) {
                     statistics.add(statProcessor.process(xmlStreamReader));
                 }
-            } else if (next == XMLEvent.END_ELEMENT && xmlStreamReader.getLocalName().equals("idol")) {
+            } else if (next == XMLEvent.END_ELEMENT && "idol".equals(xmlStreamReader.getLocalName())) {
                 if (!statistics.isEmpty() && idol == null) {
                     throw new ProcessorException("No name found for idol");
                 }

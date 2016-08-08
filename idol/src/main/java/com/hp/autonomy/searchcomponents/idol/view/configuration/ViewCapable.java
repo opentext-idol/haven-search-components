@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.view.configuration;
 /**
  * Interface declaring that a configuration class contains ViewServer configuration
  */
+@FunctionalInterface
 public interface ViewCapable {
     ViewConfig getViewConfig();
 }

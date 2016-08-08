@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.search.fields;
 import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import com.hp.autonomy.types.idol.Hit;
 
+@FunctionalInterface
 public interface FieldsParser {
     void parseDocumentFields(Hit hit, IdolSearchResult.Builder searchResultBuilder);
 }

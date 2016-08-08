@@ -10,11 +10,11 @@ import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.fields.AbstractFieldsServiceIT;
 import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConfiguration;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = HavenSearchHodConfiguration.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = HavenSearchHodConfiguration.class)
 public class HodFieldsServiceIT extends AbstractFieldsServiceIT<HodFieldsRequest, ResourceIdentifier, HodErrorException> {
     @Override
     protected HodFieldsRequest createFieldsRequest() {

@@ -8,22 +8,21 @@ package com.hp.autonomy.searchcomponents.core.typeahead;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 public abstract class AbstractTypeAheadServiceIT<E extends Exception> {
-    @SuppressWarnings("SpringJavaAutowiredMembersInspection")
     @Autowired
     protected TypeAheadService<E> typeAheadService;
 
     private final String inputText;
     private final String expectedSuggestion;
 
-    public AbstractTypeAheadServiceIT(final String inputText, final String expectedSuggestion) {
+    protected AbstractTypeAheadServiceIT(final String inputText, final String expectedSuggestion) {
         this.inputText = inputText;
         this.expectedSuggestion = expectedSuggestion;
     }

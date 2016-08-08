@@ -9,6 +9,7 @@ import com.hp.autonomy.types.IdolDatabase;
 
 import java.util.Set;
 
+@FunctionalInterface
 public interface DatabasesService<D extends IdolDatabase, R extends DatabasesRequest, E extends Exception> {
     Set<D> getDatabases(final R request) throws E;
 }

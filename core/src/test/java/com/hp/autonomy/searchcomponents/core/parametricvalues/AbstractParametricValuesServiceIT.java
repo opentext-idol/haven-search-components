@@ -19,7 +19,7 @@ import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequest<S>, F extends FieldsRequest, FB extends FieldsRequest.Builder<F>, S extends Serializable, E extends Exception> {
     @Autowired
     private FieldsService<F, E> fieldsService;
