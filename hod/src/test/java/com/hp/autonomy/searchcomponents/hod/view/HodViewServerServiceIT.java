@@ -11,10 +11,10 @@ import com.hp.autonomy.searchcomponents.core.view.AbstractViewServerServiceIT;
 import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConfiguration;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = HavenSearchHodConfiguration.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = HavenSearchHodConfiguration.class)
 public class HodViewServerServiceIT extends AbstractViewServerServiceIT<ResourceIdentifier, HodSearchResult, HodErrorException> {
 }

@@ -13,6 +13,7 @@ import java.util.Arrays;
 /**
  * Utility for adding a content security policy for securing viewed documents.
  */
+@SuppressWarnings({"unused", "UtilityClass"})
 public class ViewContentSecurityPolicy {
     private static final String CONTENT_SECURITY_POLICY = StringUtils.join(Arrays.asList(
             // Unless another directive applies, prevent loading content

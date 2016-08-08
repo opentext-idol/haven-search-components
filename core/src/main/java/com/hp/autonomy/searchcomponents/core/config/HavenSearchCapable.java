@@ -5,6 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.config;
 
+@FunctionalInterface
 public interface HavenSearchCapable {
     FieldsInfo getFieldsInfo();
 }

@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("FieldMayBeFinal")
 @Data
 @NoArgsConstructor
 public class FieldInfo<T> implements Serializable {
@@ -23,7 +22,7 @@ public class FieldInfo<T> implements Serializable {
     private String id;
     private FieldType type = FieldType.STRING;
     private boolean advanced = false;
-    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "NonSerializableFieldInSerializableClass", "TypeMayBeWeakened"})
+    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "TypeMayBeWeakened"})
     private final List<String> names = new ArrayList<>();
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "NonSerializableFieldInSerializableClass", "TypeMayBeWeakened"})
     private final List<T> values = new ArrayList<>();

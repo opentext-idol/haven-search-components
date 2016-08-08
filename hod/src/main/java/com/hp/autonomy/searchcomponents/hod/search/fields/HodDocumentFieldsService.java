@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Component
-public class HodDocumentFieldsService extends AbstractDocumentFieldsService implements DocumentFieldsService {
+class HodDocumentFieldsService extends AbstractDocumentFieldsService implements DocumentFieldsService {
     @SuppressWarnings("TypeMayBeWeakened")
     @Autowired
     public HodDocumentFieldsService(final ConfigService<? extends HavenSearchCapable> configService) {

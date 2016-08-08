@@ -17,11 +17,7 @@ public class SpringSecurityAuthenticationInformationRetriever<A extends Authenti
     public P getPrincipal() {
         final A authentication = getAuthentication();
 
-        if (authentication == null) {
-            return null;
-        } else {
-            //noinspection unchecked
-            return (P) authentication.getPrincipal();
-        }
+        //noinspection unchecked
+        return authentication == null ? null : (P) authentication.getPrincipal();
     }
 }

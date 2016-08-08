@@ -11,6 +11,7 @@ import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import java.util.List;
 import java.util.Map;
 
+@FunctionalInterface
 public interface FieldsService<R extends FieldsRequest, E extends Exception> {
 
     Map<FieldTypeParam, List<TagName>> getFields(final R request, final FieldTypeParam... fieldTypes) throws E;

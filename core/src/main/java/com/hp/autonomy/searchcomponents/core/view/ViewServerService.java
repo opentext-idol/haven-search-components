@@ -8,7 +8,6 @@ package com.hp.autonomy.searchcomponents.core.view;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.List;
 
 public interface ViewServerService<S extends Serializable, E extends Exception> {
 

@@ -8,7 +8,6 @@ package com.hp.autonomy.searchcomponents.core.search;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
-import java.util.List;
 
 public interface SearchResult extends Serializable {
     String getReference();

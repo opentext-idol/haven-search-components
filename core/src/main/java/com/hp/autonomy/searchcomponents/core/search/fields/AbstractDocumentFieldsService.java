@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 public abstract class AbstractDocumentFieldsService implements DocumentFieldsService {
-    protected final ConfigService<? extends HavenSearchCapable> configService;
+    private final ConfigService<? extends HavenSearchCapable> configService;
 
     protected AbstractDocumentFieldsService(final ConfigService<? extends HavenSearchCapable> configService) {
         this.configService = configService;

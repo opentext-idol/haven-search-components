@@ -22,7 +22,6 @@ import java.util.Map;
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonDeserialize(builder = FieldsInfo.Builder.class)
-@SuppressWarnings("InstanceVariableOfConcreteClass")
 public class FieldsInfo implements Serializable {
     private static final long serialVersionUID = 7627012722603736269L;
 

@@ -9,11 +9,11 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.fields.AbstractFieldsServiceIT;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = HavenSearchIdolConfiguration.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = HavenSearchIdolConfiguration.class)
 public class IdolFieldsServiceIT extends AbstractFieldsServiceIT<IdolFieldsRequest, String, AciErrorException> {
     @Override
     protected IdolFieldsRequest createFieldsRequest() {

@@ -5,9 +5,11 @@ import lombok.Getter;
 
 @Getter
 public class AutoCorrectException extends RuntimeException {
-    private Spelling spelling;
+    private static final long serialVersionUID = 4599903956927532715L;
 
-    public AutoCorrectException(String msg, Throwable cause, Spelling spelling) {
+    private final Spelling spelling;
+
+    public AutoCorrectException(final String msg, final Throwable cause, final Spelling spelling) {
         super(msg, cause);
         this.spelling = spelling;
     }

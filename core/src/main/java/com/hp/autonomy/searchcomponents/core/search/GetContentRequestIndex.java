@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Data
@@ -18,8 +19,8 @@ public class GetContentRequestIndex<S extends Serializable> implements Serializa
     private final S index;
     private final Set<String> references;
 
-    public GetContentRequestIndex(@JsonProperty("index") S index, @JsonProperty("references") Set<String> references) {
+    public GetContentRequestIndex(@JsonProperty("index") final S index, @JsonProperty("references") final Set<String> references) {
         this.index = index;
-        this.references = references;
+        this.references = new LinkedHashSet<>(references);
     }
 }

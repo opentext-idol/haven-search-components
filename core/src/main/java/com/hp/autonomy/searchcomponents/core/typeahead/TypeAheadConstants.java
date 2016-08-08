@@ -5,8 +5,6 @@
 
 package com.hp.autonomy.searchcomponents.core.typeahead;
 
-public class TypeAheadConstants {
-    public static final int MAX_RESULTS = 7;
-
-    private TypeAheadConstants() {}
+public interface TypeAheadConstants {
+    int MAX_RESULTS = 7;
 }
