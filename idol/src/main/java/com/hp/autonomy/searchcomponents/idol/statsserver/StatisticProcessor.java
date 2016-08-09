@@ -28,7 +28,7 @@ public class StatisticProcessor extends AbstractStAXProcessor<Set<Statistic>> {
 
     private final StAXProcessor<Statistic> statProcessor;
 
-    StatisticProcessor(final IdolAnnotationsProcessorFactory processorFactory) {
+    public StatisticProcessor(final IdolAnnotationsProcessorFactory processorFactory) {
         statProcessor = processorFactory.forClass(Statistic.class);
     }
 
