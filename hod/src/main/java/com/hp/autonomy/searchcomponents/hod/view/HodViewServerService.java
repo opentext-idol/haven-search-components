@@ -16,6 +16,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Document;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryRequestBuilder;
+import com.hp.autonomy.hod.client.api.textindex.query.search.QueryResults;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
 import com.hp.autonomy.hod.client.error.HodErrorCode;
 import com.hp.autonomy.hod.client.error.HodErrorException;
@@ -23,7 +24,6 @@ import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
-import com.hp.autonomy.types.requests.Documents;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +48,7 @@ import java.util.Objects;
 /**
  * Implementation of {@link HodViewServerService}, using the java HOD client.
  */
+@SuppressWarnings("WeakerAccess")
 @Service
 public class HodViewServerService implements ViewServerService<ResourceIdentifier, HodErrorException> {
     // Field on text index documents which (when present) contains the view URL
@@ -114,7 +115,7 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
     @Override
     public void viewDocument(final String reference, final ResourceIdentifier index, final String highlightExpression, final OutputStream outputStream) throws IOException, HodErrorException {
         final GetContentRequestBuilder getContentParams = new GetContentRequestBuilder().setPrint(Print.all);
-        final Documents<Document> documents = getContentService.getContent(Collections.singletonList(reference), index, getContentParams);
+        final QueryResults<Document> documents = getContentService.getContent(Collections.singletonList(reference), index, getContentParams);
 
         // This document will always exist because the GetContentService.getContent throws a HodErrorException if the
         // reference doesn't exist in the index
@@ -126,6 +127,7 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
             }
         }
 
+        assert document != null;
         final Map<String, Serializable> fields = document.getFields();
         final Object urlField = fields.get(URL_FIELD);
 
@@ -145,9 +147,9 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
 
                     if (highlightExpression != null) {
                         builder
-                            .addHighlightExpressions(highlightExpression)
-                            .addEndTags(HIGHLIGHT_END_TAG)
-                            .addStartTags(HIGHLIGHT_START_TAG);
+                                .addHighlightExpressions(highlightExpression)
+                                .addEndTags(HIGHLIGHT_END_TAG)
+                                .addStartTags(HIGHLIGHT_START_TAG);
                     }
 
                     inputStream = viewDocumentService.viewUrl(encodedUrl, builder);
@@ -185,7 +187,7 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
                 .setIndexes(Collections.singletonList(new ResourceIdentifier(domain, queryManipulationIndex)))
                 .setPrint(Print.all);
 
-        final Documents<Document> documents = queryTextIndexService.queryTextIndexWithText("*", queryParams);
+        final QueryResults<Document> documents = queryTextIndexService.queryTextIndexWithText("*", queryParams);
         final Map<String, Serializable> fields = documents.getDocuments().get(0).getFields();
 
         final String staticContent = hodFieldValueAsString(fields.get(CONTENT_FIELD));

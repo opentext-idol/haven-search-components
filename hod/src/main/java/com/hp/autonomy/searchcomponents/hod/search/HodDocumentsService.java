@@ -16,10 +16,12 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.FindSimilarService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Highlight;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryRequestBuilder;
+import com.hp.autonomy.hod.client.api.textindex.query.search.QueryResults;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
+import com.hp.autonomy.hod.client.warning.HodWarning;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
@@ -34,6 +36,7 @@ import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.types.requests.Documents;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.NotImplementedException;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -44,6 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
+@Slf4j
 public class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
     // IOD limits max results to 2500
     public static final int HOD_MAX_RESULTS = 2500;
@@ -102,7 +106,9 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
             params.setIndexes(Collections.singletonList(ResourceIdentifier.WIKI_ENG));
         }
 
-        final Documents<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(searchRequest.getQueryRestrictions().getQueryText(), params);
+        final QueryResults<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(searchRequest.getQueryRestrictions().getQueryText(), params);
+
+        checkForWarnings(hodDocuments);
 
         final List<HodSearchResult> documentList = new LinkedList<>();
         addDomainToSearchResults(documentList, searchRequest.getQueryRestrictions().getDatabases(), hodDocuments.getDocuments());
@@ -115,12 +121,23 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     public Documents<HodSearchResult> findSimilar(final SuggestRequest<ResourceIdentifier> suggestRequest) throws HodErrorException {
         final QueryRequestBuilder requestBuilder = setQueryParams(suggestRequest, false);
 
-        final Documents<HodSearchResult> results = findSimilarService.findSimilarDocumentsToIndexReference(suggestRequest.getReference(), requestBuilder);
+        final QueryResults<HodSearchResult> results = findSimilarService.findSimilarDocumentsToIndexReference(suggestRequest.getReference(), requestBuilder);
+
+        checkForWarnings(results);
 
         final List<HodSearchResult> documentList = new LinkedList<>();
         addDomainToSearchResults(documentList, suggestRequest.getQueryRestrictions().getDatabases(), results.getDocuments());
 
-        return new Documents<>(documentList, results.getTotalResults(), results.getExpandedQuery(), results.getSuggestion(), results.getAutoCorrection(), results.getWarnings());
+        return new Documents<>(documentList, results.getTotalResults(), results.getExpandedQuery(), results.getSuggestion(), results.getAutoCorrection(), null);
+    }
+
+    private void checkForWarnings(final QueryResults<HodSearchResult> results) {
+        final List<HodWarning> warnings = results.getHodWarnings();
+        if(!warnings.isEmpty()) {
+            for (final HodWarning warning : warnings) {
+                log.warn("HoD returned a warning of type " + warning);
+            }
+        }
     }
 
     @Cacheable(value = CacheNames.GET_DOCUMENT_CONTENT, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
