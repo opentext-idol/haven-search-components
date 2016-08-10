@@ -22,7 +22,7 @@ import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
 import org.apache.commons.lang.ArrayUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@JsonComponent
 public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResult> {
     private final ConfigService<? extends HodSearchCapable> configService;
 
