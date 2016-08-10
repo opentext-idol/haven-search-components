@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.hod.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.hp.autonomy.frontend.configuration.Authentication;
 import com.hp.autonomy.frontend.configuration.AuthenticationConfig;
 import com.hp.autonomy.frontend.configuration.BCryptUsernameAndPassword;
@@ -29,11 +30,12 @@ import com.hp.autonomy.hod.sso.HodSsoConfig;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationConfig;
+import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
+import com.hp.autonomy.searchcomponents.hod.search.fields.HodSearchResultDeserializer;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +43,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
@@ -118,7 +119,7 @@ public class HodTestConfiguration {
     public TokenProxy<EntityType.Application, TokenType.Simple> testTokenProxy(
             final HttpClient httpClient,
             final TokenRepository tokenRepository,
-            @Qualifier("hodSearchResultObjectMapper") final ObjectMapper hodSearchResultObjectMapper
+            final ObjectMapper objectMapper
     ) throws HodErrorException {
         final String application = environment.getProperty(APPLICATION_PROPERTY);
         final String domain = environment.getProperty(DOMAIN_PROPERTY);
@@ -128,7 +129,7 @@ public class HodTestConfiguration {
         final HodServiceConfig<?, TokenType.Simple> hodServiceConfig = new HodServiceConfig.Builder<EntityType.Combined, TokenType.Simple>(HOD_URL)
                 .setHttpClient(httpClient)
                 .setTokenRepository(tokenRepository)
-                .setObjectMapper(hodSearchResultObjectMapper)
+                .setObjectMapper(objectMapper)
                 .build();
 
         final AuthenticationService authenticationService = new AuthenticationServiceImpl(hodServiceConfig);
@@ -153,7 +154,7 @@ public class HodTestConfiguration {
         when(testPrincipal.getUserUuid()).thenReturn(UUID.randomUUID());
         when(testPrincipal.getUserStoreInformation()).thenReturn(userStoreInformation);
         when(testPrincipal.getTenantUuid()).thenReturn(UUID.randomUUID());
-        when(testPrincipal.getUserMetadata()).thenReturn(Collections.<String, Serializable>emptyMap());
+        when(testPrincipal.getUserMetadata()).thenReturn(Collections.emptyMap());
         return testPrincipal;
     }
 
@@ -163,14 +164,25 @@ public class HodTestConfiguration {
             final TokenProxyService<EntityType.Combined, TokenType.Simple> tokenProxyService,
             final HttpClient httpClient,
             final TokenRepository tokenRepository,
-            final ObjectMapper hodSearchResultObjectMapper
+            final ObjectMapper objectMapper
     ) {
         return new HodServiceConfig.Builder<EntityType.Combined, TokenType.Simple>(HOD_URL)
                 .setTokenProxyService(tokenProxyService)
                 .setHttpClient(httpClient)
                 .setTokenRepository(tokenRepository)
-                .setObjectMapper(hodSearchResultObjectMapper)
+                .setObjectMapper(objectMapper)
                 .build();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ObjectMapper objectMapper(final ConfigService<? extends HodSearchCapable> configService) {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final SimpleModule customModule = new SimpleModule();
+        customModule.addDeserializer(HodSearchResult.class, new HodSearchResultDeserializer(configService));
+        objectMapper.registerModule(customModule);
+
+        return objectMapper;
     }
 
     @Bean

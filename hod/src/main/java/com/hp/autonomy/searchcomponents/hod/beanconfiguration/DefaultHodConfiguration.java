@@ -5,8 +5,6 @@
 
 package com.hp.autonomy.searchcomponents.hod.beanconfiguration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.authentication.EntityType;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
@@ -36,23 +34,12 @@ import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricReques
 import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricValuesService;
 import com.hp.autonomy.searchcomponents.hod.search.HodDocumentsService;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
-import com.hp.autonomy.searchcomponents.hod.search.fields.HodSearchResultDeserializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 class DefaultHodConfiguration {
-    @Bean
-    public ObjectMapper hodSearchResultObjectMapper(final HodSearchResultDeserializer searchResultDeserializer) {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final SimpleModule customModule = new CustomModule();
-        customModule.addDeserializer(HodSearchResult.class, searchResultDeserializer);
-        objectMapper.registerModule(customModule);
-
-        return objectMapper;
-    }
-
     @Bean
     @ConditionalOnMissingBean(LanguagesService.class)
     public LanguagesService languagesService() {
@@ -97,9 +84,5 @@ class DefaultHodConfiguration {
     @ConditionalOnMissingBean(AuthenticationInformationRetriever.class)
     public AuthenticationInformationRetriever<HodAuthentication<EntityType.Combined>, HodAuthenticationPrincipal> authenticationInformationRetriever() {
         return new SpringSecurityAuthenticationInformationRetriever<>();
-    }
-
-    private static class CustomModule extends SimpleModule {
-        private static final long serialVersionUID = -7185088412606149305L;
     }
 }
