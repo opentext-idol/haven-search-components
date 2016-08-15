@@ -40,11 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.NotImplementedException;
 import org.springframework.cache.annotation.Cacheable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("WeakerAccess")
 @Slf4j
@@ -147,7 +143,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
 
         for (final GetContentRequestIndex<ResourceIdentifier> indexAndReferences : request.getIndexesAndReferences()) {
             final GetContentRequestBuilder builder = new GetContentRequestBuilder()
-                    .setPrintFields(documentFieldsService.getPrintFields())
+                    .setPrintFields(documentFieldsService.getPrintFields(Collections.emptyList()))
                     .setSummary(Summary.concept)
                     .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
 
@@ -188,7 +184,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
                 .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
 
         if (print == Print.fields) {
-            queryRequestBuilder.setPrintFields(documentFieldsService.getPrintFields());
+            queryRequestBuilder.setPrintFields(documentFieldsService.getPrintFields(searchRequest.getPrintFields()));
         }
 
         if (searchRequest.isHighlight()) {

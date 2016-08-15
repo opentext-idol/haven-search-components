@@ -35,6 +35,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 @SuppressWarnings("WeakerAccess")
@@ -94,7 +96,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.Sort.name(), searchRequest.getSort());
         aciParameters.add(QueryParams.TotalResults.name(), true);
         aciParameters.add(QueryParams.XMLMeta.name(), true);
-        addPrintParameters(aciParameters, PrintParam.fromValue(searchRequest.getPrint()));
+        addPrintParameters(aciParameters, PrintParam.fromValue(searchRequest.getPrint()), searchRequest.getPrintFields());
 
         if (searchRequest.isHighlight()) {
             aciParameters.add(QueryParams.Highlight.name(), HighlightParam.SummaryTerms);
@@ -115,17 +117,18 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.MaxResults.name(), references.size());
         aciParameters.add(QueryParams.AnyLanguage.name(), true);
         aciParameters.add(QueryParams.XMLMeta.name(), true);
-        addPrintParameters(aciParameters, print);
+        addPrintParameters(aciParameters, print, Collections.emptyList());
 
         if (indexAndReferences.getIndex() != null) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexAndReferences.getIndex()));
         }
     }
 
-    private void addPrintParameters(final AciParameters aciParameters, final PrintParam print) {
+    private void addPrintParameters(final AciParameters aciParameters, final PrintParam print, final Collection<String> printFields) {
         aciParameters.add(QueryParams.Print.name(), print);
         if (print == PrintParam.Fields) {
-            aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(documentFieldsService.getPrintFields()));
+            final Collection<String> printFieldsToApply = documentFieldsService.getPrintFields(printFields);
+            aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(printFieldsToApply));
         }
     }
 

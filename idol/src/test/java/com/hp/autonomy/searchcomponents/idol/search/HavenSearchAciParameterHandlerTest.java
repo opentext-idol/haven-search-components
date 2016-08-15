@@ -28,6 +28,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,7 +41,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class HavenSearchAciParameterHandlerTest {
     @Mock
-    private ConfigService<? extends IdolSearchCapable> configService;
+    private ConfigService<IdolSearchCapable> configService;
 
     @Mock
     private DocumentFieldsService documentFieldsService;
@@ -50,14 +51,16 @@ public class HavenSearchAciParameterHandlerTest {
 
     private HavenSearchAciParameterHandler parameterHandler;
 
+    private AciParameters aciParameters;
+
     @Before
     public void setUp() {
+        aciParameters = new AciParameters();
         parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, documentFieldsService, authenticationInformationRetriever);
     }
 
     @Test
     public void addSearchRestrictions() {
-        final AciParameters aciParameters = new AciParameters();
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder()
                 .setQueryText("Some Text")
                 .setFieldText("Some field text")
@@ -68,12 +71,11 @@ public class HavenSearchAciParameterHandlerTest {
                 .setAnyLanguage(true)
                 .build();
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
-        assertThat(aciParameters, is(not(empty())));
+        assertThat(aciParameters, hasSize(10));
     }
 
     @Test
     public void addSearchOutputParameters() {
-        final AciParameters aciParameters = new AciParameters();
         final AciSearchRequest<String> searchRequest = new SearchRequest.Builder<String>()
                 .setQueryRestrictions(null)
                 .setStart(1)
@@ -84,30 +86,28 @@ public class HavenSearchAciParameterHandlerTest {
                 .setHighlight(true)
                 .setAutoCorrect(true)
                 .setPrint(PrintParam.Fields.name())
+                .setPrintFields(Arrays.asList("CATEGORY", "REFERENCE"))
                 .setQueryType(null)
                 .build();
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
-        assertThat(aciParameters, is(not(empty())));
+        assertThat(aciParameters, hasSize(14));
     }
 
     @Test
     public void addGetDocumentOutputParameters() {
-        final AciParameters aciParameters = new AciParameters();
         final GetContentRequestIndex<String> indexAndReferences = new GetContentRequestIndex<>("Database1", Collections.singleton("SomeReference"));
         parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, PrintParam.Fields);
-        assertThat(aciParameters, is(not(empty())));
+        assertThat(aciParameters, hasSize(11));
     }
 
     @Test
     public void addGetContentOutputParameters() {
-        final AciParameters aciParameters = new AciParameters();
         parameterHandler.addGetContentOutputParameters(aciParameters, "Database1", "ref", "field");
-        assertThat(aciParameters, is(not(empty())));
+        assertThat(aciParameters, hasSize(5));
     }
 
     @Test
     public void addLanguageType() {
-        final AciParameters aciParameters = new AciParameters();
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setLanguageType("englishUTF8").build();
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
         assertThat(aciParameters, hasItem(new AciParameter(QueryParams.LanguageType.name(), "englishUTF8")));
@@ -115,7 +115,6 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void defaultLanguageType() {
-        final AciParameters aciParameters = new AciParameters();
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().build();
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
         assertThat(aciParameters, Matchers.<AciParameter>empty());
@@ -123,7 +122,6 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void noLanguageRestriction() {
-        final AciParameters aciParameters = new AciParameters();
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setAnyLanguage(true).build();
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
         assertThat(aciParameters, hasItem(new AciParameter(QueryParams.AnyLanguage.name(), true)));
@@ -131,7 +129,6 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addQmsParameters() {
-        final AciParameters aciParameters = new AciParameters();
         final IdolSearchCapable config = mock(IdolSearchCapable.class);
         when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setBlacklist("ISO_BLACKLIST").setExpandQuery(true).build());
         when(configService.getConfig()).thenReturn(config);

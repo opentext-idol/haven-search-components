@@ -11,6 +11,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 
 @Data
 @NoArgsConstructor
@@ -26,6 +28,8 @@ public class SuggestRequest<S extends Serializable> implements AciSearchRequest<
     protected String sort;
     protected boolean highlight;
     protected String print = DEFAULT_PRINT;
+    protected Collection<String> printFields = Collections.emptyList();
+
 
     private SuggestRequest(final Builder<S> builder) {
         reference = builder.reference;
@@ -37,6 +41,7 @@ public class SuggestRequest<S extends Serializable> implements AciSearchRequest<
         sort = builder.sort;
         highlight = builder.highlight;
         print = builder.print;
+        printFields = builder.printFields == null ? Collections.emptyList() : Collections.unmodifiableCollection(builder.printFields);
     }
 
     @SuppressWarnings("FieldMayBeFinal")
@@ -52,6 +57,7 @@ public class SuggestRequest<S extends Serializable> implements AciSearchRequest<
         private String sort;
         private boolean highlight;
         private String print = DEFAULT_PRINT;
+        private Collection<String> printFields = Collections.emptyList();
 
         public SuggestRequest<S> build() {
             return new SuggestRequest<>(this);

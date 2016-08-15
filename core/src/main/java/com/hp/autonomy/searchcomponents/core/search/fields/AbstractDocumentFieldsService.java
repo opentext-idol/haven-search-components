@@ -22,19 +22,20 @@ public abstract class AbstractDocumentFieldsService implements DocumentFieldsSer
     }
 
     @Override
-    public List<String> getPrintFields() {
+    public List<String> getPrintFields(final Collection<String> selectedFields) {
         final FieldsInfo fieldsInfo = configService.getConfig().getFieldsInfo();
 
         final List<String> fields = new ArrayList<>();
 
-        for (final FieldInfo<?> field : getHardCodedFields()) {
-            fields.addAll(field.getNames());
-        }
+        getHardCodedFields().stream()
+                .filter(field -> selectedFields.isEmpty() || selectedFields.contains(field.getId()))
+                .forEach(field -> fields.addAll(field.getNames()));
 
         final Collection<FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfig().values();
-        for (final FieldInfo<?> field : fieldConfig) {
-            fields.addAll(field.getNames());
-        }
+
+        fieldConfig.stream()
+                .filter(field -> selectedFields.isEmpty() || selectedFields.contains(field.getId()))
+                .forEach(field -> fields.addAll(field.getNames()));
 
         return fields;
     }
