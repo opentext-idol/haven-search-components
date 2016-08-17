@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Collections;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -38,16 +38,29 @@ public abstract class AbstractDocumentFieldsServiceTest {
         fieldsInfo = new FieldsInfo.Builder().build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);
-        assertThat(documentFieldsService.getPrintFields(), hasSize(numberOfHardCodedFields));
+        assertThat(documentFieldsService.getPrintFields(Collections.emptyList()), hasSize(numberOfHardCodedFields));
     }
 
     @Test
     public void getAllPrintFields() {
         fieldsInfo = new FieldsInfo.Builder()
                 .populateResponseMap("Some Id", new FieldInfo<String>("Some Id", Collections.singletonList("SomeField"), FieldType.STRING, false))
+                .populateResponseMap("Some other Id", new FieldInfo<String>("Some other Id", Collections.singletonList("SomeOtherField"), FieldType.STRING, false))
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);
-        assertThat(documentFieldsService.getPrintFields(), hasSize(numberOfHardCodedFields + 1));
+        assertThat(documentFieldsService.getPrintFields(Collections.emptyList()), hasSize(numberOfHardCodedFields + 2));
     }
+
+    @Test
+    public void getAllPrintFieldsWithUserRestrictedFields() {
+        fieldsInfo = new FieldsInfo.Builder()
+                .populateResponseMap("Some Id", new FieldInfo<String>("Some Id", Collections.singletonList("SomeField"), FieldType.STRING, false))
+                .populateResponseMap("Some other Id", new FieldInfo<String>("Some other Id", Collections.singletonList("SomeOtherField"), FieldType.STRING, false))
+                .build();
+        when(config.getFieldsInfo()).thenReturn(fieldsInfo);
+        when(configService.getConfig()).thenReturn(config);
+        assertThat(documentFieldsService.getPrintFields(Collections.singleton("Some Id")), hasSize(1));
+    }
+
 }

@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.core.search;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 public interface AciSearchRequest<S extends Serializable> extends Serializable {
     int DEFAULT_START = 1;
@@ -29,4 +30,6 @@ public interface AciSearchRequest<S extends Serializable> extends Serializable {
     boolean isHighlight();
 
     String getPrint();
+
+    Collection<String> getPrintFields();
 }

@@ -11,7 +11,16 @@ import java.util.Collection;
 import java.util.List;
 
 public interface DocumentFieldsService {
-    List<String> getPrintFields();
+    /**
+     *  Get fields for the printFields query parameter. Returns hard-coded fields and those in the config file,
+     *  restricted by printFields parameter if it is non-empty.
+     * @param printFields Ids of user-selected fields
+     * @return Ids of fields to include in printFields query parameter
+     */
+    List<String> getPrintFields(Collection<String> printFields);
 
+    /**
+     * @return Additional fields toi read from the result, e.g. related to query manipulation.
+     */
     Collection<FieldInfo<?>> getHardCodedFields();
 }

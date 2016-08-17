@@ -11,12 +11,15 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 
 @Data
 @NoArgsConstructor
 public class SearchRequest<S extends Serializable> implements AciSearchRequest<S> {
     private static final long serialVersionUID = -6338199353489914631L;
 
+    protected boolean autoCorrect;
     protected QueryRestrictions<S> queryRestrictions;
     protected int start = DEFAULT_START;
     protected int maxResults = DEFAULT_MAX_RESULTS;
@@ -24,8 +27,8 @@ public class SearchRequest<S extends Serializable> implements AciSearchRequest<S
     protected Integer summaryCharacters;
     protected String sort;
     protected boolean highlight;
-    protected boolean autoCorrect;
     protected String print = DEFAULT_PRINT;
+    protected Collection<String> printFields = Collections.emptyList();
     protected QueryType queryType = QueryType.MODIFIED;
 
     private SearchRequest(final Builder<S> builder) {
@@ -39,6 +42,7 @@ public class SearchRequest<S extends Serializable> implements AciSearchRequest<S
         autoCorrect = builder.autoCorrect;
         print = builder.print;
         queryType = builder.queryType;
+        printFields = builder.printFields == null ? Collections.emptyList() : Collections.unmodifiableCollection(builder.printFields);
     }
 
     public enum QueryType {
@@ -59,6 +63,7 @@ public class SearchRequest<S extends Serializable> implements AciSearchRequest<S
         private boolean autoCorrect;
         private String print = DEFAULT_PRINT;
         private QueryType queryType = QueryType.MODIFIED;
+        private Collection<String> printFields = Collections.emptyList();
 
         public SearchRequest<S> build() {
             return new SearchRequest<>(this);
