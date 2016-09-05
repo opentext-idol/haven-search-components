@@ -14,7 +14,7 @@ import com.hp.autonomy.hod.client.api.resource.Resources;
 import com.hp.autonomy.hod.client.api.resource.ResourcesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import lombok.Data;
@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+@SuppressWarnings("WeakerAccess")
 @Data
 public class HodDatabasesService implements DatabasesService<Database, HodDatabasesRequest, HodErrorException> {
     protected static final Set<ResourceFlavour> CONTENT_FLAVOURS = ResourceFlavour.of(
