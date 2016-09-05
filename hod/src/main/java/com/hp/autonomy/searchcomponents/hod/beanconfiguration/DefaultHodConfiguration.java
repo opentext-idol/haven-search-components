@@ -16,8 +16,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexServi
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthentication;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
-import com.hp.autonomy.searchcomponents.core.authentication.SpringSecurityAuthenticationInformationRetriever;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
@@ -34,6 +33,7 @@ import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricReques
 import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricValuesService;
 import com.hp.autonomy.searchcomponents.hod.search.HodDocumentsService;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
+import com.hpe.bigdata.frontend.spring.authentication.SpringSecurityAuthenticationInformationRetriever;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -83,6 +83,9 @@ class DefaultHodConfiguration {
     @Bean
     @ConditionalOnMissingBean(AuthenticationInformationRetriever.class)
     public AuthenticationInformationRetriever<HodAuthentication<EntityType.Combined>, HodAuthenticationPrincipal> authenticationInformationRetriever() {
-        return new SpringSecurityAuthenticationInformationRetriever<>();
+        @SuppressWarnings("unchecked")
+        final AuthenticationInformationRetriever<HodAuthentication<EntityType.Combined>, HodAuthenticationPrincipal> retriever =
+                new SpringSecurityAuthenticationInformationRetriever<>((Class<HodAuthentication<EntityType.Combined>>) (Class<?>) HodAuthentication.class, HodAuthenticationPrincipal.class);
+        return retriever;
     }
 }
