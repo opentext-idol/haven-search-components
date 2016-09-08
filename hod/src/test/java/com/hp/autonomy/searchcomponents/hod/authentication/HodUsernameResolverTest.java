@@ -1,64 +1,65 @@
 package com.hp.autonomy.searchcomponents.hod.authentication;
 
-import com.google.common.collect.ImmutableMap;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hp.autonomy.hod.sso.HodUserMetadata;
+import com.hp.autonomy.hod.sso.HodUserMetadataResolver;
 import org.junit.Test;
 
-import java.io.Serializable;
-import java.util.Collections;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.mock;
 
 public class HodUsernameResolverTest {
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Test
-    public void usesCorrectDisplayName() {
-        final Map<String, Serializable> metadata = ImmutableMap.of(HavenSearchUserMetadata.USER_DISPLAY_NAME, "James Bond");
+    public void usesCorrectDisplayNameOverLegacyDisplayName() throws IOException {
+        final HodUserMetadataResolver hsodUsernameResolver = new HsodUsernameResolver();
+        final Map<String, JsonNode> metadataMap = readInJsonFile("/authentication/user-metadata/metadata.json");
+        final HodUserMetadata returnedMetadata = hsodUsernameResolver.resolve(metadataMap);
 
-        final HodUsernameResolverImpl hodUsernameResolverImpl = new HodUsernameResolverImpl();
-
-        final String displayName = hodUsernameResolverImpl.resolve(metadata);
-        assertEquals("James Bond", displayName);
+        assertEquals("correct name", returnedMetadata.getUserDisplayName());
+        assertThat(returnedMetadata.getMetadata().size(), is(0));
     }
 
     @Test
-    public void usesCorrectLegacyDisplayName() {
-        final Map<String, Serializable> metadata = ImmutableMap.of(HavenSearchUserMetadata.LEGACY_USER_DISPLAY_NAME, "Jimmy Bond");
+    public void usesCorrectLegacyDisplayName() throws IOException {
+        final HodUserMetadataResolver hsodUsernameResolver = new HsodUsernameResolver();
+        final Map<String, JsonNode> metadataMap = readInJsonFile("/authentication/user-metadata/metadata-with-legacy-displayname.json");
+        final HodUserMetadata returnedMetadata = hsodUsernameResolver.resolve(metadataMap);
 
-        final HodUsernameResolverImpl hodUsernameResolverImpl = new HodUsernameResolverImpl();
+        assertEquals("legacy name", returnedMetadata.getUserDisplayName());
+        assertThat(returnedMetadata.getMetadata().size(), is(0));
+    }
 
-        final String displayName = hodUsernameResolverImpl.resolve(metadata);
-        assertEquals("Jimmy Bond", displayName);
+
+    @Test
+    public void usesCorrectDisplayNameFromArrayOverLegacyDisplayName() throws IOException {
+        final HodUserMetadataResolver hsodUsernameResolver = new HsodUsernameResolver();
+        final Map<String, JsonNode> metadataMap = readInJsonFile("/authentication/user-metadata/metadata-with-displayname-array.json");
+        final HodUserMetadata returnedMetadata = hsodUsernameResolver.resolve(metadataMap);
+
+        assertEquals("correct name", returnedMetadata.getUserDisplayName());
+        assertThat(returnedMetadata.getMetadata().size(), is(0));
     }
 
     @Test
-    public void usesCorrectDisplayNameOverLegacyDisplayName() {
-        final Map<String, Serializable> metadata = ImmutableMap.of(
-                HavenSearchUserMetadata.USER_DISPLAY_NAME, "James Bond",
-                HavenSearchUserMetadata.LEGACY_USER_DISPLAY_NAME, "Jimmy Bond");
-
-        final HodUsernameResolverImpl hodUsernameResolverImpl = new HodUsernameResolverImpl();
-
-        final String displayName = hodUsernameResolverImpl.resolve(metadata);
-        assertEquals("James Bond", displayName);
+    public void noUserInformation() throws IOException {
+        final HodUserMetadataResolver hsodUsernameResolver = new HsodUsernameResolver();
+        final Map<String, JsonNode> metadata = new HashMap<>();
+        final HodUserMetadata returnedMetadata = hsodUsernameResolver.resolve(metadata);
+        assertNull(returnedMetadata.getUserDisplayName());
     }
 
-    @Test
-    public void noUserInformation() {
-        final HodUsernameResolverImpl hodUsernameResolverImpl = new HodUsernameResolverImpl();
-
-        final String displayName = hodUsernameResolverImpl.resolve(Collections.emptyMap());
-        assertNull(displayName);
+    private Map<String, JsonNode> readInJsonFile(final String pathname) throws IOException {
+        return objectMapper.readValue(HodUsernameResolverTest.class.getResourceAsStream(pathname), new TypeReference<Map<String, JsonNode>>() {});
     }
 
-    @Test
-    public void nonStringUserInformation() {
-        final Map<String, Serializable> metadata = ImmutableMap.of(HavenSearchUserMetadata.USER_DISPLAY_NAME, mock(Serializable.class));
-
-        final HodUsernameResolverImpl hodUsernameResolverImpl = new HodUsernameResolverImpl();
-
-        final String displayName = hodUsernameResolverImpl.resolve(metadata);
-        assertNull(displayName);
-    }
 }
