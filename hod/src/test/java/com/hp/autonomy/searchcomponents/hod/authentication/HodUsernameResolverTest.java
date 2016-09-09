@@ -21,7 +21,7 @@ public class HodUsernameResolverTest {
 
     @Test
     public void usesCorrectDisplayNameOverLegacyDisplayName() throws IOException {
-        final HodUserMetadataResolver hsodUsernameResolver = new HsodUsernameResolver();
+        final HodUserMetadataResolver hsodUsernameResolver = new HsodUserMetadataResolver();
         final Map<String, JsonNode> metadataMap = readInJsonFile("/authentication/user-metadata/metadata.json");
         final HodUserMetadata returnedMetadata = hsodUsernameResolver.resolve(metadataMap);
 
@@ -31,7 +31,7 @@ public class HodUsernameResolverTest {
 
     @Test
     public void usesCorrectLegacyDisplayName() throws IOException {
-        final HodUserMetadataResolver hsodUsernameResolver = new HsodUsernameResolver();
+        final HodUserMetadataResolver hsodUsernameResolver = new HsodUserMetadataResolver();
         final Map<String, JsonNode> metadataMap = readInJsonFile("/authentication/user-metadata/metadata-with-legacy-displayname.json");
         final HodUserMetadata returnedMetadata = hsodUsernameResolver.resolve(metadataMap);
 
@@ -42,7 +42,7 @@ public class HodUsernameResolverTest {
 
     @Test
     public void usesCorrectDisplayNameFromArrayOverLegacyDisplayName() throws IOException {
-        final HodUserMetadataResolver hsodUsernameResolver = new HsodUsernameResolver();
+        final HodUserMetadataResolver hsodUsernameResolver = new HsodUserMetadataResolver();
         final Map<String, JsonNode> metadataMap = readInJsonFile("/authentication/user-metadata/metadata-with-displayname-array.json");
         final HodUserMetadata returnedMetadata = hsodUsernameResolver.resolve(metadataMap);
 
@@ -52,7 +52,7 @@ public class HodUsernameResolverTest {
 
     @Test
     public void noUserInformation() throws IOException {
-        final HodUserMetadataResolver hsodUsernameResolver = new HsodUsernameResolver();
+        final HodUserMetadataResolver hsodUsernameResolver = new HsodUserMetadataResolver();
         final Map<String, JsonNode> metadata = new HashMap<>();
         final HodUserMetadata returnedMetadata = hsodUsernameResolver.resolve(metadata);
         assertNull(returnedMetadata.getUserDisplayName());

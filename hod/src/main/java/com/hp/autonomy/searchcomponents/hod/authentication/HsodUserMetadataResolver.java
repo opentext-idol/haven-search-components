@@ -12,7 +12,7 @@ import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
 @Component
-public class HsodUsernameResolver implements HodUserMetadataResolver {
+public class HsodUserMetadataResolver implements HodUserMetadataResolver {
     public static final String LEGACY_USER_DISPLAY_NAME = "HAVEN_SEARCH_ONDEMAND_USERNAME";
     public static final String USER_DISPLAY_NAME = "DisplayName";
 
