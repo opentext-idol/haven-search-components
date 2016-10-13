@@ -15,10 +15,8 @@ import com.hp.autonomy.hod.client.api.resource.ResourcesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.authentication.AuthenticationInformationRetriever;
-import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import lombok.Data;
-import org.springframework.cache.annotation.Cacheable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -29,10 +27,10 @@ import java.util.TreeSet;
 @Data
 public class HodDatabasesService implements DatabasesService<Database, HodDatabasesRequest, HodErrorException> {
     protected static final Set<ResourceFlavour> CONTENT_FLAVOURS = ResourceFlavour.of(
-        ResourceFlavour.EXPLORER,
-        ResourceFlavour.STANDARD,
-        ResourceFlavour.CUSTOM_FIELDS,
-        ResourceFlavour.JUMBO
+            ResourceFlavour.EXPLORER,
+            ResourceFlavour.STANDARD,
+            ResourceFlavour.CUSTOM_FIELDS,
+            ResourceFlavour.JUMBO
     );
 
     protected final ResourcesService resourcesService;
@@ -44,7 +42,6 @@ public class HodDatabasesService implements DatabasesService<Database, HodDataba
     }
 
     @Override
-    @Cacheable(CacheNames.DATABASES)
     public Set<Database> getDatabases(final HodDatabasesRequest request) throws HodErrorException {
         final ListResourcesRequestBuilder builder = new ListResourcesRequestBuilder()
                 .setTypes(Collections.singleton(ResourceType.CONTENT));

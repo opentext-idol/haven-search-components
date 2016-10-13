@@ -6,7 +6,6 @@
 package com.hp.autonomy.searchcomponents.core.caching;
 
 public interface CacheNames {
-    String DATABASES = "databases";
     String RELATED_CONCEPTS = "related-concepts";
     String GET_DOCUMENT_CONTENT = "get-content";
     String FIELDS = "fields";
