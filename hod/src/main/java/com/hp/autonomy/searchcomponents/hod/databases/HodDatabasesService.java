@@ -5,35 +5,23 @@
 
 package com.hp.autonomy.searchcomponents.hod.databases;
 
-import com.hp.autonomy.hod.client.api.resource.ListResourcesRequestBuilder;
-import com.hp.autonomy.hod.client.api.resource.Resource;
-import com.hp.autonomy.hod.client.api.resource.ResourceFlavour;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
-import com.hp.autonomy.hod.client.api.resource.ResourceType;
-import com.hp.autonomy.hod.client.api.resource.Resources;
-import com.hp.autonomy.hod.client.api.resource.ResourcesService;
+import com.hp.autonomy.hod.client.api.resource.*;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import lombok.Data;
-import org.springframework.cache.annotation.Cacheable;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 @SuppressWarnings("WeakerAccess")
 @Data
 public class HodDatabasesService implements DatabasesService<Database, HodDatabasesRequest, HodErrorException> {
     protected static final Set<ResourceFlavour> CONTENT_FLAVOURS = ResourceFlavour.of(
-        ResourceFlavour.EXPLORER,
-        ResourceFlavour.STANDARD,
-        ResourceFlavour.CUSTOM_FIELDS,
-        ResourceFlavour.JUMBO
+            ResourceFlavour.EXPLORER,
+            ResourceFlavour.STANDARD,
+            ResourceFlavour.CUSTOM_FIELDS,
+            ResourceFlavour.JUMBO
     );
 
     protected final ResourcesService resourcesService;
@@ -45,7 +33,6 @@ public class HodDatabasesService implements DatabasesService<Database, HodDataba
     }
 
     @Override
-    @Cacheable(CacheNames.DATABASES)
     public Set<Database> getDatabases(final HodDatabasesRequest request) throws HodErrorException {
         final ListResourcesRequestBuilder builder = new ListResourcesRequestBuilder()
                 .setTypes(Collections.singleton(ResourceType.CONTENT));
