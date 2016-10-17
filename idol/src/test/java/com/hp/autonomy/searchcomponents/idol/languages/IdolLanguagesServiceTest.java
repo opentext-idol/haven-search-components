@@ -8,12 +8,12 @@ package com.hp.autonomy.searchcomponents.idol.languages;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.types.idol.GetStatusResponseData;
-import com.hp.autonomy.types.idol.LanguageSettingsResponseData;
-import com.hp.autonomy.types.idol.LanguageType;
-import com.hp.autonomy.types.idol.LanguageTypeSettings;
-import com.hp.autonomy.types.idol.Languages;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.GetStatusResponseData;
+import com.hp.autonomy.types.idol.responses.LanguageSettingsResponseData;
+import com.hp.autonomy.types.idol.responses.LanguageType;
+import com.hp.autonomy.types.idol.responses.LanguageTypeSettings;
+import com.hp.autonomy.types.idol.responses.Languages;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,14 +44,14 @@ public class IdolLanguagesServiceTest {
     @Mock
     private Processor<LanguageSettingsResponseData> languageSettingsProcessor;
     @Mock
-    private AciResponseJaxbProcessorFactory aciResponseProcessorFactory;
+    private ProcessorFactory aciResponseProcessorFactory;
 
     private IdolLanguagesService idolLanguagesService;
 
     @Before
     public void setUp() {
-        when(aciResponseProcessorFactory.createAciResponseProcessor(GetStatusResponseData.class)).thenReturn(getStatusProcessor);
-        when(aciResponseProcessorFactory.createAciResponseProcessor(LanguageSettingsResponseData.class)).thenReturn(languageSettingsProcessor);
+        when(aciResponseProcessorFactory.getResponseDataProcessor(GetStatusResponseData.class)).thenReturn(getStatusProcessor);
+        when(aciResponseProcessorFactory.getResponseDataProcessor(LanguageSettingsResponseData.class)).thenReturn(languageSettingsProcessor);
         
         idolLanguagesService = new IdolLanguagesService(contentAciService, aciResponseProcessorFactory);
     }

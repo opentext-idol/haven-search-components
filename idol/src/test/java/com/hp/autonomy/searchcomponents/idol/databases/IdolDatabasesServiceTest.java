@@ -6,12 +6,11 @@
 package com.hp.autonomy.searchcomponents.idol.databases;
 
 import com.autonomy.aci.client.services.AciService;
-import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.types.idol.Database;
-import com.hp.autonomy.types.idol.Databases;
-import com.hp.autonomy.types.idol.GetStatusResponseData;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.Database;
+import com.hp.autonomy.types.idol.responses.Databases;
+import com.hp.autonomy.types.idol.responses.GetStatusResponseData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +32,7 @@ public class IdolDatabasesServiceTest {
     private AciService contentAciService;
 
     @Mock
-    private AciResponseJaxbProcessorFactory processorFactory;
+    private ProcessorFactory processorFactory;
 
     private IdolDatabasesService idolDatabasesService;
 
@@ -50,7 +49,7 @@ public class IdolDatabasesServiceTest {
         databaseList.add(mockDatabaseInfo("APublicDatabase", 123, false));
         databaseList.add(mockDatabaseInfo("AnInternalDatabase", 456, true));
         responseData.setDatabases(databases);
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
         final Set<Database> results = idolDatabasesService.getDatabases(new IdolDatabasesRequest());
         assertThat(results, hasSize(1));

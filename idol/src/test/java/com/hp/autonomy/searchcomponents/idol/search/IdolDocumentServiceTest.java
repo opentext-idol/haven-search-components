@@ -8,7 +8,6 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
@@ -16,9 +15,10 @@ import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
-import com.hp.autonomy.types.idol.Hit;
-import com.hp.autonomy.types.idol.QueryResponseData;
-import com.hp.autonomy.types.idol.SuggestResponseData;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.Hit;
+import com.hp.autonomy.types.idol.responses.QueryResponseData;
+import com.hp.autonomy.types.idol.responses.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
@@ -58,7 +58,7 @@ public class IdolDocumentServiceTest {
     protected AciService aciService;
 
     @Mock
-    protected AciResponseJaxbProcessorFactory aciResponseProcessorFactory;
+    protected ProcessorFactory aciResponseProcessorFactory;
 
     protected IdolDocumentService idolDocumentService;
 

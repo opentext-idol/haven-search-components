@@ -10,11 +10,11 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadConstants;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
-import com.hp.autonomy.types.idol.TypeAheadResponseData;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.TypeAheadResponseData;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.TypeAheadActions;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.params.ModeParam;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.params.TypeAheadParams;
@@ -34,11 +34,11 @@ public class QmsTypeAheadService implements TypeAheadService<AciErrorException> 
     public QmsTypeAheadService(
             final ConfigService<? extends IdolSearchCapable> configService,
             final AciService qmsAciService,
-            final AciResponseJaxbProcessorFactory processorFactory
+            final ProcessorFactory processorFactory
     ) {
         this.configService = configService;
         this.qmsAciService = qmsAciService;
-        processor = processorFactory.createAciResponseProcessor(TypeAheadResponseData.class);
+        processor = processorFactory.getResponseDataProcessor(TypeAheadResponseData.class);
     }
 
     @Override

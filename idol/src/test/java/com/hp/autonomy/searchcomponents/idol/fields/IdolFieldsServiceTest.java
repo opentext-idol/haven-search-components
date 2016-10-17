@@ -6,10 +6,9 @@
 package com.hp.autonomy.searchcomponents.idol.fields;
 
 import com.autonomy.aci.client.services.AciService;
-import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.types.idol.GetTagNamesResponseData;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.GetTagNamesResponseData;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +31,7 @@ public class IdolFieldsServiceTest {
     private AciService contentAciService;
 
     @Mock
-    private AciResponseJaxbProcessorFactory processorFactory;
+    private ProcessorFactory processorFactory;
 
     private IdolFieldsService idolFieldsService;
 
@@ -43,7 +42,7 @@ public class IdolFieldsServiceTest {
 
     @Test
     public void getFields() {
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockTagNamesResponse());
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockTagNamesResponse());
         assertThat(idolFieldsService.getFields(new IdolFieldsRequest.Builder().setMaxValues(null).build(), FieldTypeParam.Date, FieldTypeParam.Numeric), hasEntry(is(FieldTypeParam.Numeric), not(empty())));
     }
 

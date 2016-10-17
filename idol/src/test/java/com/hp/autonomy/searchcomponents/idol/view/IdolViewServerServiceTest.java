@@ -11,14 +11,14 @@ import com.autonomy.aci.client.services.AciServiceException;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
-import com.hp.autonomy.types.idol.DocContent;
-import com.hp.autonomy.types.idol.GetContentResponseData;
-import com.hp.autonomy.types.idol.Hit;
-import com.hp.autonomy.types.idol.QueryResponse;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.DocContent;
+import com.hp.autonomy.types.idol.responses.GetContentResponseData;
+import com.hp.autonomy.types.idol.responses.Hit;
+import com.hp.autonomy.types.idol.responses.QueryResponse;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -47,7 +47,7 @@ public class IdolViewServerServiceTest {
     private AciService viewAciService;
 
     @Mock
-    private AciResponseJaxbProcessorFactory processorFactory;
+    private ProcessorFactory processorFactory;
 
     @Mock
     private HavenSearchAciParameterHandler parameterHandler;

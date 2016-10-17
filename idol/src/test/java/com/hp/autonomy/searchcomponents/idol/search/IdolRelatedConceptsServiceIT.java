@@ -9,7 +9,7 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.search.AbstractRelatedConceptsServiceIT;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
-import com.hp.autonomy.types.idol.QsElement;
+import com.hp.autonomy.types.idol.responses.QsElement;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;

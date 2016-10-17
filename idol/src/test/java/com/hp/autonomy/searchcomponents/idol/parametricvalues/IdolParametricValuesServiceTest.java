@@ -9,7 +9,6 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.google.common.collect.ImmutableMap;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
@@ -18,12 +17,13 @@ import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
-import com.hp.autonomy.types.idol.FlatField;
-import com.hp.autonomy.types.idol.GetQueryTagValuesResponseData;
-import com.hp.autonomy.types.idol.GetTagNamesResponseData;
-import com.hp.autonomy.types.idol.RecursiveField;
-import com.hp.autonomy.types.idol.TagValue;
-import com.hp.autonomy.types.idol.Values;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.FlatField;
+import com.hp.autonomy.types.idol.responses.GetQueryTagValuesResponseData;
+import com.hp.autonomy.types.idol.responses.GetTagNamesResponseData;
+import com.hp.autonomy.types.idol.responses.RecursiveField;
+import com.hp.autonomy.types.idol.responses.TagValue;
+import com.hp.autonomy.types.idol.responses.Values;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
@@ -77,7 +77,7 @@ public class IdolParametricValuesServiceTest {
     private AciServiceRetriever aciServiceRetriever;
 
     @Mock
-    private AciResponseJaxbProcessorFactory aciResponseProcessorFactory;
+    private ProcessorFactory aciResponseProcessorFactory;
 
     @Mock
     private JAXBElement<Serializable> element;

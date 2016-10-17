@@ -6,11 +6,12 @@
 package com.hp.autonomy.searchcomponents.hod.languages;
 
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
-import com.hp.autonomy.types.idol.LanguageType;
+import com.hp.autonomy.types.idol.responses.LanguageType;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("WeakerAccess")
 public class HodLanguagesService implements LanguagesService {
     public static final String THE_LANGUAGE = "English";
 

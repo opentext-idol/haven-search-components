@@ -9,10 +9,10 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
-import com.hp.autonomy.types.idol.Database;
-import com.hp.autonomy.types.idol.GetStatusResponseData;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.Database;
+import com.hp.autonomy.types.idol.responses.GetStatusResponseData;
 import com.hp.autonomy.types.requests.idol.actions.status.StatusActions;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +31,10 @@ public class IdolDatabasesService implements DatabasesService<Database, IdolData
     private final Processor<GetStatusResponseData> responseProcessor;
 
     @Autowired
-    public IdolDatabasesService(final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    public IdolDatabasesService(final AciService contentAciService, final ProcessorFactory processorFactory) {
         this.contentAciService = contentAciService;
 
-        responseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(GetStatusResponseData.class);
+        responseProcessor = processorFactory.getResponseDataProcessor(GetStatusResponseData.class);
     }
 
     @Override

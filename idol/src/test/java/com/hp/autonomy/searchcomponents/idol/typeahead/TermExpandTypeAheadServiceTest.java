@@ -6,10 +6,9 @@
 package com.hp.autonomy.searchcomponents.idol.typeahead;
 
 import com.autonomy.aci.client.services.AciService;
-import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.types.idol.TermExpandResponseData;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.TermExpandResponseData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +28,7 @@ public class TermExpandTypeAheadServiceTest {
     private AciService contentAciService;
 
     @Mock
-    private AciResponseJaxbProcessorFactory processorFactory;
+    private ProcessorFactory processorFactory;
 
     private TermExpandTypeAheadService termExpandTypeAheadService;
 
@@ -40,7 +39,7 @@ public class TermExpandTypeAheadServiceTest {
 
     @Test
     public void getSuggestions() {
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockResponse());
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockResponse());
         final List<String> suggestions = termExpandTypeAheadService.getSuggestions("A");
         assertEquals("ab", suggestions.get(0));
     }

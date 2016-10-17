@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
-import com.hp.autonomy.types.idol.RecursiveField;
+import com.hp.autonomy.types.idol.responses.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;

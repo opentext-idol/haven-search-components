@@ -14,16 +14,16 @@ import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.ServerConfig;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
-import com.hp.autonomy.idolutils.processors.CopyResponseProcessor;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewingMode;
-import com.hp.autonomy.types.idol.DocContent;
-import com.hp.autonomy.types.idol.GetContentResponseData;
-import com.hp.autonomy.types.idol.Hit;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.marshalling.processors.CopyResponseProcessor;
+import com.hp.autonomy.types.idol.responses.DocContent;
+import com.hp.autonomy.types.idol.responses.GetContentResponseData;
+import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.requests.idol.actions.connector.ConnectorActions;
 import com.hp.autonomy.types.requests.idol.actions.connector.params.ConnectorViewParams;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
@@ -58,13 +58,13 @@ public class IdolViewServerService implements ViewServerService<String, AciError
     private final ConfigService<? extends ViewCapable> configService;
 
     @Autowired
-    public IdolViewServerService(final AciService contentAciService, final AciService viewAciService, final AciResponseJaxbProcessorFactory processorFactory, final HavenSearchAciParameterHandler parameterHandler, final ConfigService<? extends ViewCapable> configService) {
+    public IdolViewServerService(final AciService contentAciService, final AciService viewAciService, final ProcessorFactory processorFactory, final HavenSearchAciParameterHandler parameterHandler, final ConfigService<? extends ViewCapable> configService) {
         this.contentAciService = contentAciService;
         this.viewAciService = viewAciService;
         this.parameterHandler = parameterHandler;
         this.configService = configService;
 
-        getContentResponseProcessor = processorFactory.createAciResponseProcessor(GetContentResponseData.class);
+        getContentResponseProcessor = processorFactory.getResponseDataProcessor(GetContentResponseData.class);
     }
 
     /**

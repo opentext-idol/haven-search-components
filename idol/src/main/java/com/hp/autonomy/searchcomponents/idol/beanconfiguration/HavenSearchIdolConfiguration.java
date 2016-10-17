@@ -13,9 +13,9 @@ import com.autonomy.aci.client.transport.AciServerDetails;
 import com.autonomy.aci.client.transport.impl.AciHttpClientImpl;
 import com.hp.autonomy.frontend.configuration.AbstractConfigurableAciService;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
+import com.hp.autonomy.types.idol.marshalling.Jaxb2ParsingConfiguration;
 import org.apache.http.client.HttpClient;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * Defines Spring beans required for using this module
@@ -32,6 +33,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan({"com.hp.autonomy.searchcomponents.core", "com.hp.autonomy.searchcomponents.idol"})
+@Import(Jaxb2ParsingConfiguration.class)
 public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
     private static final int HTTP_SOCKET_TIMEOUT = 90000;
     private static final int HTTP_MAX_CONNECTIONS_PER_ROUTE = 20;
@@ -76,11 +78,6 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
     @Bean
     public IdolAnnotationsProcessorFactory annotationsProcessorFactory() {
         return new IdolAnnotationsProcessorFactoryImpl();
-    }
-
-    @Bean
-    public AciResponseJaxbProcessorFactory processorFactory() {
-        return new AciResponseJaxbProcessorFactory();
     }
 
     @Bean
