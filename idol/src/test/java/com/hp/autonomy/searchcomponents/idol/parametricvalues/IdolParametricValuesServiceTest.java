@@ -13,6 +13,8 @@ import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
@@ -54,7 +56,9 @@ import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -70,6 +74,9 @@ public class IdolParametricValuesServiceTest {
     private AciService contentAciService;
 
     @Mock
+    private AciServiceRetriever aciServiceRetriever;
+
+    @Mock
     private AciResponseJaxbProcessorFactory aciResponseProcessorFactory;
 
     @Mock
@@ -79,7 +86,9 @@ public class IdolParametricValuesServiceTest {
 
     @Before
     public void setUp() {
-        parametricValuesService = new IdolParametricValuesService(parameterHandler, fieldsService, contentAciService, aciResponseProcessorFactory);
+        parametricValuesService = new IdolParametricValuesService(parameterHandler, fieldsService, aciServiceRetriever, aciResponseProcessorFactory);
+
+        when(aciServiceRetriever.getAciService(any(SearchRequest.QueryType.class))).thenReturn(contentAciService);
     }
 
     @Test

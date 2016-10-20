@@ -6,7 +6,6 @@
 package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
 import com.autonomy.aci.client.services.AciErrorException;
-import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.ranges.Range;
@@ -18,6 +17,8 @@ import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametric
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.types.idol.FlatField;
@@ -66,19 +67,19 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
 
     private final HavenSearchAciParameterHandler parameterHandler;
     private final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService;
-    private final AciService contentAciService;
+    private final AciServiceRetriever aciServiceRetriever;
     private final Processor<GetQueryTagValuesResponseData> queryTagValuesResponseProcessor;
 
     @Autowired
     public IdolParametricValuesService(
             final HavenSearchAciParameterHandler parameterHandler,
             final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService,
-            final AciService contentAciService,
+            final AciServiceRetriever aciServiceRetriever,
             final AciResponseJaxbProcessorFactory aciResponseProcessorFactory
     ) {
         this.parameterHandler = parameterHandler;
         this.fieldsService = fieldsService;
-        this.contentAciService = contentAciService;
+        this.aciServiceRetriever = aciServiceRetriever;
         queryTagValuesResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(GetQueryTagValuesResponseData.class);
     }
 
@@ -152,7 +153,7 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
             aciParameters.add(GetQueryTagValuesParams.FieldDependenceMultiLevel.name(), true);
 
 
-            final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
+            final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
 
             results = responseData.getValues() == null ? Collections.emptyList() : responseData.getValues().getField();
         }
@@ -172,7 +173,7 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
             aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(parametricRequest.getFieldNames(), ','));
             aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
 
-            final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
+            final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
             final Collection<FlatField> fields = responseData.getField();
 
             final Map<TagName, ValueDetails> output = new LinkedHashMap<>();
@@ -300,7 +301,12 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
         aciParameters.add(GetQueryTagValuesParams.Ranges.name(), new Ranges(parametricRequest.getRanges()));
         aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
 
-        final GetQueryTagValuesResponseData responseData = contentAciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
+        final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
         return responseData.getField();
+    }
+
+    private GetQueryTagValuesResponseData executeAction(final ParametricRequest<String> idolParametricRequest, final AciParameters aciParameters) {
+        return aciServiceRetriever.getAciService(idolParametricRequest.isModified() ? SearchRequest.QueryType.MODIFIED : SearchRequest.QueryType.RAW)
+            .executeAction(aciParameters, queryTagValuesResponseProcessor);
     }
 }
