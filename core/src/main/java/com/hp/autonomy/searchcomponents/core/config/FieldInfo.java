@@ -5,50 +5,77 @@
 
 package com.hp.autonomy.searchcomponents.core.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Singular;
+import lombok.ToString;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Builder(toBuilder = true)
+@EqualsAndHashCode
+@ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonDeserialize(builder = FieldInfo.FieldInfoBuilder.class)
 public class FieldInfo<T> implements Serializable {
     private static final long serialVersionUID = -5649457890413743332L;
-    private String id;
-    private FieldType type = FieldType.STRING;
-    private boolean advanced = false;
-    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "TypeMayBeWeakened"})
-    private final List<String> names = new ArrayList<>();
-    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "NonSerializableFieldInSerializableClass", "TypeMayBeWeakened"})
-    private final List<T> values = new ArrayList<>();
 
-    public FieldInfo(final String names, final FieldType type, final boolean advanced) {
-        this(null, Collections.singletonList(names), type, advanced, Collections.emptyList());
+    private final String id;
+    private final FieldType type;
+    private final boolean advanced;
+    @Singular
+    private final Set<String> names;
+    @SuppressWarnings({"NonSerializableFieldInSerializableClass", "MismatchedQueryAndUpdateOfCollection"})
+    @Singular
+    private final List<T> values;
+
+    @JsonIgnore
+    public String getId() {
+        return id;
     }
 
-    public FieldInfo(final String id, final Collection<String> names, final FieldType type, final boolean advanced) {
-        this(id, names, type, advanced, Collections.emptyList());
-    }
-
-    public FieldInfo(final String id, final Collection<String> names, final FieldType type, final boolean advanced, final T value) {
-        this(id, names, type, advanced, Collections.singletonList(value));
-    }
-
-    public FieldInfo(final String id, final Collection<String> names, final FieldType type, final boolean advanced, final Collection<T> values) {
-        this.id = id;
-        this.names.addAll(names);
-        this.type = type;
-        this.advanced = advanced;
-        this.values.addAll(values);
-    }
-
+    @SuppressWarnings("unused")
     @JsonProperty("type")
-    public void setType(final String type) {
-        this.type = type == null ? FieldType.STRING : FieldType.valueOf(type.toUpperCase());
+    public String getTypeAsString() {
+        return type == FieldType.STRING ? null : type.name().toLowerCase();
+    }
+
+    @SuppressWarnings("unused")
+    @JsonProperty("advanced")
+    public Boolean isAdvancedIfNotDefault() {
+        return advanced ? true : null;
+    }
+
+    @SuppressWarnings("unused")
+    @JsonProperty("names")
+    public Set<String> getNamesIfNotEmpty() {
+        return names.isEmpty() ? null : names;
+    }
+
+    @JsonIgnore
+    public List<T> getValues() {
+        return Collections.unmodifiableList(values);
+    }
+
+    @SuppressWarnings({"WeakerAccess", "unused"})
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class FieldInfoBuilder<T> {
+        private FieldType type = FieldType.STRING;
+
+        @JsonProperty("type")
+        public FieldInfoBuilder<T> setType(final String type) {
+            this.type = type == null ? FieldType.STRING : FieldType.valueOf(type.toUpperCase());
+            return this;
+        }
     }
 }

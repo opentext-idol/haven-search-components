@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class AciServiceRetrieverTest {
     @Mock
-    private ConfigService<? extends IdolSearchCapable> configService;
+    private ConfigService<IdolSearchCapable> configService;
     @Mock
     private IdolSearchCapable config;
     @Mock
@@ -62,8 +62,8 @@ public class AciServiceRetrieverTest {
     }
 
     private void enableQms() {
-        when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder()
-                .setEnabled(true)
+        when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder()
+                .enabled(true)
                 .build());
     }
 }

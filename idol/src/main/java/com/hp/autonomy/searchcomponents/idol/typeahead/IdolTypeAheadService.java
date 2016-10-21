@@ -9,6 +9,7 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
+import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,6 @@ public class IdolTypeAheadService implements TypeAheadService<AciErrorException>
 
     @Override
     public List<String> getSuggestions(final String text) {
-        return configService.getConfig().getQueryManipulation().isEnabled() ? qmsService.getSuggestions(text) : termExpandService.getSuggestions(text);
+        return BooleanUtils.isTrue(configService.getConfig().getQueryManipulation().getEnabled()) ? qmsService.getSuggestions(text) : termExpandService.getSuggestions(text);
     }
 }

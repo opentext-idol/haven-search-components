@@ -6,13 +6,12 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciService;
-import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.types.idol.Qs;
-import com.hp.autonomy.types.idol.QsElement;
-import com.hp.autonomy.types.idol.QueryResponseData;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.Qs;
+import com.hp.autonomy.types.idol.responses.QsElement;
+import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,7 @@ public class IdolRelatedConceptsServiceTest {
     private AciService contentAciService;
 
     @Mock
-    private AciResponseJaxbProcessorFactory aciResponseProcessorFactory;
+    private ProcessorFactory aciResponseProcessorFactory;
 
     private IdolRelatedConceptsService idolRelatedConceptsService;
 
@@ -56,7 +55,7 @@ public class IdolRelatedConceptsServiceTest {
         qs.getElement().add(new QsElement());
         responseData.setQs(qs);
 
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(responseData);
+        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder()
                 .setQueryText("*")

@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.languages;
 
-import com.hp.autonomy.types.idol.LanguageType;
+import com.hp.autonomy.types.idol.responses.LanguageType;
 
 import java.util.Map;
 

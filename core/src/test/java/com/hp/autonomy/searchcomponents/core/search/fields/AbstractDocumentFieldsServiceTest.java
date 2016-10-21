@@ -7,7 +7,6 @@ package com.hp.autonomy.searchcomponents.core.search.fields;
 
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
-import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
 import org.junit.Test;
@@ -15,7 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -35,7 +34,7 @@ public abstract class AbstractDocumentFieldsServiceTest {
 
     @Test
     public void getPrintFieldsHardcodedOnly() {
-        fieldsInfo = new FieldsInfo.Builder().build();
+        fieldsInfo = FieldsInfo.builder().build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);
         assertThat(documentFieldsService.getPrintFields(Collections.emptyList()), hasSize(numberOfHardCodedFields));
@@ -43,9 +42,13 @@ public abstract class AbstractDocumentFieldsServiceTest {
 
     @Test
     public void getAllPrintFields() {
-        fieldsInfo = new FieldsInfo.Builder()
-                .populateResponseMap("Some Id", new FieldInfo<String>("Some Id", Collections.singletonList("SomeField"), FieldType.STRING, false))
-                .populateResponseMap("Some other Id", new FieldInfo<String>("Some other Id", Collections.singletonList("SomeOtherField"), FieldType.STRING, false))
+        fieldsInfo = FieldsInfo.builder()
+                .populateResponseMap("Some Id", FieldInfo.<String>builder()
+                        .name("SomeField")
+                        .build())
+                .populateResponseMap("Some other Id", FieldInfo.<String>builder()
+                        .name("SomeOtherField")
+                        .build())
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);
@@ -54,9 +57,13 @@ public abstract class AbstractDocumentFieldsServiceTest {
 
     @Test
     public void getAllPrintFieldsWithUserRestrictedFields() {
-        fieldsInfo = new FieldsInfo.Builder()
-                .populateResponseMap("Some Id", new FieldInfo<String>("Some Id", Collections.singletonList("SomeField"), FieldType.STRING, false))
-                .populateResponseMap("Some other Id", new FieldInfo<String>("Some other Id", Collections.singletonList("SomeOtherField"), FieldType.STRING, false))
+        fieldsInfo = FieldsInfo.builder()
+                .populateResponseMap("Some Id", FieldInfo.<String>builder()
+                        .name("SomeField")
+                        .build())
+                .populateResponseMap("Some other Id", FieldInfo.<String>builder()
+                        .name("SomeOtherField")
+                        .build())
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);

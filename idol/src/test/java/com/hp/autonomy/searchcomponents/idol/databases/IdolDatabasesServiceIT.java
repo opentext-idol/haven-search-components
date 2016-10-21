@@ -8,7 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.databases;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.databases.AbstractDatabasesServiceIT;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
-import com.hp.autonomy.types.idol.Database;
+import com.hp.autonomy.types.idol.responses.Database;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;

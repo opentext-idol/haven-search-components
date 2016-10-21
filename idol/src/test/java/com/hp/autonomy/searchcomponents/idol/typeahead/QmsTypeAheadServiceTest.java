@@ -6,13 +6,12 @@
 package com.hp.autonomy.searchcomponents.idol.typeahead;
 
 import com.autonomy.aci.client.services.AciService;
-import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
-import com.hp.autonomy.types.idol.TypeAheadResponseData;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.TypeAheadResponseData;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.params.ModeParam;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,13 +29,13 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class QmsTypeAheadServiceTest {
     @Mock
-    private ConfigService<? extends IdolSearchCapable> configService;
+    private ConfigService<IdolSearchCapable> configService;
 
     @Mock
     private AciService qmsAciService;
 
     @Mock
-    private AciResponseJaxbProcessorFactory processorFactory;
+    private ProcessorFactory processorFactory;
 
     @Mock
     private IdolSearchCapable config;
@@ -51,16 +50,16 @@ public class QmsTypeAheadServiceTest {
 
     @Test
     public void getSuggestionsInDictionaryMode() {
-        when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setTypeAheadMode(ModeParam.Dictionary).build());
-        when(qmsAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockResponse());
+        when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().typeAheadMode(ModeParam.Dictionary).build());
+        when(qmsAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockResponse());
         final List<String> suggestions = qmsTypeAheadService.getSuggestions("A");
         assertEquals("Ab", suggestions.get(0));
     }
 
     @Test
     public void getSuggestionsInIndexMode() {
-        when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setTypeAheadMode(ModeParam.Index).build());
-        when(qmsAciService.executeAction(anySetOf(AciParameter.class), any(Processor.class))).thenReturn(mockResponse());
+        when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().typeAheadMode(ModeParam.Index).build());
+        when(qmsAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockResponse());
         final List<String> suggestions = qmsTypeAheadService.getSuggestions("A");
         assertEquals("ab", suggestions.get(0));
     }

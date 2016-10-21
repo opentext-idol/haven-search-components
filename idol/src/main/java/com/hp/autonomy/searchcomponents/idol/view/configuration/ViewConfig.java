@@ -5,30 +5,31 @@
 
 package com.hp.autonomy.searchcomponents.idol.view.configuration;
 
-import com.autonomy.aci.client.annotations.IdolAnnotationsProcessorFactory;
-import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.transport.AciServerDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.hp.autonomy.frontend.configuration.ConfigException;
-import com.hp.autonomy.frontend.configuration.ConfigurationComponent;
-import com.hp.autonomy.frontend.configuration.ProductType;
-import com.hp.autonomy.frontend.configuration.ServerConfig;
-import com.hp.autonomy.frontend.configuration.ValidationResult;
+import com.hp.autonomy.frontend.configuration.SimpleComponent;
+import com.hp.autonomy.frontend.configuration.server.ProductType;
+import com.hp.autonomy.frontend.configuration.server.ServerConfig;
+import com.hp.autonomy.frontend.configuration.validation.OptionalConfigurationComponent;
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import org.apache.commons.lang.StringUtils;
+import lombok.ToString;
 
 import java.util.Set;
 
-@Data
-@JsonDeserialize(builder = ViewConfig.Builder.class)
-public class ViewConfig implements ConfigurationComponent {
+@SuppressWarnings({"DefaultAnnotationParam", "WeakerAccess"})
+@Getter
+@Builder
+@EqualsAndHashCode(callSuper = false)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@ToString
+@JsonDeserialize(builder = ViewConfig.ViewConfigBuilder.class)
+public class ViewConfig extends SimpleComponent<ViewConfig> implements OptionalConfigurationComponent<ViewConfig> {
 
     @Getter(AccessLevel.NONE)
     private final ServerConfig serverConfig;
@@ -36,64 +37,11 @@ public class ViewConfig implements ConfigurationComponent {
     private final ServerConfig connector;
     private final String referenceField;
     private final ViewingMode viewingMode;
-
     private final Boolean highlighting;
-
-    public ViewConfig merge(final ViewConfig other) {
-        if(other != null) {
-            final ServerConfig serverConfig = this.serverConfig.merge(other.serverConfig);
-
-            return new Builder()
-                    .setProtocol(serverConfig.getProtocol())
-                    .setServiceProtocol(serverConfig.getServiceProtocol())
-                    .setHost(serverConfig.getHost())
-                    .setPort(serverConfig.getPort())
-                    .setServicePort(serverConfig.getServicePort())
-                    .setProductType(serverConfig.getProductType())
-                    .setReferenceField(referenceField == null ? other.referenceField : this.referenceField)
-                    .setViewingMode(viewingMode == null ? other.viewingMode : this.viewingMode)
-                    .setConnector(connector == null ? other.connector : this.connector.merge(other.connector))
-                    .setHighlighting(highlighting == null ? other.highlighting : highlighting)
-                    .build();
-        }
-
-        return this;
-    }
-
-    public boolean basicValidate(final String component) throws ConfigException {
-        return serverConfig.basicValidate(component);
-    }
-
-    public ValidationResult<?> validate(final AciService aciService, final IdolAnnotationsProcessorFactory idolAnnotationsProcessorFactory) {
-        final ValidationResult<?> validationResult = serverConfig.validate(aciService, null, idolAnnotationsProcessorFactory);
-
-        if(validationResult.isValid()) {
-            switch (viewingMode) {
-                case CONNECTOR:
-                    final ValidationResult<?> connectorValidation = connector.validate(aciService, null, idolAnnotationsProcessorFactory);
-
-                    if (connectorValidation.isValid()) {
-                        return validationResult;
-                    }
-                    else {
-                        return new ValidationResult<Object>(false, new ConnectorValidation(connectorValidation));
-                    }
-                case FIELD:
-                default:
-                    if(StringUtils.isBlank(referenceField)) {
-                        return new ValidationResult<>(false, Validation.REFERENCE_FIELD_BLANK);
-                    } else {
-                        return validationResult;
-                    }
-            }
-        } else {
-            return validationResult;
-        }
-    }
 
     @Override
     @JsonIgnore
-    public boolean isEnabled() {
+    public Boolean getEnabled() {
         return true;
     }
 
@@ -109,11 +57,11 @@ public class ViewConfig implements ConfigurationComponent {
         return serverConfig.getHost();
     }
 
-    public int getPort() {
+    public Integer getPort() {
         return serverConfig.getPort();
     }
 
-    public int getServicePort() {
+    public Integer getServicePort() {
         return serverConfig.getServicePort();
     }
 
@@ -125,82 +73,48 @@ public class ViewConfig implements ConfigurationComponent {
         return serverConfig.toAciServerDetails();
     }
 
-    @JsonPOJOBuilder(withPrefix = "set")
-    @NoArgsConstructor
-    @Setter
-    @Accessors(chain = true)
-    public static class Builder {
-        private String referenceField;
-
-        private final ServerConfig.Builder builder = new ServerConfig.Builder();
-
+    @SuppressWarnings({"WeakerAccess", "FieldMayBeFinal", "unused"})
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class ViewConfigBuilder {
+        private final ServerConfig.ServerConfigBuilder builder = ServerConfig.builder();
+        private ServerConfig serverConfig;
         private ServerConfig connector;
-
-        private ViewingMode viewingMode;
+        private String referenceField;
+        private ViewingMode viewingMode = ViewingMode.FIELD;
         private Boolean highlighting;
 
         public ViewConfig build() {
-            final ViewingMode viewingMode;
-
-            if (this.viewingMode != null) {
-                viewingMode = this.viewingMode;
-            }
-            else {
-                viewingMode = ViewingMode.FIELD;
-            }
-
-            return new ViewConfig(builder.build(), connector, referenceField, viewingMode, highlighting);
+            return new ViewConfig(serverConfig != null ? serverConfig : builder.build(), connector, referenceField, viewingMode, highlighting);
         }
 
-        public Builder setProtocol(final AciServerDetails.TransportProtocol protocol) {
-            builder.setProtocol(protocol);
+        public ViewConfigBuilder protocol(final AciServerDetails.TransportProtocol protocol) {
+            builder.protocol(protocol);
             return this;
         }
 
-        public Builder setServiceProtocol(final AciServerDetails.TransportProtocol serviceProtocol) {
-            builder.setServiceProtocol(serviceProtocol);
+        public ViewConfigBuilder serviceProtocol(final AciServerDetails.TransportProtocol serviceProtocol) {
+            builder.serviceProtocol(serviceProtocol);
             return this;
         }
 
-        public Builder setHost(final String host) {
-            builder.setHost(host);
+        public ViewConfigBuilder host(final String host) {
+            builder.host(host);
             return this;
         }
 
-        public Builder setPort(final int port) {
-            builder.setPort(port);
+        public ViewConfigBuilder port(final Integer port) {
+            builder.port(port);
             return this;
         }
 
-        public Builder setServicePort(final int servicePort) {
-            builder.setServicePort(servicePort);
+        public ViewConfigBuilder servicePort(final Integer servicePort) {
+            builder.servicePort(servicePort);
             return this;
         }
 
-        public Builder setProductType(final Set<ProductType> productTypes) {
-            builder.setProductType(productTypes);
+        public ViewConfigBuilder productType(final Set<ProductType> productTypes) {
+            builder.productType(productTypes);
             return this;
         }
-
-        public Builder setReferenceField(final String referenceField) {
-            this.referenceField = referenceField;
-            return this;
-        }
-
-        public Builder setHighlighting(final Boolean highlighting) {
-            this.highlighting = highlighting;
-            return this;
-        }
-    }
-
-    private enum Validation {
-        REFERENCE_FIELD_BLANK,
-        CONNECTOR_VALIDATION_ERROR
-    }
-
-    @Data
-    private static class ConnectorValidation {
-        private final Validation validation = Validation.CONNECTOR_VALIDATION_ERROR;
-        private final ValidationResult<?> connectorValidation;
     }
 }

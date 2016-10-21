@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class IdolTypeAheadServiceTest {
     @Mock
-    private ConfigService<? extends IdolSearchCapable> configService;
+    private ConfigService<IdolSearchCapable> configService;
 
     @Mock
     private TypeAheadService<AciErrorException> termExpandTypeAheadService;
@@ -43,7 +43,7 @@ public class IdolTypeAheadServiceTest {
 
     @Test
     public void getQmsSuggestions() {
-        when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setEnabled(true).build());
+        when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().enabled(true).build());
 
         final String text = "A";
         typeAheadService.getSuggestions(text);
@@ -52,7 +52,7 @@ public class IdolTypeAheadServiceTest {
 
     @Test
     public void getContentSuggestions() {
-        when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setEnabled(false).build());
+        when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().enabled(false).build());
 
         final String text = "A";
         typeAheadService.getSuggestions(text);

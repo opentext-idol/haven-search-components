@@ -14,7 +14,6 @@ import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricVa
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
@@ -28,6 +27,7 @@ import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
@@ -86,7 +86,7 @@ public class HodParametricValuesServiceTest {
 
     @Before
     public void mocks() throws HodErrorException {
-        when(config.getQueryManipulation()).thenReturn(new QueryManipulationConfig("SomeProfile", "SomeIndex"));
+        when(config.getQueryManipulation()).thenReturn(QueryManipulationConfig.builder().profile("SomeProfile").index("SomeIndex").build());
         when(configService.getConfig()).thenReturn(config);
 
         when(hodAuthenticationPrincipal.getApplication()).thenReturn(new ResourceIdentifier("SomeDomain", "SomeIndex"));
@@ -126,7 +126,7 @@ public class HodParametricValuesServiceTest {
 
     @Test
     public void emptyFieldNamesReturnEmptyParametricValues() throws HodErrorException {
-        final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.<TagName>emptyList());
+        final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptyList());
         when(fieldsService.getFields(any(HodFieldsRequest.class), any(FieldTypeParam.class))).thenReturn(response);
 
         final List<ResourceIdentifier> indexes = Collections.singletonList(ResourceIdentifier.PATENTS);

@@ -9,10 +9,10 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadConstants;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
-import com.hp.autonomy.types.idol.TermExpandResponseData;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.TermExpandResponseData;
 import com.hp.autonomy.types.requests.idol.actions.term.TermActions;
 import com.hp.autonomy.types.requests.idol.actions.term.params.ExpandTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.term.params.ExpansionParam;
@@ -33,10 +33,10 @@ public class TermExpandTypeAheadService implements TypeAheadService<AciErrorExce
     @Autowired
     public TermExpandTypeAheadService(
             final AciService contentAciService,
-            final AciResponseJaxbProcessorFactory processorFactory
+            final ProcessorFactory processorFactory
     ) {
         this.contentAciService = contentAciService;
-        processor = processorFactory.createAciResponseProcessor(TermExpandResponseData.class);
+        processor = processorFactory.getResponseDataProcessor(TermExpandResponseData.class);
     }
 
     @Override

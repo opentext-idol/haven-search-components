@@ -7,8 +7,8 @@ package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
-import com.hp.autonomy.types.idol.Hit;
-import com.hp.autonomy.types.idol.QueryResponseData;
+import com.hp.autonomy.types.idol.responses.Hit;
+import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.Documents;
 
 import java.util.Collection;

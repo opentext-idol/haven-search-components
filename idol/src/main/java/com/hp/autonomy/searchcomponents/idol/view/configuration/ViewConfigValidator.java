@@ -5,10 +5,13 @@
 
 package com.hp.autonomy.searchcomponents.idol.view.configuration;
 
-import com.autonomy.aci.client.annotations.IdolAnnotationsProcessorFactory;
 import com.autonomy.aci.client.services.AciService;
-import com.hp.autonomy.frontend.configuration.ValidationResult;
-import com.hp.autonomy.frontend.configuration.Validator;
+import com.hp.autonomy.frontend.configuration.server.ServerConfig;
+import com.hp.autonomy.frontend.configuration.validation.ValidationResult;
+import com.hp.autonomy.frontend.configuration.validation.Validator;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import lombok.Data;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,21 +19,57 @@ import org.springframework.stereotype.Component;
 public class ViewConfigValidator implements Validator<ViewConfig> {
 
     private final AciService validatorAciService;
-    private final IdolAnnotationsProcessorFactory idolAnnotationsProcessorFactory;
+    private final ProcessorFactory processorFactory;
 
     @Autowired
-    public ViewConfigValidator(final AciService validatorAciService, final IdolAnnotationsProcessorFactory idolAnnotationsProcessorFactory) {
+    public ViewConfigValidator(final AciService validatorAciService, final ProcessorFactory processorFactory) {
         this.validatorAciService = validatorAciService;
-        this.idolAnnotationsProcessorFactory = idolAnnotationsProcessorFactory;
+        this.processorFactory = processorFactory;
     }
 
     @Override
     public ValidationResult<?> validate(final ViewConfig config) {
-        return config.validate(validatorAciService, idolAnnotationsProcessorFactory);
+        final ServerConfig serverConfig = ServerConfig.builder()
+                .protocol(config.getProtocol())
+                .host(config.getHost())
+                .port(config.getPort())
+                .serviceProtocol(config.getServiceProtocol())
+                .servicePort(config.getServicePort())
+                .productType(config.getProductType())
+                .build();
+        final ValidationResult<?> validationResult = serverConfig.validate(validatorAciService, null, processorFactory);
+
+        ValidationResult<?> returnValue = null;
+        if (validationResult.isValid()) {
+            switch (config.getViewingMode()) {
+                case CONNECTOR:
+                    final ValidationResult<?> connectorValidation = config.getConnector().validate(validatorAciService, null, processorFactory);
+                    returnValue =  connectorValidation.isValid() ? validationResult : new ValidationResult<Object>(false, new ConnectorValidation(connectorValidation));
+                    break;
+                case FIELD:
+                    returnValue = StringUtils.isBlank(config.getReferenceField()) ? new ValidationResult<>(false, Validation.REFERENCE_FIELD_BLANK) : validationResult;
+                    break;
+            }
+        } else {
+            returnValue = validationResult;
+        }
+
+        return returnValue;
     }
 
     @Override
     public Class<ViewConfig> getSupportedClass() {
         return ViewConfig.class;
+    }
+
+    private enum Validation {
+        REFERENCE_FIELD_BLANK,
+        CONNECTOR_VALIDATION_ERROR
+    }
+
+    @Data
+    private static class ConnectorValidation {
+        private final Validation validation = Validation.CONNECTOR_VALIDATION_ERROR;
+        private final ValidationResult<?> connectorValidation;
     }
 }

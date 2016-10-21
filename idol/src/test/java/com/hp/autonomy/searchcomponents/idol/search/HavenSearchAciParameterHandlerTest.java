@@ -9,7 +9,6 @@ import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
@@ -20,6 +19,7 @@ import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -32,9 +32,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -117,7 +116,7 @@ public class HavenSearchAciParameterHandlerTest {
     public void defaultLanguageType() {
         final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().build();
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
-        assertThat(aciParameters, Matchers.<AciParameter>empty());
+        assertThat(aciParameters, Matchers.empty());
     }
 
     @Test
@@ -130,7 +129,7 @@ public class HavenSearchAciParameterHandlerTest {
     @Test
     public void addQmsParameters() {
         final IdolSearchCapable config = mock(IdolSearchCapable.class);
-        when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setBlacklist("ISO_BLACKLIST").setExpandQuery(true).build());
+        when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().blacklist("ISO_BLACKLIST").expandQuery(true).build());
         when(configService.getConfig()).thenReturn(config);
         parameterHandler.addQmsParameters(aciParameters, null);
         assertThat(aciParameters, hasSize(2));

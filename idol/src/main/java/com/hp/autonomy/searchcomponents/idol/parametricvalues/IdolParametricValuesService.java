@@ -10,7 +10,6 @@ import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.aci.content.ranges.Ranges;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametricValuesService;
@@ -21,10 +20,11 @@ import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
-import com.hp.autonomy.types.idol.FlatField;
-import com.hp.autonomy.types.idol.GetQueryTagValuesResponseData;
-import com.hp.autonomy.types.idol.RecursiveField;
-import com.hp.autonomy.types.idol.TagValue;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.FlatField;
+import com.hp.autonomy.types.idol.responses.GetQueryTagValuesResponseData;
+import com.hp.autonomy.types.idol.responses.RecursiveField;
+import com.hp.autonomy.types.idol.responses.TagValue;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
@@ -75,12 +75,12 @@ public class IdolParametricValuesService extends AbstractParametricValuesService
             final HavenSearchAciParameterHandler parameterHandler,
             final FieldsService<IdolFieldsRequest, AciErrorException> fieldsService,
             final AciServiceRetriever aciServiceRetriever,
-            final AciResponseJaxbProcessorFactory aciResponseProcessorFactory
+            final ProcessorFactory processorFactory
     ) {
         this.parameterHandler = parameterHandler;
         this.fieldsService = fieldsService;
         this.aciServiceRetriever = aciServiceRetriever;
-        queryTagValuesResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(GetQueryTagValuesResponseData.class);
+        queryTagValuesResponseProcessor = processorFactory.getResponseDataProcessor(GetQueryTagValuesResponseData.class);
     }
 
     @Override

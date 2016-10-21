@@ -10,7 +10,6 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.identifier.reference.Reference;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
@@ -20,9 +19,10 @@ import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
-import com.hp.autonomy.types.idol.Hit;
-import com.hp.autonomy.types.idol.QueryResponseData;
-import com.hp.autonomy.types.idol.SuggestResponseData;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.Hit;
+import com.hp.autonomy.types.idol.responses.QueryResponseData;
+import com.hp.autonomy.types.idol.responses.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
@@ -49,20 +49,20 @@ public class IdolDocumentService implements DocumentsService<String, IdolSearchR
             final HavenSearchAciParameterHandler parameterHandler,
             final QueryResponseParser queryResponseParser,
             final AciServiceRetriever aciServiceRetriever,
-            final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+            final ProcessorFactory processorFactory) {
         this.parameterHandler = parameterHandler;
         this.queryResponseParser = queryResponseParser;
         this.aciServiceRetriever = aciServiceRetriever;
 
-        queryResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(QueryResponseData.class);
-        suggestResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(SuggestResponseData.class);
+        queryResponseProcessor = processorFactory.getResponseDataProcessor(QueryResponseData.class);
+        suggestResponseProcessor = processorFactory.getResponseDataProcessor(SuggestResponseData.class);
     }
 
     @Override
     public Documents<IdolSearchResult> queryTextIndex(final SearchRequest<String> searchRequest) throws AciErrorException {
         final boolean promotions = searchRequest.getQueryType() == SearchRequest.QueryType.PROMOTIONS;
         if (!aciServiceRetriever.qmsEnabled() && promotions) {
-            return new Documents<>(Collections.<IdolSearchResult>emptyList(), 0, null, null, null, null);
+            return new Documents<>(Collections.emptyList(), 0, null, null, null, null);
         }
 
         final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());

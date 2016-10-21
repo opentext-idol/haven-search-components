@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
-import com.hp.autonomy.types.idol.RecursiveField;
+import com.hp.autonomy.types.idol.responses.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
 public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequest<S>, F extends FieldsRequest, FB extends FieldsRequest.Builder<F>, S extends Serializable, E extends Exception> {
     @Autowired

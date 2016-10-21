@@ -6,61 +6,51 @@
 package com.hp.autonomy.searchcomponents.core.config;
 
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.hp.autonomy.frontend.configuration.SimpleComponent;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
-@Data
+@SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "DefaultAnnotationParam", "CollectionDeclaredAsConcreteClass"})
+@Getter
+@Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@JsonDeserialize(builder = FieldsInfo.Builder.class)
-public class FieldsInfo implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+@ToString
+@JsonDeserialize(builder = FieldsInfo.FieldsInfoBuilder.class)
+public class FieldsInfo extends SimpleComponent<FieldsInfo> implements Serializable {
     private static final long serialVersionUID = 7627012722603736269L;
 
-    private Map<String, FieldInfo<?>> fieldConfig;
-    private Map<String, FieldInfo<?>> fieldConfigByName;
+    private final LinkedHashMap<String, FieldInfo<?>> fieldConfig;
+    private final LinkedHashMap<String, FieldInfo<?>> fieldConfigByName;
 
-    public FieldsInfo merge(final FieldsInfo other) {
-        if (other != null) {
-            if (fieldConfig == null) {
-                fieldConfig = other.fieldConfig;
-            } else {
-                final Map<String, FieldInfo<?>> mergedCustomFields = new LinkedHashMap<>(other.fieldConfig);
-                mergedCustomFields.putAll(fieldConfig);
-                fieldConfig = mergedCustomFields;
-            }
-        }
-
-        return this;
+    @JsonAnyGetter
+    public LinkedHashMap<String, FieldInfo<?>> getFieldConfig() {
+        return new LinkedHashMap<>(fieldConfig);
     }
 
-    @JsonPOJOBuilder(withPrefix = "set")
-    @Setter
-    @Accessors(chain = true)
-    public static class Builder {
-        private final Map<String, FieldInfo<?>> fieldConfig = new LinkedHashMap<>();
-        private final Map<String, FieldInfo<?>> fieldConfigByName = new LinkedHashMap<>();
+    @SuppressWarnings({"WeakerAccess", "FieldMayBeFinal", "TypeMayBeWeakened", "CollectionDeclaredAsConcreteClass"})
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class FieldsInfoBuilder {
+        private LinkedHashMap<String, FieldInfo<?>> fieldConfig = new LinkedHashMap<>();
+        private LinkedHashMap<String, FieldInfo<?>> fieldConfigByName = new LinkedHashMap<>();
 
         @JsonAnySetter
-        public Builder populateResponseMap(final String key, final FieldInfo<?> value) {
-            value.setId(key);
-            fieldConfig.put(key, value);
-            for (final String name : value.getNames()) {
-                fieldConfigByName.put(name, value);
-            }
+        public FieldsInfoBuilder populateResponseMap(final String key, final FieldInfo<?> value) {
+            final FieldInfo<?> valueWithId = value.toBuilder().id(key).build();
+            fieldConfig.put(key, valueWithId);
+            valueWithId.getNames().forEach(name -> fieldConfigByName.put(name, valueWithId));
             return this;
-        }
-
-        public FieldsInfo build() {
-            return new FieldsInfo(fieldConfig, fieldConfigByName);
         }
     }
 }

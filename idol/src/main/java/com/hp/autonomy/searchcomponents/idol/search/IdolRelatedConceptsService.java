@@ -9,11 +9,11 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
-import com.hp.autonomy.types.idol.QsElement;
-import com.hp.autonomy.types.idol.QueryResponseData;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.QsElement;
+import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
@@ -32,10 +32,10 @@ public class IdolRelatedConceptsService implements RelatedConceptsService<QsElem
     private final Processor<QueryResponseData> queryResponseProcessor;
 
     @Autowired
-    public IdolRelatedConceptsService(final HavenSearchAciParameterHandler parameterHandler, final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    public IdolRelatedConceptsService(final HavenSearchAciParameterHandler parameterHandler, final AciService contentAciService, final ProcessorFactory processorFactory) {
         this.parameterHandler = parameterHandler;
         this.contentAciService = contentAciService;
-        queryResponseProcessor = aciResponseProcessorFactory.createAciResponseProcessor(QueryResponseData.class);
+        queryResponseProcessor = processorFactory.getResponseDataProcessor(QueryResponseData.class);
     }
 
     @Override

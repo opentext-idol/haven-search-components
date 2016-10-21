@@ -7,13 +7,13 @@ package com.hp.autonomy.searchcomponents.idol.beanconfiguration;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.search.IdolDocumentService;
 import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import com.hp.autonomy.searchcomponents.idol.search.QueryResponseParser;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hpe.bigdata.frontend.spring.authentication.SpringSecurityAuthenticationInformationRetriever;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -28,8 +28,8 @@ class DefaultIdolConfiguration {
     public DocumentsService<String, IdolSearchResult, AciErrorException> documentsService(final HavenSearchAciParameterHandler parameterHandler,
                                                                                           final QueryResponseParser queryResponseParser,
                                                                                           final AciServiceRetriever aciServiceRetriever,
-                                                                                          final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
-        return new IdolDocumentService(parameterHandler, queryResponseParser, aciServiceRetriever, aciResponseProcessorFactory);
+                                                                                          final ProcessorFactory processorFactory) {
+        return new IdolDocumentService(parameterHandler, queryResponseParser, aciServiceRetriever, processorFactory);
     }
 
     @Bean

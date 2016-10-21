@@ -5,59 +5,35 @@
 
 package com.hp.autonomy.searchcomponents.idol.configuration;
 
-import com.autonomy.aci.client.annotations.IdolAnnotationsProcessorFactory;
-import com.autonomy.aci.client.services.AciService;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.frontend.configuration.ConfigException;
-import com.hp.autonomy.frontend.configuration.ConfigurationComponent;
-import com.hp.autonomy.frontend.configuration.ServerConfig;
-import com.hp.autonomy.frontend.configuration.ValidationResult;
+import com.hp.autonomy.frontend.configuration.SimpleComponent;
+import com.hp.autonomy.frontend.configuration.server.ServerConfig;
+import com.hp.autonomy.frontend.configuration.validation.OptionalConfigurationComponent;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.params.ModeParam;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import org.apache.commons.lang3.BooleanUtils;
 
-@Data
-@JsonDeserialize(builder = QueryManipulation.Builder.class)
-public class QueryManipulation implements ConfigurationComponent {
+@SuppressWarnings("DefaultAnnotationParam")
+@Getter
+@Builder
+@EqualsAndHashCode(callSuper = false)
+@ToString
+@JsonDeserialize(builder = QueryManipulation.QueryManipulationBuilder.class)
+public class QueryManipulation extends SimpleComponent<QueryManipulation> implements OptionalConfigurationComponent<QueryManipulation> {
     private final ServerConfig server;
     private final Boolean expandQuery;
     private final String blacklist;
     private final ModeParam typeAheadMode;
     private final Boolean enabled;
 
-    private QueryManipulation(final Builder builder) {
-        server = builder.server;
-        expandQuery = builder.expandQuery;
-        blacklist = builder.blacklist;
-        typeAheadMode = builder.typeAheadMode;
-        enabled = builder.enabled;
-    }
-
-    public QueryManipulation merge(final QueryManipulation queryManipulation) {
-        if (queryManipulation == null) {
-            return this;
-        } else {
-            return new Builder()
-                    .setServer(server == null ? queryManipulation.server : server.merge(queryManipulation.server))
-                    .setExpandQuery(expandQuery == null ? queryManipulation.expandQuery : expandQuery)
-                    .setBlacklist(blacklist == null ? queryManipulation.blacklist : blacklist)
-                    .setTypeAheadMode(typeAheadMode == null ? queryManipulation.typeAheadMode : typeAheadMode)
-                    .setEnabled(enabled == null ? queryManipulation.enabled : enabled)
-                    .build();
-        }
-    }
-
     @Override
-    public boolean isEnabled() {
-        return BooleanUtils.isTrue(enabled);
-    }
-
-    public void basicValidate() throws ConfigException {
-        if (isEnabled()) {
+    public void basicValidate(final String section) throws ConfigException {
+        if (BooleanUtils.isTrue(enabled)) {
             if (server == null) {
                 throw new ConfigException("QMS", "QMS is enabled but no corresponding server details have been provided");
             }
@@ -65,23 +41,8 @@ public class QueryManipulation implements ConfigurationComponent {
         }
     }
 
-    public ValidationResult<?> validate(final AciService aciService, final IdolAnnotationsProcessorFactory processorFactory) {
-        return server.validate(aciService, null, processorFactory);
-    }
-
-    @Setter
-    @Accessors(chain = true)
-    @NoArgsConstructor
-    @JsonPOJOBuilder(withPrefix = "set")
-    public static class Builder {
-        private ServerConfig server;
-        private Boolean expandQuery;
-        private String blacklist;
-        private ModeParam typeAheadMode;
-        private Boolean enabled;
-
-        public QueryManipulation build() {
-            return new QueryManipulation(this);
-        }
+    @SuppressWarnings("WeakerAccess")
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class QueryManipulationBuilder {
     }
 }

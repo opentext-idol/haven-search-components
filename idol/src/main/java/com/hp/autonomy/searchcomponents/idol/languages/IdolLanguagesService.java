@@ -8,12 +8,12 @@ package com.hp.autonomy.searchcomponents.idol.languages;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.idolutils.processors.AciResponseJaxbProcessorFactory;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
-import com.hp.autonomy.types.idol.GetStatusResponseData;
-import com.hp.autonomy.types.idol.LanguageSettingsResponseData;
-import com.hp.autonomy.types.idol.LanguageType;
-import com.hp.autonomy.types.idol.Languages;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.GetStatusResponseData;
+import com.hp.autonomy.types.idol.responses.LanguageSettingsResponseData;
+import com.hp.autonomy.types.idol.responses.LanguageType;
+import com.hp.autonomy.types.idol.responses.Languages;
 import com.hp.autonomy.types.requests.idol.actions.general.GeneralActions;
 import com.hp.autonomy.types.requests.idol.actions.status.StatusActions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +34,14 @@ public class IdolLanguagesService implements LanguagesService {
     private final Processor<LanguageSettingsResponseData> languageSettingsProcessor;
 
     @Autowired
-    public IdolLanguagesService(final AciService contentAciService, final AciResponseJaxbProcessorFactory aciResponseProcessorFactory) {
+    public IdolLanguagesService(final AciService contentAciService, final ProcessorFactory processorFactory) {
         this.contentAciService = contentAciService;
 
-        getStatusProcessor = aciResponseProcessorFactory.createAciResponseProcessor(GetStatusResponseData.class);
-        languageSettingsProcessor = aciResponseProcessorFactory.createAciResponseProcessor(LanguageSettingsResponseData.class);
+        getStatusProcessor = processorFactory.getResponseDataProcessor(GetStatusResponseData.class);
+        languageSettingsProcessor = processorFactory.getResponseDataProcessor(LanguageSettingsResponseData.class);
     }
 
+    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @Override
     @Cacheable(value = "IdolLanguagesService.getLanguages", key = "#root.methodName")
     public Map<String, LanguageType> getLanguages() {
@@ -67,6 +68,7 @@ public class IdolLanguagesService implements LanguagesService {
         return languages;
     }
 
+    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @Override
     @Cacheable(value = "IdolLanguagesService.getDefaultLanguageId", key = "#root.methodName")
     public String getDefaultLanguageId() {

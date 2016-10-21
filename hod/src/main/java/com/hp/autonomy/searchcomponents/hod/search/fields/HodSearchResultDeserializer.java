@@ -27,9 +27,7 @@ import org.springframework.boot.jackson.JsonComponent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @JsonComponent
@@ -56,20 +54,31 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
                 final String[] stringValues = parseAsStringArray(node, name);
 
                 if (ArrayUtils.isNotEmpty(stringValues)) {
-                    final List<Object> values = new ArrayList<>(stringValues.length);
+                    final Collection<Object> values = new ArrayList<>(stringValues.length);
                     for (final String stringValue : stringValues) {
                         final Object value = fieldInfo.getType().parseValue(fieldInfo.getType().getType(), stringValue);
                         values.add(value);
                     }
 
-                    if (fieldMap.containsKey(fieldInfo.getId())) {
-                        final FieldInfo<?> existingFieldInfo = fieldMap.get(fieldInfo.getId());
-                        @SuppressWarnings("unchecked")
-                        final Collection<Object> existingValues = (Collection<Object>) existingFieldInfo.getValues();
-                        existingValues.addAll(values);
-                        existingFieldInfo.getNames().add(name);
+                    final String id = fieldInfo.getId();
+                    if (fieldMap.containsKey(id)) {
+                        final FieldInfo<?> existingFieldInfo = fieldMap.get(id);
+                        @SuppressWarnings({"unchecked", "rawtypes"})
+                        final FieldInfo<?> updatedFieldInfo = existingFieldInfo.toBuilder()
+                                .name(name)
+                                .values((Collection) values)
+                                .build();
+                        fieldMap.put(id, updatedFieldInfo);
                     } else {
-                        fieldMap.put(fieldInfo.getId(), new FieldInfo<>(fieldInfo.getId(), Collections.singleton(name), fieldInfo.getType(), true, values));
+                        @SuppressWarnings({"unchecked", "rawtypes"})
+                        final FieldInfo<?> newFieldInfo = FieldInfo.builder()
+                                .id(id)
+                                .name(name)
+                                .type(fieldInfo.getType())
+                                .advanced(true)
+                                .values((Collection) values)
+                                .build();
+                        fieldMap.put(id, newFieldInfo);
                     }
                 }
             }

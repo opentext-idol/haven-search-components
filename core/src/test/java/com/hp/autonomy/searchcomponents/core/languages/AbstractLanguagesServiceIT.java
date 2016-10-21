@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.languages;
 
-import com.hp.autonomy.types.idol.LanguageType;
+import com.hp.autonomy.types.idol.responses.LanguageType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
 public abstract class AbstractLanguagesServiceIT {
     @Autowired

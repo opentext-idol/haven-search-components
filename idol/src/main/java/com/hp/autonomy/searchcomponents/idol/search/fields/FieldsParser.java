@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.search.fields;
 
 import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
-import com.hp.autonomy.types.idol.Hit;
+import com.hp.autonomy.types.idol.responses.Hit;
 
 @FunctionalInterface
 public interface FieldsParser {
