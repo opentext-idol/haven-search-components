@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.configuration;
 import com.autonomy.aci.client.services.AciService;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ public class AciServiceRetrieverImpl implements AciServiceRetriever {
 
     @Override
     public boolean qmsEnabled() {
-        return configService.getConfig().getQueryManipulation() != null && configService.getConfig().getQueryManipulation().isEnabled();
+        return configService.getConfig().getQueryManipulation() != null && BooleanUtils.isTrue(configService.getConfig().getQueryManipulation().getEnabled());
     }
 
     @Override

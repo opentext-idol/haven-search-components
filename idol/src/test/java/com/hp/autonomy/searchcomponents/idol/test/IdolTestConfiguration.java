@@ -35,14 +35,14 @@ public class IdolTestConfiguration {
     @Bean
     @Primary
     public ConfigService<IdolSearchCapable> configService() {
-        final QueryManipulation queryManipulationConfig = new QueryManipulation.Builder()
-                .setEnabled(false)
+        final QueryManipulation queryManipulationConfig = QueryManipulation.builder()
+                .enabled(false)
                 .build();
 
-        final ViewConfig viewConfig = new ViewConfig.Builder()
-                .setReferenceField(REFERENCE_FIELD_NAME)
-                .setHost(environment.getProperty("test.view.host", DEFAULT_IDOL_HOST))
-                .setPort(Integer.parseInt(environment.getProperty("test.view.port", String.valueOf(DEFAULT_VIEW_SERVER_PORT))))
+        final ViewConfig viewConfig = ViewConfig.builder()
+                .referenceField(REFERENCE_FIELD_NAME)
+                .host(environment.getProperty("test.view.host", DEFAULT_IDOL_HOST))
+                .port(Integer.parseInt(environment.getProperty("test.view.port", String.valueOf(DEFAULT_VIEW_SERVER_PORT))))
                 .build();
 
         final AciServerDetails contentAciServerDetails = new AciServerDetails(
@@ -55,7 +55,7 @@ public class IdolTestConfiguration {
         when(config.getContentAciServerDetails()).thenReturn(contentAciServerDetails);
         when(config.getQueryManipulation()).thenReturn(queryManipulationConfig);
         when(config.getViewConfig()).thenReturn(viewConfig);
-        when(config.getFieldsInfo()).thenReturn(new FieldsInfo.Builder().build());
+        when(config.getFieldsInfo()).thenReturn(FieldsInfo.builder().build());
 
         @SuppressWarnings("unchecked")
         final ConfigService<IdolSearchCapable> configService = mock(ConfigService.class);

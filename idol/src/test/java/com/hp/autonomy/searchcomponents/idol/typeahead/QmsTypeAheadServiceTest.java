@@ -50,7 +50,7 @@ public class QmsTypeAheadServiceTest {
 
     @Test
     public void getSuggestionsInDictionaryMode() {
-        when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setTypeAheadMode(ModeParam.Dictionary).build());
+        when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().typeAheadMode(ModeParam.Dictionary).build());
         when(qmsAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockResponse());
         final List<String> suggestions = qmsTypeAheadService.getSuggestions("A");
         assertEquals("Ab", suggestions.get(0));
@@ -58,7 +58,7 @@ public class QmsTypeAheadServiceTest {
 
     @Test
     public void getSuggestionsInIndexMode() {
-        when(config.getQueryManipulation()).thenReturn(new QueryManipulation.Builder().setTypeAheadMode(ModeParam.Index).build());
+        when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().typeAheadMode(ModeParam.Index).build());
         when(qmsAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockResponse());
         final List<String> suggestions = qmsTypeAheadService.getSuggestions("A");
         assertEquals("ab", suggestions.get(0));

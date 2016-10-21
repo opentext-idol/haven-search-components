@@ -62,7 +62,7 @@ public class IdolViewServerServiceTest {
 
     @Before
     public void setUp() {
-        final ViewConfig viewConfig = new ViewConfig.Builder().setReferenceField(SAMPLE_REFERENCE_FIELD_NAME).build();
+        final ViewConfig viewConfig = ViewConfig.builder().referenceField(SAMPLE_REFERENCE_FIELD_NAME).build();
         when(viewCapableConfig.getViewConfig()).thenReturn(viewConfig);
         when(configService.getConfig()).thenReturn(viewCapableConfig);
 
@@ -86,7 +86,7 @@ public class IdolViewServerServiceTest {
 
     @Test(expected = ReferenceFieldBlankException.class)
     public void noReference() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException {
-        when(viewCapableConfig.getViewConfig()).thenReturn(new ViewConfig.Builder().build());
+        when(viewCapableConfig.getViewConfig()).thenReturn(ViewConfig.builder().build());
         idolViewServerService.viewDocument(null, null, null, mock(OutputStream.class));
     }
 

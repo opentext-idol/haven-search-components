@@ -24,7 +24,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import java.util.Collections;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -47,9 +46,17 @@ public class FieldsParserTest {
     public void setUp() {
         fieldsParser = new FieldsParserImpl(configService);
 
-        final FieldsInfo fieldsInfo = new FieldsInfo.Builder()
-                .populateResponseMap("Custom Date", new FieldInfo<DateTime>("Custom Date", Collections.singletonList("CUSTOM_DATE"), FieldType.DATE, true))
-                .populateResponseMap("author", new FieldInfo<String>("author", Collections.singletonList("CUSTOM_ARRAY"), FieldType.STRING, false))
+        final FieldsInfo fieldsInfo = FieldsInfo.builder()
+                .populateResponseMap("Custom Date", FieldInfo.<DateTime>builder()
+                        .id("Custom Date")
+                        .name("CUSTOM_DATE")
+                        .type(FieldType.DATE)
+                        .advanced(true)
+                        .build())
+                .populateResponseMap("author", FieldInfo.<String>builder()
+                        .id("author")
+                        .name("CUSTOM_ARRAY")
+                        .build())
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);

@@ -5,10 +5,10 @@
 
 package com.hp.autonomy.searchcomponents.idol.configuration;
 
-import com.autonomy.aci.client.annotations.IdolAnnotationsProcessorFactory;
 import com.autonomy.aci.client.services.AciService;
-import com.hp.autonomy.frontend.configuration.ValidationResult;
-import com.hp.autonomy.frontend.configuration.Validator;
+import com.hp.autonomy.frontend.configuration.validation.ValidationResult;
+import com.hp.autonomy.frontend.configuration.validation.Validator;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,17 +16,17 @@ import org.springframework.stereotype.Component;
 public class QueryManipulationValidator implements Validator<QueryManipulation> {
 
     private final AciService aciService;
-    private final IdolAnnotationsProcessorFactory processorFactory;
+    private final ProcessorFactory processorFactory;
 
     @Autowired
-    public QueryManipulationValidator(final AciService validatorAciService, final IdolAnnotationsProcessorFactory processorFactory) {
+    public QueryManipulationValidator(final AciService validatorAciService, final ProcessorFactory processorFactory) {
         aciService = validatorAciService;
         this.processorFactory = processorFactory;
     }
 
     @Override
     public ValidationResult<?> validate(final QueryManipulation config) {
-        return config.validate(aciService, processorFactory);
+        return config.getServer().validate(aciService, null, processorFactory);
     }
 
     @Override

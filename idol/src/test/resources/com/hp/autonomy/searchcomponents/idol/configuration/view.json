@@ -1,0 +1,19 @@
+{
+  "protocol": "HTTP",
+  "host": "localhost",
+  "port": 9080,
+  "productType": [
+    "VIEW",
+    "IDOLPROXY",
+    "DAH"
+  ],
+  "referenceField": "DREREFERENCE",
+  "viewingMode": "FIELD",
+  "connector": {
+    "protocol": "HTTP",
+    "host": "localhost",
+    "port": 10000,
+    "productTypeRegex": ".*?CONNECTOR"
+  },
+  "highlighting": true
+}

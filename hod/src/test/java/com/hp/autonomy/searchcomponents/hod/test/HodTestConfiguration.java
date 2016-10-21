@@ -7,11 +7,11 @@ package com.hp.autonomy.searchcomponents.hod.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.hp.autonomy.frontend.configuration.Authentication;
-import com.hp.autonomy.frontend.configuration.AuthenticationConfig;
-import com.hp.autonomy.frontend.configuration.BCryptUsernameAndPassword;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.frontend.configuration.SingleUserAuthentication;
+import com.hp.autonomy.frontend.configuration.authentication.Authentication;
+import com.hp.autonomy.frontend.configuration.authentication.AuthenticationConfig;
+import com.hp.autonomy.frontend.configuration.authentication.BCryptUsernameAndPassword;
+import com.hp.autonomy.frontend.configuration.authentication.SingleUserAuthentication;
 import com.hp.autonomy.hod.client.api.authentication.ApiKey;
 import com.hp.autonomy.hod.client.api.authentication.AuthenticationService;
 import com.hp.autonomy.hod.client.api.authentication.AuthenticationServiceImpl;
@@ -76,8 +76,8 @@ public class HodTestConfiguration {
 
         final HodSearchCapable config = mock(HodSearchCapable.class);
 
-        when(config.getQueryManipulation()).thenReturn(new QueryManipulationConfig(QUERY_PROFILE, QUERY_MANIPULATION_INDEX));
-        when(config.getFieldsInfo()).thenReturn(new FieldsInfo.Builder().build());
+        when(config.getQueryManipulation()).thenReturn(QueryManipulationConfig.builder().profile(QUERY_PROFILE).index(QUERY_MANIPULATION_INDEX).build());
+        when(config.getFieldsInfo()).thenReturn(FieldsInfo.builder().build());
 
         when(configService.getConfig()).thenReturn(config);
 
@@ -106,7 +106,12 @@ public class HodTestConfiguration {
         final ConfigService<AuthenticationConfig<?>> configService = (ConfigService<AuthenticationConfig<?>>) mock(ConfigService.class);
 
         final AuthenticationConfig<?> config = mock(AuthenticationConfig.class);
-        final SingleUserAuthentication login = new SingleUserAuthentication.Builder().setMethod("singleUser").setSingleUser(new BCryptUsernameAndPassword.Builder().setUsername("admin").build()).build();
+        final SingleUserAuthentication login = SingleUserAuthentication.builder()
+                .method("singleUser")
+                .singleUser(BCryptUsernameAndPassword.builder()
+                        .username("admin")
+                        .build())
+                .build();
 
         when(config.getAuthentication()).thenReturn((Authentication) login);
         when(configService.getConfig()).thenReturn((AuthenticationConfig) config);

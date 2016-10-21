@@ -1,0 +1,10 @@
+{
+  "someField": {
+    "names": ["SomeName", "SomeOtherName"]
+  },
+  "someNumberField": {
+    "names": ["SomeNumber"],
+    "type": "number",
+    "advanced": true
+  }
+}

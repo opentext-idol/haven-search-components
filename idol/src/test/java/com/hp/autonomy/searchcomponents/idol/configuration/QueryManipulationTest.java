@@ -6,62 +6,88 @@
 package com.hp.autonomy.searchcomponents.idol.configuration;
 
 import com.hp.autonomy.frontend.configuration.ConfigException;
-import com.hp.autonomy.frontend.configuration.ServerConfig;
-import org.junit.Before;
+import com.hp.autonomy.frontend.configuration.ConfigurationComponentTest;
+import com.hp.autonomy.frontend.configuration.server.ServerConfig;
+import com.hp.autonomy.types.requests.qms.actions.typeahead.params.ModeParam;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.springframework.boot.test.json.JsonContent;
+import org.springframework.boot.test.json.ObjectContent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.io.IOException;
 
-public class QueryManipulationTest {
-    private QueryManipulation queryManipulation;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.*;
 
-    @Before
-    public void setUp() {
-        final ServerConfig serverConfig = new ServerConfig.Builder().setHost("find-idol").setPort(16000).build();
-        queryManipulation = new QueryManipulation.Builder()
-                .setServer(serverConfig)
-                .setExpandQuery(true)
-                .setBlacklist("ISO_Blacklist")
-                .setEnabled(true)
-                .build();
-    }
-
-    @Test
-    public void validateGoodConfig() throws ConfigException {
-        queryManipulation.basicValidate();
-    }
-
+public class QueryManipulationTest extends ConfigurationComponentTest<QueryManipulation> {
     @Test(expected = ConfigException.class)
     public void validateBadConfig() throws ConfigException {
-        queryManipulation = new QueryManipulation.Builder()
-                .setEnabled(true)
-                .build();
-        queryManipulation.basicValidate();
+        QueryManipulation.builder()
+                .enabled(true)
+                .build()
+                .basicValidate(null);
     }
 
     @Test
     public void disabled() throws ConfigException {
-        queryManipulation = new QueryManipulation.Builder()
+        QueryManipulation.builder()
+                .build()
+                .basicValidate(null);
+    }
+
+    @Override
+    protected Class<QueryManipulation> getType() {
+        return QueryManipulation.class;
+    }
+
+    @Override
+    protected QueryManipulation constructComponent() {
+        final ServerConfig serverConfig = ServerConfig.builder()
+                .host("find-idol")
+                .port(16000)
                 .build();
-        queryManipulation.basicValidate();
+        return QueryManipulation.builder()
+                .server(serverConfig)
+                .expandQuery(true)
+                .blacklist("ISO_Blacklist")
+                .enabled(true)
+                .build();
     }
 
-    @Test
-    public void merge() {
-        final String blacklist = "OSI_Blacklist";
-        final QueryManipulation defaults = new QueryManipulation.Builder().setBlacklist(blacklist).build();
-        final QueryManipulation mergedConfig = queryManipulation.merge(defaults);
-        assertNotNull(mergedConfig.getServer());
-        assertTrue(mergedConfig.getExpandQuery());
-        assertEquals("ISO_Blacklist", mergedConfig.getBlacklist());
-        assertTrue(mergedConfig.getEnabled());
-        assertTrue(mergedConfig.isEnabled());
+    @Override
+    protected String sampleJson() throws IOException {
+        return IOUtils.toString(getClass().getResourceAsStream("/com/hp/autonomy/searchcomponents/idol/configuration/queryManipulation.json"));
     }
 
-    @Test
-    public void mergeWithNoDefaults() {
-        assertEquals(queryManipulation, queryManipulation.merge(null));
+    @Override
+    protected void validateJson(final JsonContent<QueryManipulation> jsonContent) {
+        jsonContent.assertThat().hasJsonPathStringValue("@.server.host", "find-idol");
+        jsonContent.assertThat().hasJsonPathNumberValue("@.server.port", 16000);
+        jsonContent.assertThat().hasJsonPathBooleanValue("@.expandQuery", true);
+        jsonContent.assertThat().hasJsonPathStringValue("@.blacklist", "ISO_Blacklist");
+        jsonContent.assertThat().hasJsonPathBooleanValue("@.enabled", true);
+    }
+
+    @Override
+    protected void validateParsedComponent(final ObjectContent<QueryManipulation> objectContent) {
+        assertThat(objectContent.getObject().getServer().getProductType(), hasSize(3));
+        objectContent.assertThat().hasFieldOrPropertyWithValue("typeAheadMode", ModeParam.Index);
+        objectContent.assertThat().hasFieldOrPropertyWithValue("expandQuery", true);
+        objectContent.assertThat().hasFieldOrPropertyWithValue("blacklist", "ISO_BLACKLIST");
+        objectContent.assertThat().hasFieldOrPropertyWithValue("enabled", false);
+    }
+
+    @Override
+    protected void validateMergedComponent(final ObjectContent<QueryManipulation> objectContent) {
+        assertThat(objectContent.getObject().getServer().getProductType(), hasSize(3));
+        objectContent.assertThat().hasFieldOrPropertyWithValue("typeAheadMode", ModeParam.Index);
+        objectContent.assertThat().hasFieldOrPropertyWithValue("expandQuery", true);
+        objectContent.assertThat().hasFieldOrPropertyWithValue("blacklist", "ISO_Blacklist");
+        objectContent.assertThat().hasFieldOrPropertyWithValue("enabled", true);
+    }
+
+    @Override
+    protected void validateString(final String objectAsString) {
+        assertTrue(objectAsString.contains("blacklist"));
     }
 }

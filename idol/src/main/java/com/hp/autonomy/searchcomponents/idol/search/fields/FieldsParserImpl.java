@@ -24,10 +24,12 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 class FieldsParserImpl implements FieldsParser {
@@ -54,12 +56,6 @@ class FieldsParserImpl implements FieldsParser {
                 fieldMap = new HashMap<>(childNodes.getLength());
 
                 parseAllFields(fieldConfig, childNodes, fieldMap, docContent.getNodeName());
-                for (final FieldInfo<?> fieldInfo : fieldMap.values()) {
-                    //noinspection SuspiciousMethodCalls
-                    fieldInfo.getNames().removeAll(Collections.singleton(null));
-                    //noinspection SuspiciousMethodCalls
-                    fieldInfo.getValues().removeAll(Collections.singleton(null));
-                }
                 qmsId = parseField(docContent, IdolDocumentFieldsService.QMS_ID_FIELD_INFO, String.class);
                 promotionCategory = determinePromotionCategory(docContent, hit.getPromotionname(), hit.getDatabase());
             }
@@ -82,15 +78,25 @@ class FieldsParserImpl implements FieldsParser {
                     final FieldType fieldType = fieldInfo.getType();
                     final Object value = fieldType.parseValue(fieldType.getType(), stringValue);
                     if (fieldMap.containsKey(id)) {
-                        final List<String> names = fieldInfo.getNames();
                         @SuppressWarnings({"unchecked", "CastToConcreteClass"})
                         final FieldInfo<Object> objectFieldInfo = (FieldInfo<Object>) fieldMap.get(id);
-                        objectFieldInfo.getValues().add(names.indexOf(name), value);
-                        objectFieldInfo.getNames().add(names.indexOf(name), name);
+                        @SuppressWarnings({"unchecked", "rawtypes"})
+                        final FieldInfo<?> updatedFieldInfo = objectFieldInfo.toBuilder()
+                                .name(name)
+                                .value(value)
+                                .build();
+                        fieldMap.put(id, updatedFieldInfo);
                     } else {
-                        final ArrayList<String> names = new ArrayList<>(fieldInfo.getNames().size());
+                        final Collection<String> names = new ArrayList<>(fieldInfo.getNames().size());
                         names.add(name);
-                        fieldMap.put(id, new FieldInfo<>(id, names, fieldInfo.getType(), fieldInfo.isAdvanced(), value));
+                        final FieldInfo<Object> fieldInfoWithValue = FieldInfo.builder()
+                                .id(id)
+                                .names(names)
+                                .type(fieldInfo.getType())
+                                .advanced(fieldInfo.isAdvanced())
+                                .value(value)
+                                .build();
+                        fieldMap.put(id, fieldInfoWithValue);
                     }
                 }
             } else if (node.getChildNodes().getLength() > 0) {
@@ -100,7 +106,11 @@ class FieldsParserImpl implements FieldsParser {
     }
 
     private FieldInfo<?> getFieldInfo(final Map<String, FieldInfo<?>> fieldConfig, final String name) {
-        return fieldConfig.containsKey(name) ? fieldConfig.get(name) : new FieldInfo<>(name, Collections.singletonList(name), FieldType.STRING, true);
+        return fieldConfig.containsKey(name) ? fieldConfig.get(name) : FieldInfo.builder()
+                .id(name)
+                .name(name)
+                .advanced(true)
+                .build();
     }
 
     private PromotionCategory determinePromotionCategory(final Element docContent, final CharSequence promotionName, final CharSequence database) {
@@ -132,7 +142,7 @@ class FieldsParserImpl implements FieldsParser {
     }
 
     private <T> T parseField(final Element node, final FieldInfo<T> fieldInfo, final Class<T> type) {
-        final List<T> fields = parseFields(node, fieldInfo.getNames().get(0), fieldInfo.getType(), type);
+        final List<T> fields = parseFields(node, fieldInfo.getNames().iterator().next(), fieldInfo.getType(), type);
         return CollectionUtils.isNotEmpty(fields) ? fields.get(0) : null;
     }
 }

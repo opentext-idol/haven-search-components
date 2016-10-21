@@ -1,0 +1,16 @@
+{
+  "server": {
+    "protocol": "HTTP",
+    "host": "localhost",
+    "port": 16000,
+    "productType": [
+      "QMS",
+      "DAH",
+      "IDOLPROXY"
+    ]
+  },
+  "typeAheadMode": "Index",
+  "expandQuery": true,
+  "blacklist": "ISO_BLACKLIST",
+  "enabled": false
+}
