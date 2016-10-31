@@ -5,10 +5,13 @@
 
 package com.hp.autonomy.searchcomponents.core.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.autonomy.frontend.configuration.ConfigurationComponentTest;
 import org.apache.commons.io.IOUtils;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.boot.test.json.ObjectContent;
+import org.springframework.core.ResolvableType;
 
 import java.io.IOException;
 import java.util.Map;
@@ -22,6 +25,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class FieldsInfoTest extends ConfigurationComponentTest<FieldsInfo> {
+    @Override
+    public void setUp() {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.addMixIn(FieldInfo.class, FieldInfoConfigMixins.class);
+        json = new JacksonTester<>(getClass(), ResolvableType.forClass(getType()), objectMapper);
+    }
+
     @Override
     protected Class<FieldsInfo> getType() {
         return FieldsInfo.class;

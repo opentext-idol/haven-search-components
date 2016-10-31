@@ -5,7 +5,6 @@
 
 package com.hp.autonomy.searchcomponents.core.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -39,30 +38,25 @@ public class FieldInfo<T> implements Serializable {
     @Singular
     private final List<T> values;
 
-    @JsonIgnore
     public String getId() {
         return id;
     }
 
     @SuppressWarnings("unused")
-    @JsonProperty("type")
     public String getTypeAsString() {
         return type == FieldType.STRING ? null : type.name().toLowerCase();
     }
 
     @SuppressWarnings("unused")
-    @JsonProperty("advanced")
     public Boolean isAdvancedIfNotDefault() {
         return advanced ? true : null;
     }
 
     @SuppressWarnings("unused")
-    @JsonProperty("names")
     public Set<String> getNamesIfNotEmpty() {
         return names.isEmpty() ? null : names;
     }
 
-    @JsonIgnore
     public List<T> getValues() {
         return Collections.unmodifiableList(values);
     }
