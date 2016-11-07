@@ -24,10 +24,11 @@ public class IdolTestAuthenticationConfiguration {
         final CommunityPrincipal communityPrincipal = mock(CommunityPrincipal.class);
         when(communityPrincipal.getId()).thenReturn(1L);
         when(communityPrincipal.getUsername()).thenReturn("user");
+        when(communityPrincipal.getName()).thenReturn("user");
         when(authentication.getPrincipal()).thenReturn(communityPrincipal);
 
         @SuppressWarnings("unchecked")
-        final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever = mock(AuthenticationInformationRetriever.class);
+        final AuthenticationInformationRetriever<UsernamePasswordAuthenticationToken, CommunityPrincipal> authenticationInformationRetriever = mock(AuthenticationInformationRetriever.class);
         when(authenticationInformationRetriever.getAuthentication()).thenReturn(authentication);
         when(authenticationInformationRetriever.getPrincipal()).thenReturn(communityPrincipal);
         return authenticationInformationRetriever;
