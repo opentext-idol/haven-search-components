@@ -16,10 +16,11 @@ import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
 public abstract class AbstractDatabasesServiceIT<D extends IdolDatabase, R extends DatabasesRequest, E extends Exception> {
     @Autowired
-    private DatabasesService<D, R, E> databasesService;
+    DatabasesService<D, R, E> databasesService;
 
     protected abstract R createDatabasesRequest();
 
