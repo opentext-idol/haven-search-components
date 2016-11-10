@@ -7,11 +7,8 @@ package com.hp.autonomy.searchcomponents.hod.languages;
 
 import com.hp.autonomy.searchcomponents.core.languages.AbstractLanguagesServiceIT;
 import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConfiguration;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = HavenSearchHodConfiguration.class)
 public class HodLanguagesServiceIT extends AbstractLanguagesServiceIT {
 }
