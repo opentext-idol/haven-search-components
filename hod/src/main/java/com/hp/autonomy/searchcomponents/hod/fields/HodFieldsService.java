@@ -23,13 +23,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static com.hp.autonomy.searchcomponents.core.fields.FieldsService.FIELD_SERVICE_BEAN_NAME;
+
+/**
+ * Default HoD implementation of {@link FieldsService}: retrieves lists of field names for the supplied types
+ */
 @SuppressWarnings("WeakerAccess")
-@Service
-public class HodFieldsService implements FieldsService<HodFieldsRequest, HodErrorException> {
+@Service(FIELD_SERVICE_BEAN_NAME)
+class HodFieldsService implements FieldsService<HodFieldsRequest, HodErrorException> {
     private final RetrieveIndexFieldsService retrieveIndexFieldsService;
 
     @Autowired
-    public HodFieldsService(final RetrieveIndexFieldsService retrieveIndexFieldsService) {
+    HodFieldsService(final RetrieveIndexFieldsService retrieveIndexFieldsService) {
         this.retrieveIndexFieldsService = retrieveIndexFieldsService;
     }
 

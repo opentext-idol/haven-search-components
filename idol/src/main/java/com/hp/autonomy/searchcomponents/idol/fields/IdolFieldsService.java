@@ -27,14 +27,19 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.hp.autonomy.searchcomponents.core.fields.FieldsService.FIELD_SERVICE_BEAN_NAME;
+
+/**
+ * Default Idol implementation of {@link FieldsService}: sends a GetTagNames action for each desired fieldType and parses the responses into a map
+ */
 @SuppressWarnings("WeakerAccess")
-@Service
-public class IdolFieldsService implements FieldsService<IdolFieldsRequest, AciErrorException> {
+@Service(FIELD_SERVICE_BEAN_NAME)
+class IdolFieldsService implements FieldsService<IdolFieldsRequest, AciErrorException> {
     private final AciService contentAciService;
     private final Processor<GetTagNamesResponseData> tagNamesResponseProcessor;
 
     @Autowired
-    public IdolFieldsService(final AciService contentAciService, final ProcessorFactory aciResponseProcessorFactory) {
+    IdolFieldsService(final AciService contentAciService, final ProcessorFactory aciResponseProcessorFactory) {
         this.contentAciService = contentAciService;
         tagNamesResponseProcessor = aciResponseProcessorFactory.getResponseDataProcessor(GetTagNamesResponseData.class);
     }
