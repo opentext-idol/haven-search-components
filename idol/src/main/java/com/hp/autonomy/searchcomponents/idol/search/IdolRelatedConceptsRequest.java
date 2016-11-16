@@ -21,9 +21,9 @@ public class IdolRelatedConceptsRequest implements RelatedConceptsRequest<String
 
     private static final int MAX_RESULTS_DEFAULT = 200;
 
-    private int querySummaryLength;
-    private Integer maxResults;
-    private QueryRestrictions<String> queryRestrictions;
+    private final int querySummaryLength;
+    private final Integer maxResults;
+    private final QueryRestrictions<String> queryRestrictions;
 
     @SuppressWarnings("unused")
     @JsonPOJOBuilder(withPrefix = "")

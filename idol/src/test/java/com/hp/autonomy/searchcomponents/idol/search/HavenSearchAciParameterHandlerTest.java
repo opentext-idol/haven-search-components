@@ -134,4 +134,10 @@ public class HavenSearchAciParameterHandlerTest {
         parameterHandler.addQmsParameters(aciParameters, null);
         assertThat(aciParameters, hasSize(2));
     }
+
+    @Test
+    public void addStoreStateParameters() {
+        parameterHandler.addStoreStateParameters(aciParameters);
+        assertThat(aciParameters, hasSize(2));
+    }
 }

@@ -25,6 +25,7 @@ import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.core.test.TestUtils;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationConfig;
 import com.hp.autonomy.searchcomponents.hod.test.HodTestUtils;
@@ -56,31 +57,31 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class HodDocumentServiceTest {
     @Mock
-    protected FindSimilarService<HodSearchResult> findSimilarService;
+    private FindSimilarService<HodSearchResult> findSimilarService;
 
     @Mock
-    protected ConfigService<HodSearchCapable> configService;
+    private ConfigService<HodSearchCapable> configService;
 
     @Mock
-    protected HodSearchCapable config;
+    private HodSearchCapable config;
 
     @Mock
-    protected QueryTextIndexService<HodSearchResult> queryTextIndexService;
+    private QueryTextIndexService<HodSearchResult> queryTextIndexService;
 
     @Mock
-    protected GetContentService<HodSearchResult> getContentService;
+    private GetContentService<HodSearchResult> getContentService;
 
     @Mock
-    protected AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
+    private AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Mock
-    protected DocumentFieldsService documentFieldsService;
+    private DocumentFieldsService documentFieldsService;
 
     @Mock
-    protected HodAuthenticationPrincipal hodAuthenticationPrincipal;
+    private HodAuthenticationPrincipal hodAuthenticationPrincipal;
 
-    protected HodDocumentsService documentsService;
-    protected final HodTestUtils testUtils = new HodTestUtils();
+    private HodDocumentsService documentsService;
+    private final TestUtils<ResourceIdentifier> testUtils = new HodTestUtils();
 
     @Before
     public void setUp() {

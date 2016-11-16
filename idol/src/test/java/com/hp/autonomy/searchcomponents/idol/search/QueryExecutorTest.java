@@ -1,0 +1,75 @@
+/*
+ * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
+ */
+
+package com.hp.autonomy.searchcomponents.idol.search;
+
+import com.autonomy.aci.client.services.AciService;
+import com.autonomy.aci.client.util.AciParameters;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
+import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
+public class QueryExecutorTest {
+    @Mock
+    private AciServiceRetriever aciServiceRetriever;
+    @Mock
+    private AciService aciService;
+    @Mock
+    private ProcessorFactory processorFactory;
+
+    private QueryExecutor queryExecutor;
+
+    @Before
+    public void setUp() {
+        when(aciServiceRetriever.getAciService(any())).thenReturn(aciService);
+
+        queryExecutor = new QueryExecutorImpl(aciServiceRetriever, processorFactory);
+    }
+
+    @Test
+    public void performRawQuery() {
+        assertTrue(queryExecutor.performQuery(SearchRequest.QueryType.RAW));
+    }
+
+    @Test
+    public void performModifiedQuery() {
+        assertTrue(queryExecutor.performQuery(SearchRequest.QueryType.MODIFIED));
+    }
+
+    @Test
+    public void performPromotionsQueryNoQms() {
+        assertFalse(queryExecutor.performQuery(SearchRequest.QueryType.PROMOTIONS));
+    }
+
+    @Test
+    public void performPromotionsQueryAndQms() {
+        when(aciServiceRetriever.qmsEnabled()).thenReturn(true);
+        assertTrue(queryExecutor.performQuery(SearchRequest.QueryType.PROMOTIONS));
+    }
+
+    @Test
+    public void executeQuery() {
+        queryExecutor.executeQuery(new AciParameters(), SearchRequest.QueryType.MODIFIED);
+        verify(aciService).executeAction(any(), any());
+    }
+
+    @Test
+    public void executeSuggest() {
+        queryExecutor.executeSuggest(new AciParameters(), SearchRequest.QueryType.RAW);
+        verify(aciService).executeAction(any(), any());
+    }
+}

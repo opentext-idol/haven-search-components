@@ -11,10 +11,10 @@ import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import java.util.Set;
 
 /**
- * Contains reusable constants relating to the hod implementation of {@link DatabasesService}
+ * Contains reusable constants relating to the HoD implementation of {@link DatabasesService}
  */
 @SuppressWarnings("WeakerAccess")
-public interface HodDatabaseServiceConstants {
+public interface HodDatabasesServiceConstants {
     /**
      * THe flavours of HoD resource to include in list of indexes
      */

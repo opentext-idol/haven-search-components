@@ -23,7 +23,6 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.warning.HodWarning;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
@@ -36,18 +35,28 @@ import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.types.requests.Documents;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.NotImplementedException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-@SuppressWarnings("WeakerAccess")
+import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.DOCUMENTS_SERVICE_BEAN_NAME;
+import static com.hp.autonomy.searchcomponents.hod.search.HodDocumentsServiceConstants.HOD_MAX_RESULTS;
+
+/**
+ * Default Hod implementation of {@link DocumentsService}
+ */
 @Slf4j
-public class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
-    // IOD limits max results to 2500
-    public static final int HOD_MAX_RESULTS = 2500;
-
+@Service(DOCUMENTS_SERVICE_BEAN_NAME)
+class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
     private static final ImmutableSet<String> PUBLIC_INDEX_NAMES = ImmutableSet.of(
             ResourceIdentifier.WIKI_CHI.getName(),
             ResourceIdentifier.WIKI_ENG.getName(),
@@ -72,7 +81,8 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     private final DocumentFieldsService documentFieldsService;
 
     @SuppressWarnings("ConstructorWithTooManyParameters")
-    public HodDocumentsService(
+    @Autowired
+    HodDocumentsService(
             final FindSimilarService<HodSearchResult> findSimilarService,
             final ConfigService<? extends HodSearchCapable> configService,
             final QueryTextIndexService<HodSearchResult> queryTextIndexService,
@@ -129,7 +139,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
 
     private void checkForWarnings(final QueryResults<HodSearchResult> results) {
         final List<HodWarning> warnings = results.getHodWarnings();
-        if(!warnings.isEmpty()) {
+        if (!warnings.isEmpty()) {
             for (final HodWarning warning : warnings) {
                 log.warn("HoD returned a warning of type " + warning);
             }

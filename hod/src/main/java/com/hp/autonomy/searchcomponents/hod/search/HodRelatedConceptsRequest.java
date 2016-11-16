@@ -22,9 +22,9 @@ public class HodRelatedConceptsRequest implements RelatedConceptsRequest<Resourc
 
     private static final int MAX_RESULTS_DEFAULT = 200;
 
-    private int querySummaryLength;
-    private Integer maxResults;
-    private QueryRestrictions<ResourceIdentifier> queryRestrictions;
+    private final int querySummaryLength;
+    private final Integer maxResults;
+    private final QueryRestrictions<ResourceIdentifier> queryRestrictions;
 
     @SuppressWarnings("unused")
     @JsonPOJOBuilder(withPrefix = "")

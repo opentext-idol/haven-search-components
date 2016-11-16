@@ -174,6 +174,12 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.SecurityInfo.name(), securityInfo);
     }
 
+    @Override
+    public void addStoreStateParameters(final AciParameters aciParameters) {
+        aciParameters.add(QueryParams.StoreState.name(), true);
+        aciParameters.add(QueryParams.StoredStateTokenLifetime.name(), -1);  // negative value means no expiry (DAH)
+    }
+
     protected String formatDate(final ReadableInstant date) {
         return date == null ? null : DateTimeFormat.forPattern(IDOL_DATE_PARAMETER_FORMAT).print(date);
     }
