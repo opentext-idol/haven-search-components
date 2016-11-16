@@ -14,8 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class IdolFieldsServiceIT extends AbstractFieldsServiceIT<IdolFieldsRequest, String, AciErrorException> {
     @Override
     protected IdolFieldsRequest createFieldsRequest() {
-        return new IdolFieldsRequest.Builder()
-                .setMaxValues(null)
+        return IdolFieldsRequest.builder()
+                .maxValues(null)
                 .build();
     }
 }

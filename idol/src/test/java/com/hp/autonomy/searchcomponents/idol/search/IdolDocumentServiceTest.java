@@ -116,17 +116,17 @@ public class IdolDocumentServiceTest {
 
         when(aciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
-        final IdolQueryRestrictions queryRestrictions = new IdolQueryRestrictions.Builder().build();
-        final SuggestRequest<String> suggestRequest = new SuggestRequest.Builder<String>()
-                .setReference("Some reference")
-                .setQueryRestrictions(queryRestrictions)
-                .setStart(1)
-                .setMaxResults(50)
-                .setSummary(SummaryParam.Context.name())
-                .setSummaryCharacters(250)
-                .setSort(null)
-                .setHighlight(true)
-                .setPrint(PrintParam.Fields.name())
+        final IdolQueryRestrictions queryRestrictions = IdolQueryRestrictions.builder().build();
+        final SuggestRequest<String> suggestRequest = SuggestRequest.<String>builder()
+                .reference("Some reference")
+                .queryRestrictions(queryRestrictions)
+                .start(1)
+                .maxResults(50)
+                .summary(SummaryParam.Context.name())
+                .summaryCharacters(250)
+                .sort(null)
+                .highlight(true)
+                .print(PrintParam.Fields.name())
                 .build();
         idolDocumentService.findSimilar(suggestRequest);
         verify(queryResponseParser).parseQueryHits(responseData.getHits());
@@ -141,7 +141,10 @@ public class IdolDocumentServiceTest {
 
         when(aciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
-        final GetContentRequest<String> getContentRequest = new GetContentRequest<>(Collections.singleton(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference"))), PrintParam.Fields.name());
+        final GetContentRequest<String> getContentRequest = GetContentRequest.<String>builder()
+                .indexAndReferences(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference")))
+                .print(PrintParam.Fields.name())
+                .build();
         idolDocumentService.getDocumentContent(getContentRequest);
         verify(queryResponseParser).parseQueryHits(responseData.getHits());
     }
@@ -165,18 +168,22 @@ public class IdolDocumentServiceTest {
 
     // Used in Find's DocumentService test
     protected SearchRequest<String> mockQueryParams(final SearchRequest.QueryType queryType) {
-        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setDatabases(Arrays.asList("Database1", "Database2")).setMaxDate(DateTime.now()).build();
-        return new SearchRequest.Builder<String>()
-                .setQueryRestrictions(queryRestrictions)
-                .setStart(1)
-                .setMaxResults(50)
-                .setSummary(SummaryParam.Concept.name())
-                .setSummaryCharacters(250)
-                .setSort(null)
-                .setHighlight(true)
-                .setAutoCorrect(true)
-                .setPrint(PrintParam.Fields.name())
-                .setQueryType(queryType)
+        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder()
+                .queryText("*")
+                .databases(Arrays.asList("Database1", "Database2"))
+                .maxDate(DateTime.now())
+                .build();
+        return SearchRequest.<String>builder()
+                .queryRestrictions(queryRestrictions)
+                .start(1)
+                .maxResults(50)
+                .summary(SummaryParam.Concept.name())
+                .summaryCharacters(250)
+                .sort(null)
+                .highlight(true)
+                .autoCorrect(true)
+                .print(PrintParam.Fields.name())
+                .queryType(queryType)
                 .build();
     }
 

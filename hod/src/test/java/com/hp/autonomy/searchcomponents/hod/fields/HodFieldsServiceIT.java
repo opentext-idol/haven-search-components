@@ -15,9 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class HodFieldsServiceIT extends AbstractFieldsServiceIT<HodFieldsRequest, ResourceIdentifier, HodErrorException> {
     @Override
     protected HodFieldsRequest createFieldsRequest() {
-        return new HodFieldsRequest.Builder()
-                .setDatabases(testUtils.getDatabases())
-                .setMaxValues(null)
+        return HodFieldsRequest.builder()
+                .databases(testUtils.getDatabases())
+                .maxValues(null)
                 .build();
     }
 }

@@ -10,19 +10,13 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import org.springframework.stereotype.Component;
 
 @SuppressWarnings({"FieldMayBeFinal", "WeakerAccess"})
 @Data
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@JsonDeserialize(builder = HodRelatedConceptsRequest.Builder.class)
+@Builder(toBuilder = true)
+@JsonDeserialize(builder = HodRelatedConceptsRequest.HodRelatedConceptsRequestBuilder.class)
 public class HodRelatedConceptsRequest implements RelatedConceptsRequest<ResourceIdentifier> {
     private static final long serialVersionUID = 3450911770365743948L;
 
@@ -32,24 +26,10 @@ public class HodRelatedConceptsRequest implements RelatedConceptsRequest<Resourc
     private Integer maxResults;
     private QueryRestrictions<ResourceIdentifier> queryRestrictions;
 
-    @Component
-    @JsonPOJOBuilder(withPrefix = "set")
-    @Setter
-    @Accessors(chain = true)
-    @NoArgsConstructor
-    public static class Builder implements RelatedConceptsRequest.Builder<HodRelatedConceptsRequest, ResourceIdentifier> {
+    @SuppressWarnings("unused")
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class HodRelatedConceptsRequestBuilder implements RelatedConceptsRequest.RelatedConceptsRequestBuilder<HodRelatedConceptsRequest, ResourceIdentifier> {
         private int querySummaryLength = 0;
         private Integer maxResults = MAX_RESULTS_DEFAULT;
-        private QueryRestrictions<ResourceIdentifier> queryRestrictions;
-
-        public Builder(final RelatedConceptsRequest<ResourceIdentifier> relatedConceptsRequest) {
-            querySummaryLength = relatedConceptsRequest.getQuerySummaryLength();
-            queryRestrictions = relatedConceptsRequest.getQueryRestrictions();
-        }
-
-        @Override
-        public HodRelatedConceptsRequest build() {
-            return new HodRelatedConceptsRequest(querySummaryLength, maxResults, queryRestrictions);
-        }
     }
 }

@@ -5,14 +5,36 @@
 
 package com.hp.autonomy.searchcomponents.core.fields;
 
-import java.io.Serializable;
+import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 
-@FunctionalInterface
-public interface FieldsRequest extends Serializable {
+/**
+ * Options for interacting with {@link FieldsService}
+ */
+@SuppressWarnings("unused")
+public interface FieldsRequest extends RequestObject<FieldsRequest, FieldsRequest.FieldsRequestBuilder<?>> {
+    /**
+     * Max results to return in fields response
+     *
+     * @return Max results to return in fields response
+     */
     Integer getMaxValues();
 
-    @FunctionalInterface
-    interface Builder<F extends FieldsRequest> {
+    /**
+     * Builder for {@link FieldsRequest}
+     */
+    interface FieldsRequestBuilder<F extends FieldsRequest> extends RequestObject.RequestObjectBuilder<FieldsRequest, FieldsRequestBuilder<?>> {
+        /**
+         * Sets max results to return in fields response
+         *
+         * @param maxValues Max results to return in fields response
+         * @return The builder
+         */
+        FieldsRequestBuilder<F> maxValues(Integer maxValues);
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         F build();
     }
 }

@@ -32,8 +32,9 @@ public abstract class IntegrationTestUtils<S extends Serializable, D extends Sea
 
     public String getValidReference() throws E {
         final QueryRestrictions<S> queryRestrictions = buildQueryRestrictions();
-        final SearchRequest<S> searchRequest = new SearchRequest<>();
-        searchRequest.setQueryRestrictions(queryRestrictions);
+        final SearchRequest<S> searchRequest = SearchRequest.<S>builder()
+                .queryRestrictions(queryRestrictions)
+                .build();
         final Documents<D> documents = documentsService.queryTextIndex(searchRequest);
         return documents.getDocuments().get(0).getReference();
     }

@@ -14,8 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class HodDatabasesServiceIT extends AbstractDatabasesServiceIT<Database, HodDatabasesRequest, HodErrorException> {
     @Override
     protected HodDatabasesRequest createDatabasesRequest() {
-        return new HodDatabasesRequest.Builder()
-                .setPublicIndexesEnabled(true)
+        return HodDatabasesRequest.builder()
+                .publicIndexesEnabled(true)
                 .build();
     }
 }

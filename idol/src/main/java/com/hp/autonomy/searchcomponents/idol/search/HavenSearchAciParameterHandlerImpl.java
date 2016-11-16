@@ -68,11 +68,11 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         if (!queryRestrictions.getDatabases().isEmpty()) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(queryRestrictions.getDatabases()));
         }
-        if (!queryRestrictions.getStateMatchId().isEmpty()) {
-            aciParameters.add(QueryParams.StateMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateMatchId()));
+        if (!queryRestrictions.getStateMatchIds().isEmpty()) {
+            aciParameters.add(QueryParams.StateMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateMatchIds()));
         }
-        if (!queryRestrictions.getStateDontMatchId().isEmpty()) {
-            aciParameters.add(QueryParams.StateDontMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateDontMatchId()));
+        if (!queryRestrictions.getStateDontMatchIds().isEmpty()) {
+            aciParameters.add(QueryParams.StateDontMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateDontMatchIds()));
         }
 
         aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);

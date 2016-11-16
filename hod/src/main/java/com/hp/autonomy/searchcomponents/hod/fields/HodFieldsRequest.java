@@ -9,48 +9,28 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import lombok.Singular;
 
 import java.util.Collection;
-import java.util.Collections;
 
-@SuppressWarnings("FieldMayBeFinal")
+/**
+ * Options for interacting with HoD implementation of {@link FieldsService}
+ */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@JsonDeserialize(builder = HodFieldsRequest.Builder.class)
+@Builder(toBuilder = true)
+@JsonDeserialize(builder = HodFieldsRequest.HodFieldsRequestBuilder.class)
 public class HodFieldsRequest implements FieldsRequest {
     private static final long serialVersionUID = 3450911770365743948L;
 
-    private Collection<ResourceIdentifier> databases = Collections.emptySet();
+    @Singular
+    private Collection<ResourceIdentifier> databases;
     private Integer maxValues;
 
-    @Component
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    @JsonPOJOBuilder(withPrefix = "set")
-    @Setter
-    @Accessors(chain = true)
-    @NoArgsConstructor
-    public static class Builder implements FieldsRequest.Builder<HodFieldsRequest> {
-        private Collection<ResourceIdentifier> databases = Collections.emptySet();
-        private Integer maxValues;
-
-        public Builder(final HodFieldsRequest fieldsRequest) {
-            databases = fieldsRequest.getDatabases();
-            maxValues = fieldsRequest.getMaxValues();
-        }
-
-        @Override
-        public HodFieldsRequest build() {
-            return new HodFieldsRequest(databases, maxValues);
-        }
+    @SuppressWarnings("WeakerAccess")
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class HodFieldsRequestBuilder implements FieldsRequest.FieldsRequestBuilder<HodFieldsRequest> {
     }
 }

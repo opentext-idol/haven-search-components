@@ -23,11 +23,11 @@ public class HodTestUtils implements TestUtils<ResourceIdentifier> {
 
     @Override
     public QueryRestrictions<ResourceIdentifier> buildQueryRestrictions() {
-        return new HodQueryRestrictions.Builder()
-                .setQueryText("*")
-                .setFieldText("")
-                .setDatabases(getDatabases())
-                .setAnyLanguage(true)
+        return HodQueryRestrictions.builder()
+                .queryText("*")
+                .fieldText("")
+                .databases(getDatabases())
+                .anyLanguage(true)
                 .build();
     }
 }

@@ -75,7 +75,7 @@ public class QueryResponseParserImpl implements QueryResponseParser {
         Warnings warnings = null;
         for (final String warning : responseData.getWarning()) {
             if (MISSING_DATABASE_WARNING.equals(warning.trim())) {
-                final Set<Database> updatedDatabases = databasesService.getDatabases(new IdolDatabasesRequest());
+                final Set<Database> updatedDatabases = databasesService.getDatabases(IdolDatabasesRequest.builder().build());
                 final List<String> oldQueryRestrictionDatabases = searchRequest.getQueryRestrictions().getDatabases();
                 final Set<String> badDatabases = new LinkedHashSet<>(oldQueryRestrictionDatabases);
                 for (final Database database : updatedDatabases) {

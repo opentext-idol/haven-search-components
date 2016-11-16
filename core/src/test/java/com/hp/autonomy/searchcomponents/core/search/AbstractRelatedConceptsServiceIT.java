@@ -18,19 +18,25 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
 public abstract class AbstractRelatedConceptsServiceIT<Q extends QuerySummaryElement, S extends Serializable, E extends Exception> {
     @Autowired
     private RelatedConceptsService<Q, S, E> relatedConceptsService;
 
     @Autowired
-    protected TestUtils<S> testUtils;
+    private RelatedConceptsRequest.RelatedConceptsRequestBuilder<? extends RelatedConceptsRequest<S>, S> relatedConceptsRequestBuilder;
 
-    protected abstract RelatedConceptsRequest<S> createRelatedConceptsRequest();
+    @Autowired
+    protected TestUtils<S> testUtils;
 
     @Test
     public void findRelatedConcepts() throws E {
-        final List<Q> results = relatedConceptsService.findRelatedConcepts(createRelatedConceptsRequest());
+        final RelatedConceptsRequest<S> request = relatedConceptsRequestBuilder
+                .queryRestrictions(testUtils.buildQueryRestrictions())
+                .querySummaryLength(50)
+                .build();
+        final List<Q> results = relatedConceptsService.findRelatedConcepts(request);
         assertThat(results, is(not(empty())));
     }
 }

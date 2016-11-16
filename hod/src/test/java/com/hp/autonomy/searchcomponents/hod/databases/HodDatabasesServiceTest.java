@@ -60,8 +60,8 @@ public class HodDatabasesServiceTest {
 
     @Test
     public void getAllIndexes() throws HodErrorException {
-        final HodDatabasesRequest databasesRequest = new HodDatabasesRequest.Builder()
-                .setPublicIndexesEnabled(true)
+        final HodDatabasesRequest databasesRequest = HodDatabasesRequest.builder()
+                .publicIndexesEnabled(true)
                 .build();
 
         final Set<Database> results = databasesService.getDatabases(databasesRequest);
@@ -70,8 +70,8 @@ public class HodDatabasesServiceTest {
 
     @Test
     public void getPrivateIndexes() throws HodErrorException {
-        final HodDatabasesRequest databasesRequest = new HodDatabasesRequest.Builder()
-                .setPublicIndexesEnabled(false)
+        final HodDatabasesRequest databasesRequest = HodDatabasesRequest.builder()
+                .publicIndexesEnabled(false)
                 .build();
 
         final Set<Database> results = databasesService.getDatabases(databasesRequest);

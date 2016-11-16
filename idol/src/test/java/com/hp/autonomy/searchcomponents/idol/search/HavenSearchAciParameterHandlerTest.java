@@ -60,14 +60,14 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addSearchRestrictions() {
-        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder()
-                .setQueryText("Some Text")
-                .setFieldText("Some field text")
-                .setDatabases(Collections.singletonList("Database1"))
-                .setStateMatchId(Collections.singletonList("stateID1"))
-                .setStateDontMatchId(Collections.singletonList("stateID2"))
-                .setMaxDate(DateTime.now())
-                .setAnyLanguage(true)
+        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder()
+                .queryText("Some Text")
+                .fieldText("Some field text")
+                .databases(Collections.singletonList("Database1"))
+                .stateMatchId("stateID1")
+                .stateDontMatchId("stateID2")
+                .maxDate(DateTime.now())
+                .anyLanguage(true)
                 .build();
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
         assertThat(aciParameters, hasSize(10));
@@ -75,18 +75,18 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addSearchOutputParameters() {
-        final AciSearchRequest<String> searchRequest = new SearchRequest.Builder<String>()
-                .setQueryRestrictions(null)
-                .setStart(1)
-                .setMaxResults(50)
-                .setSummary(SummaryParam.Concept.name())
-                .setSummaryCharacters(250)
-                .setSort(null)
-                .setHighlight(true)
-                .setAutoCorrect(true)
-                .setPrint(PrintParam.Fields.name())
-                .setPrintFields(Arrays.asList("CATEGORY", "REFERENCE"))
-                .setQueryType(null)
+        final AciSearchRequest<String> searchRequest = SearchRequest.<String>builder()
+                .queryRestrictions(null)
+                .start(1)
+                .maxResults(50)
+                .summary(SummaryParam.Concept.name())
+                .summaryCharacters(250)
+                .sort(null)
+                .highlight(true)
+                .autoCorrect(true)
+                .print(PrintParam.Fields.name())
+                .printFields(Arrays.asList("CATEGORY", "REFERENCE"))
+                .queryType(null)
                 .build();
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
         assertThat(aciParameters, hasSize(14));
@@ -107,21 +107,21 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addLanguageType() {
-        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setLanguageType("englishUTF8").build();
+        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder().languageType("englishUTF8").build();
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
         assertThat(aciParameters, hasItem(new AciParameter(QueryParams.LanguageType.name(), "englishUTF8")));
     }
 
     @Test
     public void defaultLanguageType() {
-        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().build();
+        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder().build();
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
         assertThat(aciParameters, Matchers.empty());
     }
 
     @Test
     public void noLanguageRestriction() {
-        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setAnyLanguage(true).build();
+        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder().anyLanguage(true).build();
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
         assertThat(aciParameters, hasItem(new AciParameter(QueryParams.AnyLanguage.name(), true)));
     }

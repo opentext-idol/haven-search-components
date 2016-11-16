@@ -16,7 +16,9 @@ import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationConfig;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
@@ -31,12 +33,19 @@ import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationR
 import org.apache.commons.lang3.NotImplementedException;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
@@ -56,32 +66,42 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(MockitoJUnitRunner.class)
+@SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY)
 public class HodParametricValuesServiceTest {
-    @Mock
-    protected GetParametricValuesService getParametricValuesService;
+    @ClassRule
+    public static final SpringClassRule SCR = new SpringClassRule();
+    @Rule
+    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     @Mock
-    protected FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
+    private GetParametricValuesService getParametricValuesService;
 
     @Mock
-    protected ConfigService<HodSearchCapable> configService;
+    private FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
+
+    @Autowired
+    private BucketingParamsHelper bucketingParamsHelper;
 
     @Mock
-    protected AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
+    private ConfigService<HodSearchCapable> configService;
+
+    @Mock
+    private AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Mock
     private HodAuthenticationPrincipal hodAuthenticationPrincipal;
 
     @Mock
-    protected HodSearchCapable config;
+    private HodSearchCapable config;
 
-    protected HodParametricValuesService parametricValuesService;
+    private HodParametricValuesService parametricValuesService;
 
+    @SuppressWarnings("CastToConcreteClass")
     @Before
     public void setUp() throws HodErrorException {
-        parametricValuesService = new HodParametricValuesService(fieldsService, getParametricValuesService(), configService, authenticationInformationRetriever);
+        parametricValuesService = new HodParametricValuesService(fieldsService, getParametricValuesService(), bucketingParamsHelper, configService, authenticationInformationRetriever);
     }
 
     @Before
@@ -239,14 +259,14 @@ public class HodParametricValuesServiceTest {
 
     @Test(expected = NotImplementedException.class)
     public void dependentParametricValues() throws HodErrorException {
-        parametricValuesService.getDependentParametricValues(new HodParametricRequest.Builder().build());
+        parametricValuesService.getDependentParametricValues(HodParametricRequest.builder().build());
     }
 
-    private HodParametricRequest generateRequest(final List<ResourceIdentifier> indexes, final List<String> fieldNames) {
-        final QueryRestrictions<ResourceIdentifier> queryRestrictions = new HodQueryRestrictions.Builder().setDatabases(indexes).build();
-        return new HodParametricRequest.Builder()
-                .setFieldNames(fieldNames)
-                .setQueryRestrictions(queryRestrictions)
+    private HodParametricRequest generateRequest(final Collection<ResourceIdentifier> indexes, final Collection<String> fieldNames) {
+        final QueryRestrictions<ResourceIdentifier> queryRestrictions = HodQueryRestrictions.builder().databases(indexes).build();
+        return HodParametricRequest.builder()
+                .fieldNames(fieldNames)
+                .queryRestrictions(queryRestrictions)
                 .build();
     }
 
@@ -256,7 +276,7 @@ public class HodParametricValuesServiceTest {
                 .build();
     }
 
-    protected GetParametricValuesService getParametricValuesService() throws HodErrorException {
+    private GetParametricValuesService getParametricValuesService() throws HodErrorException {
         final Map<String, Integer> fieldsOfFootball = new LinkedHashMap<>();
         fieldsOfFootball.put("worms", 100);
         fieldsOfFootball.put("slugs", 50);
@@ -281,5 +301,4 @@ public class HodParametricValuesServiceTest {
 
         return getParametricValuesService;
     }
-
 }
