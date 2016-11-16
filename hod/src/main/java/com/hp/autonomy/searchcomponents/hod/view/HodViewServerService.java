@@ -21,9 +21,9 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexServi
 import com.hp.autonomy.hod.client.error.HodErrorCode;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,20 +44,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.VIEW_SERVER_SERVICE_BEAN_NAME;
 
 /**
- * Implementation of {@link HodViewServerService}, using the java HOD client.
+ * Implementation of {@link ViewServerService}, using the java HOD client.
  */
 @SuppressWarnings("WeakerAccess")
-@Service
-public class HodViewServerService implements ViewServerService<ResourceIdentifier, HodErrorException> {
+@Service(VIEW_SERVER_SERVICE_BEAN_NAME)
+class HodViewServerService implements ViewServerService<ResourceIdentifier, HodErrorException> {
     // Field on text index documents which (when present) contains the view URL
     private static final String URL_FIELD = "url";
 
-    public static final String CONTENT_FIELD = "static_content";
-    public static final String TITLE_FIELD = "static_title";
-    public static final String REFERENCE_FIELD = "static_reference";
-    public static final String HOD_RULE_CATEGORY = "default";
+    private static final String CONTENT_FIELD = "static_content";
+    private static final String TITLE_FIELD = "static_title";
+    private static final String REFERENCE_FIELD = "static_reference";
+    private static final String HOD_RULE_CATEGORY = "default";
+    private static final Pattern SLASH_PATTERN = Pattern.compile("/|\\\\");
+    private static final Pattern NEWLINE_PATTERN = Pattern.compile("\n", Pattern.LITERAL);
 
     private final ViewDocumentService viewDocumentService;
     private final GetContentService<Document> getContentService;
@@ -66,7 +72,7 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
     private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Autowired
-    public HodViewServerService(
+    HodViewServerService(
             final ViewDocumentService viewDocumentService,
             final GetContentService<Document> viewGetContentService,
             final QueryTextIndexService<Document> queryTextIndexService,
@@ -81,7 +87,7 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
     private String resolveTitle(final Document document) {
         if (StringUtils.isBlank(document.getTitle())) {
             // If there is no title field, assume the reference is a path and take the last part (the "file name")
-            final String[] splitReference = document.getReference().split("/|\\\\");
+            final String[] splitReference = SLASH_PATTERN.split(document.getReference());
             final String lastPart = splitReference[splitReference.length - 1];
 
             return StringUtils.isBlank(lastPart) ? document.getReference() : lastPart;
@@ -91,7 +97,7 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
     }
 
     private String escapeAndAddLineBreaks(final String input) {
-        return input == null ? "" : StringEscapeUtils.escapeHtml(input).replace("\n", "<br>");
+        return input == null ? "" : NEWLINE_PATTERN.matcher(StringEscapeUtils.escapeHtml(input)).replaceAll(Matcher.quoteReplacement("<br>"));
     }
 
     // Format the document's content for display in a browser
@@ -134,44 +140,54 @@ public class HodViewServerService implements ViewServerService<ResourceIdentifie
         final String documentUrl = urlField instanceof List ? ((List<?>) urlField).get(0).toString() : document.getReference();
 
         final UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_2_SLASHES);
+
         InputStream inputStream = null;
-
         try {
-            try {
-                final URL url = new URL(documentUrl);
-                final URI uri = new URI(url.getProtocol(), url.getAuthority(), url.getPath(), url.getQuery(), null);
-                final String encodedUrl = uri.toASCIIString();
-
-                if (urlValidator.isValid(encodedUrl)) {
-                    final ViewDocumentRequestBuilder builder = new ViewDocumentRequestBuilder();
-
-                    if (highlightExpression != null) {
-                        builder
-                                .addHighlightExpressions(highlightExpression)
-                                .addEndTags(HIGHLIGHT_END_TAG)
-                                .addStartTags(HIGHLIGHT_START_TAG);
-                    }
-
-                    inputStream = viewDocumentService.viewUrl(encodedUrl, builder);
-                } else {
-                    throw new URISyntaxException(encodedUrl, "Invalid URL");
-                }
-            } catch (URISyntaxException | MalformedURLException e) {
-                // URL was not valid, fall back to using the document content
-                inputStream = formatRawContent(document);
-            } catch (final HodErrorException e) {
-                if (e.getErrorCode() == HodErrorCode.BACKEND_REQUEST_FAILED) {
-                    // HOD failed to read the url, fall back to using the document content
-                    inputStream = formatRawContent(document);
-                } else {
-                    throw e;
-                }
-            }
+            inputStream = getInputStream(highlightExpression, document, documentUrl, urlValidator);
 
             IOUtils.copy(inputStream, outputStream);
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
+    }
+
+    @SuppressWarnings("resource")
+    private InputStream getInputStream(final String highlightExpression,
+                                       final Document document,
+                                       final String documentUrl,
+                                       final UrlValidator urlValidator) throws HodErrorException {
+        InputStream inputStream;
+        try {
+            final URL url = new URL(documentUrl);
+            final URI uri = new URI(url.getProtocol(), url.getAuthority(), url.getPath(), url.getQuery(), null);
+            final String encodedUrl = uri.toASCIIString();
+
+            if (urlValidator.isValid(encodedUrl)) {
+                final ViewDocumentRequestBuilder builder = new ViewDocumentRequestBuilder();
+
+                if (highlightExpression != null) {
+                    builder
+                            .addHighlightExpressions(highlightExpression)
+                            .addEndTags(HIGHLIGHT_END_TAG)
+                            .addStartTags(HIGHLIGHT_START_TAG);
+                }
+
+                inputStream = viewDocumentService.viewUrl(encodedUrl, builder);
+            } else {
+                inputStream = formatRawContent(document);
+            }
+        } catch (final URISyntaxException | MalformedURLException ignored) {
+            // URL was not valid, fall back to using the document content
+            inputStream = formatRawContent(document);
+        } catch (final HodErrorException e) {
+            if (e.getErrorCode() == HodErrorCode.BACKEND_REQUEST_FAILED) {
+                // HOD failed to read the url, fall back to using the document content
+                inputStream = formatRawContent(document);
+            } else {
+                throw e;
+            }
+        }
+        return inputStream;
     }
 
     @Override

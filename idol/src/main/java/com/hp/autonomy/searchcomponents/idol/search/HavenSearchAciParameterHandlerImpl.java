@@ -22,7 +22,6 @@ import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
-import com.hp.autonomy.searchcomponents.idol.view.IdolViewServerService;
 import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
@@ -38,6 +37,9 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+
+import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_GROUP;
+import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_IDENTIFIER;
 
 @SuppressWarnings("WeakerAccess")
 @Component("parameterHandler")
@@ -141,7 +143,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         }
         parameters.add(GetContentParams.Reference.name(), new Reference(documentReference));
         parameters.add(GetContentParams.Print.name(), PrintParam.Fields);
-        parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField, IdolViewServerService.AUTN_IDENTIFIER, IdolViewServerService.AUTN_GROUP));
+        parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField, AUTN_IDENTIFIER, AUTN_GROUP));
     }
 
     @Override

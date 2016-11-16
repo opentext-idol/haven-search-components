@@ -45,12 +45,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-@Service
-public class IdolViewServerService implements ViewServerService<String, AciErrorException> {
+import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.VIEW_SERVER_SERVICE_BEAN_NAME;
+import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_GROUP;
+import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_IDENTIFIER;
 
-    public static final String AUTN_IDENTIFIER = "AUTN_IDENTIFIER";
-    public static final String AUTN_GROUP = "AUTN_GROUP";
-
+/**
+ * Default Idol implementation of {@link ViewServerService}
+ */
+@Service(VIEW_SERVER_SERVICE_BEAN_NAME)
+class IdolViewServerService implements ViewServerService<String, AciErrorException> {
     private final AciService contentAciService;
     private final AciService viewAciService;
     private final HavenSearchAciParameterHandler parameterHandler;
@@ -58,7 +61,7 @@ public class IdolViewServerService implements ViewServerService<String, AciError
     private final ConfigService<? extends ViewCapable> configService;
 
     @Autowired
-    public IdolViewServerService(final AciService contentAciService, final AciService viewAciService, final ProcessorFactory processorFactory, final HavenSearchAciParameterHandler parameterHandler, final ConfigService<? extends ViewCapable> configService) {
+    IdolViewServerService(final AciService contentAciService, final AciService viewAciService, final ProcessorFactory processorFactory, final HavenSearchAciParameterHandler parameterHandler, final ConfigService<? extends ViewCapable> configService) {
         this.contentAciService = contentAciService;
         this.viewAciService = viewAciService;
         this.parameterHandler = parameterHandler;

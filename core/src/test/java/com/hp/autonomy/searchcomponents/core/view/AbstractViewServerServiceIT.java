@@ -18,6 +18,7 @@ import java.io.Serializable;
 
 import static org.junit.Assert.assertNotNull;
 
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
 public abstract class AbstractViewServerServiceIT<S extends Serializable, D extends SearchResult, E extends Exception> {
     @Autowired
