@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 @Configuration
 @ConditionalOnProperty(value = "mock.configuration", matchIfMissing = true)
 public class IdolTestConfiguration {
-    private static final String DEFAULT_IDOL_HOST = "iso-idol";
+    private static final String DEFAULT_IDOL_HOST = "ida-idol";
     private static final int DEFAULT_CONTENT_PORT = 9000;
     private static final int DEFAULT_VIEW_SERVER_PORT = 9080;
     private static final String REFERENCE_FIELD_NAME = "DREREFERENCE";
