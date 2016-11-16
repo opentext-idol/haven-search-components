@@ -5,10 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.autonomy.aci.client.services.AciService;
-import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.Qs;
 import com.hp.autonomy.types.idol.responses.QsElement;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
@@ -27,7 +24,6 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -36,16 +32,13 @@ public class IdolRelatedConceptsServiceTest {
     private HavenSearchAciParameterHandler parameterHandler;
 
     @Mock
-    private AciService contentAciService;
-
-    @Mock
-    private ProcessorFactory aciResponseProcessorFactory;
+    private QueryExecutor queryExecutor;
 
     private IdolRelatedConceptsService idolRelatedConceptsService;
 
     @Before
     public void setUp() {
-        idolRelatedConceptsService = new IdolRelatedConceptsService(parameterHandler, contentAciService, aciResponseProcessorFactory);
+        idolRelatedConceptsService = new IdolRelatedConceptsService(parameterHandler, queryExecutor);
     }
 
     @Test
@@ -55,7 +48,7 @@ public class IdolRelatedConceptsServiceTest {
         qs.getElement().add(new QsElement());
         responseData.setQs(qs);
 
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
+        when(queryExecutor.executeQuery(any(), any())).thenReturn(responseData);
 
         final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder()
                 .queryText("*")
