@@ -14,11 +14,12 @@ import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricVa
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.ParametricSort;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.types.idol.responses.RecursiveField;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametricValuesService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
@@ -30,7 +31,9 @@ import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,20 +48,30 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class HodParametricValuesService extends AbstractParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> {
+import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.PARAMETRIC_VALUES_SERVICE_BEAN_NAME;
+
+/**
+ * Default HoD implementation of {@link ParametricValuesService}
+ */
+@Service(PARAMETRIC_VALUES_SERVICE_BEAN_NAME)
+class HodParametricValuesService implements ParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> {
     private final FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
     private final GetParametricValuesService getParametricValuesService;
+    private final BucketingParamsHelper bucketingParamsHelper;
     private final ConfigService<? extends HodSearchCapable> configService;
     private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
-    public HodParametricValuesService(
+    @Autowired
+    HodParametricValuesService(
             final FieldsService<HodFieldsRequest, HodErrorException> fieldsService,
             final GetParametricValuesService getParametricValuesService,
+            final BucketingParamsHelper bucketingParamsHelper,
             final ConfigService<? extends HodSearchCapable> configService,
             final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever
     ) {
         this.fieldsService = fieldsService;
         this.getParametricValuesService = getParametricValuesService;
+        this.bucketingParamsHelper = bucketingParamsHelper;
         this.configService = configService;
         this.authenticationInformationRetriever = authenticationInformationRetriever;
     }
@@ -98,7 +111,7 @@ public class HodParametricValuesService extends AbstractParametricValuesService<
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyList();
         } else {
-            validateBucketingParams(parametricRequest, bucketingParamsPerField);
+            bucketingParamsHelper.validateBucketingParams(parametricRequest, bucketingParamsPerField);
 
             final Set<QueryTagInfo> numericFieldInfo = getNumericParametricValues(parametricRequest);
             final List<RangeInfo> ranges = new ArrayList<>(numericFieldInfo.size());
@@ -113,7 +126,7 @@ public class HodParametricValuesService extends AbstractParametricValuesService<
     }
 
     private Collection<String> lookupFieldIds(final Collection<ResourceIdentifier> databases) throws HodErrorException {
-        final List<TagName> fields = fieldsService.getFields(new HodFieldsRequest.Builder().setDatabases(databases).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
+        final List<TagName> fields = fieldsService.getFields(HodFieldsRequest.builder().databases(databases).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
         final Collection<String> fieldIds = new ArrayList<>(fields.size());
         fieldIds.addAll(fields.stream().map(TagName::getId).collect(Collectors.toList()));
 
@@ -122,7 +135,7 @@ public class HodParametricValuesService extends AbstractParametricValuesService<
 
     // Parse a list of numeric parametric values into buckets specified by the min, max and number of buckets in the BucketingParams
     private RangeInfo parseNumericParametricValuesInBuckets(final QueryTagInfo queryTagInfo, final BucketingParams bucketingParams) {
-        final List<Double> boundaries = calculateBoundaries(bucketingParams);
+        final List<Double> boundaries = bucketingParamsHelper.calculateBoundaries(bucketingParams);
 
         // Map of bucket minimum to count
         final Map<Double, Integer> bucketCounts = new HashMap<>();

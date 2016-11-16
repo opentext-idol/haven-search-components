@@ -24,7 +24,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,20 +34,20 @@ import static org.hamcrest.Matchers.*;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequest<S>, F extends FieldsRequest, FB extends FieldsRequest.Builder<F>, S extends Serializable, E extends Exception> {
+public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequest<S>, F extends FieldsRequest, FB extends FieldsRequest.FieldsRequestBuilder<F>, S extends Serializable, E extends Exception> {
     @Autowired
     private FieldsService<F, E> fieldsService;
     @Autowired
     private ParametricValuesService<R, S, E> parametricValuesService;
     @Autowired
-    private FB fieldsRequestBuilder;
+    protected FB fieldsRequestBuilder;
     @Autowired
-    private ParametricRequest.Builder<R, S> parametricRequestBuilder;
+    private ParametricRequest.ParametricRequestBuilder<R, S> parametricRequestBuilder;
 
     @Autowired
     protected TestUtils<S> testUtils;
 
-    protected abstract FieldsRequest.Builder<F> fieldsRequestParams(final FB fieldsRequestBuilder);
+    protected abstract FieldsRequest.FieldsRequestBuilder<F> fieldsRequestParams(final FB fieldsRequestBuilder);
 
     @Test
     public void getAllParametricValues() throws E {
@@ -88,21 +87,21 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
 
     private R createNumericParametricRequest() {
         return parametricRequestBuilder
-                .setFieldNames(Collections.singletonList(ParametricValuesService.AUTN_DATE_FIELD))
-                .setQueryRestrictions(testUtils.buildQueryRestrictions())
-                .setSort(SortParam.ReverseDate)
+                .fieldName(ParametricValuesService.AUTN_DATE_FIELD)
+                .queryRestrictions(testUtils.buildQueryRestrictions())
+                .sort(SortParam.ReverseDate)
                 .build();
     }
 
     private R createParametricRequest() throws E {
         final List<TagName> fields = fieldsService.getFields(fieldsRequestParams(fieldsRequestBuilder).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
-        final List<String> fieldIds = new ArrayList<>(fields.size());
+        final Collection<String> fieldIds = new ArrayList<>(fields.size());
 
         fieldIds.addAll(fields.stream().map(TagName::getId).collect(Collectors.toList()));
 
         return parametricRequestBuilder
-                .setFieldNames(fieldIds)
-                .setQueryRestrictions(testUtils.buildQueryRestrictions())
+                .fieldNames(fieldIds)
+                .queryRestrictions(testUtils.buildQueryRestrictions())
                 .build();
     }
 }

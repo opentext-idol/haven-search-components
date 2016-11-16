@@ -32,8 +32,7 @@ public interface FieldsService<R extends FieldsRequest, E extends Exception> {
      * @param request options
      * @param fieldTypes the field types to retrieve
      * @return list of fields per field type
-     * @throws E
+     * @throws E The error thrown in the event of the platform returning an error response
      */
     Map<FieldTypeParam, List<TagName>> getFields(final R request, final FieldTypeParam... fieldTypes) throws E;
-
 }
