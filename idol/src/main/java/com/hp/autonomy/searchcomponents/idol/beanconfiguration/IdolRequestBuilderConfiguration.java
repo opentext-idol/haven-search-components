@@ -41,8 +41,8 @@ public class IdolRequestBuilderConfiguration {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    @ConditionalOnMissingBean(QueryRequest.SearchRequestBuilder.class)
-    public QueryRequest.SearchRequestBuilder<String> searchRequestBuilder() {
+    @ConditionalOnMissingBean(QueryRequest.QueryRequestBuilder.class)
+    public QueryRequest.QueryRequestBuilder<String> queryRequestBuilder() {
         return QueryRequest.builder();
     }
 

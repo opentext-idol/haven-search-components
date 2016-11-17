@@ -26,9 +26,9 @@ import java.util.HashSet;
  * @param <S> The type of the database identifier
  */
 @Data
-@JsonDeserialize(builder = QueryRequest.SearchRequestBuilder.class)
+@JsonDeserialize(builder = QueryRequest.QueryRequestBuilder.class)
 public class QueryRequest<S extends Serializable>
-        implements SearchRequest<S>, RequestObject<QueryRequest<S>, QueryRequest.SearchRequestBuilder<S>> {
+        implements SearchRequest<S>, RequestObject<QueryRequest<S>, QueryRequest.QueryRequestBuilder<S>> {
     private static final long serialVersionUID = -6338199353489914631L;
 
     private final boolean autoCorrect;
@@ -44,7 +44,7 @@ public class QueryRequest<S extends Serializable>
     private final Collection<String> printFields;
     private final QueryType queryType;
 
-    private QueryRequest(final SearchRequestBuilder<S> builder) {
+    private QueryRequest(final QueryRequestBuilder<S> builder) {
         queryRestrictions = builder.queryRestrictions;
         start = builder.start;
         maxResults = builder.maxResults;
@@ -63,12 +63,12 @@ public class QueryRequest<S extends Serializable>
     }
 
     @Override
-    public SearchRequestBuilder<S> toBuilder() {
-        return new SearchRequestBuilder<>(this);
+    public QueryRequestBuilder<S> toBuilder() {
+        return new QueryRequestBuilder<>(this);
     }
 
-    public static <S extends Serializable> SearchRequestBuilder<S> builder() {
-        return new SearchRequestBuilder<>();
+    public static <S extends Serializable> QueryRequestBuilder<S> builder() {
+        return new QueryRequestBuilder<>();
     }
 
     @SuppressWarnings({"FieldMayBeFinal", "unused"})
@@ -76,8 +76,8 @@ public class QueryRequest<S extends Serializable>
     @Setter
     @NoArgsConstructor(access = AccessLevel.PACKAGE)
     @JsonPOJOBuilder(withPrefix = "")
-    public static class SearchRequestBuilder<S extends Serializable>
-            implements RequestObject.RequestObjectBuilder<QueryRequest<S>, SearchRequestBuilder<S>> {
+    public static class QueryRequestBuilder<S extends Serializable>
+            implements RequestObject.RequestObjectBuilder<QueryRequest<S>, QueryRequestBuilder<S>> {
         private QueryRestrictions<S> queryRestrictions;
         private int start = DEFAULT_START;
         private int maxResults = DEFAULT_MAX_RESULTS;
@@ -90,7 +90,7 @@ public class QueryRequest<S extends Serializable>
         private QueryType queryType = QueryType.MODIFIED;
         private Collection<String> printFields = new HashSet<>();
 
-        public SearchRequestBuilder(final QueryRequest<S> queryRequest) {
+        public QueryRequestBuilder(final QueryRequest<S> queryRequest) {
             queryRestrictions = queryRequest.queryRestrictions;
             start = queryRequest.start;
             maxResults = queryRequest.maxResults;
@@ -105,17 +105,17 @@ public class QueryRequest<S extends Serializable>
         }
 
 
-        public SearchRequestBuilder<S> printField(final String printField) {
+        public QueryRequestBuilder<S> printField(final String printField) {
             printFields.add(printField);
             return this;
         }
 
-        public SearchRequestBuilder<S> printFields(final Collection<? extends String> printFields) {
+        public QueryRequestBuilder<S> printFields(final Collection<? extends String> printFields) {
             this.printFields.addAll(printFields);
             return this;
         }
 
-        public SearchRequestBuilder<S> clearPrintFields() {
+        public QueryRequestBuilder<S> clearPrintFields() {
             printFields.clear();
             return this;
         }

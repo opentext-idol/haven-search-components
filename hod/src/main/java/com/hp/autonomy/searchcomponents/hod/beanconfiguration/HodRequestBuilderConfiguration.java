@@ -42,8 +42,8 @@ public class HodRequestBuilderConfiguration {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    @ConditionalOnMissingBean(QueryRequest.SearchRequestBuilder.class)
-    public QueryRequest.SearchRequestBuilder<ResourceIdentifier> searchRequestBuilder() {
+    @ConditionalOnMissingBean(QueryRequest.QueryRequestBuilder.class)
+    public QueryRequest.QueryRequestBuilder<ResourceIdentifier> queryRequestBuilder() {
         return QueryRequest.builder();
     }
 
