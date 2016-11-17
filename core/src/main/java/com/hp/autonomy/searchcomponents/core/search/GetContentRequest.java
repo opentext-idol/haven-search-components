@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,6 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -59,7 +59,7 @@ public class GetContentRequest<S extends Serializable>
     @SuppressWarnings({"FieldMayBeFinal", "unused"})
     @Accessors(fluent = true)
     @Setter
-    @NoArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PACKAGE)
     @JsonPOJOBuilder(withPrefix = "")
     public static class GetContentRequestBuilder<S extends Serializable>
             implements RequestObject.RequestObjectBuilder<GetContentRequest<S>, GetContentRequest.GetContentRequestBuilder<S>> {

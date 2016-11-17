@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.core.search;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -65,7 +66,7 @@ public class SuggestRequest<S extends Serializable>
     @SuppressWarnings({"FieldMayBeFinal", "unused"})
     @Accessors(fluent = true)
     @Setter
-    @NoArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PACKAGE)
     @JsonPOJOBuilder(withPrefix = "")
     public static class SuggestRequestBuilder<S extends Serializable>
             implements RequestObject.RequestObjectBuilder<SuggestRequest<S>, SuggestRequestBuilder<S>> {
