@@ -12,15 +12,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import static com.hp.autonomy.searchcomponents.hod.test.HodTestConfiguration.MOCK_AUTHENTICATION_RETRIEVER_PROPERTY;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@ConditionalOnProperty(value = "mock.configuration", matchIfMissing = true)
+@ConditionalOnProperty(value = HodTestConfiguration.MOCK_CONFIGURATION_PROPERTY, matchIfMissing = true)
 public class HodTestAuthenticationConfiguration {
     @Bean
     @Primary
-    @ConditionalOnProperty(value = "mock.authenticationRetriever", matchIfMissing = true)
+    @ConditionalOnProperty(value = MOCK_AUTHENTICATION_RETRIEVER_PROPERTY, matchIfMissing = true)
     public AuthenticationInformationRetriever<HodAuthentication<EntityType.Application>, HodAuthenticationPrincipal> authenticationInformationRetriever(
             final HodAuthenticationPrincipal testPrincipal,
             final TokenProxy<EntityType.Application, TokenType.Simple> testTokenProxy

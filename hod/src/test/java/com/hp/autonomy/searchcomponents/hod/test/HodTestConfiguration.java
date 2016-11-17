@@ -52,8 +52,12 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("WeakerAccess")
 @Configuration
-@ConditionalOnProperty(value = "mock.configuration", matchIfMissing = true)
+@ConditionalOnProperty(value = HodTestConfiguration.MOCK_CONFIGURATION_PROPERTY, matchIfMissing = true)
 public class HodTestConfiguration {
+    public static final String MOCK_CONFIGURATION_PROPERTY = "mock.configuration";
+    public static final String MOCK_AUTHENTICATION_PROPERTY = "mock.authentication";
+    public static final String MOCK_AUTHENTICATION_RETRIEVER_PROPERTY = "mock.authenticationRetriever";
+
     public static final String HOD_URL = "https://api.havenondemand.com";
     public static final String PROXY_HOST = "web-proxy.sdc.hpecorp.net";
     public static final int PROXY_PORT = 8080;
@@ -121,6 +125,7 @@ public class HodTestConfiguration {
 
 
     @Bean
+    @ConditionalOnProperty(value = MOCK_AUTHENTICATION_PROPERTY, matchIfMissing = true)
     public TokenProxy<EntityType.Application, TokenType.Simple> testTokenProxy(
             final HttpClient httpClient,
             final TokenRepository tokenRepository,
@@ -142,6 +147,7 @@ public class HodTestConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(value = MOCK_AUTHENTICATION_PROPERTY, matchIfMissing = true)
     public HodAuthenticationPrincipal testPrincipal() {
         final String application = environment.getProperty(APPLICATION_PROPERTY);
         final String domain = environment.getProperty(DOMAIN_PROPERTY);

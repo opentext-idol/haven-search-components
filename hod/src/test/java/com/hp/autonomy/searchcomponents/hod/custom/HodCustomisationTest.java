@@ -13,6 +13,7 @@ import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConf
 import com.hp.autonomy.searchcomponents.hod.databases.Database;
 import com.hp.autonomy.searchcomponents.hod.databases.HodDatabasesRequest;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
+import com.hp.autonomy.searchcomponents.hod.test.HodTestConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,11 @@ import static org.junit.Assert.assertNull;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {HavenSearchHodConfiguration.class, HodCustomConfiguration.class, HodCustomComponentConfiguration.class}, properties = CUSTOMISATION_TEST_ID)
+@SpringBootTest(classes = {HavenSearchHodConfiguration.class, HodCustomConfiguration.class, HodCustomComponentConfiguration.class}, properties = {
+        CUSTOMISATION_TEST_ID,
+        HodTestConfiguration.MOCK_AUTHENTICATION_PROPERTY + "=false",
+        HodTestConfiguration.MOCK_AUTHENTICATION_RETRIEVER_PROPERTY + "=false"
+})
 public class HodCustomisationTest {
     @Autowired
     @Qualifier("customDatabaseService")
