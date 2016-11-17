@@ -10,6 +10,7 @@ import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
+import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandlerProxy;
 import com.hp.autonomy.searchcomponents.idol.search.QueryExecutor;
 import com.hp.autonomy.searchcomponents.idol.search.QueryResponseParser;
 import com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser;
@@ -24,7 +25,6 @@ import static com.hp.autonomy.searchcomponents.core.search.fields.DocumentFields
 import static com.hp.autonomy.searchcomponents.core.test.TestUtils.CUSTOMISATION_TEST_ID;
 import static com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever.ACI_SERVICE_RETRIEVER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable.QUERY_MANIPULATION_VALIDATOR_BEAN_NAME;
-import static com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler.PARAMETER_HANDLER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.search.QueryExecutor.QUERY_EXECUTOR_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.search.QueryResponseParser.QUERY_RESPONSE_PARSER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser.FIELDS_PARSER_BEAN_NAME;
@@ -72,8 +72,9 @@ public class IdolCustomComponentConfiguration {
 
     @Bean
     @Primary
-    public HavenSearchAciParameterHandler customHavenSearchAciParameterHandler(@Qualifier(PARAMETER_HANDLER_BEAN_NAME) final HavenSearchAciParameterHandler parameterHandler) {
-        return parameterHandler;
+    public HavenSearchAciParameterHandler customHavenSearchAciParameterHandler() {
+        return new HavenSearchAciParameterHandlerProxy() {
+        };
     }
 
     @Bean
