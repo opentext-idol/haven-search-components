@@ -80,15 +80,6 @@ public class HavenSearchHodConfiguration {
     private HodServiceConfig<EntityType.Combined, TokenType.Simple> hodServiceConfig;
 
     @Bean
-    @ConditionalOnMissingBean(AuthenticationInformationRetriever.class)
-    public AuthenticationInformationRetriever<HodAuthentication<EntityType.Combined>, HodAuthenticationPrincipal> authenticationInformationRetriever() {
-        @SuppressWarnings("unchecked")
-        final AuthenticationInformationRetriever<HodAuthentication<EntityType.Combined>, HodAuthenticationPrincipal> retriever =
-                new SpringSecurityAuthenticationInformationRetriever<>((Class<HodAuthentication<EntityType.Combined>>) (Class<?>) HodAuthentication.class, HodAuthenticationPrincipal.class);
-        return retriever;
-    }
-
-    @Bean
     @ConditionalOnMissingBean(name = GET_CONTENT_SERVICE_BEAN_NAME)
     public GetContentService<HodSearchResult> getContentService() {
         return new GetContentServiceImpl<>(hodServiceConfig, HodSearchResult.class);
