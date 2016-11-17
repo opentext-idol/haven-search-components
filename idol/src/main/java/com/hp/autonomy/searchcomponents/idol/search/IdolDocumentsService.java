@@ -12,7 +12,7 @@ import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
@@ -57,30 +57,30 @@ class IdolDocumentsService implements DocumentsService<String, IdolSearchResult,
     }
 
     @Override
-    public Documents<IdolSearchResult> queryTextIndex(final SearchRequest<String> searchRequest) throws AciErrorException {
-        final SearchRequest.QueryType queryType = searchRequest.getQueryType();
+    public Documents<IdolSearchResult> queryTextIndex(final QueryRequest<String> queryRequest) throws AciErrorException {
+        final QueryRequest.QueryType queryType = queryRequest.getQueryType();
         if (!queryExecutor.performQuery(queryType)) {
             return new Documents<>(Collections.emptyList(), 0, null, null, null, null);
         }
 
         final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
 
-        parameterHandler.addSearchRestrictions(aciParameters, searchRequest.getQueryRestrictions());
-        parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
-        if (queryType != SearchRequest.QueryType.RAW) {
-            parameterHandler.addQmsParameters(aciParameters, searchRequest.getQueryRestrictions());
+        parameterHandler.addSearchRestrictions(aciParameters, queryRequest.getQueryRestrictions());
+        parameterHandler.addSearchOutputParameters(aciParameters, queryRequest);
+        if (queryType != QueryRequest.QueryType.RAW) {
+            parameterHandler.addQmsParameters(aciParameters, queryRequest.getQueryRestrictions());
         }
 
-        if (searchRequest.isAutoCorrect()) {
+        if (queryRequest.isAutoCorrect()) {
             aciParameters.add(QueryParams.SpellCheck.name(), true);
         }
 
-        if (queryType == SearchRequest.QueryType.PROMOTIONS) {
+        if (queryType == QueryRequest.QueryType.PROMOTIONS) {
             aciParameters.add(QmsQueryParams.Promotions.name(), true);
         }
 
         final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, queryType);
-        return queryResponseParser.parseQueryResults(searchRequest, aciParameters, responseData, parameters -> queryExecutor.executeQuery(parameters, queryType));
+        return queryResponseParser.parseQueryResults(queryRequest, aciParameters, responseData, parameters -> queryExecutor.executeQuery(parameters, queryType));
     }
 
     @Override
@@ -91,7 +91,7 @@ class IdolDocumentsService implements DocumentsService<String, IdolSearchResult,
         parameterHandler.addSearchRestrictions(aciParameters, suggestRequest.getQueryRestrictions());
         parameterHandler.addSearchOutputParameters(aciParameters, suggestRequest);
 
-        final SuggestResponseData responseData = queryExecutor.executeSuggest(aciParameters, SearchRequest.QueryType.RAW);
+        final SuggestResponseData responseData = queryExecutor.executeSuggest(aciParameters, QueryRequest.QueryType.RAW);
         final List<Hit> hits = responseData.getHits();
         return new Documents<>(queryResponseParser.parseQueryHits(hits), responseData.getTotalhits(), null, null, null, null);
     }
@@ -106,7 +106,7 @@ class IdolDocumentsService implements DocumentsService<String, IdolSearchResult,
             final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
             parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, PrintParam.fromValue(request.getPrint()));
 
-            final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, SearchRequest.QueryType.RAW);
+            final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, QueryRequest.QueryType.RAW);
             final List<Hit> hits = responseData.getHits();
             results.addAll(queryResponseParser.parseQueryHits(hits));
         }
@@ -135,7 +135,7 @@ class IdolDocumentsService implements DocumentsService<String, IdolSearchResult,
         // Unset combine=simple for state token generation
         aciParameters.remove(QueryParams.Combine.name());
 
-        final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, SearchRequest.QueryType.RAW);
+        final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, QueryRequest.QueryType.RAW);
         final String token = responseData.getState() != null ? responseData.getState() : EMPTY_RESULT_SET_TOKEN;
         final TypedStateToken tokenData = new TypedStateToken(token, promotions ? TypedStateToken.StateTokenType.PROMOTIONS : TypedStateToken.StateTokenType.QUERY);
 
@@ -146,7 +146,7 @@ class IdolDocumentsService implements DocumentsService<String, IdolSearchResult,
         resultCountAciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         resultCountAciParameters.add(QueryParams.Predict.name(), false);
         parameterHandler.addSearchRestrictions(resultCountAciParameters, queryRestrictions);
-        final QueryResponseData resultCountResponseData = queryExecutor.executeQuery(resultCountAciParameters, SearchRequest.QueryType.RAW);
+        final QueryResponseData resultCountResponseData = queryExecutor.executeQuery(resultCountAciParameters, QueryRequest.QueryType.RAW);
 
         return new StateTokenAndResultCount(tokenData, resultCountResponseData.getTotalhits());
     }

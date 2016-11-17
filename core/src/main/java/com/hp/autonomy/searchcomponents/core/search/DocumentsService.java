@@ -38,11 +38,11 @@ public interface DocumentsService<S extends Serializable, D extends SearchResult
     /**
      * Standard query against Idol
      *
-     * @param searchRequest Query restrictions and output modifiers
+     * @param queryRequest Query restrictions and output modifiers
      * @return The search results
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    Documents<D> queryTextIndex(SearchRequest<S> searchRequest) throws E;
+    Documents<D> queryTextIndex(QueryRequest<S> queryRequest) throws E;
 
     /**
      * Idol suggest request

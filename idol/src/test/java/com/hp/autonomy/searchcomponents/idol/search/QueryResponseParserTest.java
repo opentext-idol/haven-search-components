@@ -10,7 +10,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequest;
 import com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser;
 import com.hp.autonomy.types.idol.responses.Database;
@@ -68,7 +68,7 @@ public class QueryResponseParserTest {
                 .databases(Arrays.asList("Database1", "Database2"))
                 .maxDate(DateTime.now())
                 .build();
-        final AciSearchRequest<String> searchRequest = SearchRequest.<String>builder()
+        final AciSearchRequest<String> searchRequest = QueryRequest.<String>builder()
                 .queryRestrictions(queryRestrictions)
                 .start(1)
                 .maxResults(50)
@@ -97,7 +97,7 @@ public class QueryResponseParserTest {
                 .databases(Arrays.asList("Database1", "Database2"))
                 .maxDate(DateTime.now())
                 .build();
-        final AciSearchRequest<String> searchRequest = SearchRequest.<String>builder()
+        final AciSearchRequest<String> searchRequest = QueryRequest.<String>builder()
                 .queryRestrictions(queryRestrictions)
                 .start(1)
                 .maxResults(50)
@@ -127,7 +127,7 @@ public class QueryResponseParserTest {
                 .databases(Arrays.asList("Database1", "Database2"))
                 .maxDate(DateTime.now())
                 .build();
-        final AciSearchRequest<String> searchRequest = SearchRequest.<String>builder()
+        final AciSearchRequest<String> searchRequest = QueryRequest.<String>builder()
                 .queryRestrictions(queryRestrictions)
                 .start(1)
                 .maxResults(50)

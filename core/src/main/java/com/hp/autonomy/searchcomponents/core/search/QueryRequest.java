@@ -20,15 +20,15 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
- * Options for interacting with {@link DocumentsService#queryTextIndex(SearchRequest)}
+ * Options for interacting with {@link DocumentsService#queryTextIndex(QueryRequest)}
  * Note that this object fulfills the lombok @Builder contract but does not use the annotation to avoid IntelliJ errors (https://github.com/mplushnikov/lombok-intellij-plugin/issues/127)
  *
  * @param <S> The type of the database identifier
  */
 @Data
-@JsonDeserialize(builder = SearchRequest.SearchRequestBuilder.class)
-public class SearchRequest<S extends Serializable>
-        implements AciSearchRequest<S>, RequestObject<SearchRequest<S>, SearchRequest.SearchRequestBuilder<S>> {
+@JsonDeserialize(builder = QueryRequest.SearchRequestBuilder.class)
+public class QueryRequest<S extends Serializable>
+        implements AciSearchRequest<S>, RequestObject<QueryRequest<S>, QueryRequest.SearchRequestBuilder<S>> {
     private static final long serialVersionUID = -6338199353489914631L;
 
     private final boolean autoCorrect;
@@ -44,7 +44,7 @@ public class SearchRequest<S extends Serializable>
     private final Collection<String> printFields;
     private final QueryType queryType;
 
-    private SearchRequest(final SearchRequestBuilder<S> builder) {
+    private QueryRequest(final SearchRequestBuilder<S> builder) {
         queryRestrictions = builder.queryRestrictions;
         start = builder.start;
         maxResults = builder.maxResults;
@@ -77,7 +77,7 @@ public class SearchRequest<S extends Serializable>
     @NoArgsConstructor(access = AccessLevel.PACKAGE)
     @JsonPOJOBuilder(withPrefix = "")
     public static class SearchRequestBuilder<S extends Serializable>
-            implements RequestObject.RequestObjectBuilder<SearchRequest<S>, SearchRequestBuilder<S>> {
+            implements RequestObject.RequestObjectBuilder<QueryRequest<S>, SearchRequestBuilder<S>> {
         private QueryRestrictions<S> queryRestrictions;
         private int start = DEFAULT_START;
         private int maxResults = DEFAULT_MAX_RESULTS;
@@ -90,18 +90,18 @@ public class SearchRequest<S extends Serializable>
         private QueryType queryType = QueryType.MODIFIED;
         private Collection<String> printFields = new HashSet<>();
 
-        public SearchRequestBuilder(final SearchRequest<S> searchRequest) {
-            queryRestrictions = searchRequest.queryRestrictions;
-            start = searchRequest.start;
-            maxResults = searchRequest.maxResults;
-            summary = searchRequest.summary;
-            summaryCharacters = searchRequest.summaryCharacters;
-            sort = searchRequest.sort;
-            highlight = searchRequest.highlight;
-            autoCorrect = searchRequest.autoCorrect;
-            print = searchRequest.print;
-            queryType = searchRequest.queryType;
-            printFields = searchRequest.printFields;
+        public SearchRequestBuilder(final QueryRequest<S> queryRequest) {
+            queryRestrictions = queryRequest.queryRestrictions;
+            start = queryRequest.start;
+            maxResults = queryRequest.maxResults;
+            summary = queryRequest.summary;
+            summaryCharacters = queryRequest.summaryCharacters;
+            sort = queryRequest.sort;
+            highlight = queryRequest.highlight;
+            autoCorrect = queryRequest.autoCorrect;
+            print = queryRequest.print;
+            queryType = queryRequest.queryType;
+            printFields = queryRequest.printFields;
         }
 
 
@@ -121,8 +121,8 @@ public class SearchRequest<S extends Serializable>
         }
 
         @Override
-        public SearchRequest<S> build() {
-            return new SearchRequest<>(this);
+        public QueryRequest<S> build() {
+            return new QueryRequest<>(this);
         }
     }
 }

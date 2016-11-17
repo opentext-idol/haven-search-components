@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.configuration;
 
 import com.autonomy.aci.client.services.AciService;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,19 +46,19 @@ public class AciServiceRetrieverTest {
 
     @Test
     public void getModifiedAciServiceQmsDisabled() {
-        assertEquals(contentAciService, aciServiceRetriever.getAciService(SearchRequest.QueryType.MODIFIED));
+        assertEquals(contentAciService, aciServiceRetriever.getAciService(QueryRequest.QueryType.MODIFIED));
     }
 
     @Test
     public void getModifiedAciServiceQmsEnabled() {
         enableQms();
-        assertEquals(qmsAciService, aciServiceRetriever.getAciService(SearchRequest.QueryType.MODIFIED));
+        assertEquals(qmsAciService, aciServiceRetriever.getAciService(QueryRequest.QueryType.MODIFIED));
     }
 
     @Test
     public void getRawAciServiceQmsEnabled() {
         enableQms();
-        assertEquals(contentAciService, aciServiceRetriever.getAciService(SearchRequest.QueryType.RAW));
+        assertEquals(contentAciService, aciServiceRetriever.getAciService(QueryRequest.QueryType.RAW));
     }
 
     private void enableQms() {

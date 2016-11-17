@@ -13,7 +13,7 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
@@ -106,7 +106,7 @@ public class IdolParametricValuesServiceTest {
     public void setUp() {
         parametricValuesService = new IdolParametricValuesService(parameterHandler, fieldsService, bucketingParamsHelper, aciServiceRetriever, aciResponseProcessorFactory);
 
-        when(aciServiceRetriever.getAciService(any(SearchRequest.QueryType.class))).thenReturn(contentAciService);
+        when(aciServiceRetriever.getAciService(any(QueryRequest.QueryType.class))).thenReturn(contentAciService);
     }
 
     @Test

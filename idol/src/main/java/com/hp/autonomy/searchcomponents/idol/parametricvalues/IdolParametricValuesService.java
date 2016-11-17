@@ -18,7 +18,7 @@ import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHel
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
@@ -319,7 +319,7 @@ class IdolParametricValuesService implements ParametricValuesService<IdolParamet
     }
 
     private GetQueryTagValuesResponseData executeAction(final ParametricRequest<String> idolParametricRequest, final Set<AciParameter> aciParameters) {
-        return aciServiceRetriever.getAciService(idolParametricRequest.isModified() ? SearchRequest.QueryType.MODIFIED : SearchRequest.QueryType.RAW)
+        return aciServiceRetriever.getAciService(idolParametricRequest.isModified() ? QueryRequest.QueryType.MODIFIED : QueryRequest.QueryType.RAW)
             .executeAction(aciParameters, queryTagValuesResponseProcessor);
     }
 }

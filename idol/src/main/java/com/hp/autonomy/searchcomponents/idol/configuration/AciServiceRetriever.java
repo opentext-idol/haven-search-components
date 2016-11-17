@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.configuration;
 
 import com.autonomy.aci.client.services.AciService;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
@@ -33,5 +33,5 @@ public interface AciServiceRetriever {
      * @param queryType if raw, will retrieve Content AciService regardless; otherwise will retrieve QMS AciService if available
      * @return the QMS AciService if required and configured, otherwise the Content AciService
      */
-    AciService getAciService(final SearchRequest.QueryType queryType);
+    AciService getAciService(final QueryRequest.QueryType queryType);
 }

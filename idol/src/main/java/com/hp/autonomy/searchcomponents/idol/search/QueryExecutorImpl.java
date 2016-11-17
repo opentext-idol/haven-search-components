@@ -8,7 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
@@ -37,18 +37,18 @@ class QueryExecutorImpl implements QueryExecutor {
     }
 
     @Override
-    public boolean performQuery(final SearchRequest.QueryType queryType) {
-        return queryType != SearchRequest.QueryType.PROMOTIONS || aciServiceRetriever.qmsEnabled();
+    public boolean performQuery(final QueryRequest.QueryType queryType) {
+        return queryType != QueryRequest.QueryType.PROMOTIONS || aciServiceRetriever.qmsEnabled();
     }
 
     @Override
-    public QueryResponseData executeQuery(final AciParameters aciParameters, final SearchRequest.QueryType queryType) {
+    public QueryResponseData executeQuery(final AciParameters aciParameters, final QueryRequest.QueryType queryType) {
         final AciService aciService = aciServiceRetriever.getAciService(queryType);
         return aciService.executeAction(aciParameters, queryResponseProcessor);
     }
 
     @Override
-    public SuggestResponseData executeSuggest(final AciParameters aciParameters, final SearchRequest.QueryType queryType) {
+    public SuggestResponseData executeSuggest(final AciParameters aciParameters, final QueryRequest.QueryType queryType) {
         final AciService aciService = aciServiceRetriever.getAciService(queryType);
         return aciService.executeAction(aciParameters, suggestResponseProcessor);
     }

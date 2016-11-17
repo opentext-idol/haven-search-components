@@ -8,7 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.search.AbstractDocumentServiceIT;
 import com.hp.autonomy.searchcomponents.core.search.AutoCorrectException;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
@@ -37,7 +37,7 @@ public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<String, Ido
 
     @Test(expected = AutoCorrectException.class)
     public void queryWithInvalidAutoCorrect() throws AciErrorException {
-        final SearchRequest<String> searchRequest = SearchRequest.<String>builder()
+        final QueryRequest<String> queryRequest = QueryRequest.<String>builder()
                 .queryRestrictions(IdolQueryRestrictions.builder()
                         .queryText("XORApple")
                         .fieldText("")
@@ -53,6 +53,6 @@ public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<String, Ido
                 .autoCorrect(true)
                 .build();
 
-        documentsService.queryTextIndex(searchRequest);
+        documentsService.queryTextIndex(queryRequest);
     }
 }

@@ -22,7 +22,7 @@ import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
@@ -100,7 +100,7 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), any(QueryRequestBuilder.class))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = SearchRequest.<ResourceIdentifier>builder()
+        final QueryRequest<ResourceIdentifier> queryRequest = QueryRequest.<ResourceIdentifier>builder()
                 .queryRestrictions(queryRestrictions)
                 .start(1)
                 .maxResults(30)
@@ -110,9 +110,9 @@ public class HodDocumentServiceTest {
                 .highlight(true)
                 .autoCorrect(false)
                 .print(Print.fields.name())
-                .queryType(SearchRequest.QueryType.MODIFIED)
+                .queryType(QueryRequest.QueryType.MODIFIED)
                 .build();
-        final Documents<HodSearchResult> results = documentsService.queryTextIndex(searchRequest);
+        final Documents<HodSearchResult> results = documentsService.queryTextIndex(queryRequest);
         validateResults(results);
     }
 
@@ -122,7 +122,7 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<>("queryProfile", nullValue())))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = SearchRequest.<ResourceIdentifier>builder()
+        final QueryRequest<ResourceIdentifier> queryRequest = QueryRequest.<ResourceIdentifier>builder()
                 .queryRestrictions(queryRestrictions)
                 .start(1)
                 .maxResults(30)
@@ -132,9 +132,9 @@ public class HodDocumentServiceTest {
                 .highlight(true)
                 .autoCorrect(false)
                 .print(Print.fields.name())
-                .queryType(SearchRequest.QueryType.RAW)
+                .queryType(QueryRequest.QueryType.RAW)
                 .build();
-        final Documents<HodSearchResult> results = documentsService.queryTextIndex(searchRequest);
+        final Documents<HodSearchResult> results = documentsService.queryTextIndex(queryRequest);
         validateResults(results);
     }
 
@@ -144,7 +144,7 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<>("promotions", is(true))))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = SearchRequest.<ResourceIdentifier>builder()
+        final QueryRequest<ResourceIdentifier> queryRequest = QueryRequest.<ResourceIdentifier>builder()
                 .queryRestrictions(queryRestrictions)
                 .start(1)
                 .maxResults(30)
@@ -154,9 +154,9 @@ public class HodDocumentServiceTest {
                 .highlight(true)
                 .autoCorrect(true)
                 .print(Print.fields.name())
-                .queryType(SearchRequest.QueryType.PROMOTIONS)
+                .queryType(QueryRequest.QueryType.PROMOTIONS)
                 .build();
-        final Documents<HodSearchResult> results = documentsService.queryTextIndex(searchRequest);
+        final Documents<HodSearchResult> results = documentsService.queryTextIndex(queryRequest);
         validateResults(results);
     }
 

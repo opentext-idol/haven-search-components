@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.configuration;
 
 import com.autonomy.aci.client.services.AciService;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,8 +34,8 @@ class AciServiceRetrieverImpl implements AciServiceRetriever {
     }
 
     @Override
-    public AciService getAciService(final SearchRequest.QueryType queryType) {
-        final boolean useQms = qmsEnabled() && queryType != SearchRequest.QueryType.RAW;
+    public AciService getAciService(final QueryRequest.QueryType queryType) {
+        final boolean useQms = qmsEnabled() && queryType != QueryRequest.QueryType.RAW;
         return useQms ? qmsAciService : contentAciService;
     }
 }

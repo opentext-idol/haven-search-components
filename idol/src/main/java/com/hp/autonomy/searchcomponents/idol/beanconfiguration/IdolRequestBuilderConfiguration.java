@@ -11,7 +11,7 @@ import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequest;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
@@ -41,9 +41,9 @@ public class IdolRequestBuilderConfiguration {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    @ConditionalOnMissingBean(SearchRequest.SearchRequestBuilder.class)
-    public SearchRequest.SearchRequestBuilder<String> searchRequestBuilder() {
-        return SearchRequest.builder();
+    @ConditionalOnMissingBean(QueryRequest.SearchRequestBuilder.class)
+    public QueryRequest.SearchRequestBuilder<String> searchRequestBuilder() {
+        return QueryRequest.builder();
     }
 
     @Bean

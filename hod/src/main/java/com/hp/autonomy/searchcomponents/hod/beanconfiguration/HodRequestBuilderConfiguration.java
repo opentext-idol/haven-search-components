@@ -12,7 +12,7 @@ import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.hod.databases.HodDatabasesRequest;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
@@ -42,9 +42,9 @@ public class HodRequestBuilderConfiguration {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    @ConditionalOnMissingBean(SearchRequest.SearchRequestBuilder.class)
-    public SearchRequest.SearchRequestBuilder<ResourceIdentifier> searchRequestBuilder() {
-        return SearchRequest.builder();
+    @ConditionalOnMissingBean(QueryRequest.SearchRequestBuilder.class)
+    public QueryRequest.SearchRequestBuilder<ResourceIdentifier> searchRequestBuilder() {
+        return QueryRequest.builder();
     }
 
     @Bean

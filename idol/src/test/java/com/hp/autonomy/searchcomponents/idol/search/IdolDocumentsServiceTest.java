@@ -9,7 +9,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.types.idol.responses.Hit;
@@ -65,7 +65,7 @@ public class IdolDocumentsServiceTest {
         final QueryResponseData responseData = new QueryResponseData();
         when(queryExecutor.executeQuery(any(), any())).thenReturn(responseData);
 
-        idolDocumentsService.queryTextIndex(mockQueryParams(SearchRequest.QueryType.RAW));
+        idolDocumentsService.queryTextIndex(mockQueryParams(QueryRequest.QueryType.RAW));
         verify(queryResponseParser).parseQueryResults(any(), any(AciParameters.class), eq(responseData), any());
     }
 
@@ -76,13 +76,13 @@ public class IdolDocumentsServiceTest {
         final QueryResponseData responseData = new QueryResponseData();
         when(queryExecutor.executeQuery(any(), any())).thenReturn(responseData);
 
-        idolDocumentsService.queryTextIndex(mockQueryParams(SearchRequest.QueryType.MODIFIED));
+        idolDocumentsService.queryTextIndex(mockQueryParams(QueryRequest.QueryType.MODIFIED));
         verify(queryResponseParser).parseQueryResults(any(), any(AciParameters.class), eq(responseData), any());
     }
 
     @Test
     public void queryContentForPromotions() {
-        final Documents<IdolSearchResult> results = idolDocumentsService.queryTextIndex(mockQueryParams(SearchRequest.QueryType.PROMOTIONS));
+        final Documents<IdolSearchResult> results = idolDocumentsService.queryTextIndex(mockQueryParams(QueryRequest.QueryType.PROMOTIONS));
         assertThat(results.getDocuments(), is(empty()));
     }
 
@@ -93,7 +93,7 @@ public class IdolDocumentsServiceTest {
         final QueryResponseData responseData = new QueryResponseData();
         when(queryExecutor.executeQuery(any(), any())).thenReturn(responseData);
 
-        idolDocumentsService.queryTextIndex(mockQueryParams(SearchRequest.QueryType.PROMOTIONS));
+        idolDocumentsService.queryTextIndex(mockQueryParams(QueryRequest.QueryType.PROMOTIONS));
         verify(queryResponseParser).parseQueryResults(any(), any(AciParameters.class), eq(responseData), any());
     }
 
@@ -143,7 +143,7 @@ public class IdolDocumentsServiceTest {
     public void getStateToken() {
         when(queryExecutor.executeQuery(any(), any())).thenReturn(mockStateTokenResponse());
 
-        final String stateToken = idolDocumentsService.getStateToken(mockQueryParams(SearchRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
+        final String stateToken = idolDocumentsService.getStateToken(mockQueryParams(QueryRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
         assertThat(stateToken, is(MOCK_STATE_TOKEN));
     }
 
@@ -151,19 +151,19 @@ public class IdolDocumentsServiceTest {
     public void getStateTokenAndResultCount() {
         when(queryExecutor.executeQuery(any(), any())).thenReturn(mockStateTokenResponse());
 
-        final StateTokenAndResultCount stateTokenAndResultCount = idolDocumentsService.getStateTokenAndResultCount(mockQueryParams(SearchRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
+        final StateTokenAndResultCount stateTokenAndResultCount = idolDocumentsService.getStateTokenAndResultCount(mockQueryParams(QueryRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
         assertThat(stateTokenAndResultCount.getTypedStateToken().getStateToken(), is(MOCK_STATE_TOKEN));
         assertThat(stateTokenAndResultCount.getResultCount(), is((long) MOCK_TOTAL_HITS));
     }
 
     // Used in Find's DocumentService test
-    private SearchRequest<String> mockQueryParams(final SearchRequest.QueryType queryType) {
+    private QueryRequest<String> mockQueryParams(final QueryRequest.QueryType queryType) {
         final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder()
                 .queryText("*")
                 .databases(Arrays.asList("Database1", "Database2"))
                 .maxDate(DateTime.now())
                 .build();
-        return SearchRequest.<String>builder()
+        return QueryRequest.<String>builder()
                 .queryRestrictions(queryRestrictions)
                 .start(1)
                 .maxResults(50)

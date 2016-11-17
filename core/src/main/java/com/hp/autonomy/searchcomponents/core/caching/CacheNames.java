@@ -12,7 +12,7 @@ import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesSe
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 
@@ -38,7 +38,7 @@ public interface CacheNames {
     String PARAMETRIC_VALUES_IN_BUCKETS = "parametric-values-in-buckets";
 
     /**
-     * Cache identifier for {@link DocumentsService#queryTextIndex(SearchRequest)}
+     * Cache identifier for {@link DocumentsService#queryTextIndex(QueryRequest)}
      */
     String GET_DOCUMENT_CONTENT = "get-content";
 

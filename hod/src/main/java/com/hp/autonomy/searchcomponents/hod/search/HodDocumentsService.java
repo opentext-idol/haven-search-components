@@ -29,7 +29,7 @@ import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
@@ -99,25 +99,25 @@ class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSea
     }
 
     @Override
-    public Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> searchRequest) throws HodErrorException {
-        final QueryRequestBuilder params = setQueryParams(searchRequest, searchRequest.getQueryType() != SearchRequest.QueryType.RAW);
+    public Documents<HodSearchResult> queryTextIndex(final QueryRequest<ResourceIdentifier> queryRequest) throws HodErrorException {
+        final QueryRequestBuilder params = setQueryParams(queryRequest, queryRequest.getQueryType() != QueryRequest.QueryType.RAW);
 
-        if (searchRequest.isAutoCorrect()) {
+        if (queryRequest.isAutoCorrect()) {
             params.setCheckSpelling(CheckSpelling.autocorrect);
         }
 
-        if (searchRequest.getQueryType() == SearchRequest.QueryType.PROMOTIONS) {
+        if (queryRequest.getQueryType() == QueryRequest.QueryType.PROMOTIONS) {
             params.setPromotions(true);
             //TODO remove this when IOD have fixed the the default value of the indexes parameter (IOD-6168)
             params.setIndexes(Collections.singletonList(ResourceIdentifier.WIKI_ENG));
         }
 
-        final QueryResults<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(searchRequest.getQueryRestrictions().getQueryText(), params);
+        final QueryResults<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(queryRequest.getQueryRestrictions().getQueryText(), params);
 
         checkForWarnings(hodDocuments);
 
         final List<HodSearchResult> documentList = new LinkedList<>();
-        addDomainToSearchResults(documentList, searchRequest.getQueryRestrictions().getDatabases(), hodDocuments.getDocuments());
+        addDomainToSearchResults(documentList, queryRequest.getQueryRestrictions().getDatabases(), hodDocuments.getDocuments());
 
         final Integer totalResults = hodDocuments.getTotalResults() != null ? hodDocuments.getTotalResults() : 0;
         return new Documents<>(documentList, totalResults, hodDocuments.getExpandedQuery(), null, hodDocuments.getAutoCorrection(), null);

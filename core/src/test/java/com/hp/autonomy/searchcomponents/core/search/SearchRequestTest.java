@@ -9,7 +9,7 @@ import com.hp.autonomy.searchcomponents.core.requests.RequestObjectTest;
 
 import java.io.Serializable;
 
-public abstract class SearchRequestTest<S extends Serializable> extends RequestObjectTest<SearchRequest<S>, SearchRequest.SearchRequestBuilder<S>> {
+public abstract class SearchRequestTest<S extends Serializable> extends RequestObjectTest<QueryRequest<S>, QueryRequest.SearchRequestBuilder<S>> {
     @Override
     protected String toStringContent() {
         return "queryRestrictions";

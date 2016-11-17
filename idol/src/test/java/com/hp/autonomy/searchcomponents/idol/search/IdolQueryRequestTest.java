@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequestTest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
@@ -17,7 +17,7 @@ import org.junit.Before;
 
 import java.io.IOException;
 
-public class IdolSearchRequestTest extends SearchRequestTest<String> {
+public class IdolQueryRequestTest extends SearchRequestTest<String> {
     @Override
     @Before
     public void setUp() {
@@ -26,8 +26,8 @@ public class IdolSearchRequestTest extends SearchRequestTest<String> {
     }
 
     @Override
-    protected SearchRequest<String> constructObject() {
-        return SearchRequest.<String>builder()
+    protected QueryRequest<String> constructObject() {
+        return QueryRequest.<String>builder()
                 .queryRestrictions(IdolQueryRestrictions.builder()
                         .queryText("*")
                         .fieldText("NOT(EMPTY):{FIELD}")
@@ -49,7 +49,7 @@ public class IdolSearchRequestTest extends SearchRequestTest<String> {
                 .autoCorrect(true)
                 .print(PrintParam.Fields.name())
                 .printField("CATEGORY")
-                .queryType(SearchRequest.QueryType.MODIFIED)
+                .queryType(QueryRequest.QueryType.MODIFIED)
                 .build();
     }
 

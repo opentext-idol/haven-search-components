@@ -30,7 +30,7 @@ public abstract class AbstractDocumentServiceIT<S extends Serializable, D extend
     protected IntegrationTestUtils<S, D, E> integrationTestUtils;
 
     @Autowired
-    protected SearchRequest.SearchRequestBuilder<S> searchRequestBuilder;
+    protected QueryRequest.SearchRequestBuilder<S> searchRequestBuilder;
 
     @Autowired
     protected SuggestRequest.SuggestRequestBuilder<S> suggestRequestBuilder;
@@ -40,21 +40,21 @@ public abstract class AbstractDocumentServiceIT<S extends Serializable, D extend
 
     @Test
     public void query() throws E {
-        final SearchRequest<S> searchRequest = searchRequestBuilder
+        final QueryRequest<S> queryRequest = searchRequestBuilder
                 .queryRestrictions(integrationTestUtils.buildQueryRestrictions())
-                .queryType(SearchRequest.QueryType.MODIFIED)
+                .queryType(QueryRequest.QueryType.MODIFIED)
                 .build();
-        final Documents<D> documents = documentsService.queryTextIndex(searchRequest);
+        final Documents<D> documents = documentsService.queryTextIndex(queryRequest);
         assertThat(documents.getDocuments(), is(not(empty())));
     }
 
     @Test
     public void queryForPromotions() throws E {
-        final SearchRequest<S> searchRequest = searchRequestBuilder
+        final QueryRequest<S> queryRequest = searchRequestBuilder
                 .queryRestrictions(integrationTestUtils.buildQueryRestrictions())
-                .queryType(SearchRequest.QueryType.PROMOTIONS)
+                .queryType(QueryRequest.QueryType.PROMOTIONS)
                 .build();
-        final Documents<D> documents = documentsService.queryTextIndex(searchRequest);
+        final Documents<D> documents = documentsService.queryTextIndex(queryRequest);
         assertThat(documents.getDocuments(), is(empty())); // TODO: configure this later
     }
 

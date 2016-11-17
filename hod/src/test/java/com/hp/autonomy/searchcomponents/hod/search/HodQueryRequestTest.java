@@ -10,7 +10,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequestTest;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
@@ -18,7 +18,7 @@ import org.junit.Before;
 
 import java.io.IOException;
 
-public class HodSearchRequestTest extends SearchRequestTest<ResourceIdentifier> {
+public class HodQueryRequestTest extends SearchRequestTest<ResourceIdentifier> {
     @Override
     @Before
     public void setUp() {
@@ -27,8 +27,8 @@ public class HodSearchRequestTest extends SearchRequestTest<ResourceIdentifier> 
     }
 
     @Override
-    protected SearchRequest<ResourceIdentifier> constructObject() {
-        return SearchRequest.<ResourceIdentifier>builder()
+    protected QueryRequest<ResourceIdentifier> constructObject() {
+        return QueryRequest.<ResourceIdentifier>builder()
                 .queryRestrictions(HodQueryRestrictions.builder()
                         .queryText("*")
                         .fieldText("NOT(EMPTY):{FIELD}")
@@ -50,7 +50,7 @@ public class HodSearchRequestTest extends SearchRequestTest<ResourceIdentifier> 
                 .autoCorrect(true)
                 .print(Print.fields.name())
                 .printField("CATEGORY")
-                .queryType(SearchRequest.QueryType.MODIFIED)
+                .queryType(QueryRequest.QueryType.MODIFIED)
                 .build();
     }
 

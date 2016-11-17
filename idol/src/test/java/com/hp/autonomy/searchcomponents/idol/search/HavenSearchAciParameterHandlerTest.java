@@ -12,7 +12,7 @@ import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
@@ -75,7 +75,7 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addSearchOutputParameters() {
-        final AciSearchRequest<String> searchRequest = SearchRequest.<String>builder()
+        final AciSearchRequest<String> searchRequest = QueryRequest.<String>builder()
                 .queryRestrictions(null)
                 .start(1)
                 .maxResults(50)

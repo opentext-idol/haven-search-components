@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.idol.responses.SuggestResponseData;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,7 +31,7 @@ public interface QueryExecutor {
      * @return Whether or not to perform a query
      * @throws AciErrorException The error thrown in the event of the Idol's returning an error response
      */
-    boolean performQuery(SearchRequest.QueryType queryType) throws AciErrorException;
+    boolean performQuery(QueryRequest.QueryType queryType) throws AciErrorException;
 
     /**
      * Executes a query action
@@ -41,7 +41,7 @@ public interface QueryExecutor {
      * @return The Idol response data
      * @throws AciErrorException The error thrown in the event of the Idol's returning an error response
      */
-    QueryResponseData executeQuery(AciParameters aciParameters, SearchRequest.QueryType queryType) throws AciErrorException;
+    QueryResponseData executeQuery(AciParameters aciParameters, QueryRequest.QueryType queryType) throws AciErrorException;
 
     /**
      * Executes a suggest action
@@ -51,5 +51,5 @@ public interface QueryExecutor {
      * @return The Idol response data
      * @throws AciErrorException The error thrown in the event of the Idol's returning an error response
      */
-    SuggestResponseData executeSuggest(AciParameters aciParameters, SearchRequest.QueryType queryType) throws AciErrorException;
+    SuggestResponseData executeSuggest(AciParameters aciParameters, QueryRequest.QueryType queryType) throws AciErrorException;
 }

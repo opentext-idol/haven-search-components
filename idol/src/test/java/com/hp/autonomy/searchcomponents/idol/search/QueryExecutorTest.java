@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import org.junit.Before;
@@ -42,34 +42,34 @@ public class QueryExecutorTest {
 
     @Test
     public void performRawQuery() {
-        assertTrue(queryExecutor.performQuery(SearchRequest.QueryType.RAW));
+        assertTrue(queryExecutor.performQuery(QueryRequest.QueryType.RAW));
     }
 
     @Test
     public void performModifiedQuery() {
-        assertTrue(queryExecutor.performQuery(SearchRequest.QueryType.MODIFIED));
+        assertTrue(queryExecutor.performQuery(QueryRequest.QueryType.MODIFIED));
     }
 
     @Test
     public void performPromotionsQueryNoQms() {
-        assertFalse(queryExecutor.performQuery(SearchRequest.QueryType.PROMOTIONS));
+        assertFalse(queryExecutor.performQuery(QueryRequest.QueryType.PROMOTIONS));
     }
 
     @Test
     public void performPromotionsQueryAndQms() {
         when(aciServiceRetriever.qmsEnabled()).thenReturn(true);
-        assertTrue(queryExecutor.performQuery(SearchRequest.QueryType.PROMOTIONS));
+        assertTrue(queryExecutor.performQuery(QueryRequest.QueryType.PROMOTIONS));
     }
 
     @Test
     public void executeQuery() {
-        queryExecutor.executeQuery(new AciParameters(), SearchRequest.QueryType.MODIFIED);
+        queryExecutor.executeQuery(new AciParameters(), QueryRequest.QueryType.MODIFIED);
         verify(aciService).executeAction(any(), any());
     }
 
     @Test
     public void executeSuggest() {
-        queryExecutor.executeSuggest(new AciParameters(), SearchRequest.QueryType.RAW);
+        queryExecutor.executeSuggest(new AciParameters(), QueryRequest.QueryType.RAW);
         verify(aciService).executeAction(any(), any());
     }
 }

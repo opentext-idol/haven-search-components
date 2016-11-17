@@ -9,7 +9,7 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.types.idol.responses.QsElement;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
@@ -48,7 +48,7 @@ class IdolRelatedConceptsService implements RelatedConceptsService<QsElement, St
         parameters.add(QueryParams.QuerySummary.name(), true);
         parameters.add(QueryParams.QuerySummaryLength.name(), relatedConceptsRequest.getQuerySummaryLength());
 
-        final QueryResponseData responseData = queryExecutor.executeQuery(parameters, SearchRequest.QueryType.RAW);
+        final QueryResponseData responseData = queryExecutor.executeQuery(parameters, QueryRequest.QueryType.RAW);
         return responseData.getQs() != null ? responseData.getQs().getElement() : Collections.emptyList();
     }
 }
