@@ -30,12 +30,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+import static com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser.FIELDS_PARSER_BEAN_NAME;
+
+/**
+ * Default implementation of {@link FieldsParser}
+ */
+@Component(FIELDS_PARSER_BEAN_NAME)
 class FieldsParserImpl implements FieldsParser {
     private final ConfigService<? extends IdolSearchCapable> configService;
 
     @Autowired
-    public FieldsParserImpl(final ConfigService<? extends IdolSearchCapable> configService) {
+    FieldsParserImpl(final ConfigService<? extends IdolSearchCapable> configService) {
         this.configService = configService;
     }
 

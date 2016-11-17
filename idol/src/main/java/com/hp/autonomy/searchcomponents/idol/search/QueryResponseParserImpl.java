@@ -33,12 +33,14 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import static com.hp.autonomy.searchcomponents.idol.search.QueryResponseParser.QUERY_RESPONSE_PARSER_BEAN_NAME;
+
 /**
- * Default implementation of Idol QueryResponseParser
+ * Default implementation of {@link QueryResponseParser}
  */
 @SuppressWarnings("WeakerAccess")
-@Component
-public class QueryResponseParserImpl implements QueryResponseParser {
+@Component(QUERY_RESPONSE_PARSER_BEAN_NAME)
+class QueryResponseParserImpl implements QueryResponseParser {
     private static final Pattern SPELLING_SEPARATOR_PATTERN = Pattern.compile(", ");
 
     static final String MISSING_DATABASE_WARNING = "At least one of the databases provided in the query does not exist";
@@ -47,7 +49,7 @@ public class QueryResponseParserImpl implements QueryResponseParser {
     private final DatabasesService<Database, IdolDatabasesRequest, AciErrorException> databasesService;
 
     @Autowired
-    public QueryResponseParserImpl(final FieldsParser fieldsParser, final DatabasesService<Database, IdolDatabasesRequest, AciErrorException> databasesService) {
+    QueryResponseParserImpl(final FieldsParser fieldsParser, final DatabasesService<Database, IdolDatabasesRequest, AciErrorException> databasesService) {
         this.fieldsParser = fieldsParser;
         this.databasesService = databasesService;
     }

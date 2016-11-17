@@ -38,23 +38,26 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import static com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler.PARAMETER_HANDLER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_GROUP;
 import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_IDENTIFIER;
 
-@SuppressWarnings("WeakerAccess")
-@Component("parameterHandler")
-public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
+/**
+ * Default implementation of {@link HavenSearchAciParameterHandler}
+ */
+@Component(PARAMETER_HANDLER_BEAN_NAME)
+class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
     private static final String IDOL_DATE_PARAMETER_FORMAT = "HH:mm:ss dd/MM/yyyy";
     private static final String GET_CONTENT_QUERY_TEXT = "*";
 
-    protected final ConfigService<? extends IdolSearchCapable> configService;
-    protected final DocumentFieldsService documentFieldsService;
-    protected final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever;
+    private final ConfigService<? extends IdolSearchCapable> configService;
+    private final DocumentFieldsService documentFieldsService;
+    private final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever;
 
     private final Escaper urlFragmentEscaper = UrlEscapers.urlFragmentEscaper();
 
     @Autowired
-    public HavenSearchAciParameterHandlerImpl(
+    HavenSearchAciParameterHandlerImpl(
             final ConfigService<? extends IdolSearchCapable> configService,
             final DocumentFieldsService documentFieldsService,
             final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever
@@ -182,7 +185,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.StoredStateTokenLifetime.name(), -1);  // negative value means no expiry (DAH)
     }
 
-    protected String formatDate(final ReadableInstant date) {
+    private String formatDate(final ReadableInstant date) {
         return date == null ? null : DateTimeFormat.forPattern(IDOL_DATE_PARAMETER_FORMAT).print(date);
     }
 }

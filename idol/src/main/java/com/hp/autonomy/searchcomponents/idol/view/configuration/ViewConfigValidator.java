@@ -15,8 +15,10 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
-public class ViewConfigValidator implements Validator<ViewConfig> {
+import static com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable.VIEW_CONFIG_VALIDATOR_BEAN_NAME;
+
+@Component(VIEW_CONFIG_VALIDATOR_BEAN_NAME)
+class ViewConfigValidator implements Validator<ViewConfig> {
 
     private final AciService validatorAciService;
     private final ProcessorFactory processorFactory;
@@ -44,7 +46,7 @@ public class ViewConfigValidator implements Validator<ViewConfig> {
             switch (config.getViewingMode()) {
                 case CONNECTOR:
                     final ValidationResult<?> connectorValidation = config.getConnector().validate(validatorAciService, null, processorFactory);
-                    returnValue =  connectorValidation.isValid() ? validationResult : new ValidationResult<Object>(false, new ConnectorValidation(connectorValidation));
+                    returnValue = connectorValidation.isValid() ? validationResult : new ValidationResult<Object>(false, new ConnectorValidation(connectorValidation));
                     break;
                 case FIELD:
                     returnValue = StringUtils.isBlank(config.getReferenceField()) ? new ValidationResult<>(false, Validation.REFERENCE_FIELD_BLANK) : validationResult;

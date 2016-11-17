@@ -12,14 +12,17 @@ import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
-public class AciServiceRetrieverImpl implements AciServiceRetriever {
+/**
+ * Default implementation of {@link AciServiceRetriever}
+ */
+@Component(AciServiceRetriever.ACI_SERVICE_RETRIEVER_BEAN_NAME)
+class AciServiceRetrieverImpl implements AciServiceRetriever {
     private final ConfigService<? extends IdolSearchCapable> configService;
     private final AciService contentAciService;
     private final AciService qmsAciService;
 
     @Autowired
-    public AciServiceRetrieverImpl(final ConfigService<? extends IdolSearchCapable> configService, final AciService contentAciService, final AciService qmsAciService) {
+    AciServiceRetrieverImpl(final ConfigService<? extends IdolSearchCapable> configService, final AciService contentAciService, final AciService qmsAciService) {
         this.configService = configService;
         this.contentAciService = contentAciService;
         this.qmsAciService = qmsAciService;

@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static com.hp.autonomy.searchcomponents.hod.databases.HodDatabaseServiceConstants.CONTENT_FLAVOURS;
+import static com.hp.autonomy.searchcomponents.hod.databases.HodDatabasesServiceConstants.CONTENT_FLAVOURS;
 
 /**
  * HoD databases service implementation: retrieves private and public index information by querying HoD for content resources
@@ -74,11 +74,11 @@ class HodDatabasesService implements DatabasesService<Database, HodDatabasesRequ
      * @return A database representation of the resource
      */
     private Database databaseForResource(final Resource resource, final String domain, final boolean isPublic) {
-        return new Database.Builder()
-                .setName(resource.getResource())
-                .setDisplayName(resource.getDisplayName())
-                .setPublic(isPublic)
-                .setDomain(domain)
+        return Database.builder()
+                .name(resource.getResource())
+                .displayName(resource.getDisplayName())
+                .isPublic(isPublic)
+                .domain(domain)
                 .build();
     }
 }
