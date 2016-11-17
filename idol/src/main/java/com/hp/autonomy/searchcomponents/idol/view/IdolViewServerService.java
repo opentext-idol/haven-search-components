@@ -87,23 +87,7 @@ class IdolViewServerService implements ViewServerService<String, AciErrorExcepti
         final String reference = getReferenceFieldValue(documentReference, database);
 
         final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
-        viewParameters.add(ViewParams.NoACI.name(), true);
-        viewParameters.add(ViewParams.Reference.name(), reference);
-        viewParameters.add(ViewParams.EmbedImages.name(), true);
-        viewParameters.add(ViewParams.StripScript.name(), true);
-        viewParameters.add(ViewParams.OriginalBaseURL.name(), true);
-
-        if (highlightExpression != null) {
-            viewParameters.add(ViewParams.Links.name(), highlightExpression);
-            viewParameters.add(ViewParams.StartTag.name(), HIGHLIGHT_START_TAG);
-            viewParameters.add(ViewParams.EndTag.name(), HIGHLIGHT_END_TAG);
-
-            // we need this because we're sending query text, not a csv of stemmed terms
-            viewParameters.add(ViewParams.Boolean.name(), true);
-        }
-
-        // this prevents ViewServer from returning the raw file
-        viewParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
+        parameterHandler.addViewParameters(viewParameters, reference, highlightExpression);
         
         try {
             viewAciService.executeAction(viewParameters, new CopyResponseProcessor(outputStream));

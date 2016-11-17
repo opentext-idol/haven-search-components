@@ -86,4 +86,13 @@ public interface HavenSearchAciParameterHandler {
      * @param aciParameters The set of parameters to add to
      */
     void addStoreStateParameters(AciParameters aciParameters);
+
+    /**
+     * Adds parameters for performing a view action against ViewServer
+     *
+     * @param aciParameters The set of parameters to add to
+     * @param reference The document reference to view
+     * @param highlightExpression The expression to highlight (may be null if no highlighting desired)
+     */
+    void addViewParameters(AciParameters aciParameters, String reference, String highlightExpression);
 }

@@ -15,6 +15,8 @@ import com.hp.autonomy.aci.content.identifier.stateid.StateIdsBuilder;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
+import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
+import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
@@ -38,6 +40,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_END_TAG;
+import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_START_TAG;
 import static com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler.PARAMETER_HANDLER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_GROUP;
 import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_IDENTIFIER;
@@ -183,6 +187,27 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     public void addStoreStateParameters(final AciParameters aciParameters) {
         aciParameters.add(QueryParams.StoreState.name(), true);
         aciParameters.add(QueryParams.StoredStateTokenLifetime.name(), -1);  // negative value means no expiry (DAH)
+    }
+
+    @Override
+    public void addViewParameters(final AciParameters aciParameters, final String reference, final String highlightExpression) {
+        aciParameters.add(ViewParams.NoACI.name(), true);
+        aciParameters.add(ViewParams.Reference.name(), reference);
+        aciParameters.add(ViewParams.EmbedImages.name(), true);
+        aciParameters.add(ViewParams.StripScript.name(), true);
+        aciParameters.add(ViewParams.OriginalBaseURL.name(), true);
+
+        if (highlightExpression != null) {
+            aciParameters.add(ViewParams.Links.name(), highlightExpression);
+            aciParameters.add(ViewParams.StartTag.name(), HIGHLIGHT_START_TAG);
+            aciParameters.add(ViewParams.EndTag.name(), HIGHLIGHT_END_TAG);
+
+            // we need this because we're sending query text, not a csv of stemmed terms
+            aciParameters.add(ViewParams.Boolean.name(), true);
+        }
+
+        // this prevents ViewServer from returning the raw file
+        aciParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
     }
 
     private String formatDate(final ReadableInstant date) {

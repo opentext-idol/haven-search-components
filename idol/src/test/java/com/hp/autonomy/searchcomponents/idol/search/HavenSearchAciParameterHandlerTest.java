@@ -140,4 +140,10 @@ public class HavenSearchAciParameterHandlerTest {
         parameterHandler.addStoreStateParameters(aciParameters);
         assertThat(aciParameters, hasSize(2));
     }
+
+    @Test
+    public void addViewParameters() {
+        parameterHandler.addViewParameters(aciParameters, "123456", "SomeText");
+        assertThat(aciParameters, hasSize(10));
+    }
 }
