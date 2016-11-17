@@ -15,7 +15,7 @@ import java.util.Collection;
  *
  * @param <S> The type of the database identifier
  */
-public interface AciSearchRequest<S extends Serializable> {
+public interface SearchRequest<S extends Serializable> {
     int DEFAULT_START = 1;
     int DEFAULT_MAX_RESULTS = 30;
     String DEFAULT_PRINT = PrintParam.Fields.name();

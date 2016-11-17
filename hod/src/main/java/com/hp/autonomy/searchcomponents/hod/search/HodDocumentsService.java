@@ -24,7 +24,7 @@ import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.warning.HodWarning;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
-import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
@@ -174,7 +174,7 @@ class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSea
         throw new NotImplementedException("State tokens are not yet retrievable from Haven OnDemand");
     }
 
-    private QueryRequestBuilder setQueryParams(final AciSearchRequest<ResourceIdentifier> searchRequest, final boolean setQueryProfile) {
+    private QueryRequestBuilder setQueryParams(final SearchRequest<ResourceIdentifier> searchRequest, final boolean setQueryProfile) {
         final String profileName = configService.getConfig().getQueryManipulation().getProfile();
 
         final Print print = Print.valueOf(searchRequest.getPrint().toLowerCase());

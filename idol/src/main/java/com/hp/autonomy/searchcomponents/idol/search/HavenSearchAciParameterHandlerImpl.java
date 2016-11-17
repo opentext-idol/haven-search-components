@@ -18,7 +18,7 @@ import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
@@ -94,7 +94,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addSearchOutputParameters(final AciParameters aciParameters, final AciSearchRequest<String> searchRequest) {
+    public void addSearchOutputParameters(final AciParameters aciParameters, final SearchRequest<String> searchRequest) {
         addSecurityInfo(aciParameters);
 
         aciParameters.add(QueryParams.Start.name(), searchRequest.getStart());

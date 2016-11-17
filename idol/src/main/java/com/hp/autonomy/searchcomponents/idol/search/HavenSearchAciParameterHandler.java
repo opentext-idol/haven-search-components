@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
@@ -36,7 +36,7 @@ public interface HavenSearchAciParameterHandler {
      * @param aciParameters The set of parameters to add to
      * @param searchRequest The request options
      */
-    void addSearchOutputParameters(final AciParameters aciParameters, final AciSearchRequest<String> searchRequest);
+    void addSearchOutputParameters(final AciParameters aciParameters, final SearchRequest<String> searchRequest);
 
     /**
      * Adds Idol parameters relating to requests for retrieving document content

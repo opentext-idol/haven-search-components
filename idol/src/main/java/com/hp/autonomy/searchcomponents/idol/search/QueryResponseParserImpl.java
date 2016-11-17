@@ -9,7 +9,7 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
-import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.AutoCorrectException;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequest;
 import com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser;
@@ -55,7 +55,7 @@ class QueryResponseParserImpl implements QueryResponseParser {
     }
 
     @Override
-    public Documents<IdolSearchResult> parseQueryResults(final AciSearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData, final Function<AciParameters, QueryResponseData> queryExecutor) {
+    public Documents<IdolSearchResult> parseQueryResults(final SearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData, final Function<AciParameters, QueryResponseData> queryExecutor) {
         final List<Hit> hits = responseData.getHits();
 
         final Warnings warnings = parseWarnings(searchRequest, aciParameters, responseData);
@@ -74,7 +74,7 @@ class QueryResponseParserImpl implements QueryResponseParser {
         return documents;
     }
 
-    protected Warnings parseWarnings(final AciSearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData) {
+    protected Warnings parseWarnings(final SearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData) {
         Warnings warnings = null;
         for (final String warning : responseData.getWarning()) {
             if (MISSING_DATABASE_WARNING.equals(warning.trim())) {

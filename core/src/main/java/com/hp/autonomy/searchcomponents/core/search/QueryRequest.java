@@ -28,7 +28,7 @@ import java.util.HashSet;
 @Data
 @JsonDeserialize(builder = QueryRequest.SearchRequestBuilder.class)
 public class QueryRequest<S extends Serializable>
-        implements AciSearchRequest<S>, RequestObject<QueryRequest<S>, QueryRequest.SearchRequestBuilder<S>> {
+        implements SearchRequest<S>, RequestObject<QueryRequest<S>, QueryRequest.SearchRequestBuilder<S>> {
     private static final long serialVersionUID = -6338199353489914631L;
 
     private final boolean autoCorrect;

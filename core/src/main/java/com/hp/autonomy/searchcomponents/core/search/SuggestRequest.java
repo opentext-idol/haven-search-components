@@ -27,7 +27,7 @@ import java.util.HashSet;
 @Data
 @JsonDeserialize(builder = SuggestRequest.SuggestRequestBuilder.class)
 public class SuggestRequest<S extends Serializable>
-        implements AciSearchRequest<S>, RequestObject<SuggestRequest<S>, SuggestRequest.SuggestRequestBuilder<S>> {
+        implements SearchRequest<S>, RequestObject<SuggestRequest<S>, SuggestRequest.SuggestRequestBuilder<S>> {
     private static final long serialVersionUID = -6338199353489914631L;
 
     private final String reference;
