@@ -3,11 +3,10 @@
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
-package com.hp.autonomy.searchcomponents.hod.test;
+package com.hp.autonomy.searchcomponents.hod.search;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", defaultImpl = HodQueryRestrictions.class)
 @JsonSubTypes(@JsonSubTypes.Type(HodQueryRestrictions.class))

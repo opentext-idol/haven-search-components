@@ -8,7 +8,6 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequestTest;
-import com.hp.autonomy.searchcomponents.idol.test.IdolQueryRestrictionsMixin;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;

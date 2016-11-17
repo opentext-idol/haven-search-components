@@ -10,7 +10,7 @@ import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequestTest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
-import com.hp.autonomy.searchcomponents.hod.test.HodQueryRestrictionsMixin;
+import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictionsMixin;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;

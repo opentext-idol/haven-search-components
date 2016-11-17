@@ -12,7 +12,6 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequestTest;
-import com.hp.autonomy.searchcomponents.hod.test.HodQueryRestrictionsMixin;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;

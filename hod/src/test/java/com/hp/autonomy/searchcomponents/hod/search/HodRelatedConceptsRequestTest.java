@@ -9,7 +9,6 @@ import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequestTest;
-import com.hp.autonomy.searchcomponents.hod.test.HodQueryRestrictionsMixin;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
