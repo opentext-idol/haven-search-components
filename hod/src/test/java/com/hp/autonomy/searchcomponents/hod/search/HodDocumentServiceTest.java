@@ -209,14 +209,14 @@ public class HodDocumentServiceTest {
 
     @SuppressWarnings("CastToConcreteClass")
     private QueryResults<HodSearchResult> mockResults() {
-        final HodSearchResult resultWithIndexInQuery = new HodSearchResult.Builder()
-                .setIndex(testUtils.getDatabases().get(0).getName())
+        final HodSearchResult resultWithIndexInQuery = HodSearchResult.builder()
+                .index(testUtils.getDatabases().get(0).getName())
                 .build();
-        final HodSearchResult resultWithPublicIndex = new HodSearchResult.Builder()
-                .setIndex(ResourceIdentifier.NEWS_ENG.getName())
+        final HodSearchResult resultWithPublicIndex = HodSearchResult.builder()
+                .index(ResourceIdentifier.NEWS_ENG.getName())
                 .build();
-        final HodSearchResult resultWithPrivateIndex = new HodSearchResult.Builder()
-                .setIndex("SomeIndex")
+        final HodSearchResult resultWithPrivateIndex = HodSearchResult.builder()
+                .index("SomeIndex")
                 .build();
         final HodWarning warning = new HodWarning.Builder()
                 .setCode(40003)

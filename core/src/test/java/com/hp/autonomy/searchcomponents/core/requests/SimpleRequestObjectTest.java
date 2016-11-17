@@ -7,7 +7,6 @@ package com.hp.autonomy.searchcomponents.core.requests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,29 +14,17 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Simple abstract test class for any object intended to be passed to a HavenSearch controller endpoint
  */
-public abstract class SimpleRequestObjectTest<O extends Serializable> {
+public abstract class SimpleRequestObjectTest<O extends Serializable> extends SerializableObjectTest<O> {
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
-    O object;
-
     @Before
-    public void setUp() {
-        object = constructObject();
-
+    public void setUpObjectMapper() {
         objectMapper.registerModule(new JodaModule());
     }
-
-    /**
-     * Construct an instance of the object for use in tests
-     *
-     * @return A fully initialised object
-     */
-    protected abstract O constructObject();
 
     /**
      * Json as String to be converted into a Java object
@@ -47,19 +34,6 @@ public abstract class SimpleRequestObjectTest<O extends Serializable> {
      */
     protected abstract String json() throws IOException;
 
-    /**
-     * Expected content when invoking {@link #toString()} on the object
-     *
-     * @return the expected content
-     */
-    protected abstract String toStringContent();
-
-    @Test
-    public void serializable() {
-        final Serializable copy = SerializationUtils.clone(object);
-        assertEquals(object, copy);
-    }
-
     @Test
     public void fromJson() throws IOException {
         assertEquals(object, readJson());
@@ -67,10 +41,5 @@ public abstract class SimpleRequestObjectTest<O extends Serializable> {
 
     protected Object readJson() throws IOException {
         return objectMapper.readValue(json(), object.getClass());
-    }
-
-    @Test
-    public void toStringTest() {
-        assertTrue(object.toString().contains(toStringContent()));
     }
 }

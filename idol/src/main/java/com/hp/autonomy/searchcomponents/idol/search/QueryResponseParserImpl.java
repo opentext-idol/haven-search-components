@@ -20,6 +20,7 @@ import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.Spelling;
 import com.hp.autonomy.types.requests.Warnings;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -113,14 +114,14 @@ public class QueryResponseParserImpl implements QueryResponseParser {
     public List<IdolSearchResult> parseQueryHits(final Collection<Hit> hits) {
         final List<IdolSearchResult> results = new ArrayList<>(hits.size());
         for (final Hit hit : hits) {
-            final IdolSearchResult.Builder searchResultBuilder = new IdolSearchResult.Builder()
-                    .setReference(hit.getReference())
-                    .setIndex(hit.getDatabase())
-                    .setTitle(hit.getTitle())
-                    .setSummary(hit.getSummary())
-                    .setDate(hit.getDatestring())
-                    .setWeight(hit.getWeight())
-                    .setPromotionName(hit.getPromotionname());
+            final IdolSearchResult.IdolSearchResultBuilder searchResultBuilder = new IdolSearchResult.IdolSearchResultBuilder()
+                    .reference(hit.getReference())
+                    .index(hit.getDatabase())
+                    .title(hit.getTitle())
+                    .summary(hit.getSummary())
+                    .date(hit.getDatestring() != null ? new DateTime(hit.getDatestring()) : null)
+                    .weight(hit.getWeight())
+                    .promotionName(hit.getPromotionname());
 
             fieldsParser.parseDocumentFields(hit, searchResultBuilder);
             results.add(searchResultBuilder.build());

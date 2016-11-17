@@ -8,19 +8,19 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.Singular;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
-import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("InstanceVariableOfConcreteClass")
+@SuppressWarnings({"InstanceVariableOfConcreteClass", "MismatchedQueryAndUpdateOfCollection"})
 @Data
+@Builder(toBuilder = true)
 public class IdolSearchResult implements SearchResult {
     private static final long serialVersionUID = 4767058593555545628L;
 
@@ -33,6 +33,7 @@ public class IdolSearchResult implements SearchResult {
     private final String summary;
     private final Double weight;
 
+    @Singular("fieldEntry")
     private final Map<String, FieldInfo<?>> fieldMap;
 
     private final DateTime date;
@@ -41,7 +42,7 @@ public class IdolSearchResult implements SearchResult {
     private final String promotionName;
     private final PromotionCategory promotionCategory;
 
-    private IdolSearchResult(final Builder builder) {
+    private IdolSearchResult(final IdolSearchResultBuilder builder) {
         reference = builder.reference;
         index = builder.index;
 
@@ -49,7 +50,10 @@ public class IdolSearchResult implements SearchResult {
         weight = builder.weight;
 
         date = builder.date;
-        fieldMap = builder.fieldMap;
+        fieldMap = new HashMap<>();
+        for (int i = 0; i < builder.fieldMap$key.size() & i < builder.fieldMap$value.size(); i++) {
+            fieldMap.put(builder.fieldMap$key.get(i), builder.fieldMap$value.get(i));
+        }
 
         qmsId = builder.qmsId;
         promotionName = builder.promotionName;
@@ -65,49 +69,8 @@ public class IdolSearchResult implements SearchResult {
         }
     }
 
-    @SuppressWarnings("InstanceVariableOfConcreteClass")
-    @Setter
-    @NoArgsConstructor
-    @Accessors(chain = true)
-    public static class Builder {
-        private String reference;
-        private String index;
-
-        private String title;
-        private String summary;
-        private Double weight;
-
-        private Map<String, FieldInfo<?>> fieldMap;
-
-        private DateTime date;
-
-        private String qmsId;
-        private String promotionName;
-
-        private PromotionCategory promotionCategory;
-
-        public Builder(final IdolSearchResult document) {
-            reference = document.reference;
-            index = document.index;
-            title = document.title;
-            summary = document.summary;
-            weight = document.weight;
-            fieldMap = document.fieldMap;
-            date = document.date;
-            qmsId = document.qmsId;
-            promotionName = document.promotionName;
-            promotionCategory = document.promotionCategory;
-        }
-
-        @SuppressWarnings("UseOfObsoleteDateTimeApi")
-        public Builder setDate(final Date date) {
-            if (date != null) {
-                this.date = new DateTime(date);
-            }
-
-            return this;
-        }
-
+    public static class IdolSearchResultBuilder implements SearchResultBuilder {
+        @Override
         public IdolSearchResult build() {
             return new IdolSearchResult(this);
         }

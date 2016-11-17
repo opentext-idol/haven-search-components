@@ -237,8 +237,8 @@ class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSea
             domain = PUBLIC_INDEX_NAMES.contains(index) ? ResourceIdentifier.PUBLIC_INDEXES_DOMAIN : getDomain();
         }
 
-        return new HodSearchResult.Builder(document)
-                .setDomain(domain)
+        return document.toBuilder()
+                .domain(domain)
                 .build();
     }
 

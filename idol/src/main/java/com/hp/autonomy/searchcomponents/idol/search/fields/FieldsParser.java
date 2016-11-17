@@ -10,5 +10,5 @@ import com.hp.autonomy.types.idol.responses.Hit;
 
 @FunctionalInterface
 public interface FieldsParser {
-    void parseDocumentFields(Hit hit, IdolSearchResult.Builder searchResultBuilder);
+    void parseDocumentFields(Hit hit, IdolSearchResult.IdolSearchResultBuilder searchResultBuilder);
 }
