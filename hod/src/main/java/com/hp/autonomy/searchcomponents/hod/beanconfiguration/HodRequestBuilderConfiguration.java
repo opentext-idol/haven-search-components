@@ -5,6 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.beanconfiguration;
 
+import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesRequest;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
@@ -35,21 +36,21 @@ public class HodRequestBuilderConfiguration {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @ConditionalOnMissingBean(GetContentRequest.GetContentRequestBuilder.class)
-    public GetContentRequest.GetContentRequestBuilder<String> getContentRequestBuilder() {
+    public GetContentRequest.GetContentRequestBuilder<ResourceIdentifier> getContentRequestBuilder() {
         return GetContentRequest.builder();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @ConditionalOnMissingBean(SearchRequest.SearchRequestBuilder.class)
-    public SearchRequest.SearchRequestBuilder<String> searchRequestBuilder() {
+    public SearchRequest.SearchRequestBuilder<ResourceIdentifier> searchRequestBuilder() {
         return SearchRequest.builder();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @ConditionalOnMissingBean(SuggestRequest.SuggestRequestBuilder.class)
-    public SuggestRequest.SuggestRequestBuilder<String> suggestRequestBuilder() {
+    public SuggestRequest.SuggestRequestBuilder<ResourceIdentifier> suggestRequestBuilder() {
         return SuggestRequest.builder();
     }
 

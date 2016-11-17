@@ -89,7 +89,7 @@ class HodCustomConfiguration {
     }
 
     @Bean
-    public FindRelatedConceptsService relatedConceptsService() {
+    public FindRelatedConceptsService findRelatedConceptsService() {
         return mock(FindRelatedConceptsService.class);
     }
 

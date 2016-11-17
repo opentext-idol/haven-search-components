@@ -23,5 +23,5 @@ public interface IdolTypeAheadConstants {
      * The bean name of the term expand implementation.
      * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
      */
-    String TERM_EXPAND_TYPE_AHEAD_SERVICE_BEAN_NAME = "qmsTypeAheadService";
+    String TERM_EXPAND_TYPE_AHEAD_SERVICE_BEAN_NAME = "termExpandTypeAheadService";
 }

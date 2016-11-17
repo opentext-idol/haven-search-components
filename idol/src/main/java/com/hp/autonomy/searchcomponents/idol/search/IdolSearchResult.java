@@ -51,8 +51,10 @@ public class IdolSearchResult implements SearchResult {
 
         date = builder.date;
         fieldMap = new HashMap<>();
-        for (int i = 0; i < builder.fieldMap$key.size() & i < builder.fieldMap$value.size(); i++) {
-            fieldMap.put(builder.fieldMap$key.get(i), builder.fieldMap$value.get(i));
+        if (builder.fieldMap$key != null && builder.fieldMap$value != null) {
+            for (int i = 0; i < builder.fieldMap$key.size() & i < builder.fieldMap$value.size(); i++) {
+                fieldMap.put(builder.fieldMap$key.get(i), builder.fieldMap$value.get(i));
+            }
         }
 
         qmsId = builder.qmsId;

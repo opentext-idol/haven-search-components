@@ -138,7 +138,7 @@ public class HavenSearchHodConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(FindRelatedConceptsService.class)
-    public FindRelatedConceptsService relatedConceptsService() {
+    public FindRelatedConceptsService findRelatedConceptsService() {
         return new FindRelatedConceptsServiceImpl(hodServiceConfig);
     }
 
