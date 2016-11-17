@@ -5,8 +5,6 @@
 
 package com.hp.autonomy.searchcomponents.core.search;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 import lombok.AccessLevel;
@@ -36,8 +34,6 @@ public class GetContentRequest<S extends Serializable>
         implements RequestObject<GetContentRequest<S>, GetContentRequest.GetContentRequestBuilder<S>> {
     private static final long serialVersionUID = -6655229692839205599L;
 
-    @JsonDeserialize(contentAs = GetContentRequestIndex.class)
-    @JsonProperty("indexesAndReferences")
     @Singular("indexAndReferences")
     private final Set<GetContentRequestIndex<S>> indexesAndReferences;
     private final String print;
