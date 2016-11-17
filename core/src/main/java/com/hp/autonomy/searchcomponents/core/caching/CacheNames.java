@@ -5,11 +5,50 @@
 
 package com.hp.autonomy.searchcomponents.core.caching;
 
+import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
+import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
+import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
+import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
+import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
+
+import java.util.Map;
+
+/**
+ * Identifiers to use for caching of services
+ */
 public interface CacheNames {
-    String RELATED_CONCEPTS = "related-concepts";
-    String GET_DOCUMENT_CONTENT = "get-content";
+    /**
+     * Cache identifier for {@link FieldsService#getFields(FieldsRequest, FieldTypeParam...)}
+     */
     String FIELDS = "fields";
+
+    /**
+     * Cache identifier for {@link ParametricValuesService#getAllParametricValues(ParametricRequest)}
+     */
     String PARAMETRIC_VALUES = "parametric-values";
+
+    /**
+     * Cache identifier for {@link ParametricValuesService#getNumericParametricValuesInBuckets(ParametricRequest, Map)}
+     */
     String PARAMETRIC_VALUES_IN_BUCKETS = "parametric-values-in-buckets";
+
+    /**
+     * Cache identifier for {@link DocumentsService#queryTextIndex(SearchRequest)}
+     */
+    String GET_DOCUMENT_CONTENT = "get-content";
+
+    /**
+     * Cache identifier for {@link RelatedConceptsService#findRelatedConcepts(RelatedConceptsRequest)}
+     */
+    String RELATED_CONCEPTS = "related-concepts";
+
+    /**
+     * Cache identifier for {@link TypeAheadService#getSuggestions(String)}
+     */
     String TYPE_AHEAD = "type-ahead";
 }

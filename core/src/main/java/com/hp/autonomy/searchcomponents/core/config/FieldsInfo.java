@@ -21,6 +21,9 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 
+/**
+ * Configuration object containing a map of field information
+ */
 @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "DefaultAnnotationParam", "CollectionDeclaredAsConcreteClass"})
 @Getter
 @Builder
