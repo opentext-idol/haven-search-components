@@ -14,7 +14,6 @@ import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.Database;
 import com.hp.autonomy.types.idol.responses.GetStatusResponseData;
 import com.hp.autonomy.types.requests.idol.actions.status.StatusActions;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +22,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("WeakerAccess")
-@Data
-@Service
-public class IdolDatabasesService implements DatabasesService<Database, IdolDatabasesRequest, AciErrorException> {
+/**
+ * Idol databases service implementation: retrieves public database information by running GetStatus against content engine and parsing the response
+ */
+@Service(DatabasesService.DATABASES_SERVICE_BEAN_NAME)
+class IdolDatabasesService implements DatabasesService<Database, IdolDatabasesRequest, AciErrorException> {
     private final AciService contentAciService;
     private final Processor<GetStatusResponseData> responseProcessor;
 

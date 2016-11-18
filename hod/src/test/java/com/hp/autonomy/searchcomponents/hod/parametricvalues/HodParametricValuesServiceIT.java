@@ -12,16 +12,13 @@ import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConf
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = HavenSearchHodConfiguration.class)
-public class HodParametricValuesServiceIT extends AbstractParametricValuesServiceIT<HodParametricRequest, HodFieldsRequest, HodFieldsRequest.Builder, ResourceIdentifier, HodErrorException> {
+public class HodParametricValuesServiceIT extends AbstractParametricValuesServiceIT<HodParametricRequest, HodFieldsRequest, HodFieldsRequest.HodFieldsRequestBuilder, ResourceIdentifier, HodErrorException> {
     @Override
-    protected HodFieldsRequest.Builder fieldsRequestParams(final HodFieldsRequest.Builder fieldsRequestBuilder) {
-        return fieldsRequestBuilder.setDatabases(testUtils.getDatabases());
+    protected HodFieldsRequest.HodFieldsRequestBuilder fieldsRequestParams(final HodFieldsRequest.HodFieldsRequestBuilder fieldsRequestBuilder) {
+        return fieldsRequestBuilder.databases(testUtils.getDatabases());
     }
 
     @Override

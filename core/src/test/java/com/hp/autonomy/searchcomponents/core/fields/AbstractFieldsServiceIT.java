@@ -20,6 +20,7 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
 public abstract class AbstractFieldsServiceIT<R extends FieldsRequest, S extends Serializable, E extends Exception> {
     @Autowired

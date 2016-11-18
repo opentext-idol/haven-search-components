@@ -19,17 +19,18 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.warning.HodWarning;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.core.test.TestUtils;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationConfig;
 import com.hp.autonomy.searchcomponents.hod.test.HodTestUtils;
 import com.hp.autonomy.types.requests.Documents;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.apache.commons.lang.NotImplementedException;
 import org.hamcrest.beans.HasPropertyWithValue;
 import org.junit.Before;
@@ -40,7 +41,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -57,31 +57,31 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class HodDocumentServiceTest {
     @Mock
-    protected FindSimilarService<HodSearchResult> findSimilarService;
+    private FindSimilarService<HodSearchResult> findSimilarService;
 
     @Mock
-    protected ConfigService<HodSearchCapable> configService;
+    private ConfigService<HodSearchCapable> configService;
 
     @Mock
-    protected HodSearchCapable config;
+    private HodSearchCapable config;
 
     @Mock
-    protected QueryTextIndexService<HodSearchResult> queryTextIndexService;
+    private QueryTextIndexService<HodSearchResult> queryTextIndexService;
 
     @Mock
-    protected GetContentService<HodSearchResult> getContentService;
+    private GetContentService<HodSearchResult> getContentService;
 
     @Mock
-    protected AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
+    private AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Mock
-    protected DocumentFieldsService documentFieldsService;
+    private DocumentFieldsService documentFieldsService;
 
     @Mock
-    protected HodAuthenticationPrincipal hodAuthenticationPrincipal;
+    private HodAuthenticationPrincipal hodAuthenticationPrincipal;
 
-    protected HodDocumentsService documentsService;
-    protected final HodTestUtils testUtils = new HodTestUtils();
+    private HodDocumentsService documentsService;
+    private final TestUtils<ResourceIdentifier> testUtils = new HodTestUtils();
 
     @Before
     public void setUp() {
@@ -100,19 +100,19 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), any(QueryRequestBuilder.class))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest.Builder<ResourceIdentifier>()
-                .setQueryRestrictions(queryRestrictions)
-                .setStart(1)
-                .setMaxResults(30)
-                .setSummary(Summary.concept.name())
-                .setSummaryCharacters(250)
-                .setSort(Sort.relevance.name())
-                .setHighlight(true)
-                .setAutoCorrect(false)
-                .setPrint(Print.fields.name())
-                .setQueryType(SearchRequest.QueryType.MODIFIED)
+        final QueryRequest<ResourceIdentifier> queryRequest = QueryRequest.<ResourceIdentifier>builder()
+                .queryRestrictions(queryRestrictions)
+                .start(1)
+                .maxResults(30)
+                .summary(Summary.concept.name())
+                .summaryCharacters(250)
+                .sort(Sort.relevance.name())
+                .highlight(true)
+                .autoCorrect(false)
+                .print(Print.fields.name())
+                .queryType(QueryRequest.QueryType.MODIFIED)
                 .build();
-        final Documents<HodSearchResult> results = documentsService.queryTextIndex(searchRequest);
+        final Documents<HodSearchResult> results = documentsService.queryTextIndex(queryRequest);
         validateResults(results);
     }
 
@@ -122,19 +122,19 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<>("queryProfile", nullValue())))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest.Builder<ResourceIdentifier>()
-                .setQueryRestrictions(queryRestrictions)
-                .setStart(1)
-                .setMaxResults(30)
-                .setSummary(Summary.concept.name())
-                .setSummaryCharacters(250)
-                .setSort(Sort.relevance.name())
-                .setHighlight(true)
-                .setAutoCorrect(false)
-                .setPrint(Print.fields.name())
-                .setQueryType(SearchRequest.QueryType.RAW)
+        final QueryRequest<ResourceIdentifier> queryRequest = QueryRequest.<ResourceIdentifier>builder()
+                .queryRestrictions(queryRestrictions)
+                .start(1)
+                .maxResults(30)
+                .summary(Summary.concept.name())
+                .summaryCharacters(250)
+                .sort(Sort.relevance.name())
+                .highlight(true)
+                .autoCorrect(false)
+                .print(Print.fields.name())
+                .queryType(QueryRequest.QueryType.RAW)
                 .build();
-        final Documents<HodSearchResult> results = documentsService.queryTextIndex(searchRequest);
+        final Documents<HodSearchResult> results = documentsService.queryTextIndex(queryRequest);
         validateResults(results);
     }
 
@@ -144,35 +144,35 @@ public class HodDocumentServiceTest {
         when(queryTextIndexService.queryTextIndexWithText(anyString(), argThat(new HasPropertyWithValue<>("promotions", is(true))))).thenReturn(mockedResults);
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SearchRequest<ResourceIdentifier> searchRequest = new SearchRequest.Builder<ResourceIdentifier>()
-                .setQueryRestrictions(queryRestrictions)
-                .setStart(1)
-                .setMaxResults(30)
-                .setSummary(Summary.concept.name())
-                .setSummaryCharacters(250)
-                .setSort(Sort.relevance.name())
-                .setHighlight(true)
-                .setAutoCorrect(true)
-                .setPrint(Print.fields.name())
-                .setQueryType(SearchRequest.QueryType.PROMOTIONS)
+        final QueryRequest<ResourceIdentifier> queryRequest = QueryRequest.<ResourceIdentifier>builder()
+                .queryRestrictions(queryRestrictions)
+                .start(1)
+                .maxResults(30)
+                .summary(Summary.concept.name())
+                .summaryCharacters(250)
+                .sort(Sort.relevance.name())
+                .highlight(true)
+                .autoCorrect(true)
+                .print(Print.fields.name())
+                .queryType(QueryRequest.QueryType.PROMOTIONS)
                 .build();
-        final Documents<HodSearchResult> results = documentsService.queryTextIndex(searchRequest);
+        final Documents<HodSearchResult> results = documentsService.queryTextIndex(queryRequest);
         validateResults(results);
     }
 
     @Test
     public void findSimilar() throws HodErrorException {
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = testUtils.buildQueryRestrictions();
-        final SuggestRequest<ResourceIdentifier> suggestRequest = new SuggestRequest.Builder<ResourceIdentifier>()
-                .setReference("SomeReference")
-                .setQueryRestrictions(queryRestrictions)
-                .setStart(1)
-                .setMaxResults(30)
-                .setSummary(Summary.concept.name())
-                .setSummaryCharacters(250)
-                .setSort(Sort.relevance.name())
-                .setHighlight(true)
-                .setPrint(Print.fields.name())
+        final SuggestRequest<ResourceIdentifier> suggestRequest = SuggestRequest.<ResourceIdentifier>builder()
+                .reference("SomeReference")
+                .queryRestrictions(queryRestrictions)
+                .start(1)
+                .maxResults(30)
+                .summary(Summary.concept.name())
+                .summaryCharacters(250)
+                .sort(Sort.relevance.name())
+                .highlight(true)
+                .print(Print.fields.name())
                 .build();
         when(findSimilarService.findSimilarDocumentsToIndexReference(anyString(), any(QueryRequestBuilder.class))).thenReturn(mockResults());
         final Documents<HodSearchResult> results = documentsService.findSimilar(suggestRequest);
@@ -184,7 +184,7 @@ public class HodDocumentServiceTest {
         final GetContentRequestIndex<ResourceIdentifier> getContentRequestIndex = new GetContentRequestIndex<>(new ResourceIdentifier("x", "y"), Collections.singleton("z"));
         final GetContentRequestIndex<ResourceIdentifier> getContentRequestIndex2 = new GetContentRequestIndex<>(new ResourceIdentifier("a", "b"), Collections.singleton("c"));
         when(getContentService.getContent(anyListOf(String.class), any(ResourceIdentifier.class), any(GetContentRequestBuilder.class))).thenReturn(mockResults());
-        documentsService.getDocumentContent(new GetContentRequest<>(new HashSet<>(Arrays.asList(getContentRequestIndex, getContentRequestIndex2)), Print.fields.name()));
+        documentsService.getDocumentContent(GetContentRequest.<ResourceIdentifier>builder().indexesAndReferences(Arrays.asList(getContentRequestIndex, getContentRequestIndex2)).print(Print.fields.name()).build());
         verify(getContentService, times(2)).getContent(anyListOf(String.class), any(ResourceIdentifier.class), any(GetContentRequestBuilder.class));
     }
 
@@ -209,14 +209,14 @@ public class HodDocumentServiceTest {
 
     @SuppressWarnings("CastToConcreteClass")
     private QueryResults<HodSearchResult> mockResults() {
-        final HodSearchResult resultWithIndexInQuery = new HodSearchResult.Builder()
-                .setIndex(testUtils.getDatabases().get(0).getName())
+        final HodSearchResult resultWithIndexInQuery = HodSearchResult.builder()
+                .index(testUtils.getDatabases().get(0).getName())
                 .build();
-        final HodSearchResult resultWithPublicIndex = new HodSearchResult.Builder()
-                .setIndex(ResourceIdentifier.NEWS_ENG.getName())
+        final HodSearchResult resultWithPublicIndex = HodSearchResult.builder()
+                .index(ResourceIdentifier.NEWS_ENG.getName())
                 .build();
-        final HodSearchResult resultWithPrivateIndex = new HodSearchResult.Builder()
-                .setIndex("SomeIndex")
+        final HodSearchResult resultWithPrivateIndex = HodSearchResult.builder()
+                .index("SomeIndex")
                 .build();
         final HodWarning warning = new HodWarning.Builder()
                 .setCode(40003)

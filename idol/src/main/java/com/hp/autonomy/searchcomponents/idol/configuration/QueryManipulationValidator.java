@@ -12,8 +12,10 @@ import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
-public class QueryManipulationValidator implements Validator<QueryManipulation> {
+import static com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable.QUERY_MANIPULATION_VALIDATOR_BEAN_NAME;
+
+@Component(QUERY_MANIPULATION_VALIDATOR_BEAN_NAME)
+class QueryManipulationValidator implements Validator<QueryManipulation> {
 
     private final AciService aciService;
     private final ProcessorFactory processorFactory;

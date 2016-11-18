@@ -5,7 +5,6 @@
 
 package com.hp.autonomy.searchcomponents.hod.databases;
 
-import com.hp.autonomy.hod.client.api.authentication.TokenType;
 import com.hp.autonomy.hod.client.api.resource.ListResourcesRequestBuilder;
 import com.hp.autonomy.hod.client.api.resource.Resource;
 import com.hp.autonomy.hod.client.api.resource.ResourceFlavour;
@@ -14,14 +13,12 @@ import com.hp.autonomy.hod.client.api.resource.ResourceType;
 import com.hp.autonomy.hod.client.api.resource.Resources;
 import com.hp.autonomy.hod.client.api.resource.ResourcesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
-import com.hp.autonomy.hod.client.token.TokenProxy;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -38,15 +35,15 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class HodDatabasesServiceTest {
     @Mock
-    protected ResourcesService resourcesService;
+    private ResourcesService resourcesService;
 
     @Mock
-    protected AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
+    private AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
     @Mock
     private HodAuthenticationPrincipal hodAuthenticationPrincipal;
 
-    protected DatabasesService<Database, HodDatabasesRequest, HodErrorException> databasesService;
+    private DatabasesService<Database, HodDatabasesRequest, HodErrorException> databasesService;
 
     @Before
     public void setUp() {
@@ -63,8 +60,8 @@ public class HodDatabasesServiceTest {
 
     @Test
     public void getAllIndexes() throws HodErrorException {
-        final HodDatabasesRequest databasesRequest = new HodDatabasesRequest.Builder()
-                .setPublicIndexesEnabled(true)
+        final HodDatabasesRequest databasesRequest = HodDatabasesRequest.builder()
+                .publicIndexesEnabled(true)
                 .build();
 
         final Set<Database> results = databasesService.getDatabases(databasesRequest);
@@ -73,24 +70,24 @@ public class HodDatabasesServiceTest {
 
     @Test
     public void getPrivateIndexes() throws HodErrorException {
-        final HodDatabasesRequest databasesRequest = new HodDatabasesRequest.Builder()
-                .setPublicIndexesEnabled(false)
+        final HodDatabasesRequest databasesRequest = HodDatabasesRequest.builder()
+                .publicIndexesEnabled(false)
                 .build();
 
         final Set<Database> results = databasesService.getDatabases(databasesRequest);
         assertThat(results, hasSize(1));
     }
 
-    protected void mockListResourcesResponse() throws HodErrorException {
+    private void mockListResourcesResponse() throws HodErrorException {
         final Resource resource1 = mockResource("PrivateResource1", ResourceFlavour.STANDARD);
         final Resource resource2 = mockResource("PrivateResource2", ResourceFlavour.WEB_CLOUD);
         final List<Resource> privateResources = Arrays.asList(resource1, resource2);
         final List<Resource> publicResources = Collections.singletonList(mockResource("PublicResource1", ResourceFlavour.STANDARD));
         when(resourcesService.list(any(ListResourcesRequestBuilder.class))).thenReturn(new Resources(privateResources, publicResources));
-        when(resourcesService.list(Matchers.<TokenProxy<?, TokenType.Simple>>any(), any(ListResourcesRequestBuilder.class))).thenReturn(new Resources(privateResources, publicResources));
+        when(resourcesService.list(any(), any(ListResourcesRequestBuilder.class))).thenReturn(new Resources(privateResources, publicResources));
     }
 
-    protected Resource mockResource(final String name, final ResourceFlavour resourceFlavour) {
+    private Resource mockResource(final String name, final ResourceFlavour resourceFlavour) {
         return new Resource(name, "Some Description", ResourceType.CONTENT, resourceFlavour, null, name);
     }
 }

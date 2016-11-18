@@ -13,9 +13,12 @@ import com.autonomy.aci.client.transport.AciServerDetails;
 import com.autonomy.aci.client.transport.impl.AciHttpClientImpl;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.aci.AbstractConfigurableAciService;
+import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.types.idol.marshalling.Jaxb2ParsingConfiguration;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
+import com.hpe.bigdata.frontend.spring.authentication.SpringSecurityAuthenticationInformationRetriever;
 import org.apache.http.client.HttpClient;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -25,16 +28,60 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 /**
  * Defines Spring beans required for using this module
  *
  * @param <C> application config type
  */
+@SuppressWarnings("WeakerAccess")
 @Configuration
 @ComponentScan({"com.hp.autonomy.searchcomponents.core", "com.hp.autonomy.searchcomponents.idol"})
 @Import(Jaxb2ParsingConfiguration.class)
 public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
+    /**
+     * The bean name of the root {@link AciService} used for all standard interactions with Idol.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    public static final String ACI_SERVICE_BEAN_NAME = "aciService";
+
+    /**
+     * The bean name of the root {@link AciService} used for queries against Content.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    public static final String CONTENT_ACI_SERVICE_BEAN_NAME = "contentAciService";
+
+    /**
+     * The bean name of the root {@link AciService} used for queries against QMS.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    public static final String QMS_ACI_SERVICE_BEAN_NAME = "qmsAciService";
+
+    /**
+     * The bean name of the root {@link AciService} used for queries against ViewServer.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    public static final String VIEW_ACI_SERVICE_BEAN_NAME = "viewAciService";
+
+    /**
+     * The bean name of the root {@link AciService} used for Idol validation checks.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    public static final String VALIDATOR_ACI_SERVICE_BEAN_NAME = "validatorAciService";
+
+    /**
+     * The bean name of the http client settings used for all standard interactions with Idol.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    public static final String HTTP_CLIENT_BEAN_NAME = "httpClient";
+
+    /**
+     * The bean name of the http client settings used for Idol validation checks.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    public static final String VALIDATOR_HTTP_CLIENT_BEAN_NAME = "validatorHttpClient";
+
     private static final int HTTP_SOCKET_TIMEOUT = 90000;
     private static final int HTTP_MAX_CONNECTIONS_PER_ROUTE = 20;
     private static final int HTTP_MAX_CONNECTIONS_TOTAL = 120;
@@ -43,7 +90,23 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
     private static final int VALIDATOR_HTTP_MAX_CONNECTIONS_TOTAL = 5;
 
     @Bean
-    public AciService contentAciService(@Qualifier("aciService") final AciService aciService, final ConfigService<C> configService) {
+    @ConditionalOnMissingBean(AuthenticationInformationRetriever.class)
+    public AuthenticationInformationRetriever<UsernamePasswordAuthenticationToken, CommunityPrincipal> authenticationInformationRetriever() {
+        return new SpringSecurityAuthenticationInformationRetriever<>(UsernamePasswordAuthenticationToken.class, CommunityPrincipal.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(IdolAnnotationsProcessorFactory.class)
+    public IdolAnnotationsProcessorFactory annotationsProcessorFactory() {
+        return new IdolAnnotationsProcessorFactoryImpl();
+    }
+
+
+    @Bean
+    @ConditionalOnMissingBean(name = CONTENT_ACI_SERVICE_BEAN_NAME)
+    public AciService contentAciService(@Qualifier(ACI_SERVICE_BEAN_NAME)
+                                        final AciService aciService,
+                                        final ConfigService<C> configService) {
         return new AbstractConfigurableAciService(aciService) {
             @Override
             public AciServerDetails getServerDetails() {
@@ -52,10 +115,11 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
         };
     }
 
-
     @Bean
-    @ConditionalOnMissingBean(name = "qmsAciService")
-    public AciService qmsAciService(@Qualifier("aciService") final AciService aciService, final ConfigService<C> configService) {
+    @ConditionalOnMissingBean(name = QMS_ACI_SERVICE_BEAN_NAME)
+    public AciService qmsAciService(@Qualifier(ACI_SERVICE_BEAN_NAME)
+                                    final AciService aciService,
+                                    final ConfigService<C> configService) {
         return new AbstractConfigurableAciService(aciService) {
             @Override
             public AciServerDetails getServerDetails() {
@@ -66,7 +130,10 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
     }
 
     @Bean
-    public AciService viewAciService(@Qualifier("aciService") final AciService aciService, final ConfigService<C> configService) {
+    @ConditionalOnMissingBean(name = VIEW_ACI_SERVICE_BEAN_NAME)
+    public AciService viewAciService(@Qualifier(ACI_SERVICE_BEAN_NAME)
+                                     final AciService aciService,
+                                     final ConfigService<C> configService) {
         return new AbstractConfigurableAciService(aciService) {
             @Override
             public AciServerDetails getServerDetails() {
@@ -76,26 +143,25 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
     }
 
     @Bean
-    public IdolAnnotationsProcessorFactory annotationsProcessorFactory() {
-        return new IdolAnnotationsProcessorFactoryImpl();
-    }
-
-    @Bean
+    @ConditionalOnMissingBean(name = ACI_SERVICE_BEAN_NAME)
     public AciService aciService(final HttpClient httpClient) {
         return new AciServiceImpl(new AciHttpClientImpl(httpClient));
     }
 
     @Bean
+    @ConditionalOnMissingBean(name = VALIDATOR_ACI_SERVICE_BEAN_NAME)
     public AciService validatorAciService(final HttpClient validatorHttpClient) {
         return new AciServiceImpl(new AciHttpClientImpl(validatorHttpClient));
     }
 
     @Bean
+    @ConditionalOnMissingBean(name = HTTP_CLIENT_BEAN_NAME)
     public HttpClient httpClient() {
         return createHttpClient(HTTP_SOCKET_TIMEOUT, HTTP_MAX_CONNECTIONS_PER_ROUTE, HTTP_MAX_CONNECTIONS_TOTAL);
     }
 
     @Bean
+    @ConditionalOnMissingBean(name = VALIDATOR_HTTP_CLIENT_BEAN_NAME)
     public HttpClient validatorHttpClient() {
         return createHttpClient(VALIDATOR_HTTP_SOCKET_TIMEOUT, VALIDATOR_HTTP_MAX_CONNECTIONS_PER_ROUTE, VALIDATOR_HTTP_MAX_CONNECTIONS_TOTAL);
     }

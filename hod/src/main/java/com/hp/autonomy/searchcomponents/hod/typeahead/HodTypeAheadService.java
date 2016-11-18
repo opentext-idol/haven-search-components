@@ -18,18 +18,23 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
-@Service
+import static com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService.TYPE_AHEAD_SERVICE_BEAN_NAME;
+
+/**
+ * Default HoD implementation of {@link TypeAheadService}
+ */
+@Service(TYPE_AHEAD_SERVICE_BEAN_NAME)
 class HodTypeAheadService implements TypeAheadService<HodErrorException> {
     private final AutocompleteService autocompleteService;
 
     @Autowired
-    public HodTypeAheadService(final AutocompleteService autocompleteService) {
+    HodTypeAheadService(final AutocompleteService autocompleteService) {
         this.autocompleteService = autocompleteService;
     }
 
     @Override
     @Cacheable(cacheNames = CacheNames.TYPE_AHEAD, cacheResolver = CachingConfiguration.SIMPLE_CACHE_RESOLVER_NAME)
     public List<String> getSuggestions(final String text) throws HodErrorException {
-        return StringUtils.isBlank(text) ? Collections.<String>emptyList() : autocompleteService.getSuggestions(text);
+        return StringUtils.isBlank(text) ? Collections.emptyList() : autocompleteService.getSuggestions(text);
     }
 }

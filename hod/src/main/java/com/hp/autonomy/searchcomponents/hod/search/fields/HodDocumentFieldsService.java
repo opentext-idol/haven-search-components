@@ -16,11 +16,13 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 import java.util.Collections;
 
-@Component
+import static com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService.DOCUMENT_FIELDS_SERVICE_BEAN_NAME;
+
+@Component(DOCUMENT_FIELDS_SERVICE_BEAN_NAME)
 class HodDocumentFieldsService extends AbstractDocumentFieldsService implements DocumentFieldsService {
     @SuppressWarnings("TypeMayBeWeakened")
     @Autowired
-    public HodDocumentFieldsService(final ConfigService<? extends HavenSearchCapable> configService) {
+    HodDocumentFieldsService(final ConfigService<? extends HavenSearchCapable> configService) {
         super(configService);
     }
 

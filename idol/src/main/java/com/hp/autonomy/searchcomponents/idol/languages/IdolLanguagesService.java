@@ -24,9 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("WeakerAccess")
-@Service
-public class IdolLanguagesService implements LanguagesService {
+import static com.hp.autonomy.searchcomponents.core.languages.LanguagesService.LANGUAGES_SERVICE_BEAN_NAME;
+
+/**
+ * Default Idol implementation of {@link LanguagesService}: retrieves lists of supported languages using GetStatus and LanguageSettings actions
+ */
+@Service(LANGUAGES_SERVICE_BEAN_NAME)
+class IdolLanguagesService implements LanguagesService {
     private static final String IDOL_UTF8_ENCODING = "UTF8";
 
     private final AciService contentAciService;
@@ -34,7 +38,7 @@ public class IdolLanguagesService implements LanguagesService {
     private final Processor<LanguageSettingsResponseData> languageSettingsProcessor;
 
     @Autowired
-    public IdolLanguagesService(final AciService contentAciService, final ProcessorFactory processorFactory) {
+    IdolLanguagesService(final AciService contentAciService, final ProcessorFactory processorFactory) {
         this.contentAciService = contentAciService;
 
         getStatusProcessor = processorFactory.getResponseDataProcessor(GetStatusResponseData.class);

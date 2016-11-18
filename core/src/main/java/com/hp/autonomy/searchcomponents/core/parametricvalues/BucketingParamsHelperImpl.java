@@ -1,18 +1,22 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
+import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper.BUCKETING_PARAMS_HELPER_BEAN_NAME;
+
 /**
- * Default implementation of the ParametricValuesService
+ * Default implementation of the {@link BucketingParamsHelper}
  */
-public abstract class AbstractParametricValuesService<R extends ParametricRequest<S>, S extends Serializable, E extends Exception> implements ParametricValuesService<R, S, E> {
-    /**
-     * Verify that the fields specified in the parametric request are matched by a valid entry in the bucketing params.
-     */
-    protected void validateBucketingParams(final R parametricRequest, final Map<String, BucketingParams> bucketingParamsPerField) {
+@Component(BUCKETING_PARAMS_HELPER_BEAN_NAME)
+class BucketingParamsHelperImpl implements BucketingParamsHelper {
+    @Override
+    public <R extends ParametricRequest<S>, S extends Serializable> void validateBucketingParams(final R parametricRequest,
+                                                                                                 final Map<String, BucketingParams> bucketingParamsPerField) {
         for (final String fieldName : parametricRequest.getFieldNames()) {
             final BucketingParams bucketingParams = bucketingParamsPerField.get(fieldName);
 
@@ -30,12 +34,8 @@ public abstract class AbstractParametricValuesService<R extends ParametricReques
         }
     }
 
-    /**
-     * Calculate the boundary values (including both the min and the max) of the buckets specified in the BucketingParams.
-     * @param bucketingParams The min, max and target number of buckets
-     * @return List of boundary values, including the min and the max value
-     */
-    protected List<Double> calculateBoundaries(final BucketingParams bucketingParams) {
+    @Override
+    public List<Double> calculateBoundaries(final BucketingParams bucketingParams) {
         final double bucketSize = (bucketingParams.getMax() - bucketingParams.getMin()) / bucketingParams.getTargetNumberOfBuckets();
         final List<Double> boundaries = new LinkedList<>();
 

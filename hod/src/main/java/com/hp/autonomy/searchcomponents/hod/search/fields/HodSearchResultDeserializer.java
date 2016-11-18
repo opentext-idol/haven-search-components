@@ -84,15 +84,15 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
             }
         }
 
-        return new HodSearchResult.Builder()
-                .setReference(parseAsString(node, "reference"))
-                .setIndex(parseAsString(node, "index"))
-                .setTitle(parseAsString(node, "title"))
-                .setSummary(parseAsString(node, "summary"))
-                .setWeight(parseAsDouble(node, "weight"))
-                .setFieldMap(fieldMap)
-                .setDate(parseAsDateFromArray(node, "date"))
-                .setPromotionCategory(parsePromotionCategory(node, "promotion"))
+        return HodSearchResult.builder()
+                .reference(parseAsString(node, "reference"))
+                .index(parseAsString(node, "index"))
+                .title(parseAsString(node, "title"))
+                .summary(parseAsString(node, "summary"))
+                .weight(parseAsDouble(node, "weight"))
+                .fieldMap(fieldMap)
+                .date(parseAsDateFromArray(node, "date"))
+                .promotionCategory(parsePromotionCategory(node, "promotion"))
                 .build();
     }
 

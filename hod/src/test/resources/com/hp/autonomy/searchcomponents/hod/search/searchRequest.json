@@ -1,0 +1,27 @@
+{
+  "queryRestrictions": {
+    "queryText": "*",
+    "fieldText": "NOT(EMPTY):{FIELD}",
+    "database": {
+      "domain": "PUBLIC_INDEXES",
+      "name": "wiki_eng"
+    },
+    "minDate": "2016-11-15T16:07:00Z",
+    "maxDate": "2016-11-15T16:07:01Z",
+    "minScore": 5,
+    "languageType": "englishUtf8",
+    "anyLanguage": false,
+    "stateMatchId": "0-ABC",
+    "stateDontMatchId": "0-ABD"
+  },
+  "start": 1,
+  "maxResults": 50,
+  "summary": "concept",
+  "summaryCharacters": 250,
+  "sort": "relevance",
+  "highlight": true,
+  "autoCorrect": true,
+  "print": "fields",
+  "printField": "CATEGORY",
+  "queryType": "MODIFIED"
+}

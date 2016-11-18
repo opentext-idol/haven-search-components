@@ -8,36 +8,23 @@ package com.hp.autonomy.searchcomponents.hod.databases;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesRequest;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
-@SuppressWarnings("FieldMayBeFinal")
+/**
+ * Options for interacting with HoD implementation of {@link DatabasesService}
+ */
+@SuppressWarnings("WeakerAccess")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@JsonDeserialize(builder = HodDatabasesRequest.Builder.class)
+@Builder(toBuilder = true)
+@JsonDeserialize(builder = HodDatabasesRequest.HodDatabasesRequestBuilder.class)
 public class HodDatabasesRequest implements DatabasesRequest {
     private static final long serialVersionUID = 3450911770365743948L;
 
-    private boolean publicIndexesEnabled;
+    private final boolean publicIndexesEnabled;
 
-    @JsonPOJOBuilder(withPrefix = "set")
-    @Setter
-    @Accessors(chain = true)
-    @NoArgsConstructor
-    public static class Builder {
-        private boolean publicIndexesEnabled;
-
-        public Builder(final HodDatabasesRequest databasesRequest) {
-            publicIndexesEnabled = databasesRequest.isPublicIndexesEnabled();
-        }
-
-        public HodDatabasesRequest build() {
-            return new HodDatabasesRequest(publicIndexesEnabled);
-        }
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class HodDatabasesRequestBuilder implements DatabasesRequest.DatabasesRequestBuilder {
     }
 }

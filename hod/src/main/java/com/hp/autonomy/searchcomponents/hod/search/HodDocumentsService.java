@@ -23,31 +23,40 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.warning.HodWarning;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
-import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.types.requests.Documents;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.NotImplementedException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-@SuppressWarnings("WeakerAccess")
+import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.DOCUMENTS_SERVICE_BEAN_NAME;
+import static com.hp.autonomy.searchcomponents.hod.search.HodDocumentsServiceConstants.HOD_MAX_RESULTS;
+
+/**
+ * Default Hod implementation of {@link DocumentsService}
+ */
 @Slf4j
-public class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
-    // IOD limits max results to 2500
-    public static final int HOD_MAX_RESULTS = 2500;
-
+@Service(DOCUMENTS_SERVICE_BEAN_NAME)
+class HodDocumentsService implements DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
     private static final ImmutableSet<String> PUBLIC_INDEX_NAMES = ImmutableSet.of(
             ResourceIdentifier.WIKI_CHI.getName(),
             ResourceIdentifier.WIKI_ENG.getName(),
@@ -72,7 +81,8 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     private final DocumentFieldsService documentFieldsService;
 
     @SuppressWarnings("ConstructorWithTooManyParameters")
-    public HodDocumentsService(
+    @Autowired
+    HodDocumentsService(
             final FindSimilarService<HodSearchResult> findSimilarService,
             final ConfigService<? extends HodSearchCapable> configService,
             final QueryTextIndexService<HodSearchResult> queryTextIndexService,
@@ -89,25 +99,25 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
     }
 
     @Override
-    public Documents<HodSearchResult> queryTextIndex(final SearchRequest<ResourceIdentifier> searchRequest) throws HodErrorException {
-        final QueryRequestBuilder params = setQueryParams(searchRequest, searchRequest.getQueryType() != SearchRequest.QueryType.RAW);
+    public Documents<HodSearchResult> queryTextIndex(final QueryRequest<ResourceIdentifier> queryRequest) throws HodErrorException {
+        final QueryRequestBuilder params = setQueryParams(queryRequest, queryRequest.getQueryType() != QueryRequest.QueryType.RAW);
 
-        if (searchRequest.isAutoCorrect()) {
+        if (queryRequest.isAutoCorrect()) {
             params.setCheckSpelling(CheckSpelling.autocorrect);
         }
 
-        if (searchRequest.getQueryType() == SearchRequest.QueryType.PROMOTIONS) {
+        if (queryRequest.getQueryType() == QueryRequest.QueryType.PROMOTIONS) {
             params.setPromotions(true);
             //TODO remove this when IOD have fixed the the default value of the indexes parameter (IOD-6168)
             params.setIndexes(Collections.singletonList(ResourceIdentifier.WIKI_ENG));
         }
 
-        final QueryResults<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(searchRequest.getQueryRestrictions().getQueryText(), params);
+        final QueryResults<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(queryRequest.getQueryRestrictions().getQueryText(), params);
 
         checkForWarnings(hodDocuments);
 
         final List<HodSearchResult> documentList = new LinkedList<>();
-        addDomainToSearchResults(documentList, searchRequest.getQueryRestrictions().getDatabases(), hodDocuments.getDocuments());
+        addDomainToSearchResults(documentList, queryRequest.getQueryRestrictions().getDatabases(), hodDocuments.getDocuments());
 
         final Integer totalResults = hodDocuments.getTotalResults() != null ? hodDocuments.getTotalResults() : 0;
         return new Documents<>(documentList, totalResults, hodDocuments.getExpandedQuery(), null, hodDocuments.getAutoCorrection(), null);
@@ -129,7 +139,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
 
     private void checkForWarnings(final QueryResults<HodSearchResult> results) {
         final List<HodWarning> warnings = results.getHodWarnings();
-        if(!warnings.isEmpty()) {
+        if (!warnings.isEmpty()) {
             for (final HodWarning warning : warnings) {
                 log.warn("HoD returned a warning of type " + warning);
             }
@@ -164,7 +174,7 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
         throw new NotImplementedException("State tokens are not yet retrievable from Haven OnDemand");
     }
 
-    private QueryRequestBuilder setQueryParams(final AciSearchRequest<ResourceIdentifier> searchRequest, final boolean setQueryProfile) {
+    private QueryRequestBuilder setQueryParams(final SearchRequest<ResourceIdentifier> searchRequest, final boolean setQueryProfile) {
         final String profileName = configService.getConfig().getQueryManipulation().getProfile();
 
         final Print print = Print.valueOf(searchRequest.getPrint().toLowerCase());
@@ -227,8 +237,8 @@ public class HodDocumentsService implements DocumentsService<ResourceIdentifier,
             domain = PUBLIC_INDEX_NAMES.contains(index) ? ResourceIdentifier.PUBLIC_INDEXES_DOMAIN : getDomain();
         }
 
-        return new HodSearchResult.Builder(document)
-                .setDomain(domain)
+        return document.toBuilder()
+                .domain(domain)
                 .build();
     }
 

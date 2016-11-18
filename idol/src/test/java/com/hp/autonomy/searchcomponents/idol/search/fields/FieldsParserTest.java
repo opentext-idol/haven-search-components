@@ -64,7 +64,7 @@ public class FieldsParserTest {
 
     @Test
     public void parseDocumentFields() {
-        final IdolSearchResult.Builder builder = new IdolSearchResult.Builder();
+        final IdolSearchResult.IdolSearchResultBuilder builder = IdolSearchResult.builder();
         fieldsParser.parseDocumentFields(mockHit(), builder);
         final IdolSearchResult idolSearchResult = builder.build();
         final Map<String, FieldInfo<?>> fieldMap = idolSearchResult.getFieldMap();
@@ -74,7 +74,7 @@ public class FieldsParserTest {
 
     @Test
     public void parseStaticContentPromotionResult() {
-        final IdolSearchResult.Builder builder = new IdolSearchResult.Builder();
+        final IdolSearchResult.IdolSearchResultBuilder builder = IdolSearchResult.builder();
         final Hit hit = mockHit();
         hit.setPromotionname("SomeName");
         fieldsParser.parseDocumentFields(hit, builder);
@@ -84,7 +84,7 @@ public class FieldsParserTest {
 
     @Test
     public void parseCardinalPlacementPromotionResult() {
-        final IdolSearchResult.Builder builder = new IdolSearchResult.Builder();
+        final IdolSearchResult.IdolSearchResultBuilder builder = IdolSearchResult.builder();
         final Hit hit = mockInjectedPromotionHit();
         fieldsParser.parseDocumentFields(hit, builder);
         final IdolSearchResult idolSearchResult = builder.build();

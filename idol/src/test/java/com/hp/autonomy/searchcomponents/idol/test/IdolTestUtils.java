@@ -23,17 +23,17 @@ public class IdolTestUtils implements TestUtils<String> {
 
     @Override
     public QueryRestrictions<String> buildQueryRestrictions() {
-        return new IdolQueryRestrictions.Builder()
-                .setQueryText("*")
-                .setFieldText("")
-                .setDatabases(getDatabases())
-                .setMinDate(null)
-                .setMaxDate(DateTime.now())
-                .setMinScore(0)
-                .setLanguageType(null)
-                .setAnyLanguage(true)
-                .setStateMatchId(Collections.<String>emptyList())
-                .setStateDontMatchId(Collections.<String>emptyList())
+        return IdolQueryRestrictions.builder()
+                .queryText("*")
+                .fieldText("")
+                .databases(getDatabases())
+                .minDate(null)
+                .maxDate(DateTime.now())
+                .minScore(0)
+                .languageType(null)
+                .anyLanguage(true)
+                .stateMatchIds(Collections.emptyList())
+                .stateDontMatchIds(Collections.emptyList())
                 .build();
     }
 }

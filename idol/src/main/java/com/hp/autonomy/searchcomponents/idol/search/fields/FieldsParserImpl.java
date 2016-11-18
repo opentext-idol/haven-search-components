@@ -29,19 +29,23 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-@Component
+import static com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser.FIELDS_PARSER_BEAN_NAME;
+
+/**
+ * Default implementation of {@link FieldsParser}
+ */
+@Component(FIELDS_PARSER_BEAN_NAME)
 class FieldsParserImpl implements FieldsParser {
     private final ConfigService<? extends IdolSearchCapable> configService;
 
     @Autowired
-    public FieldsParserImpl(final ConfigService<? extends IdolSearchCapable> configService) {
+    FieldsParserImpl(final ConfigService<? extends IdolSearchCapable> configService) {
         this.configService = configService;
     }
 
     @Override
-    public void parseDocumentFields(final Hit hit, final IdolSearchResult.Builder searchResultBuilder) {
+    public void parseDocumentFields(final Hit hit, final IdolSearchResult.IdolSearchResultBuilder searchResultBuilder) {
         final FieldsInfo fieldsInfo = configService.getConfig().getFieldsInfo();
         final Map<String, FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfigByName();
 
@@ -62,9 +66,9 @@ class FieldsParserImpl implements FieldsParser {
         }
 
         searchResultBuilder
-                .setFieldMap(fieldMap)
-                .setQmsId(qmsId)
-                .setPromotionCategory(promotionCategory);
+                .fieldMap(fieldMap)
+                .qmsId(qmsId)
+                .promotionCategory(promotionCategory);
     }
 
     private void parseAllFields(final Map<String, FieldInfo<?>> fieldConfig, final NodeList childNodes, final Map<String, FieldInfo<?>> fieldMap, final String name) {
@@ -79,9 +83,7 @@ class FieldsParserImpl implements FieldsParser {
                     final Object value = fieldType.parseValue(fieldType.getType(), stringValue);
                     if (fieldMap.containsKey(id)) {
                         @SuppressWarnings({"unchecked", "CastToConcreteClass"})
-                        final FieldInfo<Object> objectFieldInfo = (FieldInfo<Object>) fieldMap.get(id);
-                        @SuppressWarnings({"unchecked", "rawtypes"})
-                        final FieldInfo<?> updatedFieldInfo = objectFieldInfo.toBuilder()
+                        final FieldInfo<?> updatedFieldInfo = ((FieldInfo<Object>) fieldMap.get(id)).toBuilder()
                                 .name(name)
                                 .value(value)
                                 .build();

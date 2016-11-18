@@ -10,15 +10,12 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametricValuesServiceIT;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class)
-public class IdolParametricValuesServiceIT extends AbstractParametricValuesServiceIT<IdolParametricRequest, IdolFieldsRequest, IdolFieldsRequest.Builder, String, AciErrorException> {
+public class IdolParametricValuesServiceIT extends AbstractParametricValuesServiceIT<IdolParametricRequest, IdolFieldsRequest, IdolFieldsRequest.IdolFieldsRequestBuilder, String, AciErrorException> {
     @Override
-    protected FieldsRequest.Builder<IdolFieldsRequest> fieldsRequestParams(final IdolFieldsRequest.Builder fieldsRequestBuilder) {
+    protected FieldsRequest.FieldsRequestBuilder<IdolFieldsRequest> fieldsRequestParams(final IdolFieldsRequest.IdolFieldsRequestBuilder fieldsRequestBuilder) {
         return fieldsRequestBuilder;
     }
 }

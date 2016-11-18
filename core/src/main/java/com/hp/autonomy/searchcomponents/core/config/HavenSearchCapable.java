@@ -5,7 +5,15 @@
 
 package com.hp.autonomy.searchcomponents.core.config;
 
+/**
+ * Configuration required for performing search actions with this module
+ */
 @FunctionalInterface
 public interface HavenSearchCapable {
+    /**
+     * A map of field information
+     *
+     * @return A map of field information
+     */
     FieldsInfo getFieldsInfo();
 }

@@ -5,17 +5,15 @@
 
 package com.hp.autonomy.searchcomponents.hod.databases;
 
-import com.autonomy.aci.client.annotations.IdolBuilderBuild;
+import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 import com.hp.autonomy.types.IdolDatabase;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
+@SuppressWarnings("WeakerAccess")
 @Data
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Database implements IdolDatabase, Comparable<Database> {
+@Builder(toBuilder = true)
+public final class Database implements IdolDatabase, Comparable<Database>, RequestObject<Database, Database.DatabaseBuilder> {
     private static final long serialVersionUID = -3966566623844850811L;
     static final String ROOT_FIELD = "database";
 
@@ -30,19 +28,5 @@ public final class Database implements IdolDatabase, Comparable<Database> {
         return name.compareTo(other.name);
     }
 
-    @Accessors(chain = true)
-    @Setter
-    public static class Builder {
-        private String name;
-        private String displayName;
-        private long documents;
-        private boolean isPublic;
-        @SuppressWarnings("FieldMayBeFinal")
-        private String domain = "";
-
-        @IdolBuilderBuild
-        public Database build() {
-            return new Database(name, displayName, documents, isPublic, domain);
-        }
-    }
+    public static class DatabaseBuilder implements RequestObject.RequestObjectBuilder<Database, DatabaseBuilder> {}
 }

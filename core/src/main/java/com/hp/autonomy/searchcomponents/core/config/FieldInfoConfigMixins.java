@@ -11,6 +11,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Json prettification when generating config output.
+ * All default values are not printed out.
+ *
+ * @param <T> The field value type
+ */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public interface FieldInfoConfigMixins<T> {
     @JsonIgnore

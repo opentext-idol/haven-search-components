@@ -17,7 +17,9 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.Collection;
 
-@Component
+import static com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService.DOCUMENT_FIELDS_SERVICE_BEAN_NAME;
+
+@Component(DOCUMENT_FIELDS_SERVICE_BEAN_NAME)
 class IdolDocumentFieldsService extends AbstractDocumentFieldsService implements DocumentFieldsService {
     static final String QMS_ID_FIELD = "qmsid";
     static final String INJECTED_PROMOTION_FIELD = "injectedpromotion";
@@ -33,7 +35,7 @@ class IdolDocumentFieldsService extends AbstractDocumentFieldsService implements
 
     @SuppressWarnings("TypeMayBeWeakened")
     @Autowired
-    public IdolDocumentFieldsService(final ConfigService<? extends HavenSearchCapable> configService) {
+    IdolDocumentFieldsService(final ConfigService<? extends HavenSearchCapable> configService) {
         super(configService);
     }
 

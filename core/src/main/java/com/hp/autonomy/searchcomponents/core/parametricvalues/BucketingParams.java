@@ -5,28 +5,15 @@
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
 
-@Getter
-@EqualsAndHashCode
-@ToString
-public class BucketingParams {
+import java.io.Serializable;
+
+@Data
+public class BucketingParams implements Serializable {
+    private static final long serialVersionUID = 7148091304033066434L;
+
     private final int targetNumberOfBuckets;
     private final double min;
     private final double max;
-
-    @JsonCreator
-    public BucketingParams(
-            @JsonProperty final int targetNumberOfBuckets,
-            @JsonProperty final double min,
-            @JsonProperty final double max
-    ) {
-        this.targetNumberOfBuckets = targetNumberOfBuckets;
-        this.min = min;
-        this.max = max;
-    }
 }
