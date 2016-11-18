@@ -9,6 +9,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -92,7 +93,7 @@ public interface HavenSearchAciParameterHandler {
      *
      * @param aciParameters The set of parameters to add to
      * @param reference The document reference to view
-     * @param highlightExpression The expression to highlight (may be null if no highlighting desired)
+     * @param viewRequest View request options
      */
-    void addViewParameters(AciParameters aciParameters, String reference, String highlightExpression);
+    void addViewParameters(AciParameters aciParameters, String reference, ViewRequest<String> viewRequest);
 }

@@ -10,6 +10,8 @@ import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
+import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import org.junit.Before;
 import org.junit.Test;
@@ -104,8 +106,8 @@ public class HavenSearchAciParameterHandlerProxyTest {
     public void addViewParameters() {
         final AciParameters aciParameters = new AciParameters();
         final String reference = "SomeReference";
-        final String highlightExpression = "SomeExpression";
-        proxy.addViewParameters(aciParameters, reference, highlightExpression);
-        verify(parameterHandler).addViewParameters(aciParameters, reference, highlightExpression);
+        final ViewRequest<String> viewRequest = IdolViewRequest.builder().build();
+        proxy.addViewParameters(aciParameters, reference, viewRequest);
+        verify(parameterHandler).addViewParameters(aciParameters, reference, viewRequest);
     }
 }
