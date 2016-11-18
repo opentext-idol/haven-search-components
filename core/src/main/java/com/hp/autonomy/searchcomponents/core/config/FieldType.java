@@ -9,6 +9,9 @@ import org.joda.time.DateTime;
 
 import java.util.function.Function;
 
+/**
+ * The different possible Idol field value types and how to convert them to {@link String}
+ */
 public enum FieldType {
     STRING(String.class, value -> value),
     DATE(DateTime.class, value -> {

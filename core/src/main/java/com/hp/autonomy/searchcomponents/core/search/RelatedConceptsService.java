@@ -6,13 +6,32 @@
 package com.hp.autonomy.searchcomponents.core.search;
 
 import com.hp.autonomy.types.requests.idol.actions.query.QuerySummaryElement;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Service for retrieving conceptually similar results to a search
+ *
+ * @param <Q> The related concept response type
+ * @param <S> The type of the database identifier
+ * @param <E> The checked exception thrown in the event of an error
+ */
 @FunctionalInterface
 public interface RelatedConceptsService<Q extends QuerySummaryElement, S extends Serializable, E extends Exception> {
+    /**
+     * The bean name of the default implementation.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    String RELATED_CONCEPTS_SERVICE_BEAN_NAME = "relatedConceptsService";
 
+    /**
+     * Retrieves conceptually similar results for a search
+     *
+     * @param relatedConceptsRequest Query restrictions
+     * @return The related concepts
+     * @throws E The error thrown in the event of the platform returning an error response
+     */
     List<Q> findRelatedConcepts(RelatedConceptsRequest<S> relatedConceptsRequest) throws E;
-
 }

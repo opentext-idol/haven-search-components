@@ -43,7 +43,7 @@ public class IdolFieldsServiceTest {
     @Test
     public void getFields() {
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockTagNamesResponse());
-        assertThat(idolFieldsService.getFields(new IdolFieldsRequest.Builder().setMaxValues(null).build(), FieldTypeParam.Date, FieldTypeParam.Numeric), hasEntry(is(FieldTypeParam.Numeric), not(empty())));
+        assertThat(idolFieldsService.getFields(IdolFieldsRequest.builder().maxValues(null).build(), FieldTypeParam.Date, FieldTypeParam.Numeric), hasEntry(is(FieldTypeParam.Numeric), not(empty())));
     }
 
     private GetTagNamesResponseData mockTagNamesResponse() {

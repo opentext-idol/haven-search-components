@@ -11,8 +11,10 @@ import com.autonomy.aci.client.transport.AciParameter;
 import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
+import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
@@ -31,11 +33,17 @@ import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.OngoingStubbing;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -49,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -56,19 +65,27 @@ import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(MockitoJUnitRunner.class)
+@SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY)
 public class IdolParametricValuesServiceTest {
+    @ClassRule
+    public static final SpringClassRule SCR = new SpringClassRule();
+    @Rule
+    public final SpringMethodRule springMethodRule = new SpringMethodRule();
+
     @Mock
     private HavenSearchAciParameterHandler parameterHandler;
 
     @Mock
     private FieldsService<IdolFieldsRequest, AciErrorException> fieldsService;
+
+    @Autowired
+    private BucketingParamsHelper bucketingParamsHelper;
 
     @Mock
     private AciService contentAciService;
@@ -84,11 +101,12 @@ public class IdolParametricValuesServiceTest {
 
     private IdolParametricValuesService parametricValuesService;
 
+    @SuppressWarnings("CastToConcreteClass")
     @Before
     public void setUp() {
-        parametricValuesService = new IdolParametricValuesService(parameterHandler, fieldsService, aciServiceRetriever, aciResponseProcessorFactory);
+        parametricValuesService = new IdolParametricValuesService(parameterHandler, fieldsService, bucketingParamsHelper, aciServiceRetriever, aciResponseProcessorFactory);
 
-        when(aciServiceRetriever.getAciService(any(SearchRequest.QueryType.class))).thenReturn(contentAciService);
+        when(aciServiceRetriever.getAciService(any(QueryRequest.QueryType.class))).thenReturn(contentAciService);
     }
 
     @Test
@@ -248,14 +266,18 @@ public class IdolParametricValuesServiceTest {
         assertThat(results, is(empty()));
     }
 
-    private IdolParametricRequest mockRequest(final List<String> fieldNames) {
-        final QueryRestrictions<String> queryRestrictions = new IdolQueryRestrictions.Builder().setQueryText("*").setFieldText("").setDatabases(Collections.emptyList()).build();
-        return new IdolParametricRequest.Builder()
-                .setFieldNames(fieldNames)
-                .setQueryRestrictions(queryRestrictions)
-                .setMaxValues(30)
-                .setSort(SortParam.DocumentCount)
-                .setModified(true)
+    private IdolParametricRequest mockRequest(final Collection<String> fieldNames) {
+        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder()
+                .queryText("*")
+                .fieldText("")
+                .databases(Collections.emptyList())
+                .build();
+        return IdolParametricRequest.builder()
+                .fieldNames(fieldNames)
+                .queryRestrictions(queryRestrictions)
+                .maxValues(30)
+                .sort(SortParam.DocumentCount)
+                .modified(true)
                 .build();
     }
 
@@ -305,8 +327,7 @@ public class IdolParametricValuesServiceTest {
         OngoingStubbing<Serializable> stub = when(element.getValue()).thenReturn(count);
 
         for (final TagValue tagValue : tagValues) {
-            //noinspection unchecked,rawtypes
-            stub = ((OngoingStubbing) stub).thenReturn(tagValue);
+            stub = stub.thenReturn(tagValue);
         }
 
         final GetQueryTagValuesResponseData responseData = new GetQueryTagValuesResponseData();

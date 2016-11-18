@@ -24,14 +24,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("WeakerAccess")
-@Service
-public class TermExpandTypeAheadService implements TypeAheadService<AciErrorException> {
+import static com.hp.autonomy.searchcomponents.idol.typeahead.IdolTypeAheadConstants.TERM_EXPAND_TYPE_AHEAD_SERVICE_BEAN_NAME;
+
+/**
+ * Term expand implementation of {@link TypeAheadService}
+ */
+@Service(TERM_EXPAND_TYPE_AHEAD_SERVICE_BEAN_NAME)
+class TermExpandTypeAheadService implements TypeAheadService<AciErrorException> {
     private final AciService contentAciService;
     private final Processor<TermExpandResponseData> processor;
 
     @Autowired
-    public TermExpandTypeAheadService(
+    TermExpandTypeAheadService(
             final AciService contentAciService,
             final ProcessorFactory processorFactory
     ) {

@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Skeletal implementation of {@link DocumentFieldsService} containing a default implementation of {@link DocumentFieldsService#getPrintFields(Collection)}
+ */
 public abstract class AbstractDocumentFieldsService implements DocumentFieldsService {
     private final ConfigService<? extends HavenSearchCapable> configService;
 

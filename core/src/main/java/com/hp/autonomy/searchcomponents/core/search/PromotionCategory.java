@@ -5,6 +5,9 @@
 
 package com.hp.autonomy.searchcomponents.core.search;
 
+/**
+ * Promotion types
+ */
 public enum PromotionCategory {
     CARDINAL_PLACEMENT,
     STATIC_CONTENT_PROMOTION,

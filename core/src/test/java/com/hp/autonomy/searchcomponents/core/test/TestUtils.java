@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.List;
 
 public interface TestUtils<S extends Serializable> {
+    String CUSTOMISATION_TEST_ID = "customisation-test";
+
     List<S> getDatabases();
 
     QueryRestrictions<S> buildQueryRestrictions();

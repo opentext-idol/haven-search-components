@@ -11,20 +11,30 @@ import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service("typeAheadService")
-public class IdolTypeAheadService implements TypeAheadService<AciErrorException> {
+import static com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService.TYPE_AHEAD_SERVICE_BEAN_NAME;
+import static com.hp.autonomy.searchcomponents.idol.typeahead.IdolTypeAheadConstants.QMS_TYPE_AHEAD_SERVICE_BEAN_NAME;
+import static com.hp.autonomy.searchcomponents.idol.typeahead.IdolTypeAheadConstants.TERM_EXPAND_TYPE_AHEAD_SERVICE_BEAN_NAME;
+
+/**
+ * Default Idol implementation of {@link TypeAheadService}
+ */
+@Service(TYPE_AHEAD_SERVICE_BEAN_NAME)
+class IdolTypeAheadService implements TypeAheadService<AciErrorException> {
     private final ConfigService<? extends IdolSearchCapable> configService;
     private final TypeAheadService<AciErrorException> termExpandService;
     private final TypeAheadService<AciErrorException> qmsService;
 
     @Autowired
-    public IdolTypeAheadService(
+    IdolTypeAheadService(
             final ConfigService<? extends IdolSearchCapable> configService,
+            @Qualifier(TERM_EXPAND_TYPE_AHEAD_SERVICE_BEAN_NAME)
             final TypeAheadService<AciErrorException> termExpandTypeAheadService,
+            @Qualifier(QMS_TYPE_AHEAD_SERVICE_BEAN_NAME)
             final TypeAheadService<AciErrorException> qmsTypeAheadService
     ) {
         this.configService = configService;

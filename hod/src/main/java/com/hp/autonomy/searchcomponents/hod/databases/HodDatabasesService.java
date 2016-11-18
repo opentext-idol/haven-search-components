@@ -5,29 +5,36 @@
 
 package com.hp.autonomy.searchcomponents.hod.databases;
 
-import com.hp.autonomy.hod.client.api.resource.*;
+import com.hp.autonomy.hod.client.api.resource.ListResourcesRequestBuilder;
+import com.hp.autonomy.hod.client.api.resource.Resource;
+import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceType;
+import com.hp.autonomy.hod.client.api.resource.Resources;
+import com.hp.autonomy.hod.client.api.resource.ResourcesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-import lombok.Data;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
-@SuppressWarnings("WeakerAccess")
-@Data
-public class HodDatabasesService implements DatabasesService<Database, HodDatabasesRequest, HodErrorException> {
-    protected static final Set<ResourceFlavour> CONTENT_FLAVOURS = ResourceFlavour.of(
-            ResourceFlavour.EXPLORER,
-            ResourceFlavour.STANDARD,
-            ResourceFlavour.CUSTOM_FIELDS,
-            ResourceFlavour.JUMBO
-    );
+import static com.hp.autonomy.searchcomponents.hod.databases.HodDatabasesServiceConstants.CONTENT_FLAVOURS;
 
-    protected final ResourcesService resourcesService;
+/**
+ * HoD databases service implementation: retrieves private and public index information by querying HoD for content resources
+ */
+@Service(DatabasesService.DATABASES_SERVICE_BEAN_NAME)
+class HodDatabasesService implements DatabasesService<Database, HodDatabasesRequest, HodErrorException> {
+    private final ResourcesService resourcesService;
     private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
-    public HodDatabasesService(final ResourcesService resourcesService, final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever) {
+    HodDatabasesService(final ResourcesService resourcesService, final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever) {
         this.resourcesService = resourcesService;
         this.authenticationInformationRetriever = authenticationInformationRetriever;
     }
@@ -47,20 +54,13 @@ public class HodDatabasesService implements DatabasesService<Database, HodDataba
 
         final String domain = authenticationInformationRetriever.getPrincipal().getApplication().getDomain();
 
-        for (final Resource resource : resources.getResources()) {
-            if (CONTENT_FLAVOURS.contains(resource.getFlavour())) {
-                privateResourceNames.add(resource.getResource());
-
-                databases.add(databaseForResource(resource, domain, false));
-            }
-        }
+        resources.getResources().stream().filter(resource -> CONTENT_FLAVOURS.contains(resource.getFlavour())).forEach(resource -> {
+            privateResourceNames.add(resource.getResource());
+            databases.add(databaseForResource(resource, domain, false));
+        });
 
         if (request.isPublicIndexesEnabled()) {
-            for (final Resource resource : resources.getPublicResources()) {
-                if (!privateResourceNames.contains(resource.getResource())) {
-                    databases.add(databaseForResource(resource, ResourceIdentifier.PUBLIC_INDEXES_DOMAIN, true));
-                }
-            }
+            databases.addAll(resources.getPublicResources().stream().filter(resource -> !privateResourceNames.contains(resource.getResource())).map(resource -> databaseForResource(resource, ResourceIdentifier.PUBLIC_INDEXES_DOMAIN, true)).collect(Collectors.toList()));
         }
 
         return databases;
@@ -72,14 +72,13 @@ public class HodDatabasesService implements DatabasesService<Database, HodDataba
      * @param resource The resource
      * @param domain   The domain of the resource
      * @return A database representation of the resource
-     * @throws HodErrorException
      */
-    protected Database databaseForResource(final Resource resource, final String domain, final boolean isPublic) throws HodErrorException {
-        return new Database.Builder()
-                .setName(resource.getResource())
-                .setDisplayName(resource.getDisplayName())
-                .setPublic(isPublic)
-                .setDomain(domain)
+    private Database databaseForResource(final Resource resource, final String domain, final boolean isPublic) {
+        return Database.builder()
+                .name(resource.getResource())
+                .displayName(resource.getDisplayName())
+                .isPublic(isPublic)
+                .domain(domain)
                 .build();
     }
 }

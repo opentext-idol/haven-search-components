@@ -5,7 +5,17 @@
 
 package com.hp.autonomy.searchcomponents.core.databases;
 
-import java.io.Serializable;
+import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 
-public interface DatabasesRequest extends Serializable {
+/**
+ * Options for interacting with {@link DatabasesService}
+ */
+@FunctionalInterface
+public interface DatabasesRequest extends RequestObject<DatabasesRequest, DatabasesRequest.DatabasesRequestBuilder> {
+    /**
+     * Builder for {@link DatabasesRequest}
+     */
+    @FunctionalInterface
+    interface DatabasesRequestBuilder extends RequestObject.RequestObjectBuilder<DatabasesRequest, DatabasesRequest.DatabasesRequestBuilder> {
+    }
 }

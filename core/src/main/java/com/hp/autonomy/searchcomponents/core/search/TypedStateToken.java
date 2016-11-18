@@ -8,11 +8,16 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.io.Serializable;
 
+/**
+ * State token information returned as part of response of {@link DocumentsService#getStateTokenAndResultCount(QueryRestrictions, int, boolean)}
+ */
 @Embeddable
 @Data
 @NoArgsConstructor
-public class TypedStateToken {
+public class TypedStateToken implements Serializable {
+    private static final long serialVersionUID = -1812490657701746949L;
 
     private String stateToken;
 

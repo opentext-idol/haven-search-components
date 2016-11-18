@@ -12,24 +12,29 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.FindRelatedConcepts
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindRelatedConceptsService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Component
-public class HodRelatedConceptsService implements RelatedConceptsService<Entity, ResourceIdentifier, HodErrorException> {
+import static com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService.RELATED_CONCEPTS_SERVICE_BEAN_NAME;
+
+/**
+ * Default HoD implementation of {@link RelatedConceptsService}
+ */
+@Service(RELATED_CONCEPTS_SERVICE_BEAN_NAME)
+class HodRelatedConceptsService implements RelatedConceptsService<Entity, ResourceIdentifier, HodErrorException> {
     private final FindRelatedConceptsService findRelatedConceptsService;
     private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationRetriever;
 
     @Autowired
-    public HodRelatedConceptsService(
+    HodRelatedConceptsService(
             final FindRelatedConceptsService findRelatedConceptsService,
             final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationRetriever) {
         this.findRelatedConceptsService = findRelatedConceptsService;

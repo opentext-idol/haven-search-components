@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.core.test;
 
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.types.requests.Documents;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +32,10 @@ public abstract class IntegrationTestUtils<S extends Serializable, D extends Sea
 
     public String getValidReference() throws E {
         final QueryRestrictions<S> queryRestrictions = buildQueryRestrictions();
-        final SearchRequest<S> searchRequest = new SearchRequest<>();
-        searchRequest.setQueryRestrictions(queryRestrictions);
-        final Documents<D> documents = documentsService.queryTextIndex(searchRequest);
+        final QueryRequest<S> queryRequest = QueryRequest.<S>builder()
+                .queryRestrictions(queryRestrictions)
+                .build();
+        final Documents<D> documents = documentsService.queryTextIndex(queryRequest);
         return documents.getDocuments().get(0).getReference();
     }
 }

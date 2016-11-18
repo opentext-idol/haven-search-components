@@ -5,68 +5,81 @@
 
 package com.hp.autonomy.searchcomponents.core.search;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 
-@Data
-@NoArgsConstructor
-public class SearchRequest<S extends Serializable> implements AciSearchRequest<S> {
-    private static final long serialVersionUID = -6338199353489914631L;
+/**
+ * Common request functionality between Search and Suggest queries
+ *
+ * @param <S> The type of the database identifier
+ */
+public interface SearchRequest<S extends Serializable> {
+    int DEFAULT_START = 1;
+    int DEFAULT_MAX_RESULTS = 30;
+    String DEFAULT_PRINT = PrintParam.Fields.name();
 
-    protected boolean autoCorrect;
-    protected QueryRestrictions<S> queryRestrictions;
-    protected int start = DEFAULT_START;
-    protected int maxResults = DEFAULT_MAX_RESULTS;
-    protected String summary;
-    protected Integer summaryCharacters;
-    protected String sort;
-    protected boolean highlight;
-    protected String print = DEFAULT_PRINT;
-    protected Collection<String> printFields = Collections.emptyList();
-    protected QueryType queryType = QueryType.MODIFIED;
+    /**
+     * The query restrictions to apply
+     *
+     * @return The query restrictions to apply
+     */
+    QueryRestrictions<S> getQueryRestrictions();
 
-    private SearchRequest(final Builder<S> builder) {
-        queryRestrictions = builder.queryRestrictions;
-        start = builder.start;
-        maxResults = builder.maxResults;
-        summary = builder.summary;
-        summaryCharacters = builder.summaryCharacters;
-        sort = builder.sort;
-        highlight = builder.highlight;
-        autoCorrect = builder.autoCorrect;
-        print = builder.print;
-        queryType = builder.queryType;
-        printFields = builder.printFields == null ? Collections.emptyList() : Collections.unmodifiableCollection(builder.printFields);
-    }
+    /**
+     * Index of first result to display (1-based)
+     *
+     * @return Index of first result to display (1-based)
+     */
+    int getStart();
 
-    public enum QueryType {
-        RAW, MODIFIED, PROMOTIONS
-    }
+    /**
+     * Index of last result to display
+     *
+     * @return Index of last result to display
+     */
+    int getMaxResults();
 
-    @SuppressWarnings("FieldMayBeFinal")
-    @Setter
-    @Accessors(chain = true)
-    public static class Builder<S extends Serializable> {
-        private QueryRestrictions<S> queryRestrictions;
-        private int start = DEFAULT_START;
-        private int maxResults = DEFAULT_MAX_RESULTS;
-        private String summary;
-        private Integer summaryCharacters;
-        private String sort;
-        private boolean highlight;
-        private boolean autoCorrect;
-        private String print = DEFAULT_PRINT;
-        private QueryType queryType = QueryType.MODIFIED;
-        private Collection<String> printFields = Collections.emptyList();
+    /**
+     * The type of summary to generate
+     *
+     * @return The type of summary to generate
+     */
+    String getSummary();
 
-        public SearchRequest<S> build() {
-            return new SearchRequest<>(this);
-        }
-    }
+    /**
+     * The maximum length of the summary
+     *
+     * @return The maximum length of the summary
+     */
+    Integer getSummaryCharacters();
+
+    /**
+     * The criterion by which to order the results
+     *
+     * @return The criterion by which to order the results
+     */
+    String getSort();
+
+    /**
+     * Whether or not to apply search highlighting
+     *
+     * @return Whether or not to apply search highlighting
+     */
+    boolean isHighlight();
+
+    /**
+     * What to display in the document result output
+     *
+     * @return What to display in the document result output
+     */
+    String getPrint();
+
+    /**
+     * The fields to display in the document result output if print is set to the 'PrintFields' option
+     *
+     * @return The fields to display in the document result output if print is set to the 'PrintFields' option
+     */
+    Collection<String> getPrintFields();
 }

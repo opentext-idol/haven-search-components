@@ -8,17 +8,19 @@ package com.hp.autonomy.searchcomponents.hod.search;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.Singular;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 @Data
+@Builder(toBuilder = true)
 public class HodSearchResult implements SearchResult {
     private static final long serialVersionUID = -7386227266595690038L;
 
@@ -32,6 +34,7 @@ public class HodSearchResult implements SearchResult {
     private final String summary;
     private final Double weight;
 
+    @Singular("fieldEntry")
     private final Map<String, FieldInfo<?>> fieldMap;
 
     private final DateTime date;
@@ -40,13 +43,18 @@ public class HodSearchResult implements SearchResult {
 
     private final String domain;
 
-    private HodSearchResult(final Builder builder) {
+    private HodSearchResult(final HodSearchResultBuilder builder) {
         reference = builder.reference;
         index = builder.index;
 
         summary = builder.summary;
         weight = builder.weight;
-        fieldMap = builder.fieldMap;
+        fieldMap = new HashMap<>();
+        if (builder.fieldMap$key != null && builder.fieldMap$value != null) {
+            for (int i = 0; i < builder.fieldMap$key.size() & i < builder.fieldMap$value.size(); i++) {
+                fieldMap.put(builder.fieldMap$key.get(i), builder.fieldMap$value.get(i));
+            }
+        }
 
         date = builder.date;
 
@@ -65,37 +73,9 @@ public class HodSearchResult implements SearchResult {
         domain = builder.domain;
     }
 
-    @Setter
-    @NoArgsConstructor
-    @Accessors(chain = true)
-    public static class Builder {
-        private String reference;
-        private String index;
-
-        private String title;
-        private String summary;
-        private Double weight;
-
-        private Map<String, FieldInfo<?>> fieldMap;
-
-        private DateTime date;
-
-        private PromotionCategory promotionCategory;
-
-        private String domain;
-
-        public Builder(final HodSearchResult document) {
-            reference = document.reference;
-            index = document.index;
-            title = document.title;
-            summary = document.summary;
-            weight = document.weight;
-            fieldMap = document.fieldMap;
-            date = document.date;
-            promotionCategory = document.promotionCategory;
-            domain = document.domain;
-        }
-
+    @SuppressWarnings("WeakerAccess")
+    public static class HodSearchResultBuilder implements SearchResult.SearchResultBuilder {
+        @Override
         public HodSearchResult build() {
             return new HodSearchResult(this);
         }

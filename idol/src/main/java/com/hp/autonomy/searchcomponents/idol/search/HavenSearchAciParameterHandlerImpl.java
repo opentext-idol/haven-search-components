@@ -15,14 +15,15 @@ import com.hp.autonomy.aci.content.identifier.stateid.StateIdsBuilder;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
+import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
+import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-import com.hp.autonomy.searchcomponents.core.search.AciSearchRequest;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
-import com.hp.autonomy.searchcomponents.idol.view.IdolViewServerService;
 import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
@@ -39,20 +40,28 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-@SuppressWarnings("WeakerAccess")
-@Component("parameterHandler")
-public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
+import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_END_TAG;
+import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_START_TAG;
+import static com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler.PARAMETER_HANDLER_BEAN_NAME;
+import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_GROUP;
+import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_IDENTIFIER;
+
+/**
+ * Default implementation of {@link HavenSearchAciParameterHandler}
+ */
+@Component(PARAMETER_HANDLER_BEAN_NAME)
+class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
     private static final String IDOL_DATE_PARAMETER_FORMAT = "HH:mm:ss dd/MM/yyyy";
     private static final String GET_CONTENT_QUERY_TEXT = "*";
 
-    protected final ConfigService<? extends IdolSearchCapable> configService;
-    protected final DocumentFieldsService documentFieldsService;
-    protected final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever;
+    private final ConfigService<? extends IdolSearchCapable> configService;
+    private final DocumentFieldsService documentFieldsService;
+    private final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever;
 
     private final Escaper urlFragmentEscaper = UrlEscapers.urlFragmentEscaper();
 
     @Autowired
-    public HavenSearchAciParameterHandlerImpl(
+    HavenSearchAciParameterHandlerImpl(
             final ConfigService<? extends IdolSearchCapable> configService,
             final DocumentFieldsService documentFieldsService,
             final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever
@@ -68,11 +77,11 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         if (!queryRestrictions.getDatabases().isEmpty()) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(queryRestrictions.getDatabases()));
         }
-        if (!queryRestrictions.getStateMatchId().isEmpty()) {
-            aciParameters.add(QueryParams.StateMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateMatchId()));
+        if (!queryRestrictions.getStateMatchIds().isEmpty()) {
+            aciParameters.add(QueryParams.StateMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateMatchIds()));
         }
-        if (!queryRestrictions.getStateDontMatchId().isEmpty()) {
-            aciParameters.add(QueryParams.StateDontMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateDontMatchId()));
+        if (!queryRestrictions.getStateDontMatchIds().isEmpty()) {
+            aciParameters.add(QueryParams.StateDontMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateDontMatchIds()));
         }
 
         aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
@@ -85,7 +94,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
     }
 
     @Override
-    public void addSearchOutputParameters(final AciParameters aciParameters, final AciSearchRequest<String> searchRequest) {
+    public void addSearchOutputParameters(final AciParameters aciParameters, final SearchRequest<String> searchRequest) {
         addSecurityInfo(aciParameters);
 
         aciParameters.add(QueryParams.Start.name(), searchRequest.getStart());
@@ -141,7 +150,7 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         }
         parameters.add(GetContentParams.Reference.name(), new Reference(documentReference));
         parameters.add(GetContentParams.Print.name(), PrintParam.Fields);
-        parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField, IdolViewServerService.AUTN_IDENTIFIER, IdolViewServerService.AUTN_GROUP));
+        parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField, AUTN_IDENTIFIER, AUTN_GROUP));
     }
 
     @Override
@@ -174,7 +183,34 @@ public class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParamet
         aciParameters.add(QueryParams.SecurityInfo.name(), securityInfo);
     }
 
-    protected String formatDate(final ReadableInstant date) {
+    @Override
+    public void addStoreStateParameters(final AciParameters aciParameters) {
+        aciParameters.add(QueryParams.StoreState.name(), true);
+        aciParameters.add(QueryParams.StoredStateTokenLifetime.name(), -1);  // negative value means no expiry (DAH)
+    }
+
+    @Override
+    public void addViewParameters(final AciParameters aciParameters, final String reference, final String highlightExpression) {
+        aciParameters.add(ViewParams.NoACI.name(), true);
+        aciParameters.add(ViewParams.Reference.name(), reference);
+        aciParameters.add(ViewParams.EmbedImages.name(), true);
+        aciParameters.add(ViewParams.StripScript.name(), true);
+        aciParameters.add(ViewParams.OriginalBaseURL.name(), true);
+
+        if (highlightExpression != null) {
+            aciParameters.add(ViewParams.Links.name(), highlightExpression);
+            aciParameters.add(ViewParams.StartTag.name(), HIGHLIGHT_START_TAG);
+            aciParameters.add(ViewParams.EndTag.name(), HIGHLIGHT_END_TAG);
+
+            // we need this because we're sending query text, not a csv of stemmed terms
+            aciParameters.add(ViewParams.Boolean.name(), true);
+        }
+
+        // this prevents ViewServer from returning the raw file
+        aciParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
+    }
+
+    private String formatDate(final ReadableInstant date) {
         return date == null ? null : DateTimeFormat.forPattern(IDOL_DATE_PARAMETER_FORMAT).print(date);
     }
 }
