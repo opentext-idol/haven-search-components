@@ -16,6 +16,7 @@ import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
+import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
 import com.hp.autonomy.types.IdolDatabase;
 import com.hp.autonomy.types.requests.idol.actions.query.QuerySummaryElement;
@@ -84,8 +85,8 @@ public class CustomServiceConfiguration {
 
     @Bean
     @Primary
-    public <S extends Serializable, E extends Exception> ViewServerService<S, E> customViewServerService(
-            @Qualifier(ViewServerService.VIEW_SERVER_SERVICE_BEAN_NAME) final ViewServerService<S, E> viewServerService) {
+    public <R extends ViewRequest<S>, S extends Serializable, E extends Exception> ViewServerService<R, S, E> customViewServerService(
+            @Qualifier(ViewServerService.VIEW_SERVER_SERVICE_BEAN_NAME) final ViewServerService<R, S, E> viewServerService) {
         return viewServerService;
     }
 }

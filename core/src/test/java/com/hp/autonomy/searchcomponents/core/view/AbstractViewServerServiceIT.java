@@ -20,19 +20,26 @@ import static org.junit.Assert.assertNotNull;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-public abstract class AbstractViewServerServiceIT<S extends Serializable, D extends SearchResult, E extends Exception> {
+public abstract class AbstractViewServerServiceIT<R extends ViewRequest<S>, S extends Serializable, D extends SearchResult, E extends Exception> {
     @Autowired
-    protected ViewServerService<S, E> viewServerService;
+    protected ViewServerService<R, S, E> viewServerService;
 
     @Autowired
     protected IntegrationTestUtils<S, D, E> integrationTestUtils;
+
+    @Autowired
+    protected ViewRequest.ViewRequestBuilder<R, S> viewRequestBuilder;
 
     @Test
     public void viewDocument() throws E, IOException {
         final String reference = integrationTestUtils.getValidReference();
 
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        viewServerService.viewDocument(reference, integrationTestUtils.getDatabases().get(0), null, outputStream);
+        final R request = viewRequestBuilder
+                .documentReference(reference)
+                .database(integrationTestUtils.getDatabases().get(0))
+                .build();
+        viewServerService.viewDocument(request, outputStream);
         assertNotNull(outputStream.toByteArray());
     }
 }

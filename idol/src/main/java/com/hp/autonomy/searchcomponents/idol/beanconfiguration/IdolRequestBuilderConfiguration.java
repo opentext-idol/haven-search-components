@@ -13,11 +13,13 @@ import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
+import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequest;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.parametricvalues.IdolParametricRequest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolRelatedConceptsRequest;
+import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -86,5 +88,12 @@ public class IdolRequestBuilderConfiguration {
     @ConditionalOnMissingBean(QueryRestrictions.QueryRestrictionsBuilder.class)
     public IdolQueryRestrictions.IdolQueryRestrictionsBuilder queryRestrictionsBuilder() {
         return IdolQueryRestrictions.builder();
+    }
+
+    @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    @ConditionalOnMissingBean(ViewRequest.ViewRequestBuilder.class)
+    public IdolViewRequest.IdolViewRequestBuilder viewRequestBuilder() {
+        return IdolViewRequest.builder();
     }
 }

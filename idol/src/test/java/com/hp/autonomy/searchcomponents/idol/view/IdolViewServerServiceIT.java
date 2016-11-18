@@ -12,5 +12,5 @@ import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class)
-public class IdolViewServerServiceIT extends AbstractViewServerServiceIT<String, IdolSearchResult, AciErrorException> {
+public class IdolViewServerServiceIT extends AbstractViewServerServiceIT<IdolViewRequest, String, IdolSearchResult, AciErrorException> {
 }

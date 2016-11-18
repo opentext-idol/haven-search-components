@@ -14,11 +14,13 @@ import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
+import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.searchcomponents.hod.databases.HodDatabasesRequest;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricRequest;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.searchcomponents.hod.search.HodRelatedConceptsRequest;
+import com.hp.autonomy.searchcomponents.hod.view.HodViewRequest;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -87,5 +89,12 @@ public class HodRequestBuilderConfiguration {
     @ConditionalOnMissingBean(QueryRestrictions.QueryRestrictionsBuilder.class)
     public HodQueryRestrictions.HodQueryRestrictionsBuilder queryRestrictionsBuilder() {
         return HodQueryRestrictions.builder();
+    }
+
+    @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    @ConditionalOnMissingBean(ViewRequest.ViewRequestBuilder.class)
+    public HodViewRequest.HodViewRequestBuilder viewRequestBuilder() {
+        return HodViewRequest.builder();
     }
 }

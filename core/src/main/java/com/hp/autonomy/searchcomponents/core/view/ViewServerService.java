@@ -14,10 +14,11 @@ import java.io.Serializable;
 /**
  * Service for viewing documents as html
  *
+ * @param <R> The request type to use
  * @param <S> The type of the database identifier
  * @param <E> The checked exception thrown in the event of an error
  */
-public interface ViewServerService<S extends Serializable, E extends Exception> {
+public interface ViewServerService<R extends ViewRequest<S>, S extends Serializable, E extends Exception> {
     /**
      * The bean name of the default implementation.
      * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
@@ -37,20 +38,19 @@ public interface ViewServerService<S extends Serializable, E extends Exception> 
     /**
      * View the document with the given reference in the given index, writing the output to the given output stream.
      *
-     * @param documentReference   The document reference
-     * @param database            The database or index containing the document
-     * @param highlightExpression Text to highlight in the document
-     * @param outputStream        The output stream to write the viewed document to
-     * @throws E The error thrown in the event of the platform returning an error response
+     * @param request      options
+     * @param outputStream The output stream to write the viewed document to
+     * @throws IOException Stream error
+     * @throws E           The error thrown in the event of the platform returning an error response
      */
-    void viewDocument(String documentReference, S database, String highlightExpression, OutputStream outputStream) throws E, IOException;
+    void viewDocument(R request, OutputStream outputStream) throws E, IOException;
 
     /**
      * View a static content promotion, writing the output to the given output stream.
      *
      * @param documentReference The reference of the search result created by the promotion
      * @param outputStream      The output stream to write the viewed document to
-     * @throws IOException
+     * @throws IOException Stream error
      * @throws E           The error thrown in the event of the platform returning an error response
      */
     void viewStaticContentPromotion(String documentReference, OutputStream outputStream) throws IOException, E;

@@ -28,8 +28,6 @@ import com.hp.autonomy.types.requests.idol.actions.connector.ConnectorActions;
 import com.hp.autonomy.types.requests.idol.actions.connector.params.ConnectorViewParams;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
-import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
-import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.NotImplementedException;
@@ -53,7 +51,7 @@ import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceCo
  * Default Idol implementation of {@link ViewServerService}
  */
 @Service(VIEW_SERVER_SERVICE_BEAN_NAME)
-class IdolViewServerService implements ViewServerService<String, AciErrorException> {
+class IdolViewServerService implements ViewServerService<IdolViewRequest, String, AciErrorException> {
     private final AciService contentAciService;
     private final AciService viewAciService;
     private final HavenSearchAciParameterHandler parameterHandler;
@@ -74,25 +72,24 @@ class IdolViewServerService implements ViewServerService<String, AciErrorExcepti
      * Provides an HTML rendering of the given IDOL document reference. This first performs a GetContent to make sure the
      * document exists, then reads the configured reference field and passes the value of the field to ViewServer.
      *
-     * @param documentReference The IDOL document reference of the document to view
-     * @param database          The IDOL databases containing the reference (no restriction set on getContent query if this is an empty collection)
-     * @param outputStream      The ViewServer output
+     * @param request      options
+     * @param outputStream The ViewServer output
      * @throws ViewDocumentNotFoundException If the given document reference does not exist in IDOL
      * @throws ViewNoReferenceFieldException If the document with the given reference does not have the required reference field
      * @throws ReferenceFieldBlankException  If the configured reference field name is blank
      * @throws ViewServerErrorException      If ViewServer returns a status code outside the 200 range
      */
     @Override
-    public void viewDocument(final String documentReference, final String database, final String highlightExpression, final OutputStream outputStream) throws ViewDocumentNotFoundException, ViewNoReferenceFieldException, ReferenceFieldBlankException {
-        final String reference = getReferenceFieldValue(documentReference, database);
+    public void viewDocument(final IdolViewRequest request, final OutputStream outputStream) throws ViewDocumentNotFoundException, ViewNoReferenceFieldException, ReferenceFieldBlankException {
+        final String reference = getReferenceFieldValue(request.getDocumentReference(), request.getDatabase());
 
         final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
-        parameterHandler.addViewParameters(viewParameters, reference, highlightExpression);
-        
+        parameterHandler.addViewParameters(viewParameters, reference, request.getHighlightExpression());
+
         try {
             viewAciService.executeAction(viewParameters, new CopyResponseProcessor(outputStream));
         } catch (final AciServiceException e) {
-            throw new ViewServerErrorException(documentReference, e);
+            throw new ViewServerErrorException(request.getDocumentReference(), e);
         }
     }
 
@@ -142,15 +139,15 @@ class IdolViewServerService implements ViewServerService<String, AciErrorExcepti
 
                 try {
                     final URI uri = new URIBuilder()
-                        .setScheme(connectorConfig.getProtocol().name().toLowerCase())
-                        .setHost(connectorConfig.getHost())
-                        .setPort(connectorConfig.getPort())
-                        // need to set the path because of ACI's weird format
-                        .setPath("/")
-                        .addParameter(AciConstants.PARAM_ACTION, ConnectorActions.View.name())
-                        .addParameter(ConnectorViewParams.Identifier.name(), identifier)
-                        .addParameter(ConnectorViewParams.Group.name(), group)
-                        .build();
+                            .setScheme(connectorConfig.getProtocol().name().toLowerCase())
+                            .setHost(connectorConfig.getHost())
+                            .setPort(connectorConfig.getPort())
+                            // need to set the path because of ACI's weird format
+                            .setPath("/")
+                            .addParameter(AciConstants.PARAM_ACTION, ConnectorActions.View.name())
+                            .addParameter(ConnectorViewParams.Identifier.name(), identifier)
+                            .addParameter(ConnectorViewParams.Group.name(), group)
+                            .build();
 
                     reference = uri.toString();
                 } catch (final URISyntaxException e) {

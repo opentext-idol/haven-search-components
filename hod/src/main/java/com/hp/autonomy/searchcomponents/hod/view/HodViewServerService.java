@@ -54,7 +54,7 @@ import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.VIEW_
  */
 @SuppressWarnings("WeakerAccess")
 @Service(VIEW_SERVER_SERVICE_BEAN_NAME)
-class HodViewServerService implements ViewServerService<ResourceIdentifier, HodErrorException> {
+class HodViewServerService implements ViewServerService<HodViewRequest, ResourceIdentifier, HodErrorException> {
     // Field on text index documents which (when present) contains the view URL
     private static final String URL_FIELD = "url";
 
@@ -119,9 +119,10 @@ class HodViewServerService implements ViewServerService<ResourceIdentifier, HodE
     }
 
     @Override
-    public void viewDocument(final String reference, final ResourceIdentifier index, final String highlightExpression, final OutputStream outputStream) throws IOException, HodErrorException {
+    public void viewDocument(final HodViewRequest request, final OutputStream outputStream) throws IOException, HodErrorException {
+        final String reference = request.getDocumentReference();
         final GetContentRequestBuilder getContentParams = new GetContentRequestBuilder().setPrint(Print.all);
-        final QueryResults<Document> documents = getContentService.getContent(Collections.singletonList(reference), index, getContentParams);
+        final QueryResults<Document> documents = getContentService.getContent(Collections.singletonList(reference), request.getDatabase(), getContentParams);
 
         // This document will always exist because the GetContentService.getContent throws a HodErrorException if the
         // reference doesn't exist in the index
@@ -143,7 +144,7 @@ class HodViewServerService implements ViewServerService<ResourceIdentifier, HodE
 
         InputStream inputStream = null;
         try {
-            inputStream = getInputStream(highlightExpression, document, documentUrl, urlValidator);
+            inputStream = getInputStream(request.getHighlightExpression(), document, documentUrl, urlValidator);
 
             IOUtils.copy(inputStream, outputStream);
         } finally {

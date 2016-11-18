@@ -13,5 +13,5 @@ import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = HavenSearchHodConfiguration.class)
-public class HodViewServerServiceIT extends AbstractViewServerServiceIT<ResourceIdentifier, HodSearchResult, HodErrorException> {
+public class HodViewServerServiceIT extends AbstractViewServerServiceIT<HodViewRequest, ResourceIdentifier, HodSearchResult, HodErrorException> {
 }
