@@ -14,8 +14,10 @@ import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
+import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
@@ -143,7 +145,10 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addViewParameters() {
-        parameterHandler.addViewParameters(aciParameters, "123456", "SomeText");
+        final ViewRequest<String> viewRequest = IdolViewRequest.builder()
+                .highlightExpression("SomeText")
+                .build();
+        parameterHandler.addViewParameters(aciParameters, "123456", viewRequest);
         assertThat(aciParameters, hasSize(10));
     }
 }

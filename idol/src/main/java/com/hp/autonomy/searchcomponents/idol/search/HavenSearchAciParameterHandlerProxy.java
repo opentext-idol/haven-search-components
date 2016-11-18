@@ -9,6 +9,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -60,7 +61,7 @@ public abstract class HavenSearchAciParameterHandlerProxy implements HavenSearch
     }
 
     @Override
-    public void addViewParameters(final AciParameters aciParameters, final String reference, final String highlightExpression) {
-        parameterHandler.addViewParameters(aciParameters, reference, highlightExpression);
+    public void addViewParameters(final AciParameters aciParameters, final String reference, final ViewRequest<String> viewRequest) {
+        parameterHandler.addViewParameters(aciParameters, reference, viewRequest);
     }
 }

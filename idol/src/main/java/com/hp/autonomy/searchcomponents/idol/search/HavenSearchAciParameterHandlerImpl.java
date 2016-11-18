@@ -15,14 +15,12 @@ import com.hp.autonomy.aci.content.identifier.stateid.StateIdsBuilder;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
-import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
-import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
@@ -30,7 +28,10 @@ import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
+import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
+import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,15 +191,15 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addViewParameters(final AciParameters aciParameters, final String reference, final String highlightExpression) {
+    public void addViewParameters(final AciParameters aciParameters, final String reference, final ViewRequest<String> viewRequest) {
         aciParameters.add(ViewParams.NoACI.name(), true);
         aciParameters.add(ViewParams.Reference.name(), reference);
         aciParameters.add(ViewParams.EmbedImages.name(), true);
         aciParameters.add(ViewParams.StripScript.name(), true);
         aciParameters.add(ViewParams.OriginalBaseURL.name(), true);
 
-        if (highlightExpression != null) {
-            aciParameters.add(ViewParams.Links.name(), highlightExpression);
+        if (viewRequest.getHighlightExpression() != null) {
+            aciParameters.add(ViewParams.Links.name(), viewRequest.getHighlightExpression());
             aciParameters.add(ViewParams.StartTag.name(), HIGHLIGHT_START_TAG);
             aciParameters.add(ViewParams.EndTag.name(), HIGHLIGHT_END_TAG);
 

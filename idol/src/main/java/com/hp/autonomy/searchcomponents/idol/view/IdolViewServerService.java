@@ -84,7 +84,7 @@ class IdolViewServerService implements ViewServerService<IdolViewRequest, String
         final String reference = getReferenceFieldValue(request.getDocumentReference(), request.getDatabase());
 
         final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
-        parameterHandler.addViewParameters(viewParameters, reference, request.getHighlightExpression());
+        parameterHandler.addViewParameters(viewParameters, reference, request);
 
         try {
             viewAciService.executeAction(viewParameters, new CopyResponseProcessor(outputStream));
