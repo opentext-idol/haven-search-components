@@ -11,12 +11,15 @@ import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Provides default methods for any custom implementation of {@link HavenSearchAciParameterHandler}
  */
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 public abstract class HavenSearchAciParameterHandlerProxy implements HavenSearchAciParameterHandler {
+    @Autowired
     @Qualifier(PARAMETER_HANDLER_BEAN_NAME)
     protected HavenSearchAciParameterHandler parameterHandler;
 
