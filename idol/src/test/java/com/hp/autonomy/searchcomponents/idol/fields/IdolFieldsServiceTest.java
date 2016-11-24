@@ -37,7 +37,7 @@ public class IdolFieldsServiceTest {
 
     @Before
     public void setUp() {
-        idolFieldsService = new IdolFieldsService(contentAciService, processorFactory);
+        idolFieldsService = new IdolFieldsServiceImpl(contentAciService, processorFactory);
     }
 
     @Test

@@ -44,8 +44,8 @@ import java.util.Set;
 import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_END_TAG;
 import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_START_TAG;
 import static com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler.PARAMETER_HANDLER_BEAN_NAME;
-import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_GROUP;
-import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerServiceConstants.AUTN_IDENTIFIER;
+import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerService.AUTN_GROUP;
+import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerService.AUTN_IDENTIFIER;
 
 /**
  * Default implementation of {@link HavenSearchAciParameterHandler}

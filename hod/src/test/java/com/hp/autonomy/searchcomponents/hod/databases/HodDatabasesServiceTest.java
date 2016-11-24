@@ -47,7 +47,7 @@ public class HodDatabasesServiceTest {
 
     @Before
     public void setUp() {
-        databasesService = new HodDatabasesService(resourcesService, authenticationInformationRetriever);
+        databasesService = new HodDatabasesServiceImpl(resourcesService, authenticationInformationRetriever);
     }
 
     @Before

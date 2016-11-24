@@ -38,7 +38,7 @@ public class IdolRelatedConceptsServiceTest {
 
     @Before
     public void setUp() {
-        idolRelatedConceptsService = new IdolRelatedConceptsService(parameterHandler, queryExecutor);
+        idolRelatedConceptsService = new IdolRelatedConceptsServiceImpl(parameterHandler, queryExecutor);
     }
 
     @Test

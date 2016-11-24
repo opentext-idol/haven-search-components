@@ -5,7 +5,6 @@
 
 package com.hp.autonomy.searchcomponents.idol.typeahead;
 
-import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
@@ -24,13 +23,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.hp.autonomy.searchcomponents.idol.typeahead.IdolTypeAheadConstants.TERM_EXPAND_TYPE_AHEAD_SERVICE_BEAN_NAME;
+import static com.hp.autonomy.searchcomponents.idol.typeahead.IdolTypeAheadService.TERM_EXPAND_TYPE_AHEAD_SERVICE_BEAN_NAME;
 
 /**
  * Term expand implementation of {@link TypeAheadService}
  */
 @Service(TERM_EXPAND_TYPE_AHEAD_SERVICE_BEAN_NAME)
-class TermExpandTypeAheadService implements TypeAheadService<AciErrorException> {
+class TermExpandTypeAheadService implements IdolTypeAheadService {
     private final AciService contentAciService;
     private final Processor<TermExpandResponseData> processor;
 

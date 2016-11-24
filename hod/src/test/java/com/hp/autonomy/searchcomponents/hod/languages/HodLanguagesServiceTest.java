@@ -9,7 +9,7 @@ import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.hp.autonomy.searchcomponents.hod.languages.HodLanguageConstants.THE_LANGUAGE;
+import static com.hp.autonomy.searchcomponents.hod.languages.HodLanguagesService.THE_LANGUAGE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
@@ -21,7 +21,7 @@ public class HodLanguagesServiceTest {
 
     @Before
     public void setUp() {
-        languagesService = new HodLanguagesService();
+        languagesService = new HodLanguagesServiceImpl();
     }
 
     @Test

@@ -38,7 +38,7 @@ public class IdolDatabasesServiceTest {
 
     @Before
     public void setUp() {
-        idolDatabasesService = new IdolDatabasesService(contentAciService, processorFactory);
+        idolDatabasesService = new IdolDatabasesServiceImpl(contentAciService, processorFactory);
     }
 
     @Test

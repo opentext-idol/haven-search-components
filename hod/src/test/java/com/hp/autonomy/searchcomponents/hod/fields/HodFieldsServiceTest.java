@@ -39,7 +39,7 @@ public class HodFieldsServiceTest {
 
     @Before
     public void setUp() {
-        fieldsService = new HodFieldsService(retrieveIndexFieldsService);
+        fieldsService = new HodFieldsServiceImpl(retrieveIndexFieldsService);
     }
 
     @Test

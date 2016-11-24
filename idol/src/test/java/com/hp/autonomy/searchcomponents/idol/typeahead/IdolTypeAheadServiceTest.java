@@ -37,7 +37,7 @@ public class IdolTypeAheadServiceTest {
 
     @Before
     public void setUp() {
-        typeAheadService = new IdolTypeAheadService(configService, termExpandTypeAheadService, qmsTypeAheadService);
+        typeAheadService = new IdolTypeAheadServiceImpl(configService, termExpandTypeAheadService, qmsTypeAheadService);
         when(configService.getConfig()).thenReturn(config);
     }
 

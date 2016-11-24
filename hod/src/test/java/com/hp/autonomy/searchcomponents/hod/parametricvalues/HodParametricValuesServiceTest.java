@@ -101,7 +101,7 @@ public class HodParametricValuesServiceTest {
     @SuppressWarnings("CastToConcreteClass")
     @Before
     public void setUp() throws HodErrorException {
-        parametricValuesService = new HodParametricValuesService(fieldsService, getParametricValuesService(), bucketingParamsHelper, configService, authenticationInformationRetriever);
+        parametricValuesService = new HodParametricValuesServiceImpl(fieldsService, getParametricValuesService(), bucketingParamsHelper, configService, authenticationInformationRetriever);
     }
 
     @Before

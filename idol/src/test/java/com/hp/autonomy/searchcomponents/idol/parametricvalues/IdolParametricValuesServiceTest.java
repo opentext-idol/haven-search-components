@@ -104,7 +104,7 @@ public class IdolParametricValuesServiceTest {
     @SuppressWarnings("CastToConcreteClass")
     @Before
     public void setUp() {
-        parametricValuesService = new IdolParametricValuesService(parameterHandler, fieldsService, bucketingParamsHelper, aciServiceRetriever, aciResponseProcessorFactory);
+        parametricValuesService = new IdolParametricValuesServiceImpl(parameterHandler, fieldsService, bucketingParamsHelper, aciServiceRetriever, aciResponseProcessorFactory);
 
         when(aciServiceRetriever.getAciService(any(QueryRequest.QueryType.class))).thenReturn(contentAciService);
     }
@@ -285,7 +285,7 @@ public class IdolParametricValuesServiceTest {
         final GetQueryTagValuesResponseData responseData = new GetQueryTagValuesResponseData();
         final FlatField field = new FlatField();
         field.getName().add("Some name");
-        when(element.getName()).thenReturn(new QName("", IdolParametricValuesService.VALUE_NODE_NAME));
+        when(element.getName()).thenReturn(new QName("", IdolParametricValuesServiceImpl.VALUE_NODE_NAME));
         final TagValue tagValue = mockTagValue("Some field", 5);
         when(element.getValue()).thenReturn(tagValue);
         field.getValueAndSubvalueOrValues().add(element);
@@ -309,10 +309,10 @@ public class IdolParametricValuesServiceTest {
         when(flatField.getTotalValues()).thenReturn(totalValues);
 
         final List<JAXBElement<? extends Serializable>> values = new LinkedList<>();
-        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_MIN_NODE_NAME, min));
-        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_MAX_NODE_NAME, max));
-        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_SUM_NODE_NAME, sum));
-        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_AVERAGE_NODE_NAME, average));
+        values.add(mockJAXBElement(IdolParametricValuesServiceImpl.VALUE_MIN_NODE_NAME, min));
+        values.add(mockJAXBElement(IdolParametricValuesServiceImpl.VALUE_MAX_NODE_NAME, max));
+        values.add(mockJAXBElement(IdolParametricValuesServiceImpl.VALUE_SUM_NODE_NAME, sum));
+        values.add(mockJAXBElement(IdolParametricValuesServiceImpl.VALUE_AVERAGE_NODE_NAME, average));
 
         when(flatField.getValueAndSubvalueOrValues()).thenReturn(values);
         return flatField;
@@ -320,8 +320,8 @@ public class IdolParametricValuesServiceTest {
 
     private void mockBucketResponses(final int count, final TagValue... tagValues) {
         when(element.getName()).thenReturn(
-                new QName("", IdolParametricValuesService.VALUES_NODE_NAME),
-                new QName("", IdolParametricValuesService.VALUE_NODE_NAME)
+                new QName("", IdolParametricValuesServiceImpl.VALUES_NODE_NAME),
+                new QName("", IdolParametricValuesServiceImpl.VALUE_NODE_NAME)
         );
 
         OngoingStubbing<Serializable> stub = when(element.getValue()).thenReturn(count);

@@ -55,7 +55,7 @@ public class IdolDocumentsServiceTest {
 
     @Before
     public void setUp() {
-        idolDocumentsService = new IdolDocumentsService(parameterHandler, queryExecutor, queryResponseParser);
+        idolDocumentsService = new IdolDocumentsServiceImpl(parameterHandler, queryExecutor, queryResponseParser);
     }
 
     @Test

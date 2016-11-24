@@ -85,7 +85,7 @@ public class HodDocumentServiceTest {
 
     @Before
     public void setUp() {
-        documentsService = new HodDocumentsService(findSimilarService, configService, queryTextIndexService, getContentService, authenticationInformationRetriever, documentFieldsService);
+        documentsService = new HodDocumentsServiceImpl(findSimilarService, configService, queryTextIndexService, getContentService, authenticationInformationRetriever, documentFieldsService);
 
         when(config.getQueryManipulation()).thenReturn(QueryManipulationConfig.builder().profile("SomeProfile").index("SomeIndex").build());
         when(configService.getConfig()).thenReturn(config);

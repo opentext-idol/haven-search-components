@@ -38,7 +38,7 @@ public class HodRelatedConceptsServiceTest {
     public void setUp() {
         when(authenticationRetriever.getPrincipal()).thenReturn(principal);
 
-        relatedConceptsService = new HodRelatedConceptsService(findRelatedConceptsService, authenticationRetriever);
+        relatedConceptsService = new HodRelatedConceptsServiceImpl(findRelatedConceptsService, authenticationRetriever);
     }
 
     @Test

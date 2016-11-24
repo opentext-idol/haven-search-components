@@ -5,7 +5,6 @@
 
 package com.hp.autonomy.searchcomponents.idol.typeahead;
 
-import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
@@ -24,13 +23,13 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.hp.autonomy.searchcomponents.idol.typeahead.IdolTypeAheadConstants.QMS_TYPE_AHEAD_SERVICE_BEAN_NAME;
+import static com.hp.autonomy.searchcomponents.idol.typeahead.IdolTypeAheadService.QMS_TYPE_AHEAD_SERVICE_BEAN_NAME;
 
 /**
  * Qms implementation of {@link TypeAheadService}
  */
 @Service(QMS_TYPE_AHEAD_SERVICE_BEAN_NAME)
-class QmsTypeAheadService implements TypeAheadService<AciErrorException> {
+class QmsTypeAheadService implements IdolTypeAheadService {
     private final ConfigService<? extends IdolSearchCapable> configService;
     private final AciService qmsAciService;
     private final Processor<TypeAheadResponseData> processor;
