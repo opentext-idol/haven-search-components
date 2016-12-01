@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * Performs general operations on answer server
  */
-public interface AnswerbankSystemService {
+public interface AnswerServerSystemService {
     /**
      * Returns the list of configured system names using configured server details
      *

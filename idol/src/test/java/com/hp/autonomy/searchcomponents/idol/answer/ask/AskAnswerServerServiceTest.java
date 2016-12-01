@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
 import com.autonomy.aci.client.services.AciService;
-import com.hp.autonomy.searchcomponents.idol.answer.system.AnswerbankSystemService;
+import com.hp.autonomy.searchcomponents.idol.answer.system.AnswerServerSystemService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.answer.Answer;
 import com.hp.autonomy.types.idol.responses.answer.Answers;
@@ -32,7 +32,7 @@ public class AskAnswerServerServiceTest {
     @Mock
     private AciService answerServerAciService;
     @Mock
-    private AnswerbankSystemService answerbankSystemService;
+    private AnswerServerSystemService answerServerSystemService;
     @Mock
     private ProcessorFactory processorFactory;
     @Mock
@@ -48,20 +48,20 @@ public class AskAnswerServerServiceTest {
         responsedata.setAnswers(answers);
         when(answerServerAciService.executeAction(any(), any())).thenReturn(responsedata);
 
-        service = new AskAnswerServerServiceImpl(answerServerAciService, answerbankSystemService, processorFactory);
+        service = new AskAnswerServerServiceImpl(answerServerAciService, answerServerSystemService, processorFactory);
     }
 
     @Test
     public void ask() {
         when(request.getSystemNames()).thenReturn(Collections.singleton("answerbank0"));
         assertThat(service.ask(request), not(empty()));
-        verify(answerbankSystemService, never()).getSystemNames();
+        verify(answerServerSystemService, never()).getSystemNames();
     }
 
     @Test
     public void askWithoutSystemNames() {
         assertThat(service.ask(request), not(empty()));
-        verify(answerbankSystemService).getSystemNames();
+        verify(answerServerSystemService).getSystemNames();
     }
 
     @Test

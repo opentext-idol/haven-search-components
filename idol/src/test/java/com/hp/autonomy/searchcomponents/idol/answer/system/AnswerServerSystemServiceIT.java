@@ -23,9 +23,9 @@ import static org.hamcrest.Matchers.hasItem;
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-public class IdolAnswerbankSystemServiceIT {
+public class AnswerServerSystemServiceIT {
     @Autowired
-    private IdolAnswerbankSystemService answerbankSystemService;
+    private AnswerServerSystemServiceImpl answerbankSystemService;
 
     @Value("${" + ANSWER_SERVER_HOST_PROPERTY + ':' + ANSWER_SERVER_HOST + '}')
     private String host;

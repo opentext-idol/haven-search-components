@@ -20,15 +20,15 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Component
-class IdolAnswerbankSystemService implements AnswerbankSystemService {
+class AnswerServerSystemServiceImpl implements AnswerServerSystemService {
     private final AciService aciService;
     private final AciService answerServerAciService;
     private final Processor<AnswerserverGetStatus> processor;
 
     @Autowired
-    IdolAnswerbankSystemService(final AciService aciService,
-                                final AciService answerServerAciService,
-                                final ProcessorFactory processorFactory) {
+    AnswerServerSystemServiceImpl(final AciService aciService,
+                                  final AciService answerServerAciService,
+                                  final ProcessorFactory processorFactory) {
         this.aciService = aciService;
         this.answerServerAciService = answerServerAciService;
         processor = processorFactory.getResponseDataProcessor(AnswerserverGetStatus.class);

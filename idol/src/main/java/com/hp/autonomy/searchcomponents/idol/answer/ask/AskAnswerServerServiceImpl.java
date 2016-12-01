@@ -8,7 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.idol.answer.system.AnswerbankSystemService;
+import com.hp.autonomy.searchcomponents.idol.answer.system.AnswerServerSystemService;
 import com.hp.autonomy.searchcomponents.idol.exceptions.IdolService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.answer.Answer;
@@ -34,15 +34,15 @@ import static com.hp.autonomy.searchcomponents.idol.exceptions.codes.IdolErrorCo
 @IdolService(ANSWER_SERVER)
 class AskAnswerServerServiceImpl implements AskAnswerServerService {
     private final AciService answerServerAciService;
-    private final AnswerbankSystemService answerbankSystemService;
+    private final AnswerServerSystemService answerServerSystemService;
     private final Processor<AskResponsedata> processor;
 
     @Autowired
     AskAnswerServerServiceImpl(final AciService answerServerAciService,
-                               final AnswerbankSystemService answerbankSystemService,
+                               final AnswerServerSystemService answerServerSystemService,
                                final ProcessorFactory processorFactory) {
         this.answerServerAciService = answerServerAciService;
-        this.answerbankSystemService = answerbankSystemService;
+        this.answerServerSystemService = answerServerSystemService;
         processor = processorFactory.getResponseDataProcessor(AskResponsedata.class);
     }
 
@@ -51,7 +51,7 @@ class AskAnswerServerServiceImpl implements AskAnswerServerService {
     public List<Answer> ask(final AskAnswerServerRequest request) {
         final Collection<String> systemNames;
         if (request.getSystemNames().isEmpty()) {
-            systemNames = answerbankSystemService.getSystemNames();
+            systemNames = answerServerSystemService.getSystemNames();
         } else {
             systemNames = request.getSystemNames();
         }

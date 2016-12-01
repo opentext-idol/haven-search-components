@@ -25,7 +25,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class IdolAnswerbankSystemServiceTest {
+public class AnswerServerSystemServiceTest {
     @Mock
     private AciService aciService;
     @Mock
@@ -35,23 +35,23 @@ public class IdolAnswerbankSystemServiceTest {
     @Mock
     protected Processor<AnswerserverGetStatus> getResourcesProcessor;
 
-    private AnswerbankSystemService answerbankSystemService;
+    private AnswerServerSystemService answerServerSystemService;
 
     @Before
     public void setUp() {
-        answerbankSystemService = new IdolAnswerbankSystemService(aciService, answerServerAciService, processorFactory);
+        answerServerSystemService = new AnswerServerSystemServiceImpl(aciService, answerServerAciService, processorFactory);
     }
 
     @Test
     public void getSystemNames() {
         when(aciService.executeAction(any(), any(), any())).thenReturn(mockStatus());
-        assertThat(answerbankSystemService.getSystemNames(new AciServerDetails()), not(empty()));
+        assertThat(answerServerSystemService.getSystemNames(new AciServerDetails()), not(empty()));
     }
 
     @Test
     public void getSystemNamesViaConfiguration() {
         when(answerServerAciService.executeAction(any(), any())).thenReturn(mockStatus());
-        assertThat(answerbankSystemService.getSystemNames(), not(empty()));
+        assertThat(answerServerSystemService.getSystemNames(), not(empty()));
     }
 
     private AnswerserverGetStatus mockStatus() {
