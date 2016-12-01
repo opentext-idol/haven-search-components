@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.configuration;
 
 import com.autonomy.aci.client.transport.AciServerDetails;
 import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfig;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -33,4 +34,11 @@ public interface IdolSearchCapable extends HavenSearchCapable, ViewCapable {
      * @return QMS configuration
      */
     QueryManipulation getQueryManipulation();
+
+    /**
+     * Returns details of Answer Server
+     *
+     * @return AnswerServer configuration
+     */
+    AnswerServerConfig getAnswerServer();
 }
