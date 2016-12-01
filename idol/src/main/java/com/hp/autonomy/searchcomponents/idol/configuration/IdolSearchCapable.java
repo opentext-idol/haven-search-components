@@ -22,6 +22,12 @@ public interface IdolSearchCapable extends HavenSearchCapable, ViewCapable {
     String QUERY_MANIPULATION_VALIDATOR_BEAN_NAME = "queryManipulationValidator";
 
     /**
+     * The bean name of the default implementation.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    String ANSWER_SERVER_VALIDATOR_BEAN_NAME = "answerServerConfigValidator";
+
+    /**
      * Returns details of Idol Content engine
      *
      * @return Content engine configuration

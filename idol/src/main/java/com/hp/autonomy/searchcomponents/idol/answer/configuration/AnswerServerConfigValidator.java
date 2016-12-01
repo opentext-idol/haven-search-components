@@ -12,14 +12,16 @@ import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
-public class AnswerServerConfigValidator implements Validator<AnswerServerConfig> {
+import static com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable.ANSWER_SERVER_VALIDATOR_BEAN_NAME;
+
+@Component(ANSWER_SERVER_VALIDATOR_BEAN_NAME)
+class AnswerServerConfigValidator implements Validator<AnswerServerConfig> {
     private final AciService aciService;
     private final ProcessorFactory processorFactory;
 
     @Autowired
-    public AnswerServerConfigValidator(final AciService validatorAciService,
-                                       final ProcessorFactory processorFactory) {
+    AnswerServerConfigValidator(final AciService validatorAciService,
+                                final ProcessorFactory processorFactory) {
         aciService = validatorAciService;
         this.processorFactory = processorFactory;
     }
