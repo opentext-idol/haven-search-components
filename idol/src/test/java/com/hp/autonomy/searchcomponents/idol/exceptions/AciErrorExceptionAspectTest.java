@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.stereotype.Service;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static com.hp.autonomy.searchcomponents.idol.exceptions.AciErrorExceptionAspectTest.ACI_ERROR_EXCEPTION_ASPECT_TEST_PROPERTY;
@@ -62,6 +63,7 @@ public class AciErrorExceptionAspectTest {
         void throwServiceException();
     }
 
+    @Service
     @IdolService(IdolErrorCodes.ANSWER_SERVER)
     @ConditionalOnProperty(ACI_ERROR_EXCEPTION_ASPECT_TEST_PROPERTY)
     public static class TestServiceImpl implements TestService {
