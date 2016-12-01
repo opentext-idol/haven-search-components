@@ -152,7 +152,7 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
 
     @Bean
     @ConditionalOnMissingBean(name = ANSWER_SERVER_ACI_SERVICE_BEAN_NAME)
-    public AciService answerbankAciService(@Qualifier(ACI_SERVICE_BEAN_NAME)
+    public AciService answerServerAciService(@Qualifier(ACI_SERVICE_BEAN_NAME)
                                            final AciService aciService,
                                            final ConfigService<C> configService) {
         return new AbstractConfigurableAciService(aciService) {

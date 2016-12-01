@@ -41,4 +41,10 @@ public class IdolAnswerbankSystemServiceIT {
         final Collection<String> systemNames = answerbankSystemService.getSystemNames(new AciServerDetails(AciServerDetails.TransportProtocol.HTTP, host, port));
         assertThat(systemNames, hasItem(systemName));
     }
+
+    @Test
+    public void getConfiguredSystemNames() {
+        final Collection<String> systemNames = answerbankSystemService.getSystemNames();
+        assertThat(systemNames, hasItem(systemName));
+    }
 }

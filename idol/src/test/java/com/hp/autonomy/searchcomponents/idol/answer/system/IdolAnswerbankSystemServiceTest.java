@@ -27,7 +27,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class IdolAnswerbankSystemServiceTest {
     @Mock
-    private AciService answerbankAciService;
+    private AciService aciService;
+    @Mock
+    private AciService answerServerAciService;
     @Mock
     protected ProcessorFactory processorFactory;
     @Mock
@@ -37,13 +39,19 @@ public class IdolAnswerbankSystemServiceTest {
 
     @Before
     public void setUp() {
-        answerbankSystemService = new IdolAnswerbankSystemService(answerbankAciService, processorFactory);
+        answerbankSystemService = new IdolAnswerbankSystemService(aciService, answerServerAciService, processorFactory);
     }
 
     @Test
     public void getSystemNames() {
-        when(answerbankAciService.executeAction(any(), any(), any())).thenReturn(mockStatus());
+        when(aciService.executeAction(any(), any(), any())).thenReturn(mockStatus());
         assertThat(answerbankSystemService.getSystemNames(new AciServerDetails()), not(empty()));
+    }
+
+    @Test
+    public void getSystemNamesViaConfiguration() {
+        when(answerServerAciService.executeAction(any(), any())).thenReturn(mockStatus());
+        assertThat(answerbankSystemService.getSystemNames(), not(empty()));
     }
 
     private AnswerserverGetStatus mockStatus() {

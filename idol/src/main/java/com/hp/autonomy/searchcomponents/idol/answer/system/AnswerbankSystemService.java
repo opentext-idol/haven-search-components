@@ -12,11 +12,18 @@ import java.util.Collection;
 /**
  * Performs general operations on answer server
  */
-@FunctionalInterface
 public interface AnswerbankSystemService {
     /**
-     * Returns the list of configured system names
+     * Returns the list of configured system names using configured server details
      *
+     * @return the list of configured system names
+     */
+    Collection<String> getSystemNames();
+
+    /**
+     * Returns the list of configured system names using specified server details
+     *
+     * @param aciServerDetails Server details
      * @return the list of configured system names
      */
     Collection<String> getSystemNames(AciServerDetails aciServerDetails);
