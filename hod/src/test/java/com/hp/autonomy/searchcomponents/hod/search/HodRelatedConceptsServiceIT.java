@@ -5,7 +5,6 @@
 
 package com.hp.autonomy.searchcomponents.hod.search;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Entity;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.search.AbstractRelatedConceptsServiceIT;
@@ -13,5 +12,5 @@ import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConf
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = HavenSearchHodConfiguration.class)
-public class HodRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceIT<Entity, ResourceIdentifier, HodErrorException> {
+public class HodRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceIT<HodRelatedConceptsRequest, Entity, HodQueryRestrictions, HodErrorException> {
 }

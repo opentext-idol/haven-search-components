@@ -8,13 +8,14 @@ package com.hp.autonomy.searchcomponents.idol.fields;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.fields.AbstractFieldsServiceIT;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
+import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class)
-public class IdolFieldsServiceIT extends AbstractFieldsServiceIT<IdolFieldsRequest, String, AciErrorException> {
+public class IdolFieldsServiceIT extends AbstractFieldsServiceIT<IdolFieldsRequest, IdolFieldsRequestBuilder, IdolQueryRestrictions, AciErrorException> {
     @Override
     protected IdolFieldsRequest createFieldsRequest() {
-        return IdolFieldsRequest.builder()
+        return fieldRequestBuilderFactory.getObject()
                 .maxValues(null)
                 .build();
     }

@@ -14,23 +14,25 @@ import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricVa
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.ParametricSort;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
-import com.hp.autonomy.types.idol.responses.RecursiveField;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
-import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
-import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
+import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequestBuilder;
+import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsService;
+import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
+import com.hp.autonomy.types.idol.responses.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
+import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -55,21 +57,25 @@ import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricV
  */
 @Service(PARAMETRIC_VALUES_SERVICE_BEAN_NAME)
 class HodParametricValuesServiceImpl implements HodParametricValuesService {
-    private final FieldsService<HodFieldsRequest, HodErrorException> fieldsService;
+    private final HodFieldsService fieldsService;
+    private final ObjectFactory<HodFieldsRequestBuilder> fieldsRequestBuilderFactory;
     private final GetParametricValuesService getParametricValuesService;
     private final BucketingParamsHelper bucketingParamsHelper;
     private final ConfigService<? extends HodSearchCapable> configService;
     private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
+    @SuppressWarnings("ConstructorWithTooManyParameters")
     @Autowired
     HodParametricValuesServiceImpl(
-            final FieldsService<HodFieldsRequest, HodErrorException> fieldsService,
+            final HodFieldsService fieldsService,
+            final ObjectFactory<HodFieldsRequestBuilder> fieldsRequestBuilderFactory,
             final GetParametricValuesService getParametricValuesService,
             final BucketingParamsHelper bucketingParamsHelper,
             final ConfigService<? extends HodSearchCapable> configService,
             final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever
     ) {
         this.fieldsService = fieldsService;
+        this.fieldsRequestBuilderFactory = fieldsRequestBuilderFactory;
         this.getParametricValuesService = getParametricValuesService;
         this.bucketingParamsHelper = bucketingParamsHelper;
         this.configService = configService;
@@ -126,7 +132,10 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
     }
 
     private Collection<String> lookupFieldIds(final Collection<ResourceIdentifier> databases) throws HodErrorException {
-        final List<TagName> fields = fieldsService.getFields(HodFieldsRequest.builder().databases(databases).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
+        final List<TagName> fields = fieldsService.getFields(fieldsRequestBuilderFactory.getObject()
+                .databases(databases)
+                .build(), FieldTypeParam.Parametric)
+                .get(FieldTypeParam.Parametric);
         final Collection<String> fieldIds = new ArrayList<>(fields.size());
         fieldIds.addAll(fields.stream().map(TagName::getId).collect(Collectors.toList()));
 
@@ -187,7 +196,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
     }
 
     // Get parametric values matching the given request from HOD and parse them as numeric CSVs
-    private Set<QueryTagInfo> getNumericParametricValues(final ParametricRequest<ResourceIdentifier> parametricRequest) throws HodErrorException {
+    private Set<QueryTagInfo> getNumericParametricValues(final ParametricRequest<HodQueryRestrictions> parametricRequest) throws HodErrorException {
         final Collection<String> fieldNames = parametricRequest.getFieldNames();
 
         final Set<QueryTagInfo> results;
@@ -254,7 +263,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         }
     }
 
-    private FieldNames getParametricValues(final ParametricRequest<ResourceIdentifier> parametricRequest, final Collection<String> fieldNames) throws HodErrorException {
+    private FieldNames getParametricValues(final ParametricRequest<HodQueryRestrictions> parametricRequest, final Collection<String> fieldNames) throws HodErrorException {
         final ResourceIdentifier queryProfile = parametricRequest.isModified() ? getQueryProfile() : null;
 
         final GetParametricValuesRequestBuilder parametricParams = new GetParametricValuesRequestBuilder()

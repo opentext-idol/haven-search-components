@@ -6,28 +6,44 @@
 package com.hp.autonomy.searchcomponents.hod.test;
 
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
+import com.hp.autonomy.searchcomponents.hod.search.HodGetContentRequestBuilder;
+import com.hp.autonomy.searchcomponents.hod.search.HodGetContentRequestIndexBuilder;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
+import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictionsBuilder;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.List;
-
 @Component
-public class HodTestUtils implements TestUtils<ResourceIdentifier> {
+public class HodTestUtils implements TestUtils<HodQueryRestrictions> {
+    @Autowired
+    private ObjectFactory<HodQueryRestrictionsBuilder> queryRestrictionsBuilderFactory;
+    @Autowired
+    private ObjectFactory<HodGetContentRequestBuilder> getContentRequestBuilderFactory;
+    @Autowired
+    private ObjectFactory<HodGetContentRequestIndexBuilder> getContentRequestIndexBuilderFactory;
+
     @Override
-    public List<ResourceIdentifier> getDatabases() {
-        return Collections.singletonList(ResourceIdentifier.WIKI_ENG);
+    public HodQueryRestrictions buildQueryRestrictions() {
+        return queryRestrictionsBuilderFactory.getObject()
+                .queryText("*")
+                .fieldText("")
+                .database(ResourceIdentifier.WIKI_ENG)
+                .anyLanguage(true)
+                .build();
     }
 
     @Override
-    public QueryRestrictions<ResourceIdentifier> buildQueryRestrictions() {
-        return HodQueryRestrictions.builder()
-                .queryText("*")
-                .fieldText("")
-                .databases(getDatabases())
-                .anyLanguage(true)
+    public <RC extends GetContentRequest<?>> RC buildGetContentRequest(final String reference) {
+        @SuppressWarnings("unchecked")
+        final RC getContentRequest = (RC) getContentRequestBuilderFactory.getObject()
+                .indexAndReferences(getContentRequestIndexBuilderFactory.getObject()
+                        .index(ResourceIdentifier.WIKI_ENG)
+                        .reference(reference)
+                        .build())
                 .build();
+        return getContentRequest;
     }
 }

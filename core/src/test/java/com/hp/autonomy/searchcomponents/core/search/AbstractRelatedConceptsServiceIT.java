@@ -9,10 +9,10 @@ import com.hp.autonomy.searchcomponents.core.test.TestUtils;
 import com.hp.autonomy.types.requests.idol.actions.query.QuerySummaryElement;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.Serializable;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,23 +20,23 @@ import static org.hamcrest.Matchers.*;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-public abstract class AbstractRelatedConceptsServiceIT<Q extends QuerySummaryElement, S extends Serializable, E extends Exception> {
+public abstract class AbstractRelatedConceptsServiceIT<R extends RelatedConceptsRequest<Q>, T extends QuerySummaryElement, Q extends QueryRestrictions<?>, E extends Exception> {
     @Autowired
-    private RelatedConceptsService<Q, S, E> relatedConceptsService;
+    private RelatedConceptsService<R, T, Q, E> relatedConceptsService;
 
     @Autowired
-    private RelatedConceptsRequest.RelatedConceptsRequestBuilder<? extends RelatedConceptsRequest<S>, S> relatedConceptsRequestBuilder;
+    private ObjectFactory<RelatedConceptsRequestBuilder<R, Q, ?>> relatedConceptsRequestBuilderFactory;
 
     @Autowired
-    protected TestUtils<S> testUtils;
+    protected TestUtils<Q> testUtils;
 
     @Test
     public void findRelatedConcepts() throws E {
-        final RelatedConceptsRequest<S> request = relatedConceptsRequestBuilder
+        final R request = relatedConceptsRequestBuilderFactory.getObject()
                 .queryRestrictions(testUtils.buildQueryRestrictions())
                 .querySummaryLength(50)
                 .build();
-        final List<Q> results = relatedConceptsService.findRelatedConcepts(request);
+        final List<T> results = relatedConceptsService.findRelatedConcepts(request);
         assertThat(results, is(not(empty())));
     }
 }

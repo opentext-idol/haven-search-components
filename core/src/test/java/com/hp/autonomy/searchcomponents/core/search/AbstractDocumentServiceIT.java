@@ -7,14 +7,12 @@ package com.hp.autonomy.searchcomponents.core.search;
 
 import com.hp.autonomy.searchcomponents.core.test.IntegrationTestUtils;
 import com.hp.autonomy.types.requests.Documents;
-import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,25 +20,25 @@ import static org.hamcrest.Matchers.*;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-public abstract class AbstractDocumentServiceIT<S extends Serializable, D extends SearchResult, E extends Exception> {
+public abstract class AbstractDocumentServiceIT<RQ extends QueryRequest<Q>, RS extends SuggestRequest<Q>, RC extends GetContentRequest<?>, Q extends QueryRestrictions<?>, D extends SearchResult, E extends Exception> {
     @Autowired
-    protected DocumentsService<S, D, E> documentsService;
+    protected DocumentsService<RQ, RS, RC, Q, D, E> documentsService;
 
     @Autowired
-    protected IntegrationTestUtils<S, D, E> integrationTestUtils;
+    protected IntegrationTestUtils<Q, D, E> integrationTestUtils;
 
     @Autowired
-    protected QueryRequest.QueryRequestBuilder<S> queryRequestBuilder;
+    protected ObjectFactory<QueryRequestBuilder<RQ, Q, ?>> queryRequestBuilderFactory;
 
     @Autowired
-    protected SuggestRequest.SuggestRequestBuilder<S> suggestRequestBuilder;
+    protected ObjectFactory<SuggestRequestBuilder<RS, Q, ?>> suggestRequestBuilderFactory;
 
     @Autowired
-    protected GetContentRequest.GetContentRequestBuilder<S> getContentRequestBuilder;
+    protected ObjectFactory<GetContentRequestBuilder<RC, ?, ?>> getContentRequestBuilder;
 
     @Test
     public void query() throws E {
-        final QueryRequest<S> queryRequest = queryRequestBuilder
+        final RQ queryRequest = queryRequestBuilderFactory.getObject()
                 .queryRestrictions(integrationTestUtils.buildQueryRestrictions())
                 .queryType(QueryRequest.QueryType.MODIFIED)
                 .build();
@@ -50,7 +48,7 @@ public abstract class AbstractDocumentServiceIT<S extends Serializable, D extend
 
     @Test
     public void queryForPromotions() throws E {
-        final QueryRequest<S> queryRequest = queryRequestBuilder
+        final RQ queryRequest = queryRequestBuilderFactory.getObject()
                 .queryRestrictions(integrationTestUtils.buildQueryRestrictions())
                 .queryType(QueryRequest.QueryType.PROMOTIONS)
                 .build();
@@ -61,11 +59,9 @@ public abstract class AbstractDocumentServiceIT<S extends Serializable, D extend
     @Test
     public void findSimilar() throws E {
         final String reference = integrationTestUtils.getValidReference();
-
-        final QueryRestrictions<S> queryRestrictions = integrationTestUtils.buildQueryRestrictions();
-        final SuggestRequest<S> suggestRequest = suggestRequestBuilder
+        final RS suggestRequest = suggestRequestBuilderFactory.getObject()
                 .reference(reference)
-                .queryRestrictions(queryRestrictions)
+                .queryRestrictions(integrationTestUtils.buildQueryRestrictions())
                 .build();
         final Documents<D> results = documentsService.findSimilar(suggestRequest);
         assertThat(results.getDocuments(), is(not(empty())));
@@ -74,13 +70,7 @@ public abstract class AbstractDocumentServiceIT<S extends Serializable, D extend
     @Test
     public void getContent() throws E {
         final String reference = integrationTestUtils.getValidReference();
-
-        final S database = integrationTestUtils.getDatabases().get(0);
-        final GetContentRequest<S> getContentRequest = getContentRequestBuilder
-                .indexAndReferences(new GetContentRequestIndex<>(database, Collections.singleton(reference)))
-                .print(PrintParam.Fields.name())
-                .build();
-        final List<D> results = documentsService.getDocumentContent(getContentRequest);
+        final List<D> results = documentsService.getDocumentContent(integrationTestUtils.buildGetContentRequest(reference));
         assertThat(results, hasSize(1));
     }
 }

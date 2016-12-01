@@ -7,9 +7,10 @@ package com.hp.autonomy.searchcomponents.idol.test;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.test.IntegrationTestUtils;
+import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IdolIntegrationTestUtils extends IntegrationTestUtils<String, IdolSearchResult, AciErrorException> {
+public class IdolIntegrationTestUtils extends IntegrationTestUtils<IdolQueryRestrictions, IdolSearchResult, AciErrorException> {
 }

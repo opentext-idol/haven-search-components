@@ -5,6 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.types.idol.responses.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
@@ -12,7 +13,6 @@ import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,15 +21,21 @@ import java.util.Set;
  * Service for retrieving parametric values
  *
  * @param <R> The request type to use
- * @param <S> The type of the database identifier
+ * @param <Q> The type of the query restrictions object
  * @param <E> The checked exception thrown in the event of an error
  */
-public interface ParametricValuesService<R extends ParametricRequest<S>, S extends Serializable, E extends Exception> {
+public interface ParametricValuesService<R extends ParametricRequest<Q>, Q extends QueryRestrictions<?>, E extends Exception> {
     /**
      * The bean name of the default implementation.
      * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
      */
     String PARAMETRIC_VALUES_SERVICE_BEAN_NAME = "parametricValuesService";
+
+    /**
+     * The bean name of the default request builder implementation.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    String PARAMETRIC_REQUEST_BUILDER_BEAN_NAME = "parametricRequestBuilder";
 
     /**
      * Special Idol parametric values field which matches the configured default date field

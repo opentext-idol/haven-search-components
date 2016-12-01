@@ -5,7 +5,6 @@
 
 package com.hp.autonomy.searchcomponents.hod.search;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Entity;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
@@ -14,5 +13,5 @@ import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
  * HoD extension to {@link RelatedConceptsService}
  */
 @FunctionalInterface
-public interface HodRelatedConceptsService extends RelatedConceptsService<Entity, ResourceIdentifier, HodErrorException> {
+public interface HodRelatedConceptsService extends RelatedConceptsService<HodRelatedConceptsRequest, Entity, HodQueryRestrictions, HodErrorException> {
 }

@@ -11,11 +11,5 @@ import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
  * Options for interacting with {@link DatabasesService}
  */
 @FunctionalInterface
-public interface DatabasesRequest extends RequestObject<DatabasesRequest, DatabasesRequest.DatabasesRequestBuilder> {
-    /**
-     * Builder for {@link DatabasesRequest}
-     */
-    @FunctionalInterface
-    interface DatabasesRequestBuilder extends RequestObject.RequestObjectBuilder<DatabasesRequest, DatabasesRequest.DatabasesRequestBuilder> {
-    }
+public interface DatabasesRequest extends RequestObject<DatabasesRequest, DatabasesRequestBuilder<?>> {
 }

@@ -5,14 +5,13 @@
 
 package com.hp.autonomy.searchcomponents.hod.search;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 
 /**
  * HoD extension to {@link DocumentsService}
  */
-public interface HodDocumentsService extends DocumentsService<ResourceIdentifier, HodSearchResult, HodErrorException> {
+public interface HodDocumentsService extends DocumentsService<HodQueryRequest, HodSuggestRequest, HodGetContentRequest, HodQueryRestrictions, HodSearchResult, HodErrorException> {
     /**
      * HoD limits max results to 2500
      */

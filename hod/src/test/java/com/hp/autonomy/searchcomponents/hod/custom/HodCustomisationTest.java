@@ -7,15 +7,15 @@ package com.hp.autonomy.searchcomponents.hod.custom;
 
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
-import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConfiguration;
-import com.hp.autonomy.searchcomponents.hod.databases.Database;
-import com.hp.autonomy.searchcomponents.hod.databases.HodDatabasesRequest;
+import com.hp.autonomy.searchcomponents.hod.databases.HodDatabasesService;
+import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictionsBuilder;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
 import com.hp.autonomy.searchcomponents.hod.test.HodTestConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +35,10 @@ import static org.junit.Assert.assertNull;
 public class HodCustomisationTest {
     @Autowired
     @Qualifier("customDatabaseService")
-    private DatabasesService<Database, HodDatabasesRequest, HodErrorException> customDatabaseService;
+    private HodDatabasesService customDatabaseService;
+    @Autowired
+    @Qualifier("customQueryRestrictionsBuilder")
+    private ObjectFactory<HodQueryRestrictionsBuilder> customQueryRestrictionsBuilderFactory;
     @Autowired
     @Qualifier("customDocumentFieldsService")
     private DocumentFieldsService customDocumentFieldsService;
@@ -46,6 +49,7 @@ public class HodCustomisationTest {
     @Test
     public void initialiseWithCustomConfiguration() throws HodErrorException {
         assertNotNull(customDatabaseService);
+        assertNotNull(customQueryRestrictionsBuilderFactory.getObject());
         assertNotNull(customDocumentFieldsService);
         assertNull(queryTextIndexService.queryTextIndexWithText(null, null)); // verify it is a mock
     }

@@ -7,9 +7,7 @@ package com.hp.autonomy.searchcomponents.core.search;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObjectTest;
 
-import java.io.Serializable;
-
-public abstract class SuggestRequestTest<S extends Serializable> extends RequestObjectTest<SuggestRequest<S>, SuggestRequest.SuggestRequestBuilder<S>> {
+public abstract class SuggestRequestTest<Q extends QueryRestrictions<?>> extends RequestObjectTest<SuggestRequest<Q>, SuggestRequestBuilder<?, Q, ?>> {
     @Override
     protected String toStringContent() {
         return "queryRestrictions";

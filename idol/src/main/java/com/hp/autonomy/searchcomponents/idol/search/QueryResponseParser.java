@@ -35,7 +35,7 @@ public interface QueryResponseParser {
      * @param queryExecutor The function used for executing the query (in case it needs to be rerun)
      * @return The parsed query results
      */
-    Documents<IdolSearchResult> parseQueryResults(SearchRequest<String> searchRequest, AciParameters aciParameters, QueryResponseData responseData, Function<AciParameters, QueryResponseData> queryExecutor);
+    Documents<IdolSearchResult> parseQueryResults(SearchRequest<IdolQueryRestrictions> searchRequest, AciParameters aciParameters, QueryResponseData responseData, Function<AciParameters, QueryResponseData> queryExecutor);
 
     /**
      * Parses the "hits" section of the Idol query response

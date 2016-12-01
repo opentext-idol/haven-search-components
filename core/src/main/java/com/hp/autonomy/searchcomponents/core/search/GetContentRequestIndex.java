@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.search;
 
-import lombok.Data;
+import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -15,10 +15,18 @@ import java.util.Set;
  *
  * @param <S> The type of the database identifier
  */
-@Data
-public class GetContentRequestIndex<S extends Serializable> implements Serializable {
-    private static final long serialVersionUID = 6930992804864364983L;
+public interface GetContentRequestIndex<S extends Serializable> extends RequestObject<GetContentRequestIndex<S>, GetContentRequestIndexBuilder<?, S, ?>> {
+    /**
+     * The database in which the references are located
+     *
+     * @return The database in which the references are located
+     */
+    S getIndex();
 
-    private final S index;
-    private final Set<String> references;
+    /**
+     * The references of the documents whose content is to be queried
+     *
+     * @return The references of the documents whose content is to be queried
+     */
+    Set<String> getReferences();
 }

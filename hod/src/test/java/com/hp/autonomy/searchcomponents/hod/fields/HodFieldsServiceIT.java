@@ -5,18 +5,18 @@
 
 package com.hp.autonomy.searchcomponents.hod.fields;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.fields.AbstractFieldsServiceIT;
 import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConfiguration;
+import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = HavenSearchHodConfiguration.class)
-public class HodFieldsServiceIT extends AbstractFieldsServiceIT<HodFieldsRequest, ResourceIdentifier, HodErrorException> {
+public class HodFieldsServiceIT extends AbstractFieldsServiceIT<HodFieldsRequest, HodFieldsRequestBuilder, HodQueryRestrictions, HodErrorException> {
     @Override
     protected HodFieldsRequest createFieldsRequest() {
-        return HodFieldsRequest.builder()
-                .databases(testUtils.getDatabases())
+        return fieldRequestBuilderFactory.getObject()
+                .databases(testUtils.buildQueryRestrictions().getDatabases())
                 .maxValues(null)
                 .build();
     }

@@ -7,9 +7,9 @@ package com.hp.autonomy.searchcomponents.core.search;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -17,8 +17,13 @@ import java.util.List;
  *
  * @param <S> The type of the database identifier
  */
-public interface QueryRestrictions<S extends Serializable>
-        extends RequestObject<QueryRestrictions<S>, QueryRestrictions.QueryRestrictionsBuilder<?, S>> {
+public interface QueryRestrictions<S extends Serializable> extends RequestObject<QueryRestrictions<S>, QueryRestrictionsBuilder<?, S, ?>> {
+    /**
+     * The bean name of the default builder implementation.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    String QUERY_RESTRICTIONS_BUILDER_BEAN_NAME = "queryRestrictionsBuilder";
+
     /**
      * Query expression
      *
@@ -69,6 +74,13 @@ public interface QueryRestrictions<S extends Serializable>
     String getLanguageType();
 
     /**
+     * Whether to return results irrespective of language
+     *
+     * @return Whether to return results irrespective of language
+     */
+    boolean isAnyLanguage();
+
+    /**
      * Saved result sets to include
      *
      * @return Saved result sets to include
@@ -81,146 +93,4 @@ public interface QueryRestrictions<S extends Serializable>
      * @return Saved result sets to exclude
      */
     List<String> getStateDontMatchIds();
-
-    /**
-     * Whether to return results irrespective of language
-     *
-     * @return Whether to return results irrespective of language
-     */
-    boolean isAnyLanguage();
-
-    @SuppressWarnings("unused")
-    interface QueryRestrictionsBuilder<Q extends QueryRestrictions<S>, S extends Serializable>
-            extends RequestObject.RequestObjectBuilder<QueryRestrictions<S>, QueryRestrictionsBuilder<?, S>> {
-        /**
-         * Sets the query expression
-         *
-         * @param queryText The query expression
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> queryText(String queryText);
-
-        /**
-         * Sets field text restrictions
-         *
-         * @param fieldText Field text restrictions
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> fieldText(String fieldText);
-
-        /**
-         * Sets the databases to query
-         *
-         * @param databases The databases to query
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> databases(Collection<? extends S> databases);
-
-        /**
-         * Sets a database to query
-         *
-         * @param database A database to query
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> database(S database);
-
-        /**
-         * Clears the collection of databases to query
-         *
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> clearDatabases();
-
-        /**
-         * Sets the minimum date of results (uses configured date field)
-         *
-         * @param minDate The minimum date of results (uses configured date field)
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> minDate(DateTime minDate);
-
-        /**
-         * Sets the maximum date of results (uses configured date field)
-         *
-         * @param maxDate The maximum date of results (uses configured date field)
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> maxDate(DateTime maxDate);
-
-        /**
-         * Sets the minimum score threshold to apply
-         *
-         * @param minScore The minimum score threshold to apply
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> minScore(Integer minScore);
-
-        /**
-         * Sets a language filter
-         *
-         * @param languageType A language filter
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> languageType(String languageType);
-
-        /**
-         * Sets saved result set to include
-         *
-         * @param stateMatchId Saved result set to include
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> stateMatchId(String stateMatchId);
-
-        /**
-         * Sets saved result sets to include
-         *
-         * @param stateMatchIds Saved result sets to include
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> stateMatchIds(Collection<? extends String> stateMatchIds);
-
-        /**
-         * Clears collection of saved result sets to include
-         *
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> clearStateMatchIds();
-
-        /**
-         * Sets saved result set to exclude
-         *
-         * @param stateDontMatchId Saved result set to exclude
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> stateDontMatchId(String stateDontMatchId);
-
-        /**
-         * Sets saved result sets to exclude
-         *
-         * @param stateDontMatchIds Saved result sets to exclude
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> stateDontMatchIds(Collection<? extends String> stateDontMatchIds);
-
-        /**
-         * Clears collection of saved result sets to exclude
-         *
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> clearStateDontMatchIds();
-
-        /**
-         * Sets whether to return results irrespective of language
-         *
-         * @param anyLanguage Whether to return results irrespective of language
-         * @return the builder (for chaining)
-         */
-        QueryRestrictionsBuilder<Q, S> anyLanguage(boolean anyLanguage);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        Q build();
-    }
 }

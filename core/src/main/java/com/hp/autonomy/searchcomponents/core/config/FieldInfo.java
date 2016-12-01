@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
+import com.hp.autonomy.searchcomponents.core.requests.RequestObjectBuilder;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -91,7 +92,7 @@ public class FieldInfo<T> implements RequestObject<FieldInfo<T>, FieldInfo.Field
     @Setter
     @NoArgsConstructor(access = AccessLevel.PACKAGE)
     @JsonPOJOBuilder(withPrefix = "")
-    public static class FieldInfoBuilder<T> implements RequestObject.RequestObjectBuilder<FieldInfo<T>, FieldInfo.FieldInfoBuilder<T>> {
+    public static class FieldInfoBuilder<T> implements RequestObjectBuilder<FieldInfo<T>, FieldInfoBuilder<T>> {
         private String id;
         private FieldType type = FieldType.STRING;
         private boolean advanced;

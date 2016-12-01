@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class BucketingParamsHelperTest {
     @Mock
-    private ParametricRequest<String> parametricRequest;
+    private ParametricRequest<?> parametricRequest;
 
     private BucketingParamsHelper bucketingParamsHelper;
 

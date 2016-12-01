@@ -9,12 +9,8 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.identifier.reference.Reference;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
-import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
 import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
@@ -57,7 +53,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
     }
 
     @Override
-    public Documents<IdolSearchResult> queryTextIndex(final QueryRequest<String> queryRequest) throws AciErrorException {
+    public Documents<IdolSearchResult> queryTextIndex(final IdolQueryRequest queryRequest) throws AciErrorException {
         final QueryRequest.QueryType queryType = queryRequest.getQueryType();
         if (!queryExecutor.performQuery(queryType)) {
             return new Documents<>(Collections.emptyList(), 0, null, null, null, null);
@@ -84,7 +80,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
     }
 
     @Override
-    public Documents<IdolSearchResult> findSimilar(final SuggestRequest<String> suggestRequest) throws AciErrorException {
+    public Documents<IdolSearchResult> findSimilar(final IdolSuggestRequest suggestRequest) throws AciErrorException {
         final AciParameters aciParameters = new AciParameters(QueryActions.Suggest.name());
         aciParameters.add(SuggestParams.Reference.name(), new Reference(suggestRequest.getReference()));
 
@@ -97,14 +93,14 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
     }
 
     @Override
-    public List<IdolSearchResult> getDocumentContent(final GetContentRequest<String> request) throws AciErrorException {
+    public List<IdolSearchResult> getDocumentContent(final IdolGetContentRequest request) throws AciErrorException {
         final List<IdolSearchResult> results = new ArrayList<>(request.getIndexesAndReferences().size());
 
-        for (final GetContentRequestIndex<String> indexAndReferences : request.getIndexesAndReferences()) {
+        for (final IdolGetContentRequestIndex indexAndReferences : request.getIndexesAndReferences()) {
 
             // We use Query and not GetContent here so we can use Combine=simple to ensure returned references are unique
             final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
-            parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, PrintParam.fromValue(request.getPrint()));
+            parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, request.getPrint());
 
             final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, QueryRequest.QueryType.RAW);
             final List<Hit> hits = responseData.getHits();
@@ -115,12 +111,12 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
     }
 
     @Override
-    public String getStateToken(final QueryRestrictions<String> queryRestrictions, final int maxResults, final boolean promotions) throws AciErrorException {
+    public String getStateToken(final IdolQueryRestrictions queryRestrictions, final int maxResults, final boolean promotions) throws AciErrorException {
         return getStateTokenAndResultCount(queryRestrictions, maxResults, promotions).getTypedStateToken().getStateToken();
     }
 
     @Override
-    public StateTokenAndResultCount getStateTokenAndResultCount(final QueryRestrictions<String> queryRestrictions, final int maxResults, final boolean promotions) throws AciErrorException {
+    public StateTokenAndResultCount getStateTokenAndResultCount(final IdolQueryRestrictions queryRestrictions, final int maxResults, final boolean promotions) throws AciErrorException {
         final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
         parameterHandler.addSecurityInfo(aciParameters);
         parameterHandler.addStoreStateParameters(aciParameters);

@@ -16,27 +16,11 @@ import java.io.Serializable;
  * @param <B> The request object builder type
  */
 @FunctionalInterface
-public interface RequestObject<O extends RequestObject<O, B>, B extends RequestObject.RequestObjectBuilder<O, B>> extends Serializable {
+public interface RequestObject<O extends RequestObject<O, B>, B extends RequestObjectBuilder<O, B>> extends Serializable {
     /**
      * Generates a builder form the current request object
      *
      * @return the builder constructed with all the fields of the current request object
      */
     B toBuilder();
-
-    /**
-     * Generic interface enforcing a basic contract for service request object builders.
-     *
-     * @param <O> The request object type
-     * @param <B> The request object builder type
-     */
-    @FunctionalInterface
-    interface RequestObjectBuilder<O extends RequestObject<O, B>, B extends RequestObjectBuilder<O, B>> {
-        /**
-         * Generates a new request object
-         *
-         * @return the new request object
-         */
-        O build();
-    }
 }

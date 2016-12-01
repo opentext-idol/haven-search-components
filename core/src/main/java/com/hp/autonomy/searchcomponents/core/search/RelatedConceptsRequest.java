@@ -7,15 +7,13 @@ package com.hp.autonomy.searchcomponents.core.search;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 
-import java.io.Serializable;
-
 /**
  * Options for interacting with {@link RelatedConceptsService}
  *
- * @param <S> The type of the database identifier
+ * @param <Q> The type of the query restrictions object
  */
-public interface RelatedConceptsRequest<S extends Serializable>
-        extends RequestObject<RelatedConceptsRequest<S>, RelatedConceptsRequest.RelatedConceptsRequestBuilder<?, S>> {
+public interface RelatedConceptsRequest<Q extends QueryRestrictions<?>>
+        extends RequestObject<RelatedConceptsRequest<Q>, RelatedConceptsRequestBuilder<?, Q, ?>> {
     /**
      * Maximum length of the query summary.
      *
@@ -35,38 +33,5 @@ public interface RelatedConceptsRequest<S extends Serializable>
      *
      * @return The query restrictions to apply
      */
-    QueryRestrictions<S> getQueryRestrictions();
-
-    interface RelatedConceptsRequestBuilder<R extends RelatedConceptsRequest<S>, S extends Serializable>
-            extends RequestObject.RequestObjectBuilder<RelatedConceptsRequest<S>, RelatedConceptsRequest.RelatedConceptsRequestBuilder<?, S>> {
-        /**
-         * Sets the maximum length of the query summary
-         *
-         * @param querySummaryLength The maximum length of the query summary
-         * @return the builder (for chaining)
-         */
-        RelatedConceptsRequestBuilder<R, S> querySummaryLength(int querySummaryLength);
-
-        /**
-         * Sets the maximum number of results to display
-         *
-         * @param maxResults The maximum number of results to display
-         * @return the builder (for chaining)
-         */
-        RelatedConceptsRequestBuilder<R, S> maxResults(Integer maxResults);
-
-        /**
-         * Sets the query restrictions to apply
-         *
-         * @param queryRestrictions The query restrictions to apply
-         * @return the builder (for chaining)
-         */
-        RelatedConceptsRequestBuilder<R, S> queryRestrictions(QueryRestrictions<S> queryRestrictions);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        R build();
-    }
+    Q getQueryRestrictions();
 }

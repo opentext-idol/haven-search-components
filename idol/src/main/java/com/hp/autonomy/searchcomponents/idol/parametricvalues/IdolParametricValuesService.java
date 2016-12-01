@@ -7,9 +7,10 @@ package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
+import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 
 /**
  * Idol extension to {@link ParametricValuesService}
  */
-public interface IdolParametricValuesService extends ParametricValuesService<IdolParametricRequest, String, AciErrorException> {
+public interface IdolParametricValuesService extends ParametricValuesService<IdolParametricRequest, IdolQueryRestrictions, AciErrorException> {
 }

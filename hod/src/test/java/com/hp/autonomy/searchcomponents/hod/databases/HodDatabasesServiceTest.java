@@ -30,6 +30,7 @@ import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -60,9 +61,8 @@ public class HodDatabasesServiceTest {
 
     @Test
     public void getAllIndexes() throws HodErrorException {
-        final HodDatabasesRequest databasesRequest = HodDatabasesRequest.builder()
-                .publicIndexesEnabled(true)
-                .build();
+        final HodDatabasesRequest databasesRequest = mock(HodDatabasesRequest.class);
+        when(databasesRequest.isPublicIndexesEnabled()).thenReturn(true);
 
         final Set<Database> results = databasesService.getDatabases(databasesRequest);
         assertThat(results, hasSize(2));
@@ -70,9 +70,7 @@ public class HodDatabasesServiceTest {
 
     @Test
     public void getPrivateIndexes() throws HodErrorException {
-        final HodDatabasesRequest databasesRequest = HodDatabasesRequest.builder()
-                .publicIndexesEnabled(false)
-                .build();
+        final HodDatabasesRequest databasesRequest = mock(HodDatabasesRequest.class);
 
         final Set<Database> results = databasesService.getDatabases(databasesRequest);
         assertThat(results, hasSize(1));

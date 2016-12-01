@@ -5,15 +5,16 @@
 
 package com.hp.autonomy.searchcomponents.core.fields;
 
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -22,12 +23,15 @@ import static org.hamcrest.Matchers.*;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-public abstract class AbstractFieldsServiceIT<R extends FieldsRequest, S extends Serializable, E extends Exception> {
+public abstract class AbstractFieldsServiceIT<R extends FieldsRequest, B extends FieldsRequestBuilder<R, ?>, Q extends QueryRestrictions<?>, E extends Exception> {
     @Autowired
     private FieldsService<R, E> fieldsService;
 
     @Autowired
-    protected TestUtils<S> testUtils;
+    protected ObjectFactory<B> fieldRequestBuilderFactory;
+
+    @Autowired
+    protected TestUtils<Q> testUtils;
 
     protected abstract R createFieldsRequest();
 

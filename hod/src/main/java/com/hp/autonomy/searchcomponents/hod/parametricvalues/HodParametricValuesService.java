@@ -5,12 +5,12 @@
 
 package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
+import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 
 /**
  * HoD extension to {@link ParametricValuesService}
  */
-public interface HodParametricValuesService extends ParametricValuesService<HodParametricRequest, ResourceIdentifier, HodErrorException> {
+public interface HodParametricValuesService extends ParametricValuesService<HodParametricRequest, HodQueryRestrictions, HodErrorException> {
 }

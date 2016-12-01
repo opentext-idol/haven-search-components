@@ -18,20 +18,15 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryResults;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.warning.HodWarning;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
-import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.types.requests.Documents;
@@ -98,7 +93,7 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
     }
 
     @Override
-    public Documents<HodSearchResult> queryTextIndex(final QueryRequest<ResourceIdentifier> queryRequest) throws HodErrorException {
+    public Documents<HodSearchResult> queryTextIndex(final HodQueryRequest queryRequest) throws HodErrorException {
         final QueryRequestBuilder params = setQueryParams(queryRequest, queryRequest.getQueryType() != QueryRequest.QueryType.RAW);
 
         if (queryRequest.isAutoCorrect()) {
@@ -123,7 +118,7 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
     }
 
     @Override
-    public Documents<HodSearchResult> findSimilar(final SuggestRequest<ResourceIdentifier> suggestRequest) throws HodErrorException {
+    public Documents<HodSearchResult> findSimilar(final HodSuggestRequest suggestRequest) throws HodErrorException {
         final QueryRequestBuilder requestBuilder = setQueryParams(suggestRequest, false);
 
         final QueryResults<HodSearchResult> results = findSimilarService.findSimilarDocumentsToIndexReference(suggestRequest.getReference(), requestBuilder);
@@ -147,7 +142,7 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
 
     @Cacheable(value = CacheNames.GET_DOCUMENT_CONTENT, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
     @Override
-    public List<HodSearchResult> getDocumentContent(final GetContentRequest<ResourceIdentifier> request) throws HodErrorException {
+    public List<HodSearchResult> getDocumentContent(final HodGetContentRequest request) throws HodErrorException {
         final List<HodSearchResult> contentResults = new ArrayList<>();
 
         for (final GetContentRequestIndex<ResourceIdentifier> indexAndReferences : request.getIndexesAndReferences()) {
@@ -164,35 +159,34 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
     }
 
     @Override
-    public String getStateToken(final QueryRestrictions<ResourceIdentifier> queryRestrictions, final int maxResults, final boolean promotions) throws HodErrorException {
+    public String getStateToken(final HodQueryRestrictions queryRestrictions, final int maxResults, final boolean promotions) throws HodErrorException {
         throw new NotImplementedException("State tokens are not yet retrievable from Haven OnDemand");
     }
 
     @Override
-    public StateTokenAndResultCount getStateTokenAndResultCount(final QueryRestrictions<ResourceIdentifier> queryRestrictions, final int maxResults, final boolean promotions) throws HodErrorException {
+    public StateTokenAndResultCount getStateTokenAndResultCount(final HodQueryRestrictions queryRestrictions, final int maxResults, final boolean promotions) throws HodErrorException {
         throw new NotImplementedException("State tokens are not yet retrievable from Haven OnDemand");
     }
 
-    private QueryRequestBuilder setQueryParams(final SearchRequest<ResourceIdentifier> searchRequest, final boolean setQueryProfile) {
+    private QueryRequestBuilder setQueryParams(final HodSearchRequest searchRequest, final boolean setQueryProfile) {
         final String profileName = configService.getConfig().getQueryManipulation().getProfile();
 
-        final Print print = Print.valueOf(searchRequest.getPrint().toLowerCase());
         final QueryRequestBuilder queryRequestBuilder = new QueryRequestBuilder()
                 .setAbsoluteMaxResults(Math.min(searchRequest.getMaxResults(), HOD_MAX_RESULTS))
-                .setSummary(searchRequest.getSummary() != null ? Summary.valueOf(searchRequest.getSummary()) : null)
+                .setSummary(searchRequest.getSummary())
                 .setStart(searchRequest.getStart())
                 .setMaxPageResults(searchRequest.getMaxResults() - searchRequest.getStart() + 1)
                 .setTotalResults(true)
                 .setIndexes(searchRequest.getQueryRestrictions().getDatabases())
                 .setFieldText(searchRequest.getQueryRestrictions().getFieldText())
-                .setSort(searchRequest.getSort() != null ? Sort.valueOf(searchRequest.getSort()) : null)
+                .setSort(searchRequest.getSort())
                 .setMinDate(searchRequest.getQueryRestrictions().getMinDate())
                 .setMaxDate(searchRequest.getQueryRestrictions().getMaxDate())
-                .setPrint(Print.fields)
+                .setPrint(searchRequest.getPrint())
                 .setMinScore(searchRequest.getQueryRestrictions().getMinScore())
                 .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
 
-        if (print == Print.fields) {
+        if (searchRequest.getPrint() == Print.fields) {
             queryRequestBuilder.setPrintFields(documentFieldsService.getPrintFields(searchRequest.getPrintFields()));
         }
 

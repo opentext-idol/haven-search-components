@@ -5,15 +5,13 @@
 
 package com.hp.autonomy.searchcomponents.core.test;
 
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 
-import java.io.Serializable;
-import java.util.List;
-
-public interface TestUtils<S extends Serializable> {
+public interface TestUtils<Q extends QueryRestrictions<?>> {
     String CUSTOMISATION_TEST_ID = "customisation-test";
 
-    List<S> getDatabases();
+    Q buildQueryRestrictions();
 
-    QueryRestrictions<S> buildQueryRestrictions();
+    <RC extends GetContentRequest<?>> RC buildGetContentRequest(String reference);
 }

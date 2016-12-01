@@ -5,9 +5,9 @@
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +24,8 @@ public interface BucketingParamsHelper {
     /**
      * Verify that the fields specified in the parametric request are matched by a valid entry in the bucketing params.
      */
-    <R extends ParametricRequest<S>, S extends Serializable> void validateBucketingParams(R parametricRequest,
-                                                                                          Map<String, BucketingParams> bucketingParamsPerField);
+    <R extends ParametricRequest<Q>, Q extends QueryRestrictions<?>> void validateBucketingParams(R parametricRequest,
+                                                                                                  Map<String, BucketingParams> bucketingParamsPerField);
 
     /**
      * Calculate the boundary values (including both the min and the max) of the buckets specified in the BucketingParams.

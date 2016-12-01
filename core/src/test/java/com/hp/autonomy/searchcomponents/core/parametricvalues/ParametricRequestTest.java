@@ -6,11 +6,10 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObjectTest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 
-import java.io.Serializable;
-
-public abstract class ParametricRequestTest<S extends Serializable>
-        extends RequestObjectTest<ParametricRequest<S>, ParametricRequest.ParametricRequestBuilder<?, S>> {
+public abstract class ParametricRequestTest<Q extends QueryRestrictions<?>>
+        extends RequestObjectTest<ParametricRequest<Q>, ParametricRequestBuilder<?, Q, ?>> {
     @Override
     protected String toStringContent() {
         return "fieldNames";

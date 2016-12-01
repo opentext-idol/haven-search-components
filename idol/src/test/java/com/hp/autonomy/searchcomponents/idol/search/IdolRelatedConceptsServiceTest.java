@@ -5,18 +5,15 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.types.idol.responses.Qs;
 import com.hp.autonomy.types.idol.responses.QsElement;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,6 +31,9 @@ public class IdolRelatedConceptsServiceTest {
     @Mock
     private QueryExecutor queryExecutor;
 
+    @Mock
+    private IdolRelatedConceptsRequest request;
+
     private IdolRelatedConceptsService idolRelatedConceptsService;
 
     @Before
@@ -50,19 +50,7 @@ public class IdolRelatedConceptsServiceTest {
 
         when(queryExecutor.executeQuery(any(), any())).thenReturn(responseData);
 
-        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder()
-                .queryText("*")
-                .fieldText("Some field text")
-                .databases(Collections.singletonList("Database1"))
-                .maxDate(DateTime.now())
-                .build();
-
-        final IdolRelatedConceptsRequest idolRelatedConceptsRequest = IdolRelatedConceptsRequest.builder()
-                .queryRestrictions(queryRestrictions)
-                .querySummaryLength(250)
-                .maxResults(200)
-                .build();
-        final List<QsElement> results = idolRelatedConceptsService.findRelatedConcepts(idolRelatedConceptsRequest);
+        final List<QsElement> results = idolRelatedConceptsService.findRelatedConcepts(request);
         assertThat(results, is(not(empty())));
     }
 }

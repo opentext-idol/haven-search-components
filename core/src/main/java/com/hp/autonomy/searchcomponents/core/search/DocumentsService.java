@@ -8,22 +8,42 @@ package com.hp.autonomy.searchcomponents.core.search;
 import com.hp.autonomy.types.requests.Documents;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * Service for performing queries against Idol documents
  *
- * @param <S> The type of the database identifier
- * @param <D> The type of the document object returned in a standard query response
- * @param <E> The checked exception thrown in the event of an error
+ * @param <RQ> The {@link QueryRequest} implementation to use
+ * @param <RS> The {@link SuggestRequest} implementation to use
+ * @param <RC> The {@link GetContentRequest} implementation to use
+ * @param <Q>  The type of the query restrictions object
+ * @param <D>  The type of the document object returned in a standard query response
+ * @param <E>  The checked exception thrown in the event of an error
  */
-public interface DocumentsService<S extends Serializable, D extends SearchResult, E extends Exception> {
+public interface DocumentsService<RQ extends QueryRequest<Q>, RS extends SuggestRequest<Q>, RC extends GetContentRequest<?>, Q extends QueryRestrictions<?>, D extends SearchResult, E extends Exception> {
     /**
      * The bean name of the default implementation.
      * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
      */
     String DOCUMENTS_SERVICE_BEAN_NAME = "documentsService";
+
+    /**
+     * The bean name of the default query request builder implementation.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    String QUERY_REQUEST_BUILDER_BEAN_NAME = "queryRequestBuilder";
+
+    /**
+     * The bean name of the default suggest request builder implementation.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    String SUGGEST_REQUEST_BUILDER_BEAN_NAME = "suggestRequestBuilder";
+
+    /**
+     * The bean name of the default getContent request builder implementation.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    String GET_CONTENT_REQUEST_BUILDER_BEAN_NAME = "getContentRequestBuilder";
 
     /**
      * Start tag to add for highlighted words. This should be transformed by the client into something meaningful.
@@ -42,7 +62,7 @@ public interface DocumentsService<S extends Serializable, D extends SearchResult
      * @return The search results
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    Documents<D> queryTextIndex(QueryRequest<S> queryRequest) throws E;
+    Documents<D> queryTextIndex(RQ queryRequest) throws E;
 
     /**
      * Idol suggest request
@@ -51,7 +71,7 @@ public interface DocumentsService<S extends Serializable, D extends SearchResult
      * @return The suggest results
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    Documents<D> findSimilar(SuggestRequest<S> suggestRequest) throws E;
+    Documents<D> findSimilar(RS suggestRequest) throws E;
 
     /**
      * Retrieves the document fields and content for the specified resources
@@ -60,7 +80,7 @@ public interface DocumentsService<S extends Serializable, D extends SearchResult
      * @return The retrieved document information
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    List<D> getDocumentContent(GetContentRequest<S> request) throws E;
+    List<D> getDocumentContent(RC request) throws E;
 
     /**
      * Retrieves a state token for a given query
@@ -71,7 +91,7 @@ public interface DocumentsService<S extends Serializable, D extends SearchResult
      * @return The state token
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    String getStateToken(QueryRestrictions<S> queryRestrictions, int maxResults, boolean promotions) throws E;
+    String getStateToken(Q queryRestrictions, int maxResults, boolean promotions) throws E;
 
     /**
      * Retrieves a state token and result count for a given query
@@ -82,5 +102,5 @@ public interface DocumentsService<S extends Serializable, D extends SearchResult
      * @return The state token
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    StateTokenAndResultCount getStateTokenAndResultCount(QueryRestrictions<S> queryRestrictions, int maxResults, boolean promotions) throws E;
+    StateTokenAndResultCount getStateTokenAndResultCount(Q queryRestrictions, int maxResults, boolean promotions) throws E;
 }

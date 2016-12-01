@@ -10,7 +10,7 @@ import com.hp.autonomy.searchcomponents.core.requests.RequestObjectTest;
 import java.io.Serializable;
 
 public abstract class ViewRequestTest<S extends Serializable>
-        extends RequestObjectTest<ViewRequest<S>, ViewRequest.ViewRequestBuilder<?, S>> {
+        extends RequestObjectTest<ViewRequest<S>, ViewRequestBuilder<?, S, ?>> {
     @Override
     protected String toStringContent() {
         return "documentReference";

@@ -5,12 +5,11 @@
 
 package com.hp.autonomy.searchcomponents.hod.search;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.search.AbstractDocumentServiceIT;
 import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = HavenSearchHodConfiguration.class)
-public class HodDocumentServiceIT extends AbstractDocumentServiceIT<ResourceIdentifier, HodSearchResult, HodErrorException> {
+public class HodDocumentServiceIT extends AbstractDocumentServiceIT<HodQueryRequest, HodSuggestRequest, HodGetContentRequest, HodQueryRestrictions, HodSearchResult, HodErrorException> {
 }

@@ -14,8 +14,7 @@ import java.io.Serializable;
  *
  * @param <S> The type of the database identifier
  */
-public interface ViewRequest<S extends Serializable>
-        extends RequestObject<ViewRequest<S>, ViewRequest.ViewRequestBuilder<?, S>> {
+public interface ViewRequest<S extends Serializable> extends RequestObject<ViewRequest<S>, ViewRequestBuilder<?, S, ?>> {
     /**
      * The document reference
      *
@@ -36,43 +35,4 @@ public interface ViewRequest<S extends Serializable>
      * @return Text to highlight in the document
      */
     String getHighlightExpression();
-
-    /**
-     * Builder methods common to all request implementations
-     *
-     * @param <R> The type of the request implementation
-     * @param <S> The type of the database identifier
-     */
-    interface ViewRequestBuilder<R extends ViewRequest<S>, S extends Serializable>
-            extends RequestObject.RequestObjectBuilder<ViewRequest<S>, ViewRequestBuilder<?, S>> {
-        /**
-         * Sets the document reference
-         *
-         * @param documentReference The document reference
-         * @return the builder (for chaining)
-         */
-        ViewRequestBuilder<R, S> documentReference(String documentReference);
-
-        /**
-         * Sets the database or index containing the document
-         *
-         * @param database The database or index containing the document
-         * @return the builder (for chaining)
-         */
-        ViewRequestBuilder<R, S> database(S database);
-
-        /**
-         * Sets the text to highlight in the document
-         *
-         * @param highlightExpression Text to highlight in the document
-         * @return the builder (for chaining)
-         */
-        ViewRequestBuilder<R, S> highlightExpression(String highlightExpression);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        R build();
-    }
 }

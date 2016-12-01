@@ -7,9 +7,8 @@ package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
-import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
+import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
 import com.hp.autonomy.types.idol.responses.QsElement;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
@@ -39,7 +38,7 @@ class IdolRelatedConceptsServiceImpl implements IdolRelatedConceptsService {
     }
 
     @Override
-    public List<QsElement> findRelatedConcepts(final RelatedConceptsRequest<String> relatedConceptsRequest) throws AciErrorException {
+    public List<QsElement> findRelatedConcepts(final IdolRelatedConceptsRequest relatedConceptsRequest) throws AciErrorException {
         final AciParameters parameters = new AciParameters(QueryActions.Query.name());
         parameterHandler.addSecurityInfo(parameters);
         parameterHandler.addSearchRestrictions(parameters, relatedConceptsRequest.getQueryRestrictions());

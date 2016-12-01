@@ -8,10 +8,10 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.database.Databases;
-import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.AutoCorrectException;
-import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequest;
+import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
+import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequestBuilder;
+import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesService;
 import com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser;
 import com.hp.autonomy.types.idol.responses.Database;
 import com.hp.autonomy.types.idol.responses.Hit;
@@ -21,6 +21,7 @@ import com.hp.autonomy.types.requests.Spelling;
 import com.hp.autonomy.types.requests.Warnings;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,16 +47,20 @@ class QueryResponseParserImpl implements QueryResponseParser {
     static final String MISSING_DATABASE_WARNING = "At least one of the databases provided in the query does not exist";
 
     private final FieldsParser fieldsParser;
-    private final DatabasesService<Database, IdolDatabasesRequest, AciErrorException> databasesService;
+    private final IdolDatabasesService databasesService;
+    private final ObjectFactory<IdolDatabasesRequestBuilder> databasesRequestBuilderFactory;
 
     @Autowired
-    QueryResponseParserImpl(final FieldsParser fieldsParser, final DatabasesService<Database, IdolDatabasesRequest, AciErrorException> databasesService) {
+    QueryResponseParserImpl(final FieldsParser fieldsParser,
+                            final IdolDatabasesService databasesService,
+                            final ObjectFactory<IdolDatabasesRequestBuilder> databasesRequestBuilderFactory) {
         this.fieldsParser = fieldsParser;
         this.databasesService = databasesService;
+        this.databasesRequestBuilderFactory = databasesRequestBuilderFactory;
     }
 
     @Override
-    public Documents<IdolSearchResult> parseQueryResults(final SearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData, final Function<AciParameters, QueryResponseData> queryExecutor) {
+    public Documents<IdolSearchResult> parseQueryResults(final SearchRequest<IdolQueryRestrictions> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData, final Function<AciParameters, QueryResponseData> queryExecutor) {
         final List<Hit> hits = responseData.getHits();
 
         final Warnings warnings = parseWarnings(searchRequest, aciParameters, responseData);
@@ -74,11 +79,11 @@ class QueryResponseParserImpl implements QueryResponseParser {
         return documents;
     }
 
-    protected Warnings parseWarnings(final SearchRequest<String> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData) {
+    protected Warnings parseWarnings(final SearchRequest<IdolQueryRestrictions> searchRequest, final AciParameters aciParameters, final QueryResponseData responseData) {
         Warnings warnings = null;
         for (final String warning : responseData.getWarning()) {
             if (MISSING_DATABASE_WARNING.equals(warning.trim())) {
-                final Set<Database> updatedDatabases = databasesService.getDatabases(IdolDatabasesRequest.builder().build());
+                final Set<Database> updatedDatabases = databasesService.getDatabases(databasesRequestBuilderFactory.getObject().build());
                 final List<String> oldQueryRestrictionDatabases = searchRequest.getQueryRestrictions().getDatabases();
                 final Set<String> badDatabases = new LinkedHashSet<>(oldQueryRestrictionDatabases);
                 for (final Database database : updatedDatabases) {

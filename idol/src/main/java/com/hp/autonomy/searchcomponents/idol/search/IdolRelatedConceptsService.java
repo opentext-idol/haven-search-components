@@ -13,5 +13,5 @@ import com.hp.autonomy.types.idol.responses.QsElement;
  * Idol extension to {@link RelatedConceptsService}
  */
 @FunctionalInterface
-public interface IdolRelatedConceptsService extends RelatedConceptsService<QsElement, String, AciErrorException> {
+public interface IdolRelatedConceptsService extends RelatedConceptsService<IdolRelatedConceptsRequest, QsElement, IdolQueryRestrictions, AciErrorException> {
 }

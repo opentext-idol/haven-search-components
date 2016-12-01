@@ -5,12 +5,12 @@
 
 package com.hp.autonomy.searchcomponents.hod.test;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.test.IntegrationTestUtils;
+import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HodIntegrationTestUtils extends IntegrationTestUtils<ResourceIdentifier, HodSearchResult, HodErrorException> {
+public class HodIntegrationTestUtils extends IntegrationTestUtils<HodQueryRestrictions, HodSearchResult, HodErrorException> {
 }

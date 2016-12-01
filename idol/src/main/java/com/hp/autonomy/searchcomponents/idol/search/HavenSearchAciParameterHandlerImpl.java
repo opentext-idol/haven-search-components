@@ -16,12 +16,9 @@ import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
-import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
@@ -73,7 +70,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addSearchRestrictions(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions) {
+    public void addSearchRestrictions(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         aciParameters.add(QueryParams.Text.name(), queryRestrictions.getQueryText());
         if (!queryRestrictions.getDatabases().isEmpty()) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(queryRestrictions.getDatabases()));
@@ -95,18 +92,18 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addSearchOutputParameters(final AciParameters aciParameters, final SearchRequest<String> searchRequest) {
+    public void addSearchOutputParameters(final AciParameters aciParameters, final IdolSearchRequest searchRequest) {
         addSecurityInfo(aciParameters);
 
         aciParameters.add(QueryParams.Start.name(), searchRequest.getStart());
         aciParameters.add(QueryParams.MaxResults.name(), searchRequest.getMaxResults());
-        aciParameters.add(QueryParams.Summary.name(), SummaryParam.fromValue(searchRequest.getSummary(), null));
+        aciParameters.add(QueryParams.Summary.name(), searchRequest.getSummary());
         aciParameters.add(QueryParams.Characters.name(), searchRequest.getSummaryCharacters());
         aciParameters.add(QueryParams.Predict.name(), false);
         aciParameters.add(QueryParams.Sort.name(), searchRequest.getSort());
         aciParameters.add(QueryParams.TotalResults.name(), true);
         aciParameters.add(QueryParams.XMLMeta.name(), true);
-        addPrintParameters(aciParameters, PrintParam.fromValue(searchRequest.getPrint()), searchRequest.getPrintFields());
+        addPrintParameters(aciParameters, searchRequest.getPrint(), searchRequest.getPrintFields());
 
         if (searchRequest.isHighlight()) {
             aciParameters.add(QueryParams.Highlight.name(), HighlightParam.SummaryTerms);
@@ -116,7 +113,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> indexAndReferences, final PrintParam print) {
+    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex indexAndReferences, final PrintParam print) {
         addSecurityInfo(aciParameters);
 
         final Set<String> references = indexAndReferences.getReferences();
@@ -155,7 +152,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addLanguageRestriction(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions) {
+    public void addLanguageRestriction(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         // If the AnyLanguage parameter is true, documents with any language can be returned, otherwise documents matching
         // the MatchLanguage parameter are returned.
         if (queryRestrictions.isAnyLanguage()) {
@@ -171,7 +168,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addQmsParameters(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions) {
+    public void addQmsParameters(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         aciParameters.add(QmsQueryParams.Blacklist.name(), configService.getConfig().getQueryManipulation().getBlacklist());
         aciParameters.add(QmsQueryParams.ExpandQuery.name(), configService.getConfig().getQueryManipulation().getExpandQuery());
     }
@@ -191,7 +188,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addViewParameters(final AciParameters aciParameters, final String reference, final ViewRequest<String> viewRequest) {
+    public void addViewParameters(final AciParameters aciParameters, final String reference, final IdolViewRequest viewRequest) {
         aciParameters.add(ViewParams.NoACI.name(), true);
         aciParameters.add(ViewParams.Reference.name(), reference);
         aciParameters.add(ViewParams.EmbedImages.name(), true);

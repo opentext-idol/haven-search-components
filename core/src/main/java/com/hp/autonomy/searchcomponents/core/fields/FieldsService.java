@@ -27,6 +27,12 @@ public interface FieldsService<R extends FieldsRequest, E extends Exception> {
     String FIELD_SERVICE_BEAN_NAME = "fieldService";
 
     /**
+     * The bean name of the default request builder implementation.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    String FIELDS_REQUEST_BUILDER_BEAN_NAME = "fieldsRequestBuilder";
+
+    /**
      * Retrieves all fields of the given field types
      *
      * @param request options

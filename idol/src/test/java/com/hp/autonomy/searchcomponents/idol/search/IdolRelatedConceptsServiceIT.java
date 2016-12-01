@@ -12,5 +12,5 @@ import com.hp.autonomy.types.idol.responses.QsElement;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class)
-public class IdolRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceIT<QsElement, String, AciErrorException> {
+public class IdolRelatedConceptsServiceIT extends AbstractRelatedConceptsServiceIT<IdolRelatedConceptsRequest, QsElement, IdolQueryRestrictions, AciErrorException> {
 }

@@ -14,7 +14,6 @@ import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ class HodRelatedConceptsServiceImpl implements HodRelatedConceptsService {
 
     @Override
     @Cacheable(value = CacheNames.RELATED_CONCEPTS, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
-    public List<Entity> findRelatedConcepts(final RelatedConceptsRequest<ResourceIdentifier> relatedConceptsRequest) throws HodErrorException {
+    public List<Entity> findRelatedConcepts(final HodRelatedConceptsRequest relatedConceptsRequest) throws HodErrorException {
 
         final QueryRestrictions<ResourceIdentifier> queryRestrictions = relatedConceptsRequest.getQueryRestrictions();
         final FindRelatedConceptsRequestBuilder params = new FindRelatedConceptsRequestBuilder()

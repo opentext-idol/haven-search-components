@@ -7,7 +7,9 @@ package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
+import com.hp.autonomy.searchcomponents.core.fields.FieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
 import com.hp.autonomy.types.idol.responses.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
@@ -18,10 +20,10 @@ import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,20 +36,20 @@ import static org.hamcrest.Matchers.*;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequest<S>, F extends FieldsRequest, FB extends FieldsRequest.FieldsRequestBuilder<F>, S extends Serializable, E extends Exception> {
+public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequest<Q>, F extends FieldsRequest, FB extends FieldsRequestBuilder<F, ?>, Q extends QueryRestrictions<?>, E extends Exception> {
     @Autowired
     private FieldsService<F, E> fieldsService;
     @Autowired
-    private ParametricValuesService<R, S, E> parametricValuesService;
+    private ParametricValuesService<R, Q, E> parametricValuesService;
     @Autowired
-    protected FB fieldsRequestBuilder;
+    protected ObjectFactory<FB> fieldsRequestBuilderFactory;
     @Autowired
-    private ParametricRequest.ParametricRequestBuilder<R, S> parametricRequestBuilder;
+    private ObjectFactory<ParametricRequestBuilder<R, Q, ?>> parametricRequestBuilderFactory;
 
     @Autowired
-    protected TestUtils<S> testUtils;
+    protected TestUtils<Q> testUtils;
 
-    protected abstract FieldsRequest.FieldsRequestBuilder<F> fieldsRequestParams(final FB fieldsRequestBuilder);
+    protected abstract FieldsRequestBuilder<F, ?> fieldsRequestParams(final FB fieldsRequestBuilder);
 
     @Test
     public void getAllParametricValues() throws E {
@@ -86,7 +88,7 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
     }
 
     private R createNumericParametricRequest() {
-        return parametricRequestBuilder
+        return parametricRequestBuilderFactory.getObject()
                 .fieldName(ParametricValuesService.AUTN_DATE_FIELD)
                 .queryRestrictions(testUtils.buildQueryRestrictions())
                 .sort(SortParam.ReverseDate)
@@ -94,12 +96,13 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
     }
 
     private R createParametricRequest() throws E {
-        final List<TagName> fields = fieldsService.getFields(fieldsRequestParams(fieldsRequestBuilder).build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
+        final FieldsRequestBuilder<F, ?> fieldsRequestBuilder = fieldsRequestParams(fieldsRequestBuilderFactory.getObject());
+        final List<TagName> fields = fieldsService.getFields(fieldsRequestBuilder.build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
         final Collection<String> fieldIds = new ArrayList<>(fields.size());
 
         fieldIds.addAll(fields.stream().map(TagName::getId).collect(Collectors.toList()));
 
-        return parametricRequestBuilder
+        return parametricRequestBuilderFactory.getObject()
                 .fieldNames(fieldIds)
                 .queryRestrictions(testUtils.buildQueryRestrictions())
                 .build();

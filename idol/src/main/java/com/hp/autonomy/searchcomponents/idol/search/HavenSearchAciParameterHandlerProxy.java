@@ -6,10 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
-import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
+import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,17 +21,17 @@ public abstract class HavenSearchAciParameterHandlerProxy implements HavenSearch
     protected HavenSearchAciParameterHandler parameterHandler;
 
     @Override
-    public void addSearchRestrictions(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions) {
+    public void addSearchRestrictions(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
     }
 
     @Override
-    public void addSearchOutputParameters(final AciParameters aciParameters, final SearchRequest<String> aciSearchRequest) {
+    public void addSearchOutputParameters(final AciParameters aciParameters, final IdolSearchRequest aciSearchRequest) {
         parameterHandler.addSearchOutputParameters(aciParameters, aciSearchRequest);
     }
 
     @Override
-    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final GetContentRequestIndex<String> getContentRequestIndex, final PrintParam printParam) {
+    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex getContentRequestIndex, final PrintParam printParam) {
         parameterHandler.addGetDocumentOutputParameters(aciParameters, getContentRequestIndex, printParam);
     }
 
@@ -44,12 +41,12 @@ public abstract class HavenSearchAciParameterHandlerProxy implements HavenSearch
     }
 
     @Override
-    public void addLanguageRestriction(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions) {
+    public void addLanguageRestriction(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
     }
 
     @Override
-    public void addQmsParameters(final AciParameters aciParameters, final QueryRestrictions<String> queryRestrictions) {
+    public void addQmsParameters(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         parameterHandler.addQmsParameters(aciParameters, queryRestrictions);
     }
 
@@ -64,7 +61,7 @@ public abstract class HavenSearchAciParameterHandlerProxy implements HavenSearch
     }
 
     @Override
-    public void addViewParameters(final AciParameters aciParameters, final String reference, final ViewRequest<String> viewRequest) {
+    public void addViewParameters(final AciParameters aciParameters, final String reference, final IdolViewRequest viewRequest) {
         parameterHandler.addViewParameters(aciParameters, reference, viewRequest);
     }
 }

@@ -11,5 +11,5 @@ import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 /**
  * Idol extension to {@link DocumentsService}
  */
-public interface IdolDocumentsService extends DocumentsService<String, IdolSearchResult, AciErrorException> {
+public interface IdolDocumentsService extends DocumentsService<IdolQueryRequest, IdolSuggestRequest, IdolGetContentRequest, IdolQueryRestrictions, IdolSearchResult, AciErrorException> {
 }

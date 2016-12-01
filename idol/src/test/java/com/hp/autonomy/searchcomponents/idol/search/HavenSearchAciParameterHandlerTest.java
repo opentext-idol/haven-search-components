@@ -9,12 +9,7 @@ import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
-import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
@@ -50,6 +45,18 @@ public class HavenSearchAciParameterHandlerTest {
     @Mock
     private AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever;
 
+    @Mock
+    private IdolQueryRestrictions queryRestrictions;
+
+    @Mock
+    private IdolSearchRequest searchRequest;
+
+    @Mock
+    private IdolGetContentRequestIndex indexAndReferences;
+
+    @Mock
+    private IdolViewRequest viewRequest;
+
     private HavenSearchAciParameterHandler parameterHandler;
 
     private AciParameters aciParameters;
@@ -62,41 +69,34 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addSearchRestrictions() {
-        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder()
-                .queryText("Some Text")
-                .fieldText("Some field text")
-                .databases(Collections.singletonList("Database1"))
-                .stateMatchId("stateID1")
-                .stateDontMatchId("stateID2")
-                .maxDate(DateTime.now())
-                .anyLanguage(true)
-                .build();
+        when(queryRestrictions.getQueryText()).thenReturn("Some Text");
+        when(queryRestrictions.getFieldText()).thenReturn("Some field text");
+        when(queryRestrictions.getDatabases()).thenReturn(Collections.singletonList("Database1"));
+        when(queryRestrictions.getStateMatchIds()).thenReturn(Collections.singletonList("stateID1"));
+        when(queryRestrictions.getStateDontMatchIds()).thenReturn(Collections.singletonList("stateID2"));
+        when(queryRestrictions.getMaxDate()).thenReturn(DateTime.now());
+        when(queryRestrictions.isAnyLanguage()).thenReturn(true);
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
         assertThat(aciParameters, hasSize(10));
     }
 
     @Test
     public void addSearchOutputParameters() {
-        final SearchRequest<String> searchRequest = QueryRequest.<String>builder()
-                .queryRestrictions(null)
-                .start(1)
-                .maxResults(50)
-                .summary(SummaryParam.Concept.name())
-                .summaryCharacters(250)
-                .sort(null)
-                .highlight(true)
-                .autoCorrect(true)
-                .print(PrintParam.Fields.name())
-                .printFields(Arrays.asList("CATEGORY", "REFERENCE"))
-                .queryType(null)
-                .build();
+        when(searchRequest.getStart()).thenReturn(1);
+        when(searchRequest.getMaxResults()).thenReturn(50);
+        when(searchRequest.getSummary()).thenReturn(SummaryParam.Concept);
+        when(searchRequest.getSummaryCharacters()).thenReturn(250);
+        when(searchRequest.isHighlight()).thenReturn(true);
+        when(searchRequest.getPrint()).thenReturn(PrintParam.Fields);
+        when(searchRequest.getPrintFields()).thenReturn(Arrays.asList("CATEGORY", "REFERENCE"));
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
         assertThat(aciParameters, hasSize(14));
     }
 
     @Test
     public void addGetDocumentOutputParameters() {
-        final GetContentRequestIndex<String> indexAndReferences = new GetContentRequestIndex<>("Database1", Collections.singleton("SomeReference"));
+        when(indexAndReferences.getIndex()).thenReturn("Database1");
+        when(indexAndReferences.getReferences()).thenReturn(Collections.singleton("SomeReference"));
         parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, PrintParam.Fields);
         assertThat(aciParameters, hasSize(11));
     }
@@ -109,21 +109,20 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addLanguageType() {
-        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder().languageType("englishUTF8").build();
+        when(queryRestrictions.getLanguageType()).thenReturn("englishUTF8");
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
         assertThat(aciParameters, hasItem(new AciParameter(QueryParams.LanguageType.name(), "englishUTF8")));
     }
 
     @Test
     public void defaultLanguageType() {
-        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder().build();
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
         assertThat(aciParameters, Matchers.empty());
     }
 
     @Test
     public void noLanguageRestriction() {
-        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder().anyLanguage(true).build();
+        when(queryRestrictions.isAnyLanguage()).thenReturn(true);
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
         assertThat(aciParameters, hasItem(new AciParameter(QueryParams.AnyLanguage.name(), true)));
     }
@@ -145,9 +144,7 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addViewParameters() {
-        final ViewRequest<String> viewRequest = IdolViewRequest.builder()
-                .highlightExpression("SomeText")
-                .build();
+        when(viewRequest.getHighlightExpression()).thenReturn("SomeText");
         parameterHandler.addViewParameters(aciParameters, "123456", viewRequest);
         assertThat(aciParameters, hasSize(10));
     }

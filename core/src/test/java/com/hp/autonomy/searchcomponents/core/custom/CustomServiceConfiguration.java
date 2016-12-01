@@ -13,8 +13,13 @@ import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
+import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
@@ -57,22 +62,22 @@ public class CustomServiceConfiguration {
 
     @Bean
     @Primary
-    public <R extends ParametricRequest<S>, S extends Serializable, E extends Exception> ParametricValuesService<R, S, E> customParametricValuesService(
-            @Qualifier(ParametricValuesService.PARAMETRIC_VALUES_SERVICE_BEAN_NAME) final ParametricValuesService<R, S, E> parametricValuesService) {
+    public <R extends ParametricRequest<Q>, Q extends QueryRestrictions<?>, E extends Exception> ParametricValuesService<R, Q, E> customParametricValuesService(
+            @Qualifier(ParametricValuesService.PARAMETRIC_VALUES_SERVICE_BEAN_NAME) final ParametricValuesService<R, Q, E> parametricValuesService) {
         return parametricValuesService;
     }
 
     @Bean
     @Primary
-    public <S extends Serializable, D extends SearchResult, E extends Exception> DocumentsService<S, D, E> customDocumentsService(
-            @Qualifier(DocumentsService.DOCUMENTS_SERVICE_BEAN_NAME) final DocumentsService<S, D, E> documentsService) {
+    public <RQ extends QueryRequest<Q>, RS extends SuggestRequest<Q>, RC extends GetContentRequest<?>, Q extends QueryRestrictions<?>, D extends SearchResult, E extends Exception> DocumentsService<RQ, RS, RC, Q, D, E> customDocumentsService(
+            @Qualifier(DocumentsService.DOCUMENTS_SERVICE_BEAN_NAME) final DocumentsService<RQ, RS, RC, Q, D, E> documentsService) {
         return documentsService;
     }
 
     @Bean
     @Primary
-    public <Q extends QuerySummaryElement, S extends Serializable, E extends Exception> RelatedConceptsService<Q, S, E> customRelatedConceptsService(
-            @Qualifier(RelatedConceptsService.RELATED_CONCEPTS_SERVICE_BEAN_NAME) final RelatedConceptsService<Q, S, E> relatedConceptsService) {
+    public <R extends RelatedConceptsRequest<Q>, T extends QuerySummaryElement, Q extends QueryRestrictions<?>, E extends Exception> RelatedConceptsService<R, T, Q, E> customRelatedConceptsService(
+            @Qualifier(RelatedConceptsService.RELATED_CONCEPTS_SERVICE_BEAN_NAME) final RelatedConceptsService<R, T, Q, E> relatedConceptsService) {
         return relatedConceptsService;
     }
 

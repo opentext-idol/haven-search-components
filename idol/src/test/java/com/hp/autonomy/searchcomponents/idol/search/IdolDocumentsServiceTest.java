@@ -6,12 +6,8 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
-import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
-import com.hp.autonomy.searchcomponents.core.search.SuggestRequest;
 import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.idol.responses.SuggestResponseData;
@@ -50,6 +46,21 @@ public class IdolDocumentsServiceTest {
 
     @Mock
     private QueryResponseParser queryResponseParser;
+
+    @Mock
+    private IdolQueryRestrictions queryRestrictions;
+
+    @Mock
+    private IdolQueryRequest queryRequest;
+
+    @Mock
+    private IdolSuggestRequest suggestRequest;
+
+    @Mock
+    private IdolGetContentRequest getContentRequest;
+
+    @Mock
+    private IdolGetContentRequestIndex getContentRequestIndex;
 
     private IdolDocumentsService idolDocumentsService;
 
@@ -106,18 +117,8 @@ public class IdolDocumentsServiceTest {
 
         when(queryExecutor.executeSuggest(any(), any())).thenReturn(responseData);
 
-        final IdolQueryRestrictions queryRestrictions = IdolQueryRestrictions.builder().build();
-        final SuggestRequest<String> suggestRequest = SuggestRequest.<String>builder()
-                .reference("Some reference")
-                .queryRestrictions(queryRestrictions)
-                .start(1)
-                .maxResults(50)
-                .summary(SummaryParam.Context.name())
-                .summaryCharacters(250)
-                .sort(null)
-                .highlight(true)
-                .print(PrintParam.Fields.name())
-                .build();
+        when(suggestRequest.getReference()).thenReturn("Some reference");
+        when(suggestRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
         idolDocumentsService.findSimilar(suggestRequest);
         verify(queryResponseParser).parseQueryHits(responseData.getHits());
     }
@@ -131,10 +132,11 @@ public class IdolDocumentsServiceTest {
 
         when(queryExecutor.executeQuery(any(), any())).thenReturn(responseData);
 
-        final GetContentRequest<String> getContentRequest = GetContentRequest.<String>builder()
-                .indexAndReferences(new GetContentRequestIndex<>("Database1", Collections.singleton("Some reference")))
-                .print(PrintParam.Fields.name())
-                .build();
+        when(getContentRequestIndex.getIndex()).thenReturn("Database1");
+        when(getContentRequestIndex.getReferences()).thenReturn(Collections.singleton("Some reference"));
+        when(getContentRequest.getIndexesAndReferences()).thenReturn(Collections.singleton(getContentRequestIndex));
+        when(getContentRequest.getPrint()).thenReturn(PrintParam.Fields);
+
         idolDocumentsService.getDocumentContent(getContentRequest);
         verify(queryResponseParser).parseQueryHits(responseData.getHits());
     }
@@ -156,25 +158,22 @@ public class IdolDocumentsServiceTest {
         assertThat(stateTokenAndResultCount.getResultCount(), is((long) MOCK_TOTAL_HITS));
     }
 
-    // Used in Find's DocumentService test
-    private QueryRequest<String> mockQueryParams(final QueryRequest.QueryType queryType) {
-        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder()
-                .queryText("*")
-                .databases(Arrays.asList("Database1", "Database2"))
-                .maxDate(DateTime.now())
-                .build();
-        return QueryRequest.<String>builder()
-                .queryRestrictions(queryRestrictions)
-                .start(1)
-                .maxResults(50)
-                .summary(SummaryParam.Concept.name())
-                .summaryCharacters(250)
-                .sort(null)
-                .highlight(true)
-                .autoCorrect(true)
-                .print(PrintParam.Fields.name())
-                .queryType(queryType)
-                .build();
+    private IdolQueryRequest mockQueryParams(final QueryRequest.QueryType queryType) {
+        when(queryRestrictions.getQueryText()).thenReturn("*");
+        when(queryRestrictions.getDatabases()).thenReturn(Arrays.asList("Database1", "Database2"));
+        when(queryRestrictions.getMaxDate()).thenReturn(DateTime.now());
+
+        when(queryRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
+        when(queryRequest.getStart()).thenReturn(1);
+        when(queryRequest.getMaxResults()).thenReturn(50);
+        when(queryRequest.getSummary()).thenReturn(SummaryParam.Concept);
+        when(queryRequest.getSummaryCharacters()).thenReturn(250);
+        when(queryRequest.isHighlight()).thenReturn(true);
+        when(queryRequest.isAutoCorrect()).thenReturn(true);
+        when(queryRequest.getPrint()).thenReturn(PrintParam.Fields);
+        when(queryRequest.getQueryType()).thenReturn(queryType);
+
+        return queryRequest;
     }
 
     private QueryResponseData mockStateTokenResponse() {
