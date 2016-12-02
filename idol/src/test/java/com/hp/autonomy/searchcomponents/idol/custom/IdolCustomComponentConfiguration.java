@@ -31,6 +31,7 @@ import static com.hp.autonomy.searchcomponents.idol.search.QueryExecutor.QUERY_E
 import static com.hp.autonomy.searchcomponents.idol.search.QueryResponseParser.QUERY_RESPONSE_PARSER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser.FIELDS_PARSER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable.VIEW_CONFIG_VALIDATOR_BEAN_NAME;
+import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("AnonymousInnerClassWithTooManyMethods")
 @Configuration
@@ -48,22 +49,25 @@ public class IdolCustomComponentConfiguration {
         return aciServiceRetriever;
     }
 
-    @Bean
-    @Primary
-    public Validator<QueryManipulation> customQueryManipulationValidator(@Qualifier(QUERY_MANIPULATION_VALIDATOR_BEAN_NAME) final Validator<QueryManipulation> queryManipulationValidator) {
-        return queryManipulationValidator;
+    @Bean(name = QUERY_MANIPULATION_VALIDATOR_BEAN_NAME)
+    public Validator<QueryManipulation> customQueryManipulationValidator() {
+        @SuppressWarnings("unchecked")
+        final Validator<QueryManipulation> validator = mock(Validator.class);
+        return validator;
     }
 
-    @Bean
-    @Primary
-    public Validator<AnswerServerConfig> customAnswerServerValidator(@Qualifier(ANSWER_SERVER_VALIDATOR_BEAN_NAME) final Validator<AnswerServerConfig> answerServerConfigValidator) {
-        return answerServerConfigValidator;
+    @Bean(name = ANSWER_SERVER_VALIDATOR_BEAN_NAME)
+    public Validator<AnswerServerConfig> customAnswerServerValidator() {
+        @SuppressWarnings("unchecked")
+        final Validator<AnswerServerConfig> validator = mock(Validator.class);
+        return validator;
     }
 
-    @Bean
-    @Primary
-    public Validator<ViewConfig> customViewConfigValidator(@Qualifier(VIEW_CONFIG_VALIDATOR_BEAN_NAME) final Validator<ViewConfig> viewConfigValidator) {
-        return viewConfigValidator;
+    @Bean(name = VIEW_CONFIG_VALIDATOR_BEAN_NAME)
+    public Validator<ViewConfig> customViewConfigValidator() {
+        @SuppressWarnings("unchecked")
+        final Validator<ViewConfig> validator = mock(Validator.class);
+        return validator;
     }
 
     @Bean

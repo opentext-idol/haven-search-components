@@ -9,18 +9,12 @@ import com.autonomy.aci.client.services.AciService;
 import com.hp.autonomy.frontend.configuration.validation.ValidationResult;
 import com.hp.autonomy.frontend.configuration.validation.Validator;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import static com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable.QUERY_MANIPULATION_VALIDATOR_BEAN_NAME;
-
-@Component(QUERY_MANIPULATION_VALIDATOR_BEAN_NAME)
-class QueryManipulationValidator implements Validator<QueryManipulation> {
+public class QueryManipulationValidator implements Validator<QueryManipulation> {
 
     private final AciService aciService;
     private final ProcessorFactory processorFactory;
 
-    @Autowired
     public QueryManipulationValidator(final AciService validatorAciService, final ProcessorFactory processorFactory) {
         aciService = validatorAciService;
         this.processorFactory = processorFactory;

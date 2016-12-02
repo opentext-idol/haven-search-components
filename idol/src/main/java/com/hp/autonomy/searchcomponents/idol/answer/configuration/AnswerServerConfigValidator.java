@@ -9,19 +9,13 @@ import com.hp.autonomy.frontend.configuration.server.ServerConfig;
 import com.hp.autonomy.frontend.configuration.validation.ValidationResult;
 import com.hp.autonomy.frontend.configuration.validation.Validator;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import static com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable.ANSWER_SERVER_VALIDATOR_BEAN_NAME;
-
-@Component(ANSWER_SERVER_VALIDATOR_BEAN_NAME)
-class AnswerServerConfigValidator implements Validator<AnswerServerConfig> {
+public class AnswerServerConfigValidator implements Validator<AnswerServerConfig> {
     private final AciService aciService;
     private final ProcessorFactory processorFactory;
 
-    @Autowired
-    AnswerServerConfigValidator(final AciService validatorAciService,
-                                final ProcessorFactory processorFactory) {
+    public AnswerServerConfigValidator(final AciService validatorAciService,
+                                       final ProcessorFactory processorFactory) {
         aciService = validatorAciService;
         this.processorFactory = processorFactory;
     }
