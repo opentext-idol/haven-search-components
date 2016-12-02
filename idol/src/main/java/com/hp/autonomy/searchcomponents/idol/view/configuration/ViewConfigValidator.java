@@ -12,18 +12,11 @@ import com.hp.autonomy.frontend.configuration.validation.Validator;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import static com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable.VIEW_CONFIG_VALIDATOR_BEAN_NAME;
-
-@Component(VIEW_CONFIG_VALIDATOR_BEAN_NAME)
-class ViewConfigValidator implements Validator<ViewConfig> {
-
+public class ViewConfigValidator implements Validator<ViewConfig> {
     private final AciService validatorAciService;
     private final ProcessorFactory processorFactory;
 
-    @Autowired
     public ViewConfigValidator(final AciService validatorAciService, final ProcessorFactory processorFactory) {
         this.validatorAciService = validatorAciService;
         this.processorFactory = processorFactory;
