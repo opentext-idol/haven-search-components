@@ -23,18 +23,19 @@ import org.springframework.core.env.Environment;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("WeakerAccess")
 @Configuration
 @ConditionalOnProperty(value = "mock.configuration", matchIfMissing = true)
 public class IdolTestConfiguration {
-    private static final String CONTENT_HOST_PROPERTY = "test.content.host";
-    private static final String CONTENT_HOST = "ida-idol";
-    private static final String CONTENT_PORT_PROPERTY = "test.content.port";
-    private static final int CONTENT_PORT = 9000;
-    private static final String VIEW_SERVER_HOST_PROPERTY = "test.view.host";
-    private static final String VIEW_SERVER_HOST = "ida-idol";
-    private static final String VIEW_SERVER_PORT_PROPERTY = "test.view.port";
-    private static final int VIEW_SERVER_PORT = 9080;
-    private static final String VIEW_SERVER_REFERENCE_FIELD = "DREREFERENCE";
+    public static final String CONTENT_HOST_PROPERTY = "test.content.host";
+    public static final String CONTENT_HOST = "ida-idol";
+    public static final String CONTENT_PORT_PROPERTY = "test.content.port";
+    public static final int CONTENT_PORT = 9000;
+    public static final String VIEW_SERVER_HOST_PROPERTY = "test.view.host";
+    public static final String VIEW_SERVER_HOST = "ida-idol";
+    public static final String VIEW_SERVER_PORT_PROPERTY = "test.view.port";
+    public static final int VIEW_SERVER_PORT = 9080;
+    public static final String VIEW_SERVER_REFERENCE_FIELD = "DREREFERENCE";
     public static final String ANSWER_SERVER_HOST_PROPERTY = "test.answer.host";
     public static final String ANSWER_SERVER_HOST = "ida-answer";
     public static final String ANSWER_SERVER_PORT_PROPERTY = "test.answer.port";
