@@ -166,11 +166,11 @@ public class IdolDocumentsServiceTest {
         when(queryRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
         when(queryRequest.getStart()).thenReturn(1);
         when(queryRequest.getMaxResults()).thenReturn(50);
-        when(queryRequest.getSummary()).thenReturn(SummaryParam.Concept);
+        when(queryRequest.getSummary()).thenReturn(SummaryParam.Concept.name());
         when(queryRequest.getSummaryCharacters()).thenReturn(250);
         when(queryRequest.isHighlight()).thenReturn(true);
         when(queryRequest.isAutoCorrect()).thenReturn(true);
-        when(queryRequest.getPrint()).thenReturn(PrintParam.Fields);
+        when(queryRequest.getPrint()).thenReturn(PrintParam.Fields.name());
         when(queryRequest.getQueryType()).thenReturn(queryType);
 
         return queryRequest;

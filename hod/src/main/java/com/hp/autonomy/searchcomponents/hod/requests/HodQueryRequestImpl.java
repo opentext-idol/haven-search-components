@@ -7,9 +7,6 @@ package com.hp.autonomy.searchcomponents.hod.requests;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.hod.search.HodDocumentsService;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRequest;
@@ -35,11 +32,11 @@ class HodQueryRequestImpl implements HodQueryRequest {
     private final HodQueryRestrictions queryRestrictions;
     private final int start;
     private final int maxResults;
-    private final Summary summary;
+    private final String summary;
     private final Integer summaryCharacters;
-    private final Sort sort;
+    private final String sort;
     private final boolean highlight;
-    private final Print print;
+    private final String print;
     @Singular
     private final Collection<String> printFields;
     private final QueryType queryType;
@@ -55,7 +52,7 @@ class HodQueryRequestImpl implements HodQueryRequest {
     static class HodQueryRequestImplBuilder implements HodQueryRequestBuilder {
         private int start = DEFAULT_START;
         private int maxResults = DEFAULT_MAX_RESULTS;
-        private Print print = DEFAULT_PRINT;
+        private String print = DEFAULT_PRINT.name();
         private QueryType queryType = QueryType.MODIFIED;
     }
 }

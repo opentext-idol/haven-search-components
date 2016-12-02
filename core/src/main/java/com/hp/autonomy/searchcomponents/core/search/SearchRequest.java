@@ -52,6 +52,27 @@ public interface SearchRequest<Q extends QueryRestrictions<?>> {
     boolean isHighlight();
 
     /**
+     * The type of summary to generate
+     *
+     * @return The type of summary to generate
+     */
+    String getSummary();
+
+    /**
+     * The criterion by which to order the results
+     *
+     * @return The criterion by which to order the results
+     */
+    String getSort();
+
+    /**
+     * What to display in the document result output
+     *
+     * @return What to display in the document result output
+     */
+    String getPrint();
+
+    /**
      * The fields to display in the document result output if print is set to the 'PrintFields' option
      *
      * @return The fields to display in the document result output if print is set to the 'PrintFields' option
