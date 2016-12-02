@@ -6,7 +6,6 @@
 package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
 import com.autonomy.aci.client.services.AciService;
-import com.hp.autonomy.searchcomponents.idol.answer.system.AnswerServerSystemService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.answer.Answer;
 import com.hp.autonomy.types.idol.responses.answer.Answers;
@@ -23,16 +22,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AskAnswerServerServiceTest {
     @Mock
     private AciService answerServerAciService;
-    @Mock
-    private AnswerServerSystemService answerServerSystemService;
     @Mock
     private ProcessorFactory processorFactory;
     @Mock
@@ -48,20 +43,13 @@ public class AskAnswerServerServiceTest {
         responsedata.setAnswers(answers);
         when(answerServerAciService.executeAction(any(), any())).thenReturn(responsedata);
 
-        service = new AskAnswerServerServiceImpl(answerServerAciService, answerServerSystemService, processorFactory);
+        service = new AskAnswerServerServiceImpl(answerServerAciService, processorFactory);
     }
 
     @Test
     public void ask() {
         when(request.getSystemNames()).thenReturn(Collections.singleton("answerbank0"));
         assertThat(service.ask(request), not(empty()));
-        verify(answerServerSystemService, never()).getSystemNames();
-    }
-
-    @Test
-    public void askWithoutSystemNames() {
-        assertThat(service.ask(request), not(empty()));
-        verify(answerServerSystemService).getSystemNames();
     }
 
     @Test

@@ -8,7 +8,6 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.idol.answer.system.AnswerServerSystemService;
 import com.hp.autonomy.searchcomponents.idol.exceptions.IdolService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.answer.Answer;
@@ -19,7 +18,6 @@ import com.hp.autonomy.types.requests.idol.actions.answer.params.AskParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -34,31 +32,21 @@ import static com.hp.autonomy.searchcomponents.idol.exceptions.codes.IdolErrorCo
 @IdolService(ANSWER_SERVER)
 class AskAnswerServerServiceImpl implements AskAnswerServerService {
     private final AciService answerServerAciService;
-    private final AnswerServerSystemService answerServerSystemService;
     private final Processor<AskResponsedata> processor;
 
     @Autowired
     AskAnswerServerServiceImpl(final AciService answerServerAciService,
-                               final AnswerServerSystemService answerServerSystemService,
                                final ProcessorFactory processorFactory) {
         this.answerServerAciService = answerServerAciService;
-        this.answerServerSystemService = answerServerSystemService;
         processor = processorFactory.getResponseDataProcessor(AskResponsedata.class);
     }
 
     @SuppressWarnings("IfMayBeConditional")
     @Override
     public List<Answer> ask(final AskAnswerServerRequest request) {
-        final Collection<String> systemNames;
-        if (request.getSystemNames().isEmpty()) {
-            systemNames = answerServerSystemService.getSystemNames();
-        } else {
-            systemNames = request.getSystemNames();
-        }
-
         final AciParameters aciParameters = new AciParameters(AnswerServerActions.Ask.name());
         aciParameters.add(AskParams.Text.name(), request.getText());
-        aciParameters.add(AskParams.SystemNames.name(), String.join(",", systemNames));
+        aciParameters.add(AskParams.SystemNames.name(), String.join(",", request.getSystemNames()));
         aciParameters.add(AskParams.MaxResults.name(), request.getMaxResults());
 
         final Answers answers = answerServerAciService.executeAction(aciParameters, processor).getAnswers();
