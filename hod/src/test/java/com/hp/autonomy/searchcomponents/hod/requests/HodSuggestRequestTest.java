@@ -43,11 +43,11 @@ public class HodSuggestRequestTest extends SuggestRequestTest<HodQueryRestrictio
                         .build())
                 .start(1)
                 .maxResults(50)
-                .summary(Summary.concept)
+                .summary(Summary.concept.name())
                 .summaryCharacters(250)
-                .sort(Sort.relevance)
+                .sort(Sort.relevance.name())
                 .highlight(true)
-                .print(Print.fields)
+                .print(Print.fields.name())
                 .printField("CATEGORY")
                 .build();
     }

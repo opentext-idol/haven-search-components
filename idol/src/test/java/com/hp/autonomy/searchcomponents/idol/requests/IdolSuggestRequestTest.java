@@ -44,11 +44,11 @@ public class IdolSuggestRequestTest extends SuggestRequestTest<IdolQueryRestrict
                         .build())
                 .start(1)
                 .maxResults(50)
-                .summary(SummaryParam.Concept)
+                .summary(SummaryParam.Concept.name())
                 .summaryCharacters(250)
-                .sort(SortParam.Alphabetical)
+                .sort(SortParam.Alphabetical.name())
                 .highlight(true)
-                .print(PrintParam.Fields)
+                .print(PrintParam.Fields.name())
                 .printField("CATEGORY")
                 .build();
     }

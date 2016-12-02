@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.custom;
 
 import com.hp.autonomy.frontend.configuration.validation.Validator;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfig;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.Primary;
 import static com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService.DOCUMENT_FIELDS_SERVICE_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.core.test.TestUtils.CUSTOMISATION_TEST_ID;
 import static com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever.ACI_SERVICE_RETRIEVER_BEAN_NAME;
+import static com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable.ANSWER_SERVER_VALIDATOR_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable.QUERY_MANIPULATION_VALIDATOR_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.search.QueryExecutor.QUERY_EXECUTOR_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.search.QueryResponseParser.QUERY_RESPONSE_PARSER_BEAN_NAME;
@@ -50,6 +52,12 @@ public class IdolCustomComponentConfiguration {
     @Primary
     public Validator<QueryManipulation> customQueryManipulationValidator(@Qualifier(QUERY_MANIPULATION_VALIDATOR_BEAN_NAME) final Validator<QueryManipulation> queryManipulationValidator) {
         return queryManipulationValidator;
+    }
+
+    @Bean
+    @Primary
+    public Validator<AnswerServerConfig> customAnswerServerValidator(@Qualifier(ANSWER_SERVER_VALIDATOR_BEAN_NAME) final Validator<AnswerServerConfig> answerServerConfigValidator) {
+        return answerServerConfigValidator;
     }
 
     @Bean

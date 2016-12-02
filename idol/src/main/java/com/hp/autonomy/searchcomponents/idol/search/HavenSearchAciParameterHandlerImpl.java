@@ -97,13 +97,13 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
 
         aciParameters.add(QueryParams.Start.name(), searchRequest.getStart());
         aciParameters.add(QueryParams.MaxResults.name(), searchRequest.getMaxResults());
-        aciParameters.add(QueryParams.Summary.name(), searchRequest.getSummary());
+        aciParameters.add(QueryParams.Summary.name(), SummaryParam.fromValue(searchRequest.getSummary(), null));
         aciParameters.add(QueryParams.Characters.name(), searchRequest.getSummaryCharacters());
         aciParameters.add(QueryParams.Predict.name(), false);
         aciParameters.add(QueryParams.Sort.name(), searchRequest.getSort());
         aciParameters.add(QueryParams.TotalResults.name(), true);
         aciParameters.add(QueryParams.XMLMeta.name(), true);
-        addPrintParameters(aciParameters, searchRequest.getPrint(), searchRequest.getPrintFields());
+        addPrintParameters(aciParameters, PrintParam.fromValue(searchRequest.getPrint(), null), searchRequest.getPrintFields());
 
         if (searchRequest.isHighlight()) {
             aciParameters.add(QueryParams.Highlight.name(), HighlightParam.SummaryTerms);

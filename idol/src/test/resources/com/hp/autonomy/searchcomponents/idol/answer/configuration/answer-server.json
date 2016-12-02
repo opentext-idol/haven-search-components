@@ -1,0 +1,12 @@
+{
+  "server": {
+    "protocol": "HTTP",
+    "host": "localhost",
+    "port": 7700,
+    "productType": [
+      "ANSWERSERVER"
+    ]
+  },
+  "systemNames": ["answerbank0"],
+  "enabled": true
+}

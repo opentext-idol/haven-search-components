@@ -56,6 +56,30 @@ public interface SearchRequestBuilder<R extends SearchRequest<Q>, Q extends Quer
     B highlight(boolean highlight);
 
     /**
+     * Sets the type of summary to generate
+     *
+     * @param summary The type of summary to generate
+     * @return the builder (for chaining)
+     */
+    B summary(String summary);
+
+    /**
+     * Sets the criterion by which to order the results
+     *
+     * @param sort The criterion by which to order the results
+     * @return the builder (for chaining)
+     */
+    B sort(String sort);
+
+    /**
+     * Sets what to display in the document result output
+     *
+     * @param print What to display in the document result output
+     * @return the builder (for chaining)
+     */
+    B print(String print);
+
+    /**
      * Sets the fields to display in the document result output if print is set to the 'PrintFields' option
      *
      * @param printFields The fields to display in the document result output if print is set to the 'PrintFields' option

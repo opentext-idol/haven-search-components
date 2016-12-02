@@ -12,9 +12,6 @@ import com.hp.autonomy.searchcomponents.idol.search.IdolDocumentsService;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRequest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
-import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
-import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
-import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
@@ -34,11 +31,11 @@ class IdolQueryRequestImpl implements IdolQueryRequest {
     private final IdolQueryRestrictions queryRestrictions;
     private final int start;
     private final int maxResults;
-    private final SummaryParam summary;
+    private final String summary;
     private final Integer summaryCharacters;
-    private final SortParam sort;
+    private final String sort;
     private final boolean highlight;
-    private final PrintParam print;
+    private final String print;
     @Singular
     private final Collection<String> printFields;
     private final QueryRequest.QueryType queryType;
@@ -48,7 +45,7 @@ class IdolQueryRequestImpl implements IdolQueryRequest {
     static class IdolQueryRequestImplBuilder implements IdolQueryRequestBuilder {
         private int start = DEFAULT_START;
         private int maxResults = DEFAULT_MAX_RESULTS;
-        private PrintParam print = DEFAULT_PRINT;
+        private String print = DEFAULT_PRINT.name();
         private QueryRequest.QueryType queryType = QueryRequest.QueryType.MODIFIED;
     }
 }

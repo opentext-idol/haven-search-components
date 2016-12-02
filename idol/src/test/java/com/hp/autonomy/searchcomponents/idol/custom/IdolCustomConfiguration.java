@@ -55,6 +55,11 @@ class IdolCustomConfiguration {
     }
 
     @Bean
+    public AciService answerServerAciService(@Qualifier(ACI_SERVICE_BEAN_NAME) final AciService aciService, final ConfigService<IdolSearchCapable> configService) {
+        return mock(AciService.class);
+    }
+
+    @Bean
     public AciService aciService(final HttpClient httpClient) {
         return mock(AciService.class);
     }

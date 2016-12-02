@@ -18,6 +18,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryResults;
 import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
+import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.warning.HodWarning;
@@ -42,6 +43,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.DOCUMENTS_SERVICE_BEAN_NAME;
 
@@ -171,22 +173,23 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
     private QueryRequestBuilder setQueryParams(final HodSearchRequest searchRequest, final boolean setQueryProfile) {
         final String profileName = configService.getConfig().getQueryManipulation().getProfile();
 
+        final Print print = Optional.ofNullable(searchRequest.getPrint()).map(Print::valueOf).orElse(null);
         final QueryRequestBuilder queryRequestBuilder = new QueryRequestBuilder()
                 .setAbsoluteMaxResults(Math.min(searchRequest.getMaxResults(), HOD_MAX_RESULTS))
-                .setSummary(searchRequest.getSummary())
+                .setSummary(Optional.ofNullable(searchRequest.getSummary()).map(Summary::valueOf).orElse(null))
                 .setStart(searchRequest.getStart())
                 .setMaxPageResults(searchRequest.getMaxResults() - searchRequest.getStart() + 1)
                 .setTotalResults(true)
                 .setIndexes(searchRequest.getQueryRestrictions().getDatabases())
                 .setFieldText(searchRequest.getQueryRestrictions().getFieldText())
-                .setSort(searchRequest.getSort())
+                .setSort(Optional.ofNullable(searchRequest.getSort()).map(Sort::valueOf).orElse(null))
                 .setMinDate(searchRequest.getQueryRestrictions().getMinDate())
                 .setMaxDate(searchRequest.getQueryRestrictions().getMaxDate())
-                .setPrint(searchRequest.getPrint())
+                .setPrint(print)
                 .setMinScore(searchRequest.getQueryRestrictions().getMinScore())
                 .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
 
-        if (searchRequest.getPrint() == Print.fields) {
+        if (print == Print.fields) {
             queryRequestBuilder.setPrintFields(documentFieldsService.getPrintFields(searchRequest.getPrintFields()));
         }
 

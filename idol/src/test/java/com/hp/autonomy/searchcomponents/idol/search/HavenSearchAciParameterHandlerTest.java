@@ -84,10 +84,10 @@ public class HavenSearchAciParameterHandlerTest {
     public void addSearchOutputParameters() {
         when(searchRequest.getStart()).thenReturn(1);
         when(searchRequest.getMaxResults()).thenReturn(50);
-        when(searchRequest.getSummary()).thenReturn(SummaryParam.Concept);
+        when(searchRequest.getSummary()).thenReturn(SummaryParam.Concept.name());
         when(searchRequest.getSummaryCharacters()).thenReturn(250);
         when(searchRequest.isHighlight()).thenReturn(true);
-        when(searchRequest.getPrint()).thenReturn(PrintParam.Fields);
+        when(searchRequest.getPrint()).thenReturn(PrintParam.Fields.name());
         when(searchRequest.getPrintFields()).thenReturn(Arrays.asList("CATEGORY", "REFERENCE"));
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
         assertThat(aciParameters, hasSize(14));
