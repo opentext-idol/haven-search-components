@@ -5,20 +5,17 @@
 
 package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
-import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.google.common.collect.ImmutableMap;
-import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
-import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
+import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
+import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsService;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
-import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.FlatField;
 import com.hp.autonomy.types.idol.responses.GetQueryTagValuesResponseData;
@@ -31,7 +28,6 @@ import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
-import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -40,6 +36,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.OngoingStubbing;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -82,7 +79,13 @@ public class IdolParametricValuesServiceTest {
     private HavenSearchAciParameterHandler parameterHandler;
 
     @Mock
-    private FieldsService<IdolFieldsRequest, AciErrorException> fieldsService;
+    private IdolFieldsService fieldsService;
+
+    @Mock
+    private ObjectFactory<IdolFieldsRequestBuilder> fieldsRequestBuilderFactory;
+
+    @Mock
+    private IdolFieldsRequestBuilder fieldsRequestBuilder;
 
     @Autowired
     private BucketingParamsHelper bucketingParamsHelper;
@@ -104,7 +107,9 @@ public class IdolParametricValuesServiceTest {
     @SuppressWarnings("CastToConcreteClass")
     @Before
     public void setUp() {
-        parametricValuesService = new IdolParametricValuesService(parameterHandler, fieldsService, bucketingParamsHelper, aciServiceRetriever, aciResponseProcessorFactory);
+        when(fieldsRequestBuilderFactory.getObject()).thenReturn(fieldsRequestBuilder);
+
+        parametricValuesService = new IdolParametricValuesServiceImpl(parameterHandler, fieldsService, fieldsRequestBuilderFactory, bucketingParamsHelper, aciServiceRetriever, aciResponseProcessorFactory);
 
         when(aciServiceRetriever.getAciService(any(QueryRequest.QueryType.class))).thenReturn(contentAciService);
     }
@@ -123,7 +128,7 @@ public class IdolParametricValuesServiceTest {
     public void getFieldNamesFirst() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
-        when(fieldsService.getFields(any(IdolFieldsRequest.class), eq(FieldTypeParam.Parametric))).thenReturn(ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(new TagName("CATEGORY"))));
+        when(fieldsService.getFields(any(), eq(FieldTypeParam.Parametric))).thenReturn(ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(new TagName("CATEGORY"))));
 
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
@@ -137,7 +142,7 @@ public class IdolParametricValuesServiceTest {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
         final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptyList());
-        when(fieldsService.getFields(any(IdolFieldsRequest.class), any(FieldTypeParam.class))).thenReturn(response);
+        when(fieldsService.getFields(any(), any(FieldTypeParam.class))).thenReturn(response);
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(new GetTagNamesResponseData());
 
         final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
@@ -245,7 +250,7 @@ public class IdolParametricValuesServiceTest {
     public void getDependentValuesFieldNamesFirst() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
-        when(fieldsService.getFields(any(IdolFieldsRequest.class), eq(FieldTypeParam.Parametric))).thenReturn(ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(new TagName("CATEGORY"))));
+        when(fieldsService.getFields(any(), eq(FieldTypeParam.Parametric))).thenReturn(ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(new TagName("CATEGORY"))));
 
         final GetQueryTagValuesResponseData responseData = mockRecursiveResponse();
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
@@ -259,33 +264,31 @@ public class IdolParametricValuesServiceTest {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
         final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptyList());
-        when(fieldsService.getFields(any(IdolFieldsRequest.class), any(FieldTypeParam.class))).thenReturn(response);
+        when(fieldsService.getFields(any(), any(FieldTypeParam.class))).thenReturn(response);
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(new GetTagNamesResponseData());
 
         final Collection<RecursiveField> results = parametricValuesService.getDependentParametricValues(idolParametricRequest);
         assertThat(results, is(empty()));
     }
 
-    private IdolParametricRequest mockRequest(final Collection<String> fieldNames) {
-        final QueryRestrictions<String> queryRestrictions = IdolQueryRestrictions.builder()
-                .queryText("*")
-                .fieldText("")
-                .databases(Collections.emptyList())
-                .build();
-        return IdolParametricRequest.builder()
-                .fieldNames(fieldNames)
-                .queryRestrictions(queryRestrictions)
-                .maxValues(30)
-                .sort(SortParam.DocumentCount)
-                .modified(true)
-                .build();
+    private IdolParametricRequest mockRequest(final List<String> fieldNames) {
+        final IdolParametricRequest parametricRequest = mock(IdolParametricRequest.class);
+        when(parametricRequest.getFieldNames()).thenReturn(fieldNames);
+
+        final IdolParametricRequestBuilder parametricRequestBuilder = mock(IdolParametricRequestBuilder.class);
+        when(parametricRequestBuilder.maxValues(any())).thenReturn(parametricRequestBuilder);
+        when(parametricRequestBuilder.ranges(any())).thenReturn(parametricRequestBuilder);
+        when(parametricRequest.toBuilder()).thenReturn(parametricRequestBuilder);
+        when(parametricRequestBuilder.build()).thenReturn(parametricRequest);
+
+        return parametricRequest;
     }
 
     private GetQueryTagValuesResponseData mockQueryResponse() {
         final GetQueryTagValuesResponseData responseData = new GetQueryTagValuesResponseData();
         final FlatField field = new FlatField();
         field.getName().add("Some name");
-        when(element.getName()).thenReturn(new QName("", IdolParametricValuesService.VALUE_NODE_NAME));
+        when(element.getName()).thenReturn(new QName("", IdolParametricValuesServiceImpl.VALUE_NODE_NAME));
         final TagValue tagValue = mockTagValue("Some field", 5);
         when(element.getValue()).thenReturn(tagValue);
         field.getValueAndSubvalueOrValues().add(element);
@@ -309,10 +312,10 @@ public class IdolParametricValuesServiceTest {
         when(flatField.getTotalValues()).thenReturn(totalValues);
 
         final List<JAXBElement<? extends Serializable>> values = new LinkedList<>();
-        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_MIN_NODE_NAME, min));
-        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_MAX_NODE_NAME, max));
-        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_SUM_NODE_NAME, sum));
-        values.add(mockJAXBElement(IdolParametricValuesService.VALUE_AVERAGE_NODE_NAME, average));
+        values.add(mockJAXBElement(IdolParametricValuesServiceImpl.VALUE_MIN_NODE_NAME, min));
+        values.add(mockJAXBElement(IdolParametricValuesServiceImpl.VALUE_MAX_NODE_NAME, max));
+        values.add(mockJAXBElement(IdolParametricValuesServiceImpl.VALUE_SUM_NODE_NAME, sum));
+        values.add(mockJAXBElement(IdolParametricValuesServiceImpl.VALUE_AVERAGE_NODE_NAME, average));
 
         when(flatField.getValueAndSubvalueOrValues()).thenReturn(values);
         return flatField;
@@ -320,8 +323,8 @@ public class IdolParametricValuesServiceTest {
 
     private void mockBucketResponses(final int count, final TagValue... tagValues) {
         when(element.getName()).thenReturn(
-                new QName("", IdolParametricValuesService.VALUES_NODE_NAME),
-                new QName("", IdolParametricValuesService.VALUE_NODE_NAME)
+                new QName("", IdolParametricValuesServiceImpl.VALUES_NODE_NAME),
+                new QName("", IdolParametricValuesServiceImpl.VALUE_NODE_NAME)
         );
 
         OngoingStubbing<Serializable> stub = when(element.getValue()).thenReturn(count);

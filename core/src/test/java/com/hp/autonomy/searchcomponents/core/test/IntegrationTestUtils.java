@@ -6,36 +6,41 @@
 package com.hp.autonomy.searchcomponents.core.test;
 
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequestBuilder;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.types.requests.Documents;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.Serializable;
-import java.util.List;
-
-public abstract class IntegrationTestUtils<S extends Serializable, D extends SearchResult, E extends Exception> {
+@SuppressWarnings("SpringJavaAutowiringInspection")
+public abstract class IntegrationTestUtils<Q extends QueryRestrictions<?>, D extends SearchResult, E extends Exception> {
     @Autowired
-    protected DocumentsService<S, D, E> documentsService;
+    protected DocumentsService<? extends QueryRequest<Q>, ?, ?, Q, D, E> documentsService;
 
     @Autowired
-    protected TestUtils<S> testUtils;
+    protected ObjectFactory<QueryRequestBuilder<? extends QueryRequest<Q>, Q, ?>> queryRequestBuilderFactory;
 
-    public List<S> getDatabases() {
-        return testUtils.getDatabases();
-    }
+    @Autowired
+    protected TestUtils<Q> testUtils;
 
-    public QueryRestrictions<S> buildQueryRestrictions() {
+    public Q buildQueryRestrictions() {
         return testUtils.buildQueryRestrictions();
     }
 
+    public <RC extends GetContentRequest<?>> RC buildGetContentRequest(final String reference) {
+        return testUtils.buildGetContentRequest(reference);
+    }
+
     public String getValidReference() throws E {
-        final QueryRestrictions<S> queryRestrictions = buildQueryRestrictions();
-        final QueryRequest<S> queryRequest = QueryRequest.<S>builder()
+        final Q queryRestrictions = buildQueryRestrictions();
+        final QueryRequest<Q> queryRequest = queryRequestBuilderFactory.getObject()
                 .queryRestrictions(queryRestrictions)
                 .build();
-        final Documents<D> documents = documentsService.queryTextIndex(queryRequest);
+        @SuppressWarnings("unchecked")
+        final Documents<D> documents = ((DocumentsService<QueryRequest<Q>, ?, ?, Q, D, E>) documentsService).queryTextIndex(queryRequest);
         return documents.getDocuments().get(0).getReference();
     }
 }

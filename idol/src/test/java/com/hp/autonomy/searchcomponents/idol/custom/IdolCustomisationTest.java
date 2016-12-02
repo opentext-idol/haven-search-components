@@ -5,15 +5,14 @@
 
 package com.hp.autonomy.searchcomponents.idol.custom;
 
-import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
-import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
-import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequest;
-import com.hp.autonomy.types.idol.responses.Database;
+import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesService;
+import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictionsBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +28,10 @@ import static org.junit.Assert.assertNull;
 public class IdolCustomisationTest {
     @Autowired
     @Qualifier("customDatabaseService")
-    private DatabasesService<Database, IdolDatabasesRequest, AciErrorException> customDatabaseService;
+    private IdolDatabasesService customDatabaseService;
+    @Autowired
+    @Qualifier("customQueryRestrictionsBuilder")
+    private ObjectFactory<IdolQueryRestrictionsBuilder> customQueryRestrictionsBuilderFactory;
     @Autowired
     @Qualifier("customDocumentFieldsService")
     private DocumentFieldsService customDocumentFieldsService;
@@ -40,6 +42,7 @@ public class IdolCustomisationTest {
     @Test
     public void initialiseWithCustomConfiguration() {
         assertNotNull(customDatabaseService);
+        assertNotNull(customQueryRestrictionsBuilderFactory.getObject());
         assertNotNull(customDocumentFieldsService);
         assertNull(contentAciService.executeAction(null, null)); // verify it is a mock
     }

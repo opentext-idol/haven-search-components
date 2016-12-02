@@ -8,9 +8,10 @@ package com.hp.autonomy.searchcomponents.idol.view;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.view.AbstractViewServerServiceIT;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
+import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class)
-public class IdolViewServerServiceIT extends AbstractViewServerServiceIT<IdolViewRequest, String, IdolSearchResult, AciErrorException> {
+public class IdolViewServerServiceIT extends AbstractViewServerServiceIT<IdolViewRequest, IdolQueryRestrictions, String, IdolSearchResult, AciErrorException> {
 }

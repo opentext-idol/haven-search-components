@@ -6,39 +6,14 @@
 package com.hp.autonomy.searchcomponents.hod.languages;
 
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
-import com.hp.autonomy.types.idol.responses.LanguageType;
-import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.hp.autonomy.searchcomponents.core.languages.LanguagesService.LANGUAGES_SERVICE_BEAN_NAME;
-import static com.hp.autonomy.searchcomponents.hod.languages.HodLanguageConstants.THE_LANGUAGE;
 
 /**
- * Default HoD implementation of {@link LanguagesService}: HoD only supports English
+ * HoD extension to {@link LanguagesService}
  */
-@Service(LANGUAGES_SERVICE_BEAN_NAME)
-class HodLanguagesService implements LanguagesService {
-    @Override
-    public Map<String, LanguageType> getLanguages() {
-        final LanguageType theLanguage = new LanguageType();
-        theLanguage.setName(THE_LANGUAGE);
-        theLanguage.setLanguage(THE_LANGUAGE);
-        theLanguage.setDocuments(10);
-
-        final Map<String, LanguageType> languages = new HashMap<>(1);
-        languages.put(THE_LANGUAGE, theLanguage);
-        return languages;
-    }
-
-    @Override
-    public String getDefaultLanguageId() {
-        return THE_LANGUAGE;
-    }
-
-    @Override
-    public boolean isValidLanguage(final String language) {
-        return language.equals(THE_LANGUAGE);
-    }
+@SuppressWarnings("WeakerAccess")
+public interface HodLanguagesService extends LanguagesService {
+    /**
+     * The only language supported by HoD
+     */
+    String THE_LANGUAGE = "English";
 }

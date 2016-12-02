@@ -29,7 +29,7 @@ public class HodTypeAheadServiceTest {
 
     @Before
     public void setUp() {
-        typeAheadService = new HodTypeAheadService(autocompleteService);
+        typeAheadService = new HodTypeAheadServiceImpl(autocompleteService);
     }
 
     @Test

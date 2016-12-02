@@ -56,6 +56,9 @@ public class IdolViewServerServiceTest {
     @Mock
     private ViewCapable viewCapableConfig;
 
+    @Mock
+    private IdolViewRequest request;
+
     private IdolViewServerService idolViewServerService;
 
     @Before
@@ -64,19 +67,16 @@ public class IdolViewServerServiceTest {
         when(viewCapableConfig.getViewConfig()).thenReturn(viewConfig);
         when(configService.getConfig()).thenReturn(viewCapableConfig);
 
-        idolViewServerService = new IdolViewServerService(contentAciService, viewAciService, processorFactory, parameterHandler, configService);
+        when(request.getDocumentReference()).thenReturn("dede952d-8a4d-4f54-ac1f-5187bf10a744");
+        when(request.getHighlightExpression()).thenReturn("SomeText");
+
+        idolViewServerService = new IdolViewServerServiceImpl(contentAciService, viewAciService, processorFactory, parameterHandler, configService);
     }
 
     @Test
-    public void viewDocument() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException {
+    public void viewDocument() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException, IOException {
         final GetContentResponseData responseData = mockResponseData();
         when(contentAciService.executeAction(any(AciParameters.class), any())).thenReturn(responseData);
-
-        final IdolViewRequest request = IdolViewRequest.builder()
-                .documentReference("dede952d-8a4d-4f54-ac1f-5187bf10a744")
-                .database("SomeDatabase")
-                .highlightExpression("SomeText")
-                .build();
         idolViewServerService.viewDocument(request, mock(OutputStream.class));
 
         verify(parameterHandler).addViewParameters(any(), eq("http://en.wikipedia.org/wiki/Car"), any());
@@ -89,31 +89,25 @@ public class IdolViewServerServiceTest {
     }
 
     @Test(expected = ReferenceFieldBlankException.class)
-    public void noReference() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException {
+    public void noReference() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException, IOException {
         when(viewCapableConfig.getViewConfig()).thenReturn(ViewConfig.builder().build());
-        idolViewServerService.viewDocument(IdolViewRequest.builder().build(), mock(OutputStream.class));
+        idolViewServerService.viewDocument(mock(IdolViewRequest.class), mock(OutputStream.class));
     }
 
     @Test(expected = ViewDocumentNotFoundException.class)
-    public void errorGettingContent() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException {
+    public void errorGettingContent() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException, IOException {
         when(contentAciService.executeAction(any(AciParameters.class), any(Processor.class))).thenThrow(new AciErrorException());
-        final IdolViewRequest request = IdolViewRequest.builder()
-                .documentReference("dede952d-8a4d-4f54-ac1f-5187bf10a744")
-                .build();
         idolViewServerService.viewDocument(request, mock(OutputStream.class));
     }
 
     @Test(expected = ViewDocumentNotFoundException.class)
-    public void noDocumentFound() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException {
+    public void noDocumentFound() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException, IOException {
         when(contentAciService.executeAction(any(AciParameters.class), any())).thenReturn(new GetContentResponseData());
-        final IdolViewRequest request = IdolViewRequest.builder()
-                .documentReference("dede952d-8a4d-4f54-ac1f-5187bf10a744")
-                .build();
         idolViewServerService.viewDocument(request, mock(OutputStream.class));
     }
 
     @Test(expected = ViewNoReferenceFieldException.class)
-    public void noMatchingField() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException {
+    public void noMatchingField() throws ViewNoReferenceFieldException, ViewDocumentNotFoundException, ReferenceFieldBlankException, IOException {
         final QueryResponse responseData = new GetContentResponseData();
 
         final Hit hit = new Hit();
@@ -130,22 +124,15 @@ public class IdolViewServerServiceTest {
         when(node.getChildNodes()).thenReturn(childNodes);
 
         when(contentAciService.executeAction(any(AciParameters.class), any())).thenReturn(responseData);
-        final IdolViewRequest request = IdolViewRequest.builder()
-                .documentReference("dede952d-8a4d-4f54-ac1f-5187bf10a744")
-                .build();
         idolViewServerService.viewDocument(request, mock(OutputStream.class));
     }
 
     @Test(expected = ViewServerErrorException.class)
-    public void viewServer404() {
+    public void viewServer404() throws IOException {
         final GetContentResponseData responseData = mockResponseData();
         when(contentAciService.executeAction(any(AciParameters.class), any())).thenReturn(responseData);
         when(viewAciService.executeAction(any(AciParameters.class), any(Processor.class))).thenThrow(new AciServiceException());
 
-        final IdolViewRequest request = IdolViewRequest.builder()
-                .documentReference("dede952d-8a4d-4f54-ac1f-5187bf10a744")
-                .database("SomeDatabase")
-                .build();
         idolViewServerService.viewDocument(request, mock(OutputStream.class));
     }
 

@@ -8,12 +8,13 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.search.AbstractDocumentServiceIT;
 import com.hp.autonomy.searchcomponents.core.search.AutoCorrectException;
-import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Collections;
@@ -22,8 +23,12 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class)
-public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<String, IdolSearchResult, AciErrorException> {
+public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<IdolQueryRequest, IdolSuggestRequest, IdolGetContentRequest, IdolQueryRestrictions, IdolSearchResult, AciErrorException> {
+    @Autowired
+    private ObjectFactory<IdolQueryRestrictionsBuilder> queryRestrictionsBuilder;
+
     @Test
     public void getStateTokenAndResultCount() {
         final StateTokenAndResultCount stateTokenAndResultCount = documentsService.getStateTokenAndResultCount(integrationTestUtils.buildQueryRestrictions(), 3, false);
@@ -37,11 +42,11 @@ public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<String, Ido
 
     @Test(expected = AutoCorrectException.class)
     public void queryWithInvalidAutoCorrect() throws AciErrorException {
-        final QueryRequest<String> queryRequest = QueryRequest.<String>builder()
-                .queryRestrictions(IdolQueryRestrictions.builder()
+        final IdolQueryRequest queryRequest = queryRequestBuilderFactory.getObject()
+                .queryRestrictions(queryRestrictionsBuilder.getObject()
                         .queryText("XORApple")
                         .fieldText("")
-                        .databases(integrationTestUtils.getDatabases())
+                        .databases(integrationTestUtils.buildQueryRestrictions().getDatabases())
                         .minDate(null)
                         .maxDate(DateTime.now())
                         .minScore(0)

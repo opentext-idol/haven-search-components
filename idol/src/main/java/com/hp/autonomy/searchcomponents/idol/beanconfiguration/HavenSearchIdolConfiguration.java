@@ -14,11 +14,13 @@ import com.autonomy.aci.client.transport.impl.AciHttpClientImpl;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.aci.AbstractConfigurableAciService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
+import com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfig;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.types.idol.marshalling.Jaxb2ParsingConfiguration;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hpe.bigdata.frontend.spring.authentication.SpringSecurityAuthenticationInformationRetriever;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -63,6 +65,12 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
      * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
      */
     public static final String VIEW_ACI_SERVICE_BEAN_NAME = "viewAciService";
+
+    /**
+     * The bean name of the root {@link AciService} used for queries against AnswerServer.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    public static final String ANSWER_SERVER_ACI_SERVICE_BEAN_NAME = "answerServerAciService";
 
     /**
      * The bean name of the root {@link AciService} used for Idol validation checks.
@@ -138,6 +146,24 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
             @Override
             public AciServerDetails getServerDetails() {
                 return configService.getConfig().getViewConfig().toAciServerDetails();
+            }
+        };
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(name = ANSWER_SERVER_ACI_SERVICE_BEAN_NAME)
+    public AciService answerServerAciService(@Qualifier(ACI_SERVICE_BEAN_NAME)
+                                           final AciService aciService,
+                                           final ConfigService<C> configService) {
+        return new AbstractConfigurableAciService(aciService) {
+            @Override
+            public AciServerDetails getServerDetails() {
+                final AnswerServerConfig answerServerConfig = configService.getConfig().getAnswerServer();
+                if (answerServerConfig == null || BooleanUtils.isFalse(answerServerConfig.getEnabled())) {
+                    throw new IllegalStateException("Attempted to contact AnswerServer but AnswerServer is not configured");
+                }
+
+                return answerServerConfig.toAciServerDetails();
             }
         };
     }

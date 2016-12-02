@@ -28,6 +28,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -39,14 +40,14 @@ public class HodFieldsServiceTest {
 
     @Before
     public void setUp() {
-        fieldsService = new HodFieldsService(retrieveIndexFieldsService);
+        fieldsService = new HodFieldsServiceImpl(retrieveIndexFieldsService);
     }
 
     @Test
     public void getFields() throws HodErrorException {
         final RetrieveIndexFieldsResponse response = new RetrieveIndexFieldsResponse.Builder().setParametricTypeFields(Collections.singletonList(new TagName("CATEGORY"))).build();
         when(retrieveIndexFieldsService.retrieveIndexFields(anyListOf(ResourceIdentifier.class), any(RetrieveIndexFieldsRequestBuilder.class))).thenReturn(response);
-        final Map<FieldTypeParam, List<TagName>> results = fieldsService.getFields(HodFieldsRequest.builder().database(ResourceIdentifier.WIKI_ENG).maxValues(null).build(), FieldTypeParam.Parametric);
+        final Map<FieldTypeParam, List<TagName>> results = fieldsService.getFields(mock(HodFieldsRequest.class), FieldTypeParam.Parametric);
         assertThat(results.get(FieldTypeParam.Parametric), is(not(empty())));
     }
 }

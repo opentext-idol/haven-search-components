@@ -5,26 +5,22 @@
 
 package com.hp.autonomy.searchcomponents.hod.databases;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesRequest;
-import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
-import lombok.Builder;
-import lombok.Data;
 
 /**
- * Options for interacting with HoD implementation of {@link DatabasesService}
+ * Options for interacting with {@link HodDatabasesService}
  */
-@SuppressWarnings("WeakerAccess")
-@Data
-@Builder(toBuilder = true)
-@JsonDeserialize(builder = HodDatabasesRequest.HodDatabasesRequestBuilder.class)
-public class HodDatabasesRequest implements DatabasesRequest {
-    private static final long serialVersionUID = 3450911770365743948L;
+public interface HodDatabasesRequest extends DatabasesRequest {
+    /**
+     * Whether to return public indexes as well as private indexes
+     *
+     * @return Whether to return public indexes as well as private indexes
+     */
+    boolean isPublicIndexesEnabled();
 
-    private final boolean publicIndexesEnabled;
-
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class HodDatabasesRequestBuilder implements DatabasesRequest.DatabasesRequestBuilder {
-    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HodDatabasesRequestBuilder toBuilder();
 }

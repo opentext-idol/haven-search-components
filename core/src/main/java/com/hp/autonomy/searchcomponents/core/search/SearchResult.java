@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.core.search;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
+import com.hp.autonomy.searchcomponents.core.requests.RequestObjectBuilder;
 import org.joda.time.DateTime;
 
 /**
@@ -65,7 +66,7 @@ public interface SearchResult extends RequestObject<SearchResult, SearchResult.S
     /**
      * Builder
      */
-    interface SearchResultBuilder extends RequestObject.RequestObjectBuilder<SearchResult, SearchResultBuilder> {
+    interface SearchResultBuilder extends RequestObjectBuilder<SearchResult, SearchResultBuilder> {
         /**
          * Sets the document reference
          *

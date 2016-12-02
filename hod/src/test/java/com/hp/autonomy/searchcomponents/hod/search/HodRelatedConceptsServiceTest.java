@@ -5,13 +5,9 @@
 
 package com.hp.autonomy.searchcomponents.hod.search;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Entity;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindRelatedConceptsService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
-import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
-import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,23 +27,24 @@ public class HodRelatedConceptsServiceTest {
     private AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationRetriever;
     @Mock
     private HodAuthenticationPrincipal principal;
+    @Mock
+    private HodRelatedConceptsRequest request;
+    @Mock
+    private HodQueryRestrictions queryRestrictions;
 
-    private RelatedConceptsService<Entity, ResourceIdentifier, HodErrorException> relatedConceptsService;
+    private HodRelatedConceptsService relatedConceptsService;
 
     @Before
     public void setUp() {
         when(authenticationRetriever.getPrincipal()).thenReturn(principal);
 
-        relatedConceptsService = new HodRelatedConceptsService(findRelatedConceptsService, authenticationRetriever);
+        relatedConceptsService = new HodRelatedConceptsServiceImpl(findRelatedConceptsService, authenticationRetriever);
     }
 
     @Test
     public void findRelatedConcepts() throws HodErrorException {
-        final RelatedConceptsRequest<ResourceIdentifier> relatedConceptsRequest = HodRelatedConceptsRequest.<ResourceIdentifier>builder()
-                .queryRestrictions(HodQueryRestrictions.builder()
-                        .build())
-                .build();
-        relatedConceptsService.findRelatedConcepts(relatedConceptsRequest);
+        when(request.getQueryRestrictions()).thenReturn(queryRestrictions);
+        relatedConceptsService.findRelatedConcepts(request);
         verify(findRelatedConceptsService).findRelatedConceptsWithText(any(), any());
     }
 }

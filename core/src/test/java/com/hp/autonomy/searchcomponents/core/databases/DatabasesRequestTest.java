@@ -7,5 +7,5 @@ package com.hp.autonomy.searchcomponents.core.databases;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObjectTest;
 
-public abstract class DatabasesRequestTest extends RequestObjectTest<DatabasesRequest, DatabasesRequest.DatabasesRequestBuilder> {
+public abstract class DatabasesRequestTest extends RequestObjectTest<DatabasesRequest, DatabasesRequestBuilder<?>> {
 }

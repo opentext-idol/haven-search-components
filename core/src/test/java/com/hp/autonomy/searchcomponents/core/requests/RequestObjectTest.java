@@ -16,7 +16,7 @@ import static org.junit.Assert.assertFalse;
  * @param <O> the request object type
  * @param <B> the request object builder type
  */
-public abstract class RequestObjectTest<O extends RequestObject<O, B>, B extends RequestObject.RequestObjectBuilder<O, B>>
+public abstract class RequestObjectTest<O extends RequestObject<O, B>, B extends RequestObjectBuilder<O, B>>
         extends SimpleRequestObjectTest<O> {
     @SuppressWarnings("ObjectEquality")
     @Test

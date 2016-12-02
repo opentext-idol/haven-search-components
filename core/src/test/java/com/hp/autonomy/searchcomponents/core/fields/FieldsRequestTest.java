@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.core.fields;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObjectTest;
 
-public abstract class FieldsRequestTest extends RequestObjectTest<FieldsRequest, FieldsRequest.FieldsRequestBuilder<?>> {
+public abstract class FieldsRequestTest extends RequestObjectTest<FieldsRequest, FieldsRequestBuilder<?, ?>> {
     @Override
     protected String toStringContent() {
         return "maxValues";

@@ -11,10 +11,10 @@ import com.hp.autonomy.searchcomponents.hod.beanconfiguration.HavenSearchHodConf
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = HavenSearchHodConfiguration.class)
-public class HodDatabasesServiceIT extends AbstractDatabasesServiceIT<Database, HodDatabasesRequest, HodErrorException> {
+public class HodDatabasesServiceIT extends AbstractDatabasesServiceIT<Database, HodDatabasesRequest, HodDatabasesRequestBuilder, HodErrorException> {
     @Override
     protected HodDatabasesRequest createDatabasesRequest() {
-        return HodDatabasesRequest.builder()
+        return databasesRequestBuilderFactory.getObject()
                 .publicIndexesEnabled(true)
                 .build();
     }

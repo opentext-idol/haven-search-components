@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.databases;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.transport.AciParameter;
+import com.hp.autonomy.searchcomponents.core.databases.DatabasesRequest;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.Database;
 import com.hp.autonomy.types.idol.responses.Databases;
@@ -24,6 +25,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -38,7 +40,7 @@ public class IdolDatabasesServiceTest {
 
     @Before
     public void setUp() {
-        idolDatabasesService = new IdolDatabasesService(contentAciService, processorFactory);
+        idolDatabasesService = new IdolDatabasesServiceImpl(contentAciService, processorFactory);
     }
 
     @Test
@@ -51,7 +53,7 @@ public class IdolDatabasesServiceTest {
         responseData.setDatabases(databases);
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
 
-        final Set<Database> results = idolDatabasesService.getDatabases(new IdolDatabasesRequest());
+        final Set<Database> results = idolDatabasesService.getDatabases(mock(IdolDatabasesRequest.class));
         assertThat(results, hasSize(1));
     }
 

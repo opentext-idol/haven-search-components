@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.hod.databases;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
+import com.hp.autonomy.searchcomponents.core.requests.RequestObjectBuilder;
 import com.hp.autonomy.types.IdolDatabase;
 import lombok.Builder;
 import lombok.Data;
@@ -28,5 +29,5 @@ public final class Database implements IdolDatabase, Comparable<Database>, Reque
         return name.compareTo(other.name);
     }
 
-    public static class DatabaseBuilder implements RequestObject.RequestObjectBuilder<Database, DatabaseBuilder> {}
+    public static class DatabaseBuilder implements RequestObjectBuilder<Database, DatabaseBuilder> {}
 }

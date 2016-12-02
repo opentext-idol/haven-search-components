@@ -6,16 +6,17 @@
 package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
 import com.autonomy.aci.client.services.AciErrorException;
-import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametricValuesServiceIT;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
+import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
+import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class)
-public class IdolParametricValuesServiceIT extends AbstractParametricValuesServiceIT<IdolParametricRequest, IdolFieldsRequest, IdolFieldsRequest.IdolFieldsRequestBuilder, String, AciErrorException> {
+public class IdolParametricValuesServiceIT extends AbstractParametricValuesServiceIT<IdolParametricRequest, IdolFieldsRequest, IdolFieldsRequestBuilder, IdolQueryRestrictions, AciErrorException> {
     @Override
-    protected FieldsRequest.FieldsRequestBuilder<IdolFieldsRequest> fieldsRequestParams(final IdolFieldsRequest.IdolFieldsRequestBuilder fieldsRequestBuilder) {
+    protected IdolFieldsRequestBuilder fieldsRequestParams(final IdolFieldsRequestBuilder fieldsRequestBuilder) {
         return fieldsRequestBuilder;
     }
 }

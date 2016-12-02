@@ -5,28 +5,12 @@
 
 package com.hp.autonomy.searchcomponents.core.search;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.hp.autonomy.searchcomponents.core.requests.SimpleRequestObjectTest;
+import com.hp.autonomy.searchcomponents.core.requests.RequestObjectTest;
 
-import java.io.IOException;
-import java.util.Collections;
+import java.io.Serializable;
 
-public class GetContentRequestIndexTest extends SimpleRequestObjectTest<GetContentRequestIndex<String>> {
-    @Override
-    protected GetContentRequestIndex<String> constructObject() {
-        return new GetContentRequestIndex<>("Database1", Collections.singleton("Reference1"));
-    }
-
-    @Override
-    protected String json() throws IOException {
-        return "{\"index\": \"Database1\", \"references\": [\"Reference1\"]}";
-    }
-
-    @Override
-    protected Object readJson() throws IOException {
-        return objectMapper.readValue(json(), new TypeReference<GetContentRequestIndex<String>>() {});
-    }
-
+public abstract class GetContentRequestIndexTest<S extends Serializable>
+        extends RequestObjectTest<GetContentRequestIndex<S>, GetContentRequestIndexBuilder<?, S, ?>> {
     @Override
     protected String toStringContent() {
         return "references";

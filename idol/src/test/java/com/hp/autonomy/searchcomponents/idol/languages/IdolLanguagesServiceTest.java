@@ -53,7 +53,7 @@ public class IdolLanguagesServiceTest {
         when(aciResponseProcessorFactory.getResponseDataProcessor(GetStatusResponseData.class)).thenReturn(getStatusProcessor);
         when(aciResponseProcessorFactory.getResponseDataProcessor(LanguageSettingsResponseData.class)).thenReturn(languageSettingsProcessor);
         
-        idolLanguagesService = new IdolLanguagesService(contentAciService, aciResponseProcessorFactory);
+        idolLanguagesService = new IdolLanguagesServiceImpl(contentAciService, aciResponseProcessorFactory);
     }
 
     @Test

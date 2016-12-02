@@ -26,6 +26,12 @@ public interface DatabasesService<D extends IdolDatabase, R extends DatabasesReq
     String DATABASES_SERVICE_BEAN_NAME = "databasesService";
 
     /**
+     * The bean name of the default request builder implementation.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    String DATABASES_REQUEST_BUILDER_BEAN_NAME = "databasesRequestBuilder";
+
+    /**
      * Retrieves the details of the databases in the platform
      *
      * @param request options

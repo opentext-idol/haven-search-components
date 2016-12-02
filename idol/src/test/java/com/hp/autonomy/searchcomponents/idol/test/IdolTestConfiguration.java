@@ -7,7 +7,9 @@ package com.hp.autonomy.searchcomponents.idol.test;
 
 import com.autonomy.aci.client.transport.AciServerDetails;
 import com.hp.autonomy.frontend.configuration.ConfigService;
+import com.hp.autonomy.frontend.configuration.server.ServerConfig;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
+import com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfig;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
@@ -21,13 +23,25 @@ import org.springframework.core.env.Environment;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("WeakerAccess")
 @Configuration
 @ConditionalOnProperty(value = "mock.configuration", matchIfMissing = true)
 public class IdolTestConfiguration {
-    private static final String DEFAULT_IDOL_HOST = "ida-idol";
-    private static final int DEFAULT_CONTENT_PORT = 9000;
-    private static final int DEFAULT_VIEW_SERVER_PORT = 9080;
-    private static final String REFERENCE_FIELD_NAME = "DREREFERENCE";
+    public static final String CONTENT_HOST_PROPERTY = "test.content.host";
+    public static final String CONTENT_HOST = "ida-idol";
+    public static final String CONTENT_PORT_PROPERTY = "test.content.port";
+    public static final int CONTENT_PORT = 9000;
+    public static final String VIEW_SERVER_HOST_PROPERTY = "test.view.host";
+    public static final String VIEW_SERVER_HOST = "ida-idol";
+    public static final String VIEW_SERVER_PORT_PROPERTY = "test.view.port";
+    public static final int VIEW_SERVER_PORT = 9080;
+    public static final String VIEW_SERVER_REFERENCE_FIELD = "DREREFERENCE";
+    public static final String ANSWER_SERVER_HOST_PROPERTY = "test.answer.host";
+    public static final String ANSWER_SERVER_HOST = "ida-answer";
+    public static final String ANSWER_SERVER_PORT_PROPERTY = "test.answer.port";
+    public static final int ANSWER_SERVER_PORT = 7700;
+    public static final String ANSWER_SERVER_SYSTEM_PROPERTY = "test.answer.system";
+    public static final String ANSWER_SERVER_SYSTEM_NAME = "answerbank0";
 
     @Autowired
     private Environment environment;
@@ -40,14 +54,22 @@ public class IdolTestConfiguration {
                 .build();
 
         final ViewConfig viewConfig = ViewConfig.builder()
-                .referenceField(REFERENCE_FIELD_NAME)
-                .host(environment.getProperty("test.view.host", DEFAULT_IDOL_HOST))
-                .port(Integer.parseInt(environment.getProperty("test.view.port", String.valueOf(DEFAULT_VIEW_SERVER_PORT))))
+                .referenceField(VIEW_SERVER_REFERENCE_FIELD)
+                .host(getProperty(VIEW_SERVER_HOST_PROPERTY, VIEW_SERVER_HOST))
+                .port(getIntProperty(VIEW_SERVER_PORT_PROPERTY, VIEW_SERVER_PORT))
+                .build();
+
+        final AnswerServerConfig answerServerConfig = AnswerServerConfig.builder()
+                .server(ServerConfig.builder()
+                        .host(getProperty(ANSWER_SERVER_HOST_PROPERTY, ANSWER_SERVER_HOST))
+                        .port(getIntProperty(ANSWER_SERVER_PORT_PROPERTY, ANSWER_SERVER_PORT))
+                        .build())
+                .systemName(getProperty(ANSWER_SERVER_SYSTEM_PROPERTY, ANSWER_SERVER_SYSTEM_NAME))
                 .build();
 
         final AciServerDetails contentAciServerDetails = new AciServerDetails(
-                environment.getProperty("test.content.host", DEFAULT_IDOL_HOST),
-                Integer.parseInt(environment.getProperty("test.content.port", String.valueOf(DEFAULT_CONTENT_PORT)))
+                getProperty(CONTENT_HOST_PROPERTY, CONTENT_HOST),
+                getIntProperty(CONTENT_PORT_PROPERTY, CONTENT_PORT)
         );
 
         final IdolSearchCapable config = mock(IdolSearchCapable.class);
@@ -55,6 +77,7 @@ public class IdolTestConfiguration {
         when(config.getContentAciServerDetails()).thenReturn(contentAciServerDetails);
         when(config.getQueryManipulation()).thenReturn(queryManipulationConfig);
         when(config.getViewConfig()).thenReturn(viewConfig);
+        when(config.getAnswerServer()).thenReturn(answerServerConfig);
         when(config.getFieldsInfo()).thenReturn(FieldsInfo.builder().build());
 
         @SuppressWarnings("unchecked")
@@ -63,5 +86,13 @@ public class IdolTestConfiguration {
         when(configService.getConfig()).thenReturn(config);
 
         return configService;
+    }
+
+    private String getProperty(final String property, final String defaultValue) {
+        return environment.getProperty(property, defaultValue);
+    }
+
+    private int getIntProperty(final String property, final int defaultValue) {
+        return Integer.parseInt(environment.getProperty(property, String.valueOf(defaultValue)));
     }
 }

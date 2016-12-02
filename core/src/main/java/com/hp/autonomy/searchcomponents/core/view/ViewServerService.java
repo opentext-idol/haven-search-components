@@ -26,6 +26,12 @@ public interface ViewServerService<R extends ViewRequest<S>, S extends Serializa
     String VIEW_SERVER_SERVICE_BEAN_NAME = "viewServerService";
 
     /**
+     * The bean name of the default request builder implementation.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    String VIEW_REQUEST_BUILDER_BEAN_NAME = "viewRequestBuilder";
+
+    /**
      * Start tag to add for highlighted words.
      */
     String HIGHLIGHT_START_TAG = "<span class='haven-search-view-document-highlighting'>";

@@ -23,6 +23,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -37,13 +38,13 @@ public class IdolFieldsServiceTest {
 
     @Before
     public void setUp() {
-        idolFieldsService = new IdolFieldsService(contentAciService, processorFactory);
+        idolFieldsService = new IdolFieldsServiceImpl(contentAciService, processorFactory);
     }
 
     @Test
     public void getFields() {
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockTagNamesResponse());
-        assertThat(idolFieldsService.getFields(IdolFieldsRequest.builder().maxValues(null).build(), FieldTypeParam.Date, FieldTypeParam.Numeric), hasEntry(is(FieldTypeParam.Numeric), not(empty())));
+        assertThat(idolFieldsService.getFields(mock(IdolFieldsRequest.class), FieldTypeParam.Date, FieldTypeParam.Numeric), hasEntry(is(FieldTypeParam.Numeric), not(empty())));
     }
 
     private GetTagNamesResponseData mockTagNamesResponse() {

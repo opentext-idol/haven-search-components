@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.core.databases;
 import com.hp.autonomy.types.IdolDatabase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -18,9 +19,11 @@ import static org.hamcrest.Matchers.*;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-public abstract class AbstractDatabasesServiceIT<D extends IdolDatabase, R extends DatabasesRequest, E extends Exception> {
+public abstract class AbstractDatabasesServiceIT<D extends IdolDatabase, R extends DatabasesRequest, B extends DatabasesRequestBuilder<R>, E extends Exception> {
     @Autowired
-    DatabasesService<D, R, E> databasesService;
+    private DatabasesService<D, R, E> databasesService;
+    @Autowired
+    protected ObjectFactory<B> databasesRequestBuilderFactory;
 
     protected abstract R createDatabasesRequest();
 

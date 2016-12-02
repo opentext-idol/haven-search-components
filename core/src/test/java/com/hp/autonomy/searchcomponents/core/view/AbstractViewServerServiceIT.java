@@ -5,10 +5,12 @@
 
 package com.hp.autonomy.searchcomponents.core.view;
 
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.core.test.IntegrationTestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -20,24 +22,24 @@ import static org.junit.Assert.assertNotNull;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-public abstract class AbstractViewServerServiceIT<R extends ViewRequest<S>, S extends Serializable, D extends SearchResult, E extends Exception> {
+public abstract class AbstractViewServerServiceIT<R extends ViewRequest<S>, Q extends QueryRestrictions<S>, S extends Serializable, D extends SearchResult, E extends Exception> {
     @Autowired
     protected ViewServerService<R, S, E> viewServerService;
 
     @Autowired
-    protected IntegrationTestUtils<S, D, E> integrationTestUtils;
+    protected IntegrationTestUtils<Q, D, E> integrationTestUtils;
 
     @Autowired
-    protected ViewRequest.ViewRequestBuilder<R, S> viewRequestBuilder;
+    protected ObjectFactory<ViewRequestBuilder<R, S, ?>> viewRequestBuilderFactory;
 
     @Test
     public void viewDocument() throws E, IOException {
         final String reference = integrationTestUtils.getValidReference();
 
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        final R request = viewRequestBuilder
+        final R request = viewRequestBuilderFactory.getObject()
                 .documentReference(reference)
-                .database(integrationTestUtils.getDatabases().get(0))
+                .database(integrationTestUtils.buildQueryRestrictions().getDatabases().get(0))
                 .build();
         viewServerService.viewDocument(request, outputStream);
         assertNotNull(outputStream.toByteArray());

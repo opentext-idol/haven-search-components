@@ -5,28 +5,15 @@
 
 package com.hp.autonomy.searchcomponents.idol.view;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
-import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
-import lombok.Builder;
-import lombok.Data;
 
 /**
- * Options for interacting with Idol implementation of {@link ViewServerService}
+ * Options for interacting with {@link IdolViewServerService}
  */
-@SuppressWarnings("WeakerAccess")
-@Data
-@Builder(toBuilder = true)
-@JsonDeserialize(builder = IdolViewRequest.IdolViewRequestBuilder.class)
-public class IdolViewRequest implements ViewRequest<String> {
-    private static final long serialVersionUID = 7368417933475466364L;
-
-    private final String documentReference;
-    private final String database;
-    private final String highlightExpression;
-
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class IdolViewRequestBuilder implements ViewRequest.ViewRequestBuilder<IdolViewRequest, String> {
-    }
+public interface IdolViewRequest extends ViewRequest<String> {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    IdolViewRequestBuilder toBuilder();
 }

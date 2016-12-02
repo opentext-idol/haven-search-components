@@ -5,32 +5,25 @@
 
 package com.hp.autonomy.searchcomponents.hod.fields;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
-import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Singular;
 
 import java.util.Collection;
 
 /**
- * Options for interacting with HoD implementation of {@link FieldsService}
+ * Options for interacting with {@link HodFieldsService}
  */
-@Data
-@Builder(toBuilder = true)
-@JsonDeserialize(builder = HodFieldsRequest.HodFieldsRequestBuilder.class)
-public class HodFieldsRequest implements FieldsRequest {
-    private static final long serialVersionUID = 3450911770365743948L;
+public interface HodFieldsRequest extends FieldsRequest {
+    /**
+     * The indexes from which to retrieve fields
+     *
+     * @return The indexes from which to retrieve fields
+     */
+    Collection<ResourceIdentifier> getDatabases();
 
-    @Singular
-    private Collection<ResourceIdentifier> databases;
-    private Integer maxValues;
-
-    @SuppressWarnings("WeakerAccess")
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class HodFieldsRequestBuilder implements FieldsRequest.FieldsRequestBuilder<HodFieldsRequest> {
-    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    HodFieldsRequestBuilder toBuilder();
 }

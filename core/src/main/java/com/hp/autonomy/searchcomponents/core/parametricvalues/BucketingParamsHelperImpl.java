@@ -1,8 +1,8 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +15,8 @@ import static com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingPa
 @Component(BUCKETING_PARAMS_HELPER_BEAN_NAME)
 class BucketingParamsHelperImpl implements BucketingParamsHelper {
     @Override
-    public <R extends ParametricRequest<S>, S extends Serializable> void validateBucketingParams(final R parametricRequest,
-                                                                                                 final Map<String, BucketingParams> bucketingParamsPerField) {
+    public <R extends ParametricRequest<Q>, Q extends QueryRestrictions<?>> void validateBucketingParams(final R parametricRequest,
+                                                                                                         final Map<String, BucketingParams> bucketingParamsPerField) {
         for (final String fieldName : parametricRequest.getFieldNames()) {
             final BucketingParams bucketingParams = bucketingParamsPerField.get(fieldName);
 

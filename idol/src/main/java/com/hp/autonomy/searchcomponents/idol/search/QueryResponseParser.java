@@ -6,7 +6,6 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.core.search.SearchRequest;
 import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.Documents;
@@ -31,11 +30,11 @@ public interface QueryResponseParser {
      *
      * @param searchRequest The query request options
      * @param aciParameters The parameters sent in the Idol request
-     * @param responseData The Idol response
+     * @param responseData  The Idol response
      * @param queryExecutor The function used for executing the query (in case it needs to be rerun)
      * @return The parsed query results
      */
-    Documents<IdolSearchResult> parseQueryResults(SearchRequest<String> searchRequest, AciParameters aciParameters, QueryResponseData responseData, Function<AciParameters, QueryResponseData> queryExecutor);
+    Documents<IdolSearchResult> parseQueryResults(IdolSearchRequest searchRequest, AciParameters aciParameters, QueryResponseData responseData, Function<AciParameters, QueryResponseData> queryExecutor);
 
     /**
      * Parses the "hits" section of the Idol query response

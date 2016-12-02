@@ -11,9 +11,7 @@
     "maxDate": "2016-11-15T16:07:01Z",
     "minScore": 5,
     "languageType": "englishUtf8",
-    "anyLanguage": false,
-    "stateMatchId": "0-ABC",
-    "stateDontMatchId": "0-ABD"
+    "anyLanguage": false
   },
   "start": 1,
   "maxResults": 50,
