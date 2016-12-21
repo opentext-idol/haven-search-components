@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
+import com.hp.autonomy.types.requests.idol.actions.answer.params.AskSortParam;
 
 import java.util.Set;
 
@@ -22,6 +23,13 @@ public interface AskAnswerServerRequest extends RequestObject<AskAnswerServerReq
     String getText();
 
     /**
+     * Sort criteria
+     *
+     * @return Sort criteria
+     */
+    AskSortParam getSort();
+
+    /**
      * The systems behind AnswerServer to query
      *
      * @return The systems to query
@@ -34,4 +42,11 @@ public interface AskAnswerServerRequest extends RequestObject<AskAnswerServerReq
      * @return The maximum number of results to return
      */
     Integer getMaxResults();
+
+    /**
+     * The score threshold for returned results
+     *
+     * @return The score threshold for returned results
+     */
+    Double getMinScore();
 }

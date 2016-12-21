@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
-import com.hp.autonomy.types.idol.responses.answer.Answer;
+import com.hp.autonomy.types.idol.responses.answer.AskAnswer;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
@@ -33,5 +33,5 @@ public interface AskAnswerServerService {
      * @param request query options
      * @return answers returned by AnswerServer (may be empty)
      */
-    List<Answer> ask(AskAnswerServerRequest request);
+    List<AskAnswer> ask(AskAnswerServerRequest request);
 }

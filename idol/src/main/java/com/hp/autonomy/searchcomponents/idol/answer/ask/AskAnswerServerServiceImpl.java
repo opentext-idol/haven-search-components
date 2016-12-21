@@ -10,11 +10,12 @@ import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.idol.exceptions.IdolService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.answer.Answer;
-import com.hp.autonomy.types.idol.responses.answer.Answers;
+import com.hp.autonomy.types.idol.responses.answer.AskAnswer;
+import com.hp.autonomy.types.idol.responses.answer.AskAnswers;
 import com.hp.autonomy.types.idol.responses.answer.AskResponsedata;
 import com.hp.autonomy.types.requests.idol.actions.answer.AnswerServerActions;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.AskParams;
+import com.hp.autonomy.types.requests.idol.actions.answer.params.AskSortParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,13 +44,15 @@ class AskAnswerServerServiceImpl implements AskAnswerServerService {
 
     @SuppressWarnings("IfMayBeConditional")
     @Override
-    public List<Answer> ask(final AskAnswerServerRequest request) {
+    public List<AskAnswer> ask(final AskAnswerServerRequest request) {
         final AciParameters aciParameters = new AciParameters(AnswerServerActions.Ask.name());
         aciParameters.add(AskParams.Text.name(), request.getText());
+        aciParameters.add(AskParams.Sort.name(), Optional.ofNullable(request.getSort()).map(AskSortParam::value).orElse(null));
         aciParameters.add(AskParams.SystemNames.name(), String.join(",", request.getSystemNames()));
         aciParameters.add(AskParams.MaxResults.name(), request.getMaxResults());
+        aciParameters.add(AskParams.MinScore.name(), request.getMinScore());
 
-        final Answers answers = answerServerAciService.executeAction(aciParameters, processor).getAnswers();
-        return Optional.ofNullable(answers).map(Answers::getAnswer).orElse(Collections.emptyList());
+        final AskAnswers answers = answerServerAciService.executeAction(aciParameters, processor).getAnswers();
+        return Optional.ofNullable(answers).map(AskAnswers::getAnswer).orElse(Collections.emptyList());
     }
 }

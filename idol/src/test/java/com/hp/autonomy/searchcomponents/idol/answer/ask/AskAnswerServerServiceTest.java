@@ -7,8 +7,8 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
 import com.autonomy.aci.client.services.AciService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.answer.Answer;
-import com.hp.autonomy.types.idol.responses.answer.Answers;
+import com.hp.autonomy.types.idol.responses.answer.AskAnswer;
+import com.hp.autonomy.types.idol.responses.answer.AskAnswers;
 import com.hp.autonomy.types.idol.responses.answer.AskResponsedata;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,8 +38,8 @@ public class AskAnswerServerServiceTest {
     @Before
     public void setUp() {
         final AskResponsedata responsedata = new AskResponsedata();
-        final Answers answers = new Answers();
-        answers.getAnswer().add(new Answer());
+        final AskAnswers answers = new AskAnswers();
+        answers.getAnswer().add(new AskAnswer());
         responsedata.setAnswers(answers);
         when(answerServerAciService.executeAction(any(), any())).thenReturn(responsedata);
 

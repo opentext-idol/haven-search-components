@@ -9,7 +9,7 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciServerDetails;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.answer.AnswerserverGetStatus;
+import com.hp.autonomy.types.idol.responses.answer.GetStatusResponsedata;
 import com.hp.autonomy.types.idol.responses.answer.System;
 import com.hp.autonomy.types.idol.responses.answer.Systems;
 import org.junit.Before;
@@ -33,7 +33,7 @@ public class AnswerServerSystemServiceTest {
     @Mock
     protected ProcessorFactory processorFactory;
     @Mock
-    protected Processor<AnswerserverGetStatus> getResourcesProcessor;
+    protected Processor<GetStatusResponsedata> getResourcesProcessor;
 
     private AnswerServerSystemService answerServerSystemService;
 
@@ -54,8 +54,8 @@ public class AnswerServerSystemServiceTest {
         assertThat(answerServerSystemService.getSystemNames(), not(empty()));
     }
 
-    private AnswerserverGetStatus mockStatus() {
-        final AnswerserverGetStatus answerbankStatus = new AnswerserverGetStatus();
+    private GetStatusResponsedata mockStatus() {
+        final GetStatusResponsedata answerbankStatus = new GetStatusResponsedata();
         final Systems systems = new Systems();
         final System system = new System();
         system.setName("answerbank0");
