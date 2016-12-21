@@ -10,7 +10,7 @@ import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciServerDetails;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.answer.AnswerserverGetStatus;
+import com.hp.autonomy.types.idol.responses.answer.GetStatusResponsedata;
 import com.hp.autonomy.types.idol.responses.answer.System;
 import com.hp.autonomy.types.requests.idol.actions.status.StatusActions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 class AnswerServerSystemServiceImpl implements AnswerServerSystemService {
     private final AciService aciService;
     private final AciService answerServerAciService;
-    private final Processor<AnswerserverGetStatus> processor;
+    private final Processor<GetStatusResponsedata> processor;
 
     @Autowired
     AnswerServerSystemServiceImpl(final AciService aciService,
@@ -31,7 +31,7 @@ class AnswerServerSystemServiceImpl implements AnswerServerSystemService {
                                   final ProcessorFactory processorFactory) {
         this.aciService = aciService;
         this.answerServerAciService = answerServerAciService;
-        processor = processorFactory.getResponseDataProcessor(AnswerserverGetStatus.class);
+        processor = processorFactory.getResponseDataProcessor(GetStatusResponsedata.class);
     }
 
     @Override
