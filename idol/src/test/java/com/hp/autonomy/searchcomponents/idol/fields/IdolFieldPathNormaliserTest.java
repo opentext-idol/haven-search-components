@@ -3,14 +3,15 @@
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
-package com.hp.autonomy.searchcomponents.core.fields;
+package com.hp.autonomy.searchcomponents.idol.fields;
 
+import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class FieldPathNormaliserTest {
+public class IdolFieldPathNormaliserTest {
     private static final String EXPECTED_NORMALISED_FIELD_PATH = "/DOCUMENT/MY_FIELD";
     private static final String EXPECTED_NORMALISED_XML_FIELD_PATH = "/DOCUMENTS/DOCUMENT/MY_FIELD1/MY_FIELD2";
 
@@ -18,7 +19,7 @@ public class FieldPathNormaliserTest {
 
     @Before
     public void setUp() {
-        fieldPathNormaliser = new FieldPathNormaliserImpl();
+        fieldPathNormaliser = new IdolFieldPathNormaliserImpl();
     }
 
     @Test(expected = IllegalArgumentException.class)
