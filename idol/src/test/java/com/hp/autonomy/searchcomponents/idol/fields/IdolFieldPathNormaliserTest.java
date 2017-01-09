@@ -9,6 +9,7 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.AUTN_DATE_FIELD;
 import static org.junit.Assert.assertEquals;
 
 public class IdolFieldPathNormaliserTest {
@@ -30,6 +31,16 @@ public class IdolFieldPathNormaliserTest {
     @Test(expected = IllegalArgumentException.class)
     public void emptyArg() {
         fieldPathNormaliser.normaliseFieldPath("");
+    }
+
+    @Test
+    public void autnDate() {
+        assertEquals(AUTN_DATE_FIELD, fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD));
+    }
+
+    @Test
+    public void lowerCaseAutnDate() {
+        assertEquals(AUTN_DATE_FIELD, fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD.toLowerCase()));
     }
 
     @Test

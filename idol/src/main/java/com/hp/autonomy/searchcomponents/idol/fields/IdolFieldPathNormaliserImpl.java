@@ -28,12 +28,16 @@ class IdolFieldPathNormaliserImpl implements FieldPathNormaliser {
             throw new IllegalArgumentException("Field names may not be blank or contain only forward slashes");
         }
 
+        if (ParametricValuesService.AUTN_DATE_FIELD.equalsIgnoreCase(fieldPath)) {
+            return fieldPath.toUpperCase();
+        }
+
         String normalisedFieldName = fieldPath;
         if (fieldPath.contains(FULL_PATH_IDENTIFIER)) {
             if (!fieldPath.startsWith("/")) {
                 normalisedFieldName = '/' + fieldPath;
             }
-        } else if (!fieldPath.equals(ParametricValuesService.AUTN_DATE_FIELD)) {
+        } else {
             normalisedFieldName = '/' + FULL_PATH_IDENTIFIER + (fieldPath.startsWith("/") ? fieldPath.substring(1) : fieldPath);
         }
 

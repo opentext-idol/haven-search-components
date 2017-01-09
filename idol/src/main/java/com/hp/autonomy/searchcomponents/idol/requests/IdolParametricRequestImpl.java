@@ -11,6 +11,7 @@ import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.searchcomponents.idol.parametricvalues.IdolParametricRequest;
 import com.hp.autonomy.searchcomponents.idol.parametricvalues.IdolParametricRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import lombok.Builder;
 import lombok.Data;
@@ -31,7 +32,7 @@ class IdolParametricRequestImpl implements IdolParametricRequest {
     private static final long serialVersionUID = 3450911770365743948L;
 
     @Singular
-    private final List<String> fieldNames;
+    private final List<TagName> fieldNames;
     private final Integer maxValues;
     private final SortParam sort;
     @Singular

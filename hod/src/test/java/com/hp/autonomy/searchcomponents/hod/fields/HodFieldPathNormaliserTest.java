@@ -9,6 +9,7 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.AUTN_DATE_FIELD;
 import static org.junit.Assert.assertEquals;
 
 public class HodFieldPathNormaliserTest {
@@ -32,5 +33,15 @@ public class HodFieldPathNormaliserTest {
     @Test
     public void anyOldValue() {
         assertEquals("FOO", fieldPathNormaliser.normaliseFieldPath("FOO"));
+    }
+
+    @Test
+    public void autnDate() {
+        assertEquals(AUTN_DATE_FIELD.toLowerCase(), fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD.toLowerCase()));
+    }
+
+    @Test
+    public void upperCaseAutnDate() {
+        assertEquals(AUTN_DATE_FIELD.toLowerCase(), fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD));
     }
 }

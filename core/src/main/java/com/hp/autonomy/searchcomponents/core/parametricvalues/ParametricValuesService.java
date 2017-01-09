@@ -40,7 +40,7 @@ public interface ParametricValuesService<R extends ParametricRequest<Q>, Q exten
     /**
      * Special Idol parametric values field which matches the configured default date field
      */
-    String AUTN_DATE_FIELD = "autn_date";
+    String AUTN_DATE_FIELD = "AUTN_DATE";
 
     /**
      * Returns all parametric values for the requested parametric fields
@@ -61,7 +61,7 @@ public interface ParametricValuesService<R extends ParametricRequest<Q>, Q exten
      * @throws E The error thrown in the event of the platform returning an error response
      */
 
-    List<RangeInfo> getNumericParametricValuesInBuckets(R parametricRequest, final Map<String, BucketingParams> bucketingParamsPerField) throws E;
+    List<RangeInfo> getNumericParametricValuesInBuckets(R parametricRequest, final Map<TagName, BucketingParams> bucketingParamsPerField) throws E;
 
     /**
      * Returns parametric values in a hierarchy

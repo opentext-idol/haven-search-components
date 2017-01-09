@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.core.parametricvalues;
 import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public interface ParametricRequest<Q extends QueryRestrictions<?>> extends Reque
      *
      * @return Idol field names
      */
-    List<String> getFieldNames();
+    List<TagName> getFieldNames();
 
     /**
      * Max results to return

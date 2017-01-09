@@ -20,7 +20,7 @@ import java.io.Serializable;
  * Simple abstract test class for any object returned by a HavenSearch controller endpoint
  */
 public abstract class SimpleResponseObjectTest<O extends Serializable> extends SerializableObjectTest<O> {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    protected final ObjectMapper objectMapper = new ObjectMapper();
 
     protected JacksonTester<O> json;
 
@@ -28,6 +28,10 @@ public abstract class SimpleResponseObjectTest<O extends Serializable> extends S
     @Before
     public void setUp() {
         super.setUp();
+        setUpObjectMapper();
+    }
+
+    protected void setUpObjectMapper() {
         objectMapper.registerModule(new JodaModule());
         json = new JacksonTester<>(getClass(), ResolvableType.forClass(object.getClass()), objectMapper);
     }

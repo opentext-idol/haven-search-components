@@ -18,7 +18,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +34,8 @@ import static org.mockito.Mockito.when;
 public class HodFieldsServiceTest {
     @Mock
     private RetrieveIndexFieldsService retrieveIndexFieldsService;
+    @Mock
+    private RetrieveIndexFieldsResponse response;
 
     private HodFieldsService fieldsService;
 
@@ -45,7 +46,6 @@ public class HodFieldsServiceTest {
 
     @Test
     public void getFields() throws HodErrorException {
-        final RetrieveIndexFieldsResponse response = new RetrieveIndexFieldsResponse.Builder().setParametricTypeFields(Collections.singletonList(new TagName("CATEGORY"))).build();
         when(retrieveIndexFieldsService.retrieveIndexFields(anyListOf(ResourceIdentifier.class), any(RetrieveIndexFieldsRequestBuilder.class))).thenReturn(response);
         final Map<FieldTypeParam, List<TagName>> results = fieldsService.getFields(mock(HodFieldsRequest.class), FieldTypeParam.Parametric);
         assertThat(results.get(FieldTypeParam.Parametric), is(not(empty())));

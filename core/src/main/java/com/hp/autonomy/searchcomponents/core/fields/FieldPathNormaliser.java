@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Handles normalisation of field paths (e.g. as supplied by Idol responses or in a user's application configuration)
  */
 @FunctionalInterface
-
 public interface FieldPathNormaliser {
     /**
      * The bean name of the default implementation.

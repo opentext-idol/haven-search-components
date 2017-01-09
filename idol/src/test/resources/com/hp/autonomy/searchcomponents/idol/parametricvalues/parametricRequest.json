@@ -1,5 +1,5 @@
 {
-  "fieldNames": ["field1", "field2"],
+  "fieldNames": ["/DOCUMENT/FIELD1", "/DOCUMENT/FIELD2"],
   "maxValues": 10,
   "sort": "Alphabetical",
   "queryRestrictions": {
