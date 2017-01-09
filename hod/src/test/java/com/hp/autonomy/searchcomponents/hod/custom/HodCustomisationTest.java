@@ -18,6 +18,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
+import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -27,6 +29,8 @@ import static org.junit.Assert.assertNull;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
+@JsonTest
+@AutoConfigureJsonTesters(enabled = false)
 @SpringBootTest(classes = {HavenSearchHodConfiguration.class, HodCustomConfiguration.class, HodCustomComponentConfiguration.class}, properties = {
         CUSTOMISATION_TEST_ID,
         HodTestConfiguration.MOCK_AUTHENTICATION_PROPERTY + "=false",

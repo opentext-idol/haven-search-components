@@ -15,6 +15,7 @@ import com.hp.autonomy.hod.client.api.textindex.query.parametric.ParametricSort;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
+import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
@@ -61,6 +62,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
     private final ObjectFactory<HodFieldsRequestBuilder> fieldsRequestBuilderFactory;
     private final GetParametricValuesService getParametricValuesService;
     private final BucketingParamsHelper bucketingParamsHelper;
+    private final TagNameFactory tagNameFactory;
     private final ConfigService<? extends HodSearchCapable> configService;
     private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
 
@@ -71,6 +73,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
             final ObjectFactory<HodFieldsRequestBuilder> fieldsRequestBuilderFactory,
             final GetParametricValuesService getParametricValuesService,
             final BucketingParamsHelper bucketingParamsHelper,
+            final TagNameFactory tagNameFactory,
             final ConfigService<? extends HodSearchCapable> configService,
             final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever
     ) {
@@ -78,6 +81,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         this.fieldsRequestBuilderFactory = fieldsRequestBuilderFactory;
         this.getParametricValuesService = getParametricValuesService;
         this.bucketingParamsHelper = bucketingParamsHelper;
+        this.tagNameFactory = tagNameFactory;
         this.configService = configService;
         this.authenticationInformationRetriever = authenticationInformationRetriever;
     }
@@ -85,10 +89,10 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
     @Override
     @Cacheable(value = CacheNames.PARAMETRIC_VALUES, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
     public Set<QueryTagInfo> getAllParametricValues(final HodParametricRequest parametricRequest) throws HodErrorException {
-        final Collection<String> fieldNames = new HashSet<>();
+        final Collection<TagName> fieldNames = new HashSet<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
-            fieldNames.addAll(lookupFieldIds(parametricRequest.getQueryRestrictions().getDatabases()));
+            fieldNames.addAll(lookupFields(parametricRequest.getQueryRestrictions().getDatabases()));
         }
 
         final Set<QueryTagInfo> results;
@@ -102,7 +106,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
             for (final String name : fieldNamesSet) {
                 final Set<QueryTagCountInfo> values = new HashSet<>(parametricFieldNames.getValuesAndCountsForFieldName(name));
                 if (!values.isEmpty()) {
-                    results.add(new QueryTagInfo(new TagName(name), values));
+                    results.add(new QueryTagInfo(tagNameFactory.buildTagName(name), values));
                 }
             }
         }
@@ -113,7 +117,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
     //TODO use the same method as IDOL for bucketing, once HOD-2784 and HOD-2785 are complete
     @Override
     @Cacheable(value = CacheNames.PARAMETRIC_VALUES_IN_BUCKETS, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
-    public List<RangeInfo> getNumericParametricValuesInBuckets(final HodParametricRequest parametricRequest, final Map<String, BucketingParams> bucketingParamsPerField) throws HodErrorException {
+    public List<RangeInfo> getNumericParametricValuesInBuckets(final HodParametricRequest parametricRequest, final Map<TagName, BucketingParams> bucketingParamsPerField) throws HodErrorException {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyList();
         } else {
@@ -123,7 +127,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
             final List<RangeInfo> ranges = new ArrayList<>(numericFieldInfo.size());
 
             for (final QueryTagInfo queryTagInfo : numericFieldInfo) {
-                final BucketingParams bucketingParams = bucketingParamsPerField.get(queryTagInfo.getId());
+                final BucketingParams bucketingParams = bucketingParamsPerField.get(tagNameFactory.buildTagName(queryTagInfo.getId()));
                 ranges.add(parseNumericParametricValuesInBuckets(queryTagInfo, bucketingParams));
             }
 
@@ -131,15 +135,11 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         }
     }
 
-    private Collection<String> lookupFieldIds(final Collection<ResourceIdentifier> databases) throws HodErrorException {
-        final List<TagName> fields = fieldsService.getFields(fieldsRequestBuilderFactory.getObject()
+    private Collection<TagName> lookupFields(final Collection<ResourceIdentifier> databases) throws HodErrorException {
+        return fieldsService.getFields(fieldsRequestBuilderFactory.getObject()
                 .databases(databases)
                 .build(), FieldTypeParam.Parametric)
                 .get(FieldTypeParam.Parametric);
-        final Collection<String> fieldIds = new ArrayList<>(fields.size());
-        fieldIds.addAll(fields.stream().map(TagName::getId).collect(Collectors.toList()));
-
-        return fieldIds;
     }
 
     // Parse a list of numeric parametric values into buckets specified by the min, max and number of buckets in the BucketingParams
@@ -192,12 +192,12 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
 
         // All buckets have the same size, so just use the value from the first one
         final double bucketSize = boundaries.get(1) - boundaries.get(0);
-        return new RangeInfo(new TagName(queryTagInfo.getId()), totalCount, bucketingParams.getMin(), bucketingParams.getMax(), bucketSize, buckets);
+        return new RangeInfo(tagNameFactory.buildTagName(queryTagInfo.getId()), totalCount, bucketingParams.getMin(), bucketingParams.getMax(), bucketSize, buckets);
     }
 
     // Get parametric values matching the given request from HOD and parse them as numeric CSVs
     private Set<QueryTagInfo> getNumericParametricValues(final ParametricRequest<HodQueryRestrictions> parametricRequest) throws HodErrorException {
-        final Collection<String> fieldNames = parametricRequest.getFieldNames();
+        final Collection<TagName> fieldNames = parametricRequest.getFieldNames();
 
         final Set<QueryTagInfo> results;
         if (fieldNames.isEmpty()) {
@@ -210,7 +210,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
             for (final String name : fieldNamesSet) {
                 final Set<QueryTagCountInfo> values = new LinkedHashSet<>(parametricFieldNames.getValuesAndCountsForNumericField(name));
                 if (!values.isEmpty()) {
-                    results.add(new QueryTagInfo(new TagName(name), values));
+                    results.add(new QueryTagInfo(tagNameFactory.buildTagName(name), values));
                 }
             }
         }
@@ -256,14 +256,14 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                         .setTotalValues(values.size())
                         .build();
 
-                output.put(new TagName(fieldName), valueDetails);
+                output.put(tagNameFactory.buildTagName(fieldName), valueDetails);
             }
 
             return output;
         }
     }
 
-    private FieldNames getParametricValues(final ParametricRequest<HodQueryRestrictions> parametricRequest, final Collection<String> fieldNames) throws HodErrorException {
+    private FieldNames getParametricValues(final ParametricRequest<HodQueryRestrictions> parametricRequest, final Collection<TagName> fieldNames) throws HodErrorException {
         final ResourceIdentifier queryProfile = parametricRequest.isModified() ? getQueryProfile() : null;
 
         final GetParametricValuesRequestBuilder parametricParams = new GetParametricValuesRequestBuilder()
@@ -275,7 +275,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                 .setMinScore(parametricRequest.getQueryRestrictions().getMinScore())
                 .setSecurityInfo(authenticationInformationRetriever.getPrincipal().getSecurityInfo());
 
-        return getParametricValuesService.getParametricValues(fieldNames,
+        return getParametricValuesService.getParametricValues(fieldNames.stream().map(TagName::getId).collect(Collectors.toList()),
                 new ArrayList<>(parametricRequest.getQueryRestrictions().getDatabases()), parametricParams);
     }
 

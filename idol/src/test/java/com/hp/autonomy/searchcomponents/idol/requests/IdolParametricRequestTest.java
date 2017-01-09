@@ -5,30 +5,51 @@
 
 package com.hp.autonomy.searchcomponents.idol.requests;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequestTest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import com.hp.autonomy.searchcomponents.idol.parametricvalues.IdolParametricRequest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
+import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.util.Arrays;
 
+import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
+
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
+@RunWith(SpringRunner.class)
+@JsonTest
+@AutoConfigureJsonTesters(enabled = false)
+@SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY)
 public class IdolParametricRequestTest extends ParametricRequestTest<IdolQueryRestrictions> {
+    @Autowired
+    private ObjectMapper springObjectMapper;
+    @Autowired
+    private TagNameFactory tagNameFactory;
+
     @Override
     @Before
     public void setUp() {
         super.setUp();
-        objectMapper.addMixIn(QueryRestrictions.class, IdolQueryRestrictionsMixin.class);
+        springObjectMapper.addMixIn(QueryRestrictions.class, IdolQueryRestrictionsMixin.class);
     }
 
     @Override
     protected IdolParametricRequest constructObject() {
         return IdolParametricRequestImpl.builder()
-                .fieldNames(Arrays.asList("field1", "field2"))
+                .fieldNames(Arrays.asList(tagNameFactory.buildTagName("/DOCUMENT/FIELD1"), tagNameFactory.buildTagName("/DOCUMENT/FIELD2")))
                 .maxValues(10)
                 .sort(SortParam.Alphabetical)
                 .queryRestrictions(IdolQueryRestrictionsImpl.builder()
@@ -50,5 +71,10 @@ public class IdolParametricRequestTest extends ParametricRequestTest<IdolQueryRe
     @Override
     protected String json() throws IOException {
         return IOUtils.toString(getClass().getResourceAsStream("/com/hp/autonomy/searchcomponents/idol/parametricvalues/parametricRequest.json"));
+    }
+
+    @Override
+    protected Object readJson() throws IOException {
+        return springObjectMapper.readValue(json(), IdolParametricRequestImpl.class);
     }
 }

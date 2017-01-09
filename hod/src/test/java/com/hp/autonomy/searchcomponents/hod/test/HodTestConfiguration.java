@@ -6,7 +6,6 @@
 package com.hp.autonomy.searchcomponents.hod.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.Authentication;
 import com.hp.autonomy.frontend.configuration.authentication.AuthenticationConfig;
@@ -30,8 +29,6 @@ import com.hp.autonomy.hod.sso.HodSsoConfig;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.configuration.QueryManipulationConfig;
-import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
-import com.hp.autonomy.searchcomponents.hod.search.fields.HodSearchResultDeserializer;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -183,17 +180,6 @@ public class HodTestConfiguration {
                 .setTokenRepository(tokenRepository)
                 .setObjectMapper(objectMapper)
                 .build();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ObjectMapper objectMapper(final ConfigService<? extends HodSearchCapable> configService) {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final SimpleModule customModule = new SimpleModule();
-        customModule.addDeserializer(HodSearchResult.class, new HodSearchResultDeserializer(configService));
-        objectMapper.registerModule(customModule);
-
-        return objectMapper;
     }
 
     @Bean
