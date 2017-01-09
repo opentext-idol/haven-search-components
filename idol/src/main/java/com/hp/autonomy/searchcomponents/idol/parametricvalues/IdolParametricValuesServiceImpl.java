@@ -12,6 +12,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.aci.content.ranges.Ranges;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
+import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
@@ -56,7 +57,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.PARAMETRIC_VALUES_SERVICE_BEAN_NAME;
 
@@ -76,6 +76,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     private final IdolFieldsService fieldsService;
     private final ObjectFactory<IdolFieldsRequestBuilder> fieldsRequestBuilderFactory;
     private final BucketingParamsHelper bucketingParamsHelper;
+    private final TagNameFactory tagNameFactory;
     private final AciServiceRetriever aciServiceRetriever;
     private final Processor<GetQueryTagValuesResponseData> queryTagValuesResponseProcessor;
 
@@ -86,6 +87,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
             final IdolFieldsService fieldsService,
             final ObjectFactory<IdolFieldsRequestBuilder> fieldsRequestBuilderFactory,
             final BucketingParamsHelper bucketingParamsHelper,
+            final TagNameFactory tagNameFactory,
             final AciServiceRetriever aciServiceRetriever,
             final ProcessorFactory processorFactory
     ) {
@@ -93,16 +95,17 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         this.fieldsService = fieldsService;
         this.fieldsRequestBuilderFactory = fieldsRequestBuilderFactory;
         this.bucketingParamsHelper = bucketingParamsHelper;
+        this.tagNameFactory = tagNameFactory;
         this.aciServiceRetriever = aciServiceRetriever;
         queryTagValuesResponseProcessor = processorFactory.getResponseDataProcessor(GetQueryTagValuesResponseData.class);
     }
 
     @Override
     public Set<QueryTagInfo> getAllParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
-        final Collection<String> fieldNames = new HashSet<>();
+        final Collection<TagName> fieldNames = new HashSet<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
-            fieldNames.addAll(lookupFieldIds());
+            fieldNames.addAll(lookupFields());
         }
 
         final Set<QueryTagInfo> results;
@@ -119,7 +122,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                     values.add(new QueryTagCountInfo(tagValue.getValue(), tagValue.getCount()));
                 });
                 if (!values.isEmpty()) {
-                    final TagName tagName = new TagName(field.getName().get(0));
+                    final TagName tagName = tagNameFactory.buildTagName(field.getName().get(0));
                     results.add(new QueryTagInfo(tagName, values));
                 }
             }
@@ -130,15 +133,15 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
     @Override
     @Cacheable(CacheNames.PARAMETRIC_VALUES_IN_BUCKETS)
-    public List<RangeInfo> getNumericParametricValuesInBuckets(final IdolParametricRequest parametricRequest, final Map<String, BucketingParams> bucketingParamsPerField) throws AciErrorException {
+    public List<RangeInfo> getNumericParametricValuesInBuckets(final IdolParametricRequest parametricRequest, final Map<TagName, BucketingParams> bucketingParamsPerField) throws AciErrorException {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyList();
         } else {
             bucketingParamsHelper.validateBucketingParams(parametricRequest, bucketingParamsPerField);
 
-            final Map<String, List<Double>> boundariesPerField = new HashMap<>();
+            final Map<TagName, List<Double>> boundariesPerField = new HashMap<>();
 
-            for (final Map.Entry<String, BucketingParams> entry : bucketingParamsPerField.entrySet()) {
+            for (final Map.Entry<TagName, BucketingParams> entry : bucketingParamsPerField.entrySet()) {
                 boundariesPerField.put(entry.getKey(), bucketingParamsHelper.calculateBoundaries(entry.getValue()));
             }
 
@@ -148,10 +151,10 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
     @Override
     public List<RecursiveField> getDependentParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
-        final Collection<String> fieldNames = new ArrayList<>();
+        final Collection<TagName> fieldNames = new ArrayList<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {
-            fieldNames.addAll(lookupFieldIds());
+            fieldNames.addAll(lookupFields());
         }
 
         final List<RecursiveField> results;
@@ -162,7 +165,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
             parameterHandler.addSecurityInfo(aciParameters);
             aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
-            aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
+            aciParameters.add(GetQueryTagValuesParams.FieldName.name(), tagNamesToFieldNamesParam(fieldNames));
             aciParameters.add(GetQueryTagValuesParams.FieldDependence.name(), true);
             aciParameters.add(GetQueryTagValuesParams.FieldDependenceMultiLevel.name(), true);
 
@@ -184,7 +187,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
             parameterHandler.addSecurityInfo(aciParameters);
             aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), 1);
-            aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(parametricRequest.getFieldNames(), ','));
+            aciParameters.add(GetQueryTagValuesParams.FieldName.name(), tagNamesToFieldNamesParam(parametricRequest.getFieldNames()));
             aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
 
             final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
@@ -212,7 +215,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                     }
                 }
 
-                final TagName tagName = new TagName(field.getName().get(0));
+                final TagName tagName = tagNameFactory.buildTagName(field.getName().get(0));
                 output.put(tagName, builder.build());
             }
 
@@ -229,21 +232,17 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         return aciParameters;
     }
 
-    private Collection<String> lookupFieldIds() {
-        final List<TagName> fields = fieldsService.getFields(fieldsRequestBuilderFactory.getObject().build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
-        final Collection<String> fieldIds = new ArrayList<>(fields.size());
-        fieldIds.addAll(fields.stream().map(TagName::getId).collect(Collectors.toList()));
-
-        return fieldIds;
+    private Collection<TagName> lookupFields() {
+        return fieldsService.getFields(fieldsRequestBuilderFactory.getObject().build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
     }
 
     @SuppressWarnings("TypeMayBeWeakened")
-    private List<RangeInfo> queryForRanges(final IdolParametricRequest parametricRequest, final Map<String, List<Double>> boundariesPerField) {
+    private List<RangeInfo> queryForRanges(final IdolParametricRequest parametricRequest, final Map<TagName, List<Double>> boundariesPerField) {
         final Collection<Range> ranges = new LinkedList<>();
 
-        for (final Map.Entry<String, List<Double>> entry : boundariesPerField.entrySet()) {
+        for (final Map.Entry<TagName, List<Double>> entry : boundariesPerField.entrySet()) {
             final List<Double> boundaries = entry.getValue();
-            ranges.add(new Range(entry.getKey(), ArrayUtils.toPrimitive(boundaries.toArray(new Double[boundaries.size()]))));
+            ranges.add(new Range(entry.getKey().getId(), ArrayUtils.toPrimitive(boundaries.toArray(new Double[boundaries.size()]))));
         }
 
         final IdolParametricRequest bucketingRequest = parametricRequest.toBuilder()
@@ -256,11 +255,11 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         return parseRangeResponse(boundariesPerField, flatFields);
     }
 
-    private List<RangeInfo> parseRangeResponse(final Map<String, List<Double>> boundariesPerField, final Iterable<FlatField> flatFields) {
+    private List<RangeInfo> parseRangeResponse(final Map<TagName, List<Double>> boundariesPerField, final Iterable<FlatField> flatFields) {
         final List<RangeInfo> results = new LinkedList<>();
 
         for (final FlatField field : flatFields) {
-            final TagName tagName = new TagName(field.getName().get(0));
+            final TagName tagName = tagNameFactory.buildTagName(field.getName().get(0));
 
             final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
             int count = 0;
@@ -282,7 +281,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                 }
             }
 
-            final List<Double> boundaries = boundariesPerField.get(tagName.getId());
+            final List<Double> boundaries = boundariesPerField.get(tagName);
 
             // Boundaries includes the min and the max values, so has a minimum size of 2
             for (int i = 0; i < boundaries.size() - 1; i++) {
@@ -300,7 +299,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         return results;
     }
 
-    private List<FlatField> getFlatFields(final IdolParametricRequest parametricRequest, final Collection<String> fieldNames) {
+    private List<FlatField> getFlatFields(final IdolParametricRequest parametricRequest, final Collection<TagName> fieldNames) {
         final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
         parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
 
@@ -311,13 +310,17 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         parameterHandler.addSecurityInfo(aciParameters);
         aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
         aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), parametricRequest.getMaxValues());
-        aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.toArray(), ','));
+        aciParameters.add(GetQueryTagValuesParams.FieldName.name(), tagNamesToFieldNamesParam(fieldNames));
         aciParameters.add(GetQueryTagValuesParams.Sort.name(), parametricRequest.getSort());
         aciParameters.add(GetQueryTagValuesParams.Ranges.name(), new Ranges(parametricRequest.getRanges()));
         aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
 
         final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
         return responseData.getField();
+    }
+
+    private String tagNamesToFieldNamesParam(final Collection<TagName> fieldNames) {
+        return StringUtils.join(fieldNames.stream().map(TagName::getId).toArray(String[]::new), ',');
     }
 
     private GetQueryTagValuesResponseData executeAction(final ParametricRequest<IdolQueryRestrictions> idolParametricRequest, final Set<AciParameter> aciParameters) {

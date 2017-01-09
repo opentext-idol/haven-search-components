@@ -12,6 +12,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
+import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.GetTagNamesResponseData;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
@@ -36,11 +37,15 @@ import static com.hp.autonomy.searchcomponents.core.fields.FieldsService.FIELD_S
 @Service(FIELD_SERVICE_BEAN_NAME)
 class IdolFieldsServiceImpl implements IdolFieldsService {
     private final AciService contentAciService;
+    private final TagNameFactory tagNameFactory;
     private final Processor<GetTagNamesResponseData> tagNamesResponseProcessor;
 
     @Autowired
-    IdolFieldsServiceImpl(final AciService contentAciService, final ProcessorFactory aciResponseProcessorFactory) {
+    IdolFieldsServiceImpl(final AciService contentAciService,
+                          final TagNameFactory tagNameFactory,
+                          final ProcessorFactory aciResponseProcessorFactory) {
         this.contentAciService = contentAciService;
+        this.tagNameFactory = tagNameFactory;
         tagNamesResponseProcessor = aciResponseProcessorFactory.getResponseDataProcessor(GetTagNamesResponseData.class);
     }
 
@@ -66,7 +71,7 @@ class IdolFieldsServiceImpl implements IdolFieldsService {
         final List<TagName> tagNames = new ArrayList<>(names.size());
         for (final GetTagNamesResponseData.Name name : names) {
             final String value = name.getValue();
-            tagNames.add(new TagName(value));
+            tagNames.add(tagNameFactory.buildTagName(value));
         }
 
         return tagNames;

@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.fields;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.transport.AciParameter;
+import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.GetTagNamesResponseData;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
@@ -32,13 +33,16 @@ public class IdolFieldsServiceTest {
     private AciService contentAciService;
 
     @Mock
+    private TagNameFactory tagNameFactory;
+
+    @Mock
     private ProcessorFactory processorFactory;
 
     private IdolFieldsService idolFieldsService;
 
     @Before
     public void setUp() {
-        idolFieldsService = new IdolFieldsServiceImpl(contentAciService, processorFactory);
+        idolFieldsService = new IdolFieldsServiceImpl(contentAciService, tagNameFactory, processorFactory);
     }
 
     @Test

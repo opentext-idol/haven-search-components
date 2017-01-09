@@ -12,6 +12,7 @@ import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesSe
 import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricRequest;
 import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricRequestBuilder;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import lombok.Builder;
 import lombok.Data;
@@ -32,7 +33,7 @@ class HodParametricRequestImpl implements HodParametricRequest {
     public static final int MAX_VALUES_DEFAULT = 5;
 
     @Singular
-    private final List<String> fieldNames;
+    private final List<TagName> fieldNames;
     private final Integer maxValues;
     private final SortParam sort;
     @Singular

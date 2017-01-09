@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.google.common.collect.ImmutableMap;
+import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
@@ -53,6 +54,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -90,6 +92,9 @@ public class IdolParametricValuesServiceTest {
     @Autowired
     private BucketingParamsHelper bucketingParamsHelper;
 
+    @Autowired
+    private TagNameFactory tagNameFactory;
+
     @Mock
     private AciService contentAciService;
 
@@ -109,7 +114,7 @@ public class IdolParametricValuesServiceTest {
     public void setUp() {
         when(fieldsRequestBuilderFactory.getObject()).thenReturn(fieldsRequestBuilder);
 
-        parametricValuesService = new IdolParametricValuesServiceImpl(parameterHandler, fieldsService, fieldsRequestBuilderFactory, bucketingParamsHelper, aciServiceRetriever, aciResponseProcessorFactory);
+        parametricValuesService = new IdolParametricValuesServiceImpl(parameterHandler, fieldsService, fieldsRequestBuilderFactory, bucketingParamsHelper, tagNameFactory, aciServiceRetriever, aciResponseProcessorFactory);
 
         when(aciServiceRetriever.getAciService(any(QueryRequest.QueryType.class))).thenReturn(contentAciService);
     }
@@ -128,7 +133,8 @@ public class IdolParametricValuesServiceTest {
     public void getFieldNamesFirst() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
-        when(fieldsService.getFields(any(), eq(FieldTypeParam.Parametric))).thenReturn(ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(new TagName("CATEGORY"))));
+        final ImmutableMap<FieldTypeParam, List<TagName>> fieldsResponse = ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(tagNameFactory.buildTagName("CATEGORY")));
+        when(fieldsService.getFields(any(), eq(FieldTypeParam.Parametric))).thenReturn(fieldsResponse);
 
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
@@ -174,16 +180,16 @@ public class IdolParametricValuesServiceTest {
 
         final Map<TagName, ValueDetails> valueDetails = parametricValuesService.getValueDetails(parametricRequest);
         assertThat(valueDetails.size(), is(3));
-        assertThat(valueDetails, hasEntry(equalTo(new TagName(elevation)), equalTo(new ValueDetails(-50, 1242, 500.5, 12314, 3))));
-        assertThat(valueDetails, hasEntry(equalTo(new TagName(age)), equalTo(new ValueDetails(0, 96, 26, 1314, 100))));
-        assertThat(valueDetails, hasEntry(equalTo(new TagName(notThere)), equalTo(new ValueDetails(0d, 0d, 0d, 0d, 0))));
+        assertThat(valueDetails, hasEntry(equalTo(tagNameFactory.buildTagName(elevation)), equalTo(new ValueDetails(-50, 1242, 500.5, 12314, 3))));
+        assertThat(valueDetails, hasEntry(equalTo(tagNameFactory.buildTagName(age)), equalTo(new ValueDetails(0, 96, 26, 1314, 100))));
+        assertThat(valueDetails, hasEntry(equalTo(tagNameFactory.buildTagName(notThere)), equalTo(new ValueDetails(0d, 0d, 0d, 0d, 0))));
     }
 
     @Test
     public void getNumericParametricValues() {
         mockBucketResponses(7, mockTagValue("2,3", 5), mockTagValue("3,4", 2));
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of("ParametricNumericDateField", new BucketingParams(5, 1.0, 6.0)));
+        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.buildTagName("ParametricNumericDateField"), new BucketingParams(5, 1.0, 6.0)));
         assertThat(results, is(not(empty())));
         final RangeInfo info = results.iterator().next();
         final List<RangeInfo.Value> countInfo = info.getValues();
@@ -202,7 +208,7 @@ public class IdolParametricValuesServiceTest {
     public void getNumericParametricValuesInBucketsNoResults() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
         mockBucketResponses(0);
-        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of("ParametricNumericDateField", new BucketingParams(5, 1.0, 6.0)));
+        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.buildTagName("ParametricNumericDateField"), new BucketingParams(5, 1.0, 6.0)));
         assertThat(results, is(not(empty())));
         final RangeInfo info = results.iterator().next();
         final List<RangeInfo.Value> countInfo = info.getValues();
@@ -220,7 +226,7 @@ public class IdolParametricValuesServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void getNumericParametricValuesZeroBucketsZeroBuckets() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of("ParametricNumericDateField", new BucketingParams(0, 1.0, 5.0)));
+        parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.buildTagName("ParametricNumericDateField"), new BucketingParams(0, 1.0, 5.0)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -250,7 +256,8 @@ public class IdolParametricValuesServiceTest {
     public void getDependentValuesFieldNamesFirst() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
-        when(fieldsService.getFields(any(), eq(FieldTypeParam.Parametric))).thenReturn(ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(new TagName("CATEGORY"))));
+        final ImmutableMap<FieldTypeParam, List<TagName>> fieldsResponse = ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(tagNameFactory.buildTagName("CATEGORY")));
+        when(fieldsService.getFields(any(), eq(FieldTypeParam.Parametric))).thenReturn(fieldsResponse);
 
         final GetQueryTagValuesResponseData responseData = mockRecursiveResponse();
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
@@ -271,9 +278,10 @@ public class IdolParametricValuesServiceTest {
         assertThat(results, is(empty()));
     }
 
-    private IdolParametricRequest mockRequest(final List<String> fieldNames) {
+    private IdolParametricRequest mockRequest(final Collection<String> fieldNames) {
         final IdolParametricRequest parametricRequest = mock(IdolParametricRequest.class);
-        when(parametricRequest.getFieldNames()).thenReturn(fieldNames);
+        final List<TagName> tagNames = fieldNames.stream().map(tagNameFactory::buildTagName).collect(Collectors.toList());
+        when(parametricRequest.getFieldNames()).thenReturn(tagNames);
 
         final IdolParametricRequestBuilder parametricRequestBuilder = mock(IdolParametricRequestBuilder.class);
         when(parametricRequestBuilder.maxValues(any())).thenReturn(parametricRequestBuilder);

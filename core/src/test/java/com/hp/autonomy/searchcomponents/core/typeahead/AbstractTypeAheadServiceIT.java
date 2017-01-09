@@ -8,6 +8,8 @@ package com.hp.autonomy.searchcomponents.core.typeahead;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
+import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,6 +18,8 @@ import static org.hamcrest.Matchers.is;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
+@JsonTest
+@AutoConfigureJsonTesters(enabled = false)
 public abstract class AbstractTypeAheadServiceIT<E extends Exception> {
     @Autowired
     protected TypeAheadService<E> typeAheadService;
