@@ -64,6 +64,26 @@ public class IdolFieldPathNormaliserTest {
     }
 
     @Test
+    public void normalisedFullPathIdxLowerCase() {
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/document/my_field"));
+    }
+
+    @Test
+    public void fullPathIdxLowerCase() {
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("document/my_field"));
+    }
+
+    @Test
+    public void nameWithSlashIdxLowerCase() {
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/my_field"));
+    }
+
+    @Test
+    public void nameOnlyIdxLowerCase() {
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("my_field"));
+    }
+
+    @Test
     public void normalisedFullPathXml() {
         assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/DOCUMENTS/DOCUMENT/MY_FIELD1/MY_FIELD2"));
     }
@@ -81,5 +101,25 @@ public class IdolFieldPathNormaliserTest {
     @Test
     public void nameOnlyXml() {
         assertEquals("/DOCUMENT/MY_FIELD1/MY_FIELD2", fieldPathNormaliser.normaliseFieldPath("MY_FIELD1/MY_FIELD2"));
+    }
+
+    @Test
+    public void normalisedFullPathXmlLowerCase() {
+        assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/documents/document/my_field1/my_field2"));
+    }
+
+    @Test
+    public void fullPathXmlLowerCase() {
+        assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("documents/document/my_field1/my_field2"));
+    }
+
+    @Test
+    public void nameWithSlashXmlLowerCase() {
+        assertEquals("/DOCUMENT/MY_FIELD1/MY_FIELD2", fieldPathNormaliser.normaliseFieldPath("/my_field1/my_field2"));
+    }
+
+    @Test
+    public void nameOnlyXmlLowerCase() {
+        assertEquals("/DOCUMENT/MY_FIELD1/MY_FIELD2", fieldPathNormaliser.normaliseFieldPath("my_field1/my_field2"));
     }
 }
