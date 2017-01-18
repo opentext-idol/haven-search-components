@@ -15,6 +15,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.server.ServerConfig;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
@@ -49,6 +50,7 @@ import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.VIEW_
  * Default Idol implementation of {@link ViewServerService}
  */
 @Service(VIEW_SERVER_SERVICE_BEAN_NAME)
+@IdolService
 class IdolViewServerServiceImpl implements IdolViewServerService {
     private final AciService contentAciService;
     private final AciService viewAciService;

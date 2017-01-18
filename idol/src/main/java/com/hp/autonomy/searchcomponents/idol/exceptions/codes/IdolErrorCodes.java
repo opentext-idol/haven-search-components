@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.exceptions.codes;
 
 import com.hp.autonomy.searchcomponents.idol.exceptions.IdolErrorCode;
-import com.hp.autonomy.searchcomponents.idol.exceptions.IdolService;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -15,7 +15,8 @@ import java.util.Optional;
  * Enum of error codes for different services, for use within {@link IdolService}
  */
 public enum IdolErrorCodes {
-    ANSWER_SERVER(AnswerServerErrorCode.values());
+    ANSWER_SERVER(AnswerServerErrorCode.values()),
+    NO_OP(new IdolErrorCode[]{});
 
     private final IdolErrorCode<?>[] errorCodes;
 

@@ -10,6 +10,7 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.Database;
 import com.hp.autonomy.types.idol.responses.GetStatusResponseData;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
  * Idol databases service implementation: retrieves public database information by running GetStatus against content engine and parsing the response
  */
 @Service(DatabasesService.DATABASES_SERVICE_BEAN_NAME)
+@IdolService
 class IdolDatabasesServiceImpl implements IdolDatabasesService {
     private final AciService contentAciService;
     private final Processor<GetStatusResponseData> responseProcessor;
