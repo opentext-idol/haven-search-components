@@ -3,10 +3,9 @@
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
-package com.hp.autonomy.searchcomponents.idol.exceptions;
+package com.hp.autonomy.searchcomponents.idol.annotations;
 
 import com.hp.autonomy.searchcomponents.idol.exceptions.codes.IdolErrorCodes;
-import org.springframework.stereotype.Service;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,5 +18,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IdolService {
-    IdolErrorCodes value();
+    IdolErrorCodes value() default IdolErrorCodes.NO_OP;
 }

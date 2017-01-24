@@ -13,6 +13,7 @@ import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.GetTagNamesResponseData;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
@@ -35,6 +36,7 @@ import static com.hp.autonomy.searchcomponents.core.fields.FieldsService.FIELD_S
  */
 @SuppressWarnings("WeakerAccess")
 @Service(FIELD_SERVICE_BEAN_NAME)
+@IdolService
 class IdolFieldsServiceImpl implements IdolFieldsService {
     private final AciService contentAciService;
     private final TagNameFactory tagNameFactory;

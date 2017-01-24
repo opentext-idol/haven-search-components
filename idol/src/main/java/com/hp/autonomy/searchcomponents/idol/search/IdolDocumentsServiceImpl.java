@@ -12,6 +12,7 @@ import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.idol.responses.SuggestResponseData;
@@ -34,6 +35,7 @@ import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.DOCU
  * Default Idol implementation of {@link DocumentsService}
  */
 @Service(DOCUMENTS_SERVICE_BEAN_NAME)
+@IdolService
 class IdolDocumentsServiceImpl implements IdolDocumentsService {
     // fake token in a format that IDOL is happy with
     private static final String EMPTY_RESULT_SET_TOKEN = "NULL-0";

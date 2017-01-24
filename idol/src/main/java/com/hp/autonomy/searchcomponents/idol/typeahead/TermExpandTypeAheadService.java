@@ -10,6 +10,7 @@ import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadConstants;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.TermExpandResponseData;
 import com.hp.autonomy.types.requests.idol.actions.term.TermActions;
@@ -29,6 +30,7 @@ import static com.hp.autonomy.searchcomponents.idol.typeahead.IdolTypeAheadServi
  * Term expand implementation of {@link TypeAheadService}
  */
 @Service(TERM_EXPAND_TYPE_AHEAD_SERVICE_BEAN_NAME)
+@IdolService
 class TermExpandTypeAheadService implements IdolTypeAheadService {
     private final AciService contentAciService;
     private final Processor<TermExpandResponseData> processor;
