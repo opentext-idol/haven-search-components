@@ -9,6 +9,7 @@ import com.autonomy.aci.client.annotations.IdolAnnotationsProcessorFactory;
 import com.autonomy.aci.client.annotations.IdolAnnotationsProcessorFactoryImpl;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.impl.AciServiceImpl;
+import com.autonomy.aci.client.transport.AciHttpClient;
 import com.autonomy.aci.client.transport.AciServerDetails;
 import com.autonomy.aci.client.transport.impl.AciHttpClientImpl;
 import com.hp.autonomy.frontend.configuration.ConfigService;
@@ -77,6 +78,18 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
      * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
      */
     public static final String VALIDATOR_ACI_SERVICE_BEAN_NAME = "validatorAciService";
+
+    /**
+     * The bean name of the aci http client used for all standard interactions with Idol.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    public static final String ACI_HTTP_CLIENT_BEAN_NAME = "aciHttpClient";
+
+    /**
+     * The bean name of the aci http client used for Idol validation checks.
+     * Use this in an {@link Qualifier} tag to access this implementation via autowiring.
+     */
+    public static final String VALIDATOR_ACI_HTTP_CLIENT_BEAN_NAME = "validatorAciHttpClient";
 
     /**
      * The bean name of the http client settings used for all standard interactions with Idol.
@@ -170,14 +183,26 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
 
     @Bean
     @ConditionalOnMissingBean(name = ACI_SERVICE_BEAN_NAME)
-    public AciService aciService(final HttpClient httpClient) {
-        return new AciServiceImpl(new AciHttpClientImpl(httpClient));
+    public AciService aciService(final AciHttpClient aciHttpClient) {
+        return new AciServiceImpl(aciHttpClient);
     }
 
     @Bean
     @ConditionalOnMissingBean(name = VALIDATOR_ACI_SERVICE_BEAN_NAME)
-    public AciService validatorAciService(final HttpClient validatorHttpClient) {
-        return new AciServiceImpl(new AciHttpClientImpl(validatorHttpClient));
+    public AciService validatorAciService(final AciHttpClient validatorAciHttpClient) {
+        return new AciServiceImpl(validatorAciHttpClient);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(name = ACI_HTTP_CLIENT_BEAN_NAME)
+    public AciHttpClient aciHttpClient(final HttpClient httpClient) {
+        return new AciHttpClientImpl(httpClient);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(name = VALIDATOR_ACI_HTTP_CLIENT_BEAN_NAME)
+    public AciHttpClient validatorAciHttpClient(final HttpClient validatorHttpClient) {
+        return new AciHttpClientImpl(validatorHttpClient);
     }
 
     @Bean

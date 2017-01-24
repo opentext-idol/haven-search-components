@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.exceptions;
 
 import com.autonomy.aci.client.services.AciErrorException;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;

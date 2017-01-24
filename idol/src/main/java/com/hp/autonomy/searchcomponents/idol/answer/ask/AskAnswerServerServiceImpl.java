@@ -8,7 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.idol.exceptions.IdolService;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.answer.AskAnswer;
 import com.hp.autonomy.types.idol.responses.answer.AskAnswers;

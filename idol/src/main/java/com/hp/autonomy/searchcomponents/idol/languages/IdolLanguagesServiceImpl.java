@@ -9,6 +9,7 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.GetStatusResponseData;
 import com.hp.autonomy.types.idol.responses.LanguageSettingsResponseData;
@@ -30,6 +31,7 @@ import static com.hp.autonomy.searchcomponents.core.languages.LanguagesService.L
  * Default Idol implementation of {@link LanguagesService}: retrieves lists of supported languages using GetStatus and LanguageSettings actions
  */
 @Service(LANGUAGES_SERVICE_BEAN_NAME)
+@IdolService
 class IdolLanguagesServiceImpl implements IdolLanguagesService {
     private static final String IDOL_UTF8_ENCODING = "UTF8";
 

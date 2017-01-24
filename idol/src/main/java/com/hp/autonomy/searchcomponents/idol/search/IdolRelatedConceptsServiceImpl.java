@@ -9,6 +9,7 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.types.idol.responses.QsElement;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
@@ -27,6 +28,7 @@ import static com.hp.autonomy.searchcomponents.core.search.RelatedConceptsServic
  */
 @SuppressWarnings("WeakerAccess")
 @Service(RELATED_CONCEPTS_SERVICE_BEAN_NAME)
+@IdolService
 class IdolRelatedConceptsServiceImpl implements IdolRelatedConceptsService {
     private final HavenSearchAciParameterHandler parameterHandler;
     private final QueryExecutor queryExecutor;

@@ -12,6 +12,7 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadConstants;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.TypeAheadResponseData;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.TypeAheadActions;
@@ -29,6 +30,7 @@ import static com.hp.autonomy.searchcomponents.idol.typeahead.IdolTypeAheadServi
  * Qms implementation of {@link TypeAheadService}
  */
 @Service(QMS_TYPE_AHEAD_SERVICE_BEAN_NAME)
+@IdolService
 class QmsTypeAheadService implements IdolTypeAheadService {
     private final ConfigService<? extends IdolSearchCapable> configService;
     private final AciService qmsAciService;

@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.exceptions;
 
 import com.autonomy.aci.client.services.AciErrorException;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 
 /**
  * Interface defining an aspect which maps {@link AciErrorException} with recognised error id to an enumerated exception

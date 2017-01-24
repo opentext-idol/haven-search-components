@@ -19,6 +19,7 @@ import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsService;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
@@ -64,6 +65,7 @@ import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricV
  * Default Idol implementation of {@link ParametricValuesService}
  */
 @Service(PARAMETRIC_VALUES_SERVICE_BEAN_NAME)
+@IdolService
 class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     static final String VALUE_NODE_NAME = "value";
     static final String VALUES_NODE_NAME = "values";

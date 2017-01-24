@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.exceptions;
 
 import com.autonomy.aci.client.services.AciErrorException;
+import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.searchcomponents.idol.exceptions.codes.AnswerServerErrorCode;
 import com.hp.autonomy.searchcomponents.idol.exceptions.codes.IdolErrorCodes;
 import com.hp.autonomy.types.idol.marshalling.marshallers.AciErrorExceptionBuilder;
