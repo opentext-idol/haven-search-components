@@ -6,8 +6,6 @@
 package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
 import com.autonomy.aci.client.services.AciErrorException;
-import com.autonomy.aci.client.services.Processor;
-import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.aci.content.ranges.Ranges;
@@ -18,13 +16,12 @@ import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHel
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
-import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsService;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.searchcomponents.idol.search.QueryExecutor;
 import com.hp.autonomy.types.idol.responses.FlatField;
 import com.hp.autonomy.types.idol.responses.GetQueryTagValuesResponseData;
 import com.hp.autonomy.types.idol.responses.RecursiveField;
@@ -79,8 +76,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     private final ObjectFactory<IdolFieldsRequestBuilder> fieldsRequestBuilderFactory;
     private final BucketingParamsHelper bucketingParamsHelper;
     private final TagNameFactory tagNameFactory;
-    private final AciServiceRetriever aciServiceRetriever;
-    private final Processor<GetQueryTagValuesResponseData> queryTagValuesResponseProcessor;
+    private final QueryExecutor queryExecutor;
 
     @SuppressWarnings("ConstructorWithTooManyParameters")
     @Autowired
@@ -90,16 +86,14 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
             final ObjectFactory<IdolFieldsRequestBuilder> fieldsRequestBuilderFactory,
             final BucketingParamsHelper bucketingParamsHelper,
             final TagNameFactory tagNameFactory,
-            final AciServiceRetriever aciServiceRetriever,
-            final ProcessorFactory processorFactory
+            final QueryExecutor queryExecutor
     ) {
         this.parameterHandler = parameterHandler;
         this.fieldsService = fieldsService;
         this.fieldsRequestBuilderFactory = fieldsRequestBuilderFactory;
         this.bucketingParamsHelper = bucketingParamsHelper;
         this.tagNameFactory = tagNameFactory;
-        this.aciServiceRetriever = aciServiceRetriever;
-        queryTagValuesResponseProcessor = processorFactory.getResponseDataProcessor(GetQueryTagValuesResponseData.class);
+        this.queryExecutor = queryExecutor;
     }
 
     @Override
@@ -325,8 +319,10 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         return StringUtils.join(fieldNames.stream().map(TagName::getId).toArray(String[]::new), ',');
     }
 
-    private GetQueryTagValuesResponseData executeAction(final ParametricRequest<IdolQueryRestrictions> idolParametricRequest, final Set<AciParameter> aciParameters) {
-        return aciServiceRetriever.getAciService(idolParametricRequest.isModified() ? QueryRequest.QueryType.MODIFIED : QueryRequest.QueryType.RAW)
-                .executeAction(aciParameters, queryTagValuesResponseProcessor);
+    private GetQueryTagValuesResponseData executeAction(final ParametricRequest<IdolQueryRestrictions> idolParametricRequest, final AciParameters aciParameters) {
+        return queryExecutor.executeGetQueryTagValues(
+                aciParameters,
+                idolParametricRequest.isModified() ? QueryRequest.QueryType.MODIFIED : QueryRequest.QueryType.RAW
+        );
     }
 }
