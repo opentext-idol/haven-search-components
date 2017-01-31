@@ -5,12 +5,14 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
+import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.GetQueryTagValuesResponseData;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.idol.responses.SuggestResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ class QueryExecutorImpl implements QueryExecutor {
     private final AciServiceRetriever aciServiceRetriever;
     private final Processor<QueryResponseData> queryResponseProcessor;
     private final Processor<SuggestResponseData> suggestResponseProcessor;
+    private final Processor<GetQueryTagValuesResponseData> queryTagValuesResponseProcessor;
 
     @Autowired
     public QueryExecutorImpl(final AciServiceRetriever aciServiceRetriever,
@@ -34,6 +37,7 @@ class QueryExecutorImpl implements QueryExecutor {
 
         queryResponseProcessor = processorFactory.getResponseDataProcessor(QueryResponseData.class);
         suggestResponseProcessor = processorFactory.getResponseDataProcessor(SuggestResponseData.class);
+        queryTagValuesResponseProcessor = processorFactory.getResponseDataProcessor(GetQueryTagValuesResponseData.class);
     }
 
     @Override
@@ -51,5 +55,11 @@ class QueryExecutorImpl implements QueryExecutor {
     public SuggestResponseData executeSuggest(final AciParameters aciParameters, final QueryRequest.QueryType queryType) {
         final AciService aciService = aciServiceRetriever.getAciService(queryType);
         return aciService.executeAction(aciParameters, suggestResponseProcessor);
+    }
+
+    @Override
+    public GetQueryTagValuesResponseData executeGetQueryTagValues(final AciParameters aciParameters, final QueryRequest.QueryType queryType) throws AciErrorException {
+        final AciService aciService = aciServiceRetriever.getAciService(queryType);
+        return aciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
     }
 }
