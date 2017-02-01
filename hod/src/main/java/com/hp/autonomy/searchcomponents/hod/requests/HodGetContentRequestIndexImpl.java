@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.hod.requests;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.hod.search.HodDocumentsService;
 import com.hp.autonomy.searchcomponents.hod.search.HodGetContentRequestIndex;
@@ -27,7 +27,7 @@ import java.util.Set;
 class HodGetContentRequestIndexImpl implements HodGetContentRequestIndex {
     private static final long serialVersionUID = 6930992804864364983L;
 
-    private final ResourceIdentifier index;
+    private final ResourceName index;
     @Singular
     private final Set<String> references;
 

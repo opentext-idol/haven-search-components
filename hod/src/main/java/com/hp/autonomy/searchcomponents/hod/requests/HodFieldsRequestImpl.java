@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.hod.requests;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequestBuilder;
 import lombok.Builder;
@@ -26,7 +27,7 @@ class HodFieldsRequestImpl implements HodFieldsRequest {
     private static final long serialVersionUID = 3450911770365743948L;
 
     @Singular
-    private Collection<ResourceIdentifier> databases;
+    private Collection<ResourceName> databases;
     private Integer maxValues;
 
     @SuppressWarnings("WeakerAccess")

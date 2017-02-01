@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.fields;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 
 import java.util.Collection;
@@ -19,7 +19,7 @@ public interface HodFieldsRequest extends FieldsRequest {
      *
      * @return The indexes from which to retrieve fields
      */
-    Collection<ResourceIdentifier> getDatabases();
+    Collection<ResourceName> getDatabases();
 
     /**
      * {@inheritDoc}

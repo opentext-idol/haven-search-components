@@ -5,11 +5,11 @@
 
 package com.hp.autonomy.searchcomponents.hod.search;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndexBuilder;
 
 /**
  * Builder for {@link HodGetContentRequestIndex}
  */
-public interface HodGetContentRequestIndexBuilder extends GetContentRequestIndexBuilder<HodGetContentRequestIndex, ResourceIdentifier, HodGetContentRequestIndexBuilder> {
+public interface HodGetContentRequestIndexBuilder extends GetContentRequestIndexBuilder<HodGetContentRequestIndex, ResourceName, HodGetContentRequestIndexBuilder> {
 }

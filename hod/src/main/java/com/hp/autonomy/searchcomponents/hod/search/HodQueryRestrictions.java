@@ -5,13 +5,13 @@
 
 package com.hp.autonomy.searchcomponents.hod.search;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 
 /**
  * Filter restrictions to apply to queries against Idol behind HoD
  */
-public interface HodQueryRestrictions extends QueryRestrictions<ResourceIdentifier> {
+public interface HodQueryRestrictions extends QueryRestrictions<ResourceName> {
     /**
      * {@inheritDoc}
      */

@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.caching.CachingConfiguration;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldNames;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
@@ -25,11 +25,7 @@ import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsService;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.types.idol.responses.RecursiveField;
-import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
-import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
+import com.hp.autonomy.types.requests.idol.actions.tags.*;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.apache.commons.lang3.NotImplementedException;
@@ -38,17 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.PARAMETRIC_VALUES_SERVICE_BEAN_NAME;
@@ -135,7 +121,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         }
     }
 
-    private Collection<TagName> lookupFields(final Collection<ResourceIdentifier> databases) throws HodErrorException {
+    private Collection<TagName> lookupFields(final Collection<ResourceName> databases) throws HodErrorException {
         return fieldsService.getFields(fieldsRequestBuilderFactory.getObject()
                 .databases(databases)
                 .build(), FieldTypeParam.Parametric)
@@ -264,7 +250,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
     }
 
     private FieldNames getParametricValues(final ParametricRequest<HodQueryRestrictions> parametricRequest, final Collection<TagName> fieldNames) throws HodErrorException {
-        final ResourceIdentifier queryProfile = parametricRequest.isModified() ? getQueryProfile() : null;
+        final ResourceName queryProfile = parametricRequest.isModified() ? getQueryProfile() : null;
 
         final GetParametricValuesRequestBuilder parametricParams = new GetParametricValuesRequestBuilder()
                 .setQueryProfile(queryProfile)
@@ -279,10 +265,10 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                 new ArrayList<>(parametricRequest.getQueryRestrictions().getDatabases()), parametricParams);
     }
 
-    private ResourceIdentifier getQueryProfile() {
+    private ResourceName getQueryProfile() {
         final String profileName = configService.getConfig().getQueryManipulation().getProfile();
         final String domain = authenticationInformationRetriever.getPrincipal().getApplication().getDomain();
-        return new ResourceIdentifier(domain, profileName);
+        return new ResourceName(domain, profileName);
     }
 
 }

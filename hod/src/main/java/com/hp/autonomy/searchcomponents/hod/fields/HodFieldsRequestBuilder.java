@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.fields;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsRequestBuilder;
 
 import java.util.Collection;
@@ -21,7 +21,7 @@ public interface HodFieldsRequestBuilder extends FieldsRequestBuilder<HodFieldsR
      * @param databases The indexes from which to retrieve fields
      * @return The builder (for chaining)
      */
-    HodFieldsRequestBuilder databases(Collection<? extends ResourceIdentifier> databases);
+    HodFieldsRequestBuilder databases(Collection<? extends ResourceName> databases);
 
     /**
      * Sets an index from which to retrieve fields
@@ -29,7 +29,7 @@ public interface HodFieldsRequestBuilder extends FieldsRequestBuilder<HodFieldsR
      * @param database An index from which to retrieve fields
      * @return The builder (for chaining)
      */
-    HodFieldsRequestBuilder database(ResourceIdentifier database);
+    HodFieldsRequestBuilder database(ResourceName database);
 
     /**
      * Clears the collection of indexes from which to retrieve fields

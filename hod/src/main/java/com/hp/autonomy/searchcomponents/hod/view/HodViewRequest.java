@@ -5,13 +5,13 @@
 
 package com.hp.autonomy.searchcomponents.hod.view;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 
 /**
  * Options for interacting with {@link HodViewServerService}
  */
-public interface HodViewRequest extends ViewRequest<ResourceIdentifier> {
+public interface HodViewRequest extends ViewRequest<ResourceName> {
     /**
      * {@inheritDoc}
      */

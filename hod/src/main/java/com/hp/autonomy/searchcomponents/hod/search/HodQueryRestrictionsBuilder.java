@@ -5,11 +5,11 @@
 
 package com.hp.autonomy.searchcomponents.hod.search;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictionsBuilder;
 
 /**
  * Builder for {@link HodQueryRestrictions}
  */
-public interface HodQueryRestrictionsBuilder extends QueryRestrictionsBuilder<HodQueryRestrictions, ResourceIdentifier, HodQueryRestrictionsBuilder> {
+public interface HodQueryRestrictionsBuilder extends QueryRestrictionsBuilder<HodQueryRestrictions, ResourceName, HodQueryRestrictionsBuilder> {
 }

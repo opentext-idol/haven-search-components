@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.databases;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceFlavour;
+import com.hp.autonomy.hod.client.api.textindex.IndexFlavor;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 
@@ -19,10 +19,10 @@ public interface HodDatabasesService extends DatabasesService<Database, HodDatab
     /**
      * The flavours of HoD resource to include in list of indexes
      */
-    Set<ResourceFlavour> CONTENT_FLAVOURS = ResourceFlavour.of(
-            ResourceFlavour.EXPLORER,
-            ResourceFlavour.STANDARD,
-            ResourceFlavour.CUSTOM_FIELDS,
-            ResourceFlavour.JUMBO
+    Set<IndexFlavor> CONTENT_FLAVOURS = IndexFlavor.of(
+            IndexFlavor.EXPLORER,
+            IndexFlavor.STANDARD,
+            IndexFlavor.CUSTOM_FIELDS,
+            IndexFlavor.JUMBO
     );
 }

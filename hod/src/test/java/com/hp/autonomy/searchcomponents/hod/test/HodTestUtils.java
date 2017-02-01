@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.test;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
 import com.hp.autonomy.searchcomponents.hod.search.HodGetContentRequestBuilder;
@@ -30,7 +30,7 @@ public class HodTestUtils implements TestUtils<HodQueryRestrictions> {
         return queryRestrictionsBuilderFactory.getObject()
                 .queryText("*")
                 .fieldText("")
-                .database(ResourceIdentifier.WIKI_ENG)
+                .database(ResourceName.WIKI_ENG)
                 .anyLanguage(true)
                 .build();
     }
@@ -40,7 +40,7 @@ public class HodTestUtils implements TestUtils<HodQueryRestrictions> {
         @SuppressWarnings("unchecked")
         final RC getContentRequest = (RC) getContentRequestBuilderFactory.getObject()
                 .indexAndReferences(getContentRequestIndexBuilderFactory.getObject()
-                        .index(ResourceIdentifier.WIKI_ENG)
+                        .index(ResourceName.WIKI_ENG)
                         .reference(reference)
                         .build())
                 .build();

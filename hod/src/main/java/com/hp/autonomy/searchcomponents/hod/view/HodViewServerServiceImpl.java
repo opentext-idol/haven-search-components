@@ -10,14 +10,10 @@ import com.hp.autonomy.aci.content.fieldtext.MATCH;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.analysis.viewdocument.ViewDocumentRequestBuilder;
 import com.hp.autonomy.hod.client.api.analysis.viewdocument.ViewDocumentService;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Document;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
-import com.hp.autonomy.hod.client.api.textindex.query.search.QueryRequestBuilder;
-import com.hp.autonomy.hod.client.api.textindex.query.search.QueryResults;
-import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
+import com.hp.autonomy.hod.client.api.textindex.query.search.*;
 import com.hp.autonomy.hod.client.error.HodErrorCode;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
@@ -201,7 +197,7 @@ class HodViewServerServiceImpl implements HodViewServerService {
 
         final QueryRequestBuilder queryParams = new QueryRequestBuilder()
                 .setFieldText(fieldText.toString())
-                .setIndexes(Collections.singletonList(new ResourceIdentifier(domain, queryManipulationIndex)))
+                .setIndexes(Collections.singletonList(new ResourceName(domain, queryManipulationIndex)))
                 .setPrint(Print.all);
 
         final QueryResults<Document> documents = queryTextIndexService.queryTextIndexWithText("*", queryParams);
