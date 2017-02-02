@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.hod.requests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequestTest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
@@ -56,7 +56,7 @@ public class HodParametricRequestTest extends ParametricRequestTest<HodQueryRest
                 .queryRestrictions(HodQueryRestrictionsImpl.builder()
                         .queryText("*")
                         .fieldText("NOT(EMPTY):{FIELD}")
-                        .database(ResourceIdentifier.WIKI_ENG)
+                        .database(ResourceName.WIKI_ENG)
                         .minDate(DateTime.parse("2016-11-15T16:07:00Z"))
                         .maxDate(DateTime.parse("2016-11-15T16:07:01Z"))
                         .minScore(5)

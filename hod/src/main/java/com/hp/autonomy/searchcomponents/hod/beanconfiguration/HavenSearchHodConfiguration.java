@@ -19,19 +19,11 @@ import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFields
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsServiceImpl;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesServiceImpl;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Document;
-import com.hp.autonomy.hod.client.api.textindex.query.search.FindRelatedConceptsService;
-import com.hp.autonomy.hod.client.api.textindex.query.search.FindRelatedConceptsServiceImpl;
-import com.hp.autonomy.hod.client.api.textindex.query.search.FindSimilarService;
-import com.hp.autonomy.hod.client.api.textindex.query.search.FindSimilarServiceImpl;
-import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
-import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexServiceImpl;
+import com.hp.autonomy.hod.client.api.textindex.query.search.*;
+import com.hp.autonomy.hod.client.api.textindex.status.TextIndexStatusService;
+import com.hp.autonomy.hod.client.api.textindex.status.TextIndexStatusServiceImpl;
 import com.hp.autonomy.hod.client.config.HodServiceConfig;
-import com.hp.autonomy.hod.sso.HodAuthentication;
-import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-import com.hpe.bigdata.frontend.spring.authentication.SpringSecurityAuthenticationInformationRetriever;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -143,5 +135,11 @@ public class HavenSearchHodConfiguration {
     @ConditionalOnMissingBean(ResourcesService.class)
     public ResourcesService resourcesService() {
         return new ResourcesServiceImpl(hodServiceConfig);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(TextIndexStatusService.class)
+    public TextIndexStatusService textIndexStatusService(final HodServiceConfig<EntityType.Combined, TokenType.Simple> hodServiceConfig) {
+        return new TextIndexStatusServiceImpl(hodServiceConfig);
     }
 }

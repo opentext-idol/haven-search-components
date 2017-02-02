@@ -8,7 +8,7 @@ package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldNames;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
@@ -24,11 +24,7 @@ import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsService;
 import com.hp.autonomy.searchcomponents.hod.requests.HodRequestBuilderConfiguration;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
-import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
-import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
+import com.hp.autonomy.types.requests.idol.actions.tags.*;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
@@ -47,15 +43,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
@@ -120,13 +108,13 @@ public class HodParametricValuesServiceTest {
         when(config.getQueryManipulation()).thenReturn(QueryManipulationConfig.builder().profile("SomeProfile").index("SomeIndex").build());
         when(configService.getConfig()).thenReturn(config);
 
-        when(hodAuthenticationPrincipal.getApplication()).thenReturn(new ResourceIdentifier("SomeDomain", "SomeIndex"));
+        when(hodAuthenticationPrincipal.getApplication()).thenReturn(new ResourceName("SomeDomain", "SomeIndex"));
         when(authenticationInformationRetriever.getPrincipal()).thenReturn(hodAuthenticationPrincipal);
     }
 
     @Test
     public void getsParametricValues() throws HodErrorException {
-        final List<ResourceIdentifier> indexes = Arrays.asList(ResourceIdentifier.WIKI_ENG, ResourceIdentifier.PATENTS);
+        final List<ResourceName> indexes = Arrays.asList(ResourceName.WIKI_ENG, ResourceName.PATENTS);
 
         final List<String> fieldNames = ImmutableList.<String>builder()
                 .add("grassy field")
@@ -160,7 +148,7 @@ public class HodParametricValuesServiceTest {
         final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptyList());
         when(fieldsService.getFields(any(), any(FieldTypeParam.class))).thenReturn(response);
 
-        final List<ResourceIdentifier> indexes = Collections.singletonList(ResourceIdentifier.PATENTS);
+        final List<ResourceName> indexes = Collections.singletonList(ResourceName.PATENTS);
         final HodParametricRequest testRequest = generateRequest(indexes, Collections.emptyList());
         final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
         assertThat(fieldNamesSet, is(empty()));
@@ -171,7 +159,7 @@ public class HodParametricValuesServiceTest {
         final ImmutableMap<FieldTypeParam, List<TagName>> fieldsResponse = ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(tagNameFactory.buildTagName("grassy field")));
         when(fieldsService.getFields(any(), eq(FieldTypeParam.Parametric))).thenReturn(fieldsResponse);
 
-        final List<ResourceIdentifier> indexes = Collections.singletonList(ResourceIdentifier.WIKI_ENG);
+        final List<ResourceName> indexes = Collections.singletonList(ResourceName.WIKI_ENG);
         final HodParametricRequest testRequest = generateRequest(indexes, Collections.emptyList());
         final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
         assertThat(fieldNamesSet, is(not(empty())));
@@ -179,17 +167,17 @@ public class HodParametricValuesServiceTest {
 
     @Test
     public void getValueDetailsNoFields() throws HodErrorException {
-        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.emptyList());
+        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.emptyList());
         assertThat(parametricValuesService.getValueDetails(parametricRequest).size(), is(0));
     }
 
     @Test
     public void getValueDetails() throws HodErrorException {
         final String field = "MyField";
-        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList(field));
+        final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList(field));
 
         final FieldNames response = mockNumericQueryResponse(field, ImmutableMap.of("1", 1, "0.8,4.2", 2, "1,9", 1, "12", 1, "21", 1));
-        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(response);
+        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceName.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(response);
 
         final Map<TagName, ValueDetails> valueDetails = parametricValuesService.getValueDetails(parametricRequest);
         assertThat(valueDetails.size(), is(1));
@@ -199,9 +187,9 @@ public class HodParametricValuesServiceTest {
     @Test
     public void getNumericParametricValuesInBuckets() throws HodErrorException {
         final FieldNames responseData = mockNumericQueryResponse("ParametricNumericDateField", ImmutableMap.of("1", 1, "1,3", 2, "6,11", 1, "12", 1, "21", 1));
-        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
+        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceName.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
 
-        final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
+        final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
         final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, ImmutableMap.of(tagNameFactory.buildTagName("ParametricNumericDateField"), new BucketingParams(9, 3.0, 12.0)));
 
         assertThat(results, hasSize(1));
@@ -226,9 +214,9 @@ public class HodParametricValuesServiceTest {
     @Test
     public void getNumericParametricValuesInBucketsNoResults() throws HodErrorException {
         final FieldNames responseData = mockNumericQueryResponse("ParametricNumericDateField", ImmutableMap.of("1", 1, "1,3", 2, "6,9", 1, "12", 1, "21", 1));
-        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
+        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceName.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
 
-        final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
+        final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
         final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, ImmutableMap.of(tagNameFactory.buildTagName("ParametricNumericDateField"), new BucketingParams(5, 10.0, 11.0)));
 
         assertThat(results, is(not(empty())));
@@ -248,23 +236,23 @@ public class HodParametricValuesServiceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void getNumericParametricValuesZeroBucketsZeroBuckets() throws HodErrorException {
-        final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
+        final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
         parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, ImmutableMap.of(tagNameFactory.buildTagName("ParametricNumericDateField"), new BucketingParams(0, 10.0, 11.0)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void getNumericParametricValuesNoParams() throws HodErrorException {
-        final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
+        final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
         parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, Collections.emptyMap());
     }
 
     @Test
     public void getNumericParametricValuesInBucketsNoFields() throws HodErrorException {
-        final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceIdentifier.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
+        final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
         final FieldNames responseData = new FieldNames.Builder()
                 .addParametricValue("numericParametricValue", Collections.emptyMap())
                 .build();
-        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
+        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceName.class), any(GetParametricValuesRequestBuilder.class))).thenReturn(responseData);
         final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, ImmutableMap.of(tagNameFactory.buildTagName("ParametricNumericDateField"), new BucketingParams(3, 1.5, 5.5)));
         MatcherAssert.assertThat(results, empty());
     }
@@ -274,7 +262,7 @@ public class HodParametricValuesServiceTest {
         parametricValuesService.getDependentParametricValues(mock(HodParametricRequest.class));
     }
 
-    private HodParametricRequest generateRequest(final List<ResourceIdentifier> indexes, final Collection<String> fieldNames) {
+    private HodParametricRequest generateRequest(final List<ResourceName> indexes, final Collection<String> fieldNames) {
         final HodQueryRestrictions queryRestrictions = mock(HodQueryRestrictions.class);
         when(queryRestrictions.getDatabases()).thenReturn(indexes);
         final HodParametricRequest parametricRequest = mock(HodParametricRequest.class);
@@ -311,7 +299,7 @@ public class HodParametricValuesServiceTest {
                 .addParametricValue("empty field", new LinkedHashMap<>())
                 .build();
 
-        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceIdentifier.class), any(GetParametricValuesRequestBuilder.class)
+        when(getParametricValuesService.getParametricValues(anyCollectionOf(String.class), anyCollectionOf(ResourceName.class), any(GetParametricValuesRequestBuilder.class)
         )).thenReturn(everythingFieldNames);
 
         return getParametricValuesService;

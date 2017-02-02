@@ -5,19 +5,19 @@
 
 package com.hp.autonomy.searchcomponents.hod.requests;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.view.ViewRequest;
 import com.hp.autonomy.searchcomponents.core.view.ViewRequestTest;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
-public class HodViewRequestTest extends ViewRequestTest<ResourceIdentifier> {
+public class HodViewRequestTest extends ViewRequestTest<ResourceName> {
     @Override
-    protected ViewRequest<ResourceIdentifier> constructObject() {
-        return HodViewRequestImpl.<ResourceIdentifier>builder()
+    protected ViewRequest<ResourceName> constructObject() {
+        return HodViewRequestImpl.<ResourceName>builder()
                 .documentReference("dede952d-8a4d-4f54-ac1f-5187bf10a744")
-                .database(ResourceIdentifier.WIKI_ENG)
+                .database(ResourceName.WIKI_ENG)
                 .highlightExpression("SomeExpression")
                 .build();
     }

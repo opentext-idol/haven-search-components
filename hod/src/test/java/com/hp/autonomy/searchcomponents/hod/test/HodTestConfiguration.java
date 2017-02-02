@@ -16,8 +16,8 @@ import com.hp.autonomy.hod.client.api.authentication.AuthenticationService;
 import com.hp.autonomy.hod.client.api.authentication.AuthenticationServiceImpl;
 import com.hp.autonomy.hod.client.api.authentication.EntityType;
 import com.hp.autonomy.hod.client.api.authentication.TokenType;
-import com.hp.autonomy.hod.client.api.authentication.tokeninformation.UserStoreInformation;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.Resource;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.hod.client.config.HodServiceConfig;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.token.InMemoryTokenRepository;
@@ -148,19 +148,18 @@ public class HodTestConfiguration {
     public HodAuthenticationPrincipal testPrincipal() {
         final String application = environment.getProperty(APPLICATION_PROPERTY);
         final String domain = environment.getProperty(DOMAIN_PROPERTY);
-
-        final UserStoreInformation userStoreInformation = mock(UserStoreInformation.class);
-        when(userStoreInformation.getDomain()).thenReturn(domain);
-        when(userStoreInformation.getUuid()).thenReturn(UUID.randomUUID());
-
         final String userStoreName = "DEFAULT_USER_STORE";
-        when(userStoreInformation.getName()).thenReturn(userStoreName);
-        when(userStoreInformation.getIdentifier()).thenReturn(new ResourceIdentifier(domain, userStoreName));
+
+        final Resource userStore = Resource.builder()
+                .uuid(UUID.randomUUID())
+                .domain(domain)
+                .name(userStoreName)
+                .build();
 
         final HodAuthenticationPrincipal testPrincipal = mock(HodAuthenticationPrincipal.class);
-        when(testPrincipal.getApplication()).thenReturn(new ResourceIdentifier(domain, application));
+        when(testPrincipal.getApplication()).thenReturn(new ResourceName(domain, application));
         when(testPrincipal.getUserUuid()).thenReturn(UUID.randomUUID());
-        when(testPrincipal.getUserStoreInformation()).thenReturn(userStoreInformation);
+        when(testPrincipal.getUserStoreInformation()).thenReturn(userStore);
         when(testPrincipal.getTenantUuid()).thenReturn(UUID.randomUUID());
         when(testPrincipal.getUserMetadata()).thenReturn(Collections.emptyMap());
         return testPrincipal;

@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.hod.requests;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictionsBuilder;
 import lombok.Builder;
@@ -26,7 +27,7 @@ class HodQueryRestrictionsImpl implements HodQueryRestrictions {
     private final String queryText;
     private final String fieldText;
     @Singular
-    private final List<ResourceIdentifier> databases;
+    private final List<ResourceName> databases;
     private final DateTime minDate;
     private final DateTime maxDate;
     private final Integer minScore;

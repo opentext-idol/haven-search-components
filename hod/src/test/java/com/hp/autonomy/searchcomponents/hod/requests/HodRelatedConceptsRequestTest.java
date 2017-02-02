@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.requests;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequestTest;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
@@ -26,11 +26,11 @@ public class HodRelatedConceptsRequestTest extends RelatedConceptsRequestTest<Ho
 
     @Override
     protected HodRelatedConceptsRequest constructObject() {
-        return HodRelatedConceptsRequestImpl.<ResourceIdentifier>builder()
+        return HodRelatedConceptsRequestImpl.<ResourceName>builder()
                 .queryRestrictions(HodQueryRestrictionsImpl.builder()
                         .queryText("*")
                         .fieldText("NOT(EMPTY):{FIELD}")
-                        .database(ResourceIdentifier.WIKI_ENG)
+                        .database(ResourceName.WIKI_ENG)
                         .minDate(DateTime.parse("2016-11-15T16:07:00Z"))
                         .maxDate(DateTime.parse("2016-11-15T16:07:01Z"))
                         .minScore(5)

@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.hod.requests;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.hod.view.HodViewRequest;
 import com.hp.autonomy.searchcomponents.hod.view.HodViewRequestBuilder;
 import lombok.Builder;
@@ -23,7 +23,7 @@ class HodViewRequestImpl implements HodViewRequest {
     private static final long serialVersionUID = -3421795905288242621L;
 
     private final String documentReference;
-    private final ResourceIdentifier database;
+    private final ResourceName database;
     private final String highlightExpression;
 
     @JsonPOJOBuilder(withPrefix = "")

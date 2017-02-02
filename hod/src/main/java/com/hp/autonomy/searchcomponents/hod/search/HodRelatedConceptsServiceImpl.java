@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.hod.search;
 
 import com.hp.autonomy.hod.caching.CachingConfiguration;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Entity;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindRelatedConceptsRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindRelatedConceptsService;
@@ -44,7 +44,7 @@ class HodRelatedConceptsServiceImpl implements HodRelatedConceptsService {
     @Cacheable(value = CacheNames.RELATED_CONCEPTS, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
     public List<Entity> findRelatedConcepts(final HodRelatedConceptsRequest relatedConceptsRequest) throws HodErrorException {
 
-        final QueryRestrictions<ResourceIdentifier> queryRestrictions = relatedConceptsRequest.getQueryRestrictions();
+        final QueryRestrictions<ResourceName> queryRestrictions = relatedConceptsRequest.getQueryRestrictions();
         final FindRelatedConceptsRequestBuilder params = new FindRelatedConceptsRequestBuilder()
                 .setIndexes(queryRestrictions.getDatabases())
                 .setFieldText(queryRestrictions.getFieldText())

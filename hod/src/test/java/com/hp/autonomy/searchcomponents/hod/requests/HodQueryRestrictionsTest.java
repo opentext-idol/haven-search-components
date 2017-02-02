@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.requests;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictionsTest;
 import org.apache.commons.io.IOUtils;
@@ -13,13 +13,13 @@ import org.joda.time.DateTime;
 
 import java.io.IOException;
 
-public class HodQueryRestrictionsTest extends QueryRestrictionsTest<ResourceIdentifier> {
+public class HodQueryRestrictionsTest extends QueryRestrictionsTest<ResourceName> {
     @Override
-    protected QueryRestrictions<ResourceIdentifier> constructObject() {
+    protected QueryRestrictions<ResourceName> constructObject() {
         return HodQueryRestrictionsImpl.builder()
                 .queryText("*")
                 .fieldText("NOT(EMPTY):{FIELD}")
-                .database(ResourceIdentifier.WIKI_ENG)
+                .database(ResourceName.WIKI_ENG)
                 .minDate(DateTime.parse("2016-11-15T16:07:00Z"))
                 .maxDate(DateTime.parse("2016-11-15T16:07:01Z"))
                 .minScore(5)

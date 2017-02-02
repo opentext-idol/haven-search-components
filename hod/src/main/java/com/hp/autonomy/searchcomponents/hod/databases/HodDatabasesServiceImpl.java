@@ -5,24 +5,18 @@
 
 package com.hp.autonomy.searchcomponents.hod.databases;
 
-import com.hp.autonomy.hod.client.api.resource.ListResourcesRequestBuilder;
-import com.hp.autonomy.hod.client.api.resource.Resource;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
-import com.hp.autonomy.hod.client.api.resource.ResourceType;
-import com.hp.autonomy.hod.client.api.resource.Resources;
-import com.hp.autonomy.hod.client.api.resource.ResourcesService;
+import com.hp.autonomy.hod.client.api.resource.*;
+import com.hp.autonomy.hod.client.api.textindex.IndexFlavor;
 import com.hp.autonomy.hod.client.error.HodErrorException;
-import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
+import lombok.Data;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * HoD databases service implementation: retrieves private and public index information by querying HoD for content resources
@@ -30,53 +24,63 @@ import java.util.stream.Collectors;
 @Service(DatabasesService.DATABASES_SERVICE_BEAN_NAME)
 class HodDatabasesServiceImpl implements HodDatabasesService {
     private final ResourcesService resourcesService;
-    private final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
+    private final IndexFlavourService indexFlavourService;
 
-    HodDatabasesServiceImpl(final ResourcesService resourcesService, final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever) {
+    HodDatabasesServiceImpl(
+            final ResourcesService resourcesService,
+            final IndexFlavourService indexFlavourService
+    ) {
         this.resourcesService = resourcesService;
-        this.authenticationInformationRetriever = authenticationInformationRetriever;
+        this.indexFlavourService = indexFlavourService;
     }
 
     @Override
     public Set<Database> getDatabases(final HodDatabasesRequest request) throws HodErrorException {
         final ListResourcesRequestBuilder builder = new ListResourcesRequestBuilder()
-                .setTypes(Collections.singleton(ResourceType.CONTENT));
+                .setTypes(Collections.singleton(ResourceType.TEXT_INDEX));
 
-        final Resources resources = resourcesService.list(builder);
+        final List<ResourceDetails> resources = resourcesService.list(builder);
+        final Map<Boolean, List<ResourceDetails>> partitioned = resources.stream().collect(Collectors.partitioningBy(isPublicIndex));
+        final Collection<FlavouredResource> flavouredPrivateResources = fetchFlavours(partitioned.get(false));
 
-        final Set<Database> databases = new TreeSet<>();
+        final Stream<Database> privateDatabases = flavouredPrivateResources.stream()
+                .filter(isContentFlavour)
+                .map(databaseForResource.compose(FlavouredResource::getDetails));
 
-        // Private and public indexes can have the same name. You can't do anything with the public index in this case,
-        // so we remove the public index duplicates here.
-        final Collection<String> privateResourceNames = new HashSet<>();
+        final Stream<Database> publicDatabases = request.isPublicIndexesEnabled()
+                ? partitioned.get(true).stream().map(databaseForResource)
+                : Stream.empty();
 
-        final String domain = authenticationInformationRetriever.getPrincipal().getApplication().getDomain();
+        return Stream.concat(privateDatabases, publicDatabases)
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
 
-        resources.getResources().stream().filter(resource -> CONTENT_FLAVOURS.contains(resource.getFlavour())).forEach(resource -> {
-            privateResourceNames.add(resource.getResource());
-            databases.add(databaseForResource(resource, domain, false));
-        });
+    private Collection<FlavouredResource> fetchFlavours(final Iterable<ResourceDetails> detailsList) throws HodErrorException {
+        final Collection<FlavouredResource> flavouredResources = new LinkedList<>();
 
-        if (request.isPublicIndexesEnabled()) {
-            databases.addAll(resources.getPublicResources().stream().filter(resource -> !privateResourceNames.contains(resource.getResource())).map(resource -> databaseForResource(resource, ResourceIdentifier.PUBLIC_INDEXES_DOMAIN, true)).collect(Collectors.toList()));
+        for (final ResourceDetails details : detailsList) {
+            final IndexFlavor indexFlavour = indexFlavourService.getIndexFlavour(details.getResource().getResourceUuid());
+            flavouredResources.add(new FlavouredResource(details, indexFlavour));
         }
 
-        return databases;
+        return flavouredResources;
     }
 
-    /**
-     * Converts the given resource name to a database
-     *
-     * @param resource The resource
-     * @param domain   The domain of the resource
-     * @return A database representation of the resource
-     */
-    private Database databaseForResource(final Resource resource, final String domain, final boolean isPublic) {
-        return Database.builder()
-                .name(resource.getResource())
-                .displayName(resource.getDisplayName())
-                .isPublic(isPublic)
-                .domain(domain)
-                .build();
+    @Data
+    private static class FlavouredResource {
+        private final ResourceDetails details;
+        private final IndexFlavor flavour;
     }
+
+    private static final Predicate<FlavouredResource> isContentFlavour = flavouredResource -> CONTENT_FLAVOURS.contains(flavouredResource.getFlavour());
+    private static final Predicate<ResourceDetails> isPublicIndex = details -> ResourceName.PUBLIC_INDEXES_DOMAIN.equals(details.getResource().getDomain());
+
+    private static final Function<ResourceDetails, Database> databaseForResource = details -> {
+        return Database.builder()
+                .name(details.getResource().getName())
+                .domain(details.getResource().getDomain())
+                .displayName(details.getDisplayName())
+                .isPublic(isPublicIndex.test(details))
+                .build();
+    };
 }

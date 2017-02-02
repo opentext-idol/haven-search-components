@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.view;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
 
@@ -13,5 +13,5 @@ import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
  * HoD extension to {@link ViewServerService}
  */
 @SuppressWarnings("WeakerAccess")
-public interface HodViewServerService extends ViewServerService<HodViewRequest, ResourceIdentifier, HodErrorException> {
+public interface HodViewServerService extends ViewServerService<HodViewRequest, ResourceName, HodErrorException> {
 }

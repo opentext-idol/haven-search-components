@@ -5,11 +5,11 @@
 
 package com.hp.autonomy.searchcomponents.hod.view;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.view.ViewRequestBuilder;
 
 /**
  * Builder for {@link HodViewRequest}
  */
-public interface HodViewRequestBuilder extends ViewRequestBuilder<HodViewRequest, ResourceIdentifier, HodViewRequestBuilder> {
+public interface HodViewRequestBuilder extends ViewRequestBuilder<HodViewRequest, ResourceName, HodViewRequestBuilder> {
 }

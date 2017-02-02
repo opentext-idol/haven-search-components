@@ -8,18 +8,10 @@ package com.hp.autonomy.searchcomponents.hod.search;
 import com.google.common.collect.ImmutableSet;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.caching.CachingConfiguration;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
-import com.hp.autonomy.hod.client.api.textindex.query.search.CheckSpelling;
-import com.hp.autonomy.hod.client.api.textindex.query.search.FindSimilarService;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Highlight;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
-import com.hp.autonomy.hod.client.api.textindex.query.search.QueryRequestBuilder;
-import com.hp.autonomy.hod.client.api.textindex.query.search.QueryResults;
-import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
-import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
+import com.hp.autonomy.hod.client.api.textindex.query.search.*;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.warning.HodWarning;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
@@ -38,12 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.DOCUMENTS_SERVICE_BEAN_NAME;
 
@@ -54,19 +41,19 @@ import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.DOCU
 @Service(DOCUMENTS_SERVICE_BEAN_NAME)
 class HodDocumentsServiceImpl implements HodDocumentsService {
     private static final ImmutableSet<String> PUBLIC_INDEX_NAMES = ImmutableSet.of(
-            ResourceIdentifier.WIKI_CHI.getName(),
-            ResourceIdentifier.WIKI_ENG.getName(),
-            ResourceIdentifier.WIKI_FRA.getName(),
-            ResourceIdentifier.WIKI_GER.getName(),
-            ResourceIdentifier.WIKI_ITA.getName(),
-            ResourceIdentifier.WIKI_SPA.getName(),
-            ResourceIdentifier.WORLD_FACTBOOK.getName(),
-            ResourceIdentifier.NEWS_ENG.getName(),
-            ResourceIdentifier.NEWS_FRA.getName(),
-            ResourceIdentifier.NEWS_GER.getName(),
-            ResourceIdentifier.NEWS_ITA.getName(),
-            ResourceIdentifier.ARXIV.getName(),
-            ResourceIdentifier.PATENTS.getName()
+            ResourceName.WIKI_CHI.getName(),
+            ResourceName.WIKI_ENG.getName(),
+            ResourceName.WIKI_FRA.getName(),
+            ResourceName.WIKI_GER.getName(),
+            ResourceName.WIKI_ITA.getName(),
+            ResourceName.WIKI_SPA.getName(),
+            ResourceName.WORLD_FACTBOOK.getName(),
+            ResourceName.NEWS_ENG.getName(),
+            ResourceName.NEWS_FRA.getName(),
+            ResourceName.NEWS_GER.getName(),
+            ResourceName.NEWS_ITA.getName(),
+            ResourceName.ARXIV.getName(),
+            ResourceName.PATENTS.getName()
     );
 
     private final FindSimilarService<HodSearchResult> findSimilarService;
@@ -105,7 +92,7 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
         if (queryRequest.getQueryType() == QueryRequest.QueryType.PROMOTIONS) {
             params.setPromotions(true);
             //TODO remove this when IOD have fixed the the default value of the indexes parameter (IOD-6168)
-            params.setIndexes(Collections.singletonList(ResourceIdentifier.WIKI_ENG));
+            params.setIndexes(Collections.singletonList(ResourceName.WIKI_ENG));
         }
 
         final QueryResults<HodSearchResult> hodDocuments = queryTextIndexService.queryTextIndexWithText(queryRequest.getQueryRestrictions().getQueryText(), params);
@@ -147,7 +134,7 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
     public List<HodSearchResult> getDocumentContent(final HodGetContentRequest request) throws HodErrorException {
         final List<HodSearchResult> contentResults = new ArrayList<>();
 
-        for (final GetContentRequestIndex<ResourceIdentifier> indexAndReferences : request.getIndexesAndReferences()) {
+        for (final GetContentRequestIndex<ResourceName> indexAndReferences : request.getIndexesAndReferences()) {
             final GetContentRequestBuilder builder = new GetContentRequestBuilder()
                     .setPrintFields(documentFieldsService.getPrintFields(Collections.emptyList()))
                     .setSummary(Summary.concept)
@@ -201,27 +188,27 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
         }
 
         if (setQueryProfile) {
-            queryRequestBuilder.setQueryProfile(new ResourceIdentifier(getDomain(), profileName));
+            queryRequestBuilder.setQueryProfile(new ResourceName(getDomain(), profileName));
         }
 
         return queryRequestBuilder;
     }
 
-    private void addDomainToSearchResults(final Collection<HodSearchResult> documentList, final Iterable<ResourceIdentifier> indexIdentifiers, final Iterable<HodSearchResult> documents) {
+    private void addDomainToSearchResults(final Collection<HodSearchResult> documentList, final Iterable<ResourceName> indexIdentifiers, final Iterable<HodSearchResult> documents) {
         for (final HodSearchResult hodSearchResult : documents) {
             documentList.add(addDomain(indexIdentifiers, hodSearchResult));
         }
     }
 
     // Add a domain to a FindDocument, given the collection of indexes which were queried against to return it from HOD
-    private HodSearchResult addDomain(final Iterable<ResourceIdentifier> indexIdentifiers, final HodSearchResult document) {
+    private HodSearchResult addDomain(final Iterable<ResourceName> indexIdentifiers, final HodSearchResult document) {
         // HOD does not return the domain for documents yet, but it does return the index
         final String index = document.getIndex();
         String domain = null;
 
         // It's most likely that the returned documents will be in one of the indexes we are querying (hopefully the
         // names are unique between the domains...)
-        for (final ResourceIdentifier indexIdentifier : indexIdentifiers) {
+        for (final ResourceName indexIdentifier : indexIdentifiers) {
             if (index.equals(indexIdentifier.getName())) {
                 domain = indexIdentifier.getDomain();
                 break;
@@ -230,7 +217,7 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
 
         if (domain == null) {
             // If not, it might be a public index
-            domain = PUBLIC_INDEX_NAMES.contains(index) ? ResourceIdentifier.PUBLIC_INDEXES_DOMAIN : getDomain();
+            domain = PUBLIC_INDEX_NAMES.contains(index) ? ResourceName.PUBLIC_INDEXES_DOMAIN : getDomain();
         }
 
         return document.toBuilder()

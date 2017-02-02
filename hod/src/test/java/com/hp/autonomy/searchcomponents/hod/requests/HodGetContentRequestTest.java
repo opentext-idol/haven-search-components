@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.requests;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestTest;
@@ -27,7 +27,7 @@ public class HodGetContentRequestTest extends GetContentRequestTest<HodGetConten
     @Override
     protected HodGetContentRequest constructObject() {
         return HodGetContentRequestImpl.builder()
-                .indexAndReferences(new HodGetContentRequestIndexImpl(ResourceIdentifier.WIKI_ENG, Collections.singleton("Reference1")))
+                .indexAndReferences(new HodGetContentRequestIndexImpl(ResourceName.WIKI_ENG, Collections.singleton("Reference1")))
                 .print(Print.fields)
                 .build();
     }

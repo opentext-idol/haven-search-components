@@ -5,17 +5,10 @@
 
 package com.hp.autonomy.searchcomponents.hod.databases;
 
-import com.hp.autonomy.hod.client.api.resource.ListResourcesRequestBuilder;
-import com.hp.autonomy.hod.client.api.resource.Resource;
-import com.hp.autonomy.hod.client.api.resource.ResourceFlavour;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
-import com.hp.autonomy.hod.client.api.resource.ResourceType;
-import com.hp.autonomy.hod.client.api.resource.Resources;
-import com.hp.autonomy.hod.client.api.resource.ResourcesService;
+import com.hp.autonomy.hod.client.api.resource.*;
+import com.hp.autonomy.hod.client.api.textindex.IndexFlavor;
 import com.hp.autonomy.hod.client.error.HodErrorException;
-import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
-import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,13 +16,13 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,24 +32,24 @@ public class HodDatabasesServiceTest {
     private ResourcesService resourcesService;
 
     @Mock
-    private AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationInformationRetriever;
-
-    @Mock
-    private HodAuthenticationPrincipal hodAuthenticationPrincipal;
+    private IndexFlavourService indexFlavourService;
 
     private DatabasesService<Database, HodDatabasesRequest, HodErrorException> databasesService;
 
     @Before
-    public void setUp() {
-        databasesService = new HodDatabasesServiceImpl(resourcesService, authenticationInformationRetriever);
-    }
+    public void setUp() throws HodErrorException {
+        final ResourceDetails resource1 = mockResource("PrivateResource1", "PrivateDomain");
+        final ResourceDetails resource2 = mockResource("PrivateResource2", "PrivateDomain");
+        final ResourceDetails publicIndex = mockResource("PublicResource1", ResourceName.PUBLIC_INDEXES_DOMAIN);
 
-    @Before
-    public void mocks() throws HodErrorException {
-        when(hodAuthenticationPrincipal.getApplication()).thenReturn(new ResourceIdentifier("SomeDomain", "SomeIndex"));
-        when(authenticationInformationRetriever.getPrincipal()).thenReturn(hodAuthenticationPrincipal);
+        when(resourcesService.list(any(ListResourcesRequestBuilder.class))).thenReturn(Arrays.asList(resource1, resource2, publicIndex));
+        when(resourcesService.list(any(), any(ListResourcesRequestBuilder.class))).thenReturn(Arrays.asList(resource1, resource2, publicIndex));
 
-        mockListResourcesResponse();
+        when(indexFlavourService.getIndexFlavour(eq(new ResourceUuid(resource1.getResource().getUuid())))).thenReturn(IndexFlavor.JUMBO);
+        when(indexFlavourService.getIndexFlavour(eq(new ResourceUuid(resource2.getResource().getUuid())))).thenReturn(IndexFlavor.QUERY_MANIPULATION);
+        when(indexFlavourService.getIndexFlavour(eq(new ResourceUuid(publicIndex.getResource().getUuid())))).thenReturn(IndexFlavor.STANDARD);
+
+        databasesService = new HodDatabasesServiceImpl(resourcesService, indexFlavourService);
     }
 
     @Test
@@ -76,16 +69,13 @@ public class HodDatabasesServiceTest {
         assertThat(results, hasSize(1));
     }
 
-    private void mockListResourcesResponse() throws HodErrorException {
-        final Resource resource1 = mockResource("PrivateResource1", ResourceFlavour.STANDARD);
-        final Resource resource2 = mockResource("PrivateResource2", ResourceFlavour.WEB_CLOUD);
-        final List<Resource> privateResources = Arrays.asList(resource1, resource2);
-        final List<Resource> publicResources = Collections.singletonList(mockResource("PublicResource1", ResourceFlavour.STANDARD));
-        when(resourcesService.list(any(ListResourcesRequestBuilder.class))).thenReturn(new Resources(privateResources, publicResources));
-        when(resourcesService.list(any(), any(ListResourcesRequestBuilder.class))).thenReturn(new Resources(privateResources, publicResources));
-    }
+    private ResourceDetails mockResource(final String name, final String domain) {
+        final Resource resource = Resource.builder()
+                .uuid(UUID.randomUUID())
+                .domain(domain)
+                .name(name)
+                .build();
 
-    private Resource mockResource(final String name, final ResourceFlavour resourceFlavour) {
-        return new Resource(name, "Some Description", ResourceType.CONTENT, resourceFlavour, null, name);
+        return new ResourceDetails(resource, "description", ResourceType.TEXT_INDEX, null, name);
     }
 }

@@ -5,17 +5,17 @@
 
 package com.hp.autonomy.searchcomponents.hod.requests;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndexTest;
 import com.hp.autonomy.searchcomponents.hod.search.HodGetContentRequestIndex;
 
 import java.io.IOException;
 import java.util.Collections;
 
-public class HodGetContentRequestIndexTest extends GetContentRequestIndexTest<ResourceIdentifier> {
+public class HodGetContentRequestIndexTest extends GetContentRequestIndexTest<ResourceName> {
     @Override
     protected HodGetContentRequestIndex constructObject() {
-        return new HodGetContentRequestIndexImpl(ResourceIdentifier.WIKI_ENG, Collections.singleton("Reference1"));
+        return new HodGetContentRequestIndexImpl(ResourceName.WIKI_ENG, Collections.singleton("Reference1"));
     }
 
     @Override

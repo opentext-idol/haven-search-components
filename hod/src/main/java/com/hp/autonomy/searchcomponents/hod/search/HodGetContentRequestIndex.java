@@ -5,14 +5,14 @@
 
 package com.hp.autonomy.searchcomponents.hod.search;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequest;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 
 /**
  * Option for interacting with {@link HodDocumentsService#getDocumentContent(GetContentRequest)}
  */
-public interface HodGetContentRequestIndex extends GetContentRequestIndex<ResourceIdentifier> {
+public interface HodGetContentRequestIndex extends GetContentRequestIndex<ResourceName> {
     /**
      * {@inheritDoc}
      */

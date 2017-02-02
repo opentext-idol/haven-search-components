@@ -5,7 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.requests;
 
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
@@ -30,11 +30,11 @@ public class HodQueryRequestTest extends SearchRequestTest<HodQueryRestrictions>
 
     @Override
     protected HodQueryRequest constructObject() {
-        return HodQueryRequestImpl.<ResourceIdentifier>builder()
+        return HodQueryRequestImpl.<ResourceName>builder()
                 .queryRestrictions(HodQueryRestrictionsImpl.builder()
                         .queryText("*")
                         .fieldText("NOT(EMPTY):{FIELD}")
-                        .database(ResourceIdentifier.WIKI_ENG)
+                        .database(ResourceName.WIKI_ENG)
                         .minDate(DateTime.parse("2016-11-15T16:07:00Z"))
                         .maxDate(DateTime.parse("2016-11-15T16:07:01Z"))
                         .minScore(5)

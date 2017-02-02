@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.hod.search;
 
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
+import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindSimilarService;
@@ -94,7 +94,7 @@ public class HodDocumentServiceTest {
         when(config.getQueryManipulation()).thenReturn(QueryManipulationConfig.builder().profile("SomeProfile").index("SomeIndex").build());
         when(configService.getConfig()).thenReturn(config);
 
-        when(hodAuthenticationPrincipal.getApplication()).thenReturn(new ResourceIdentifier("SomeDomain", "SomeIndex"));
+        when(hodAuthenticationPrincipal.getApplication()).thenReturn(new ResourceName("SomeDomain", "SomeIndex"));
         when(authenticationInformationRetriever.getPrincipal()).thenReturn(hodAuthenticationPrincipal);
 
         when(queryRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
@@ -140,18 +140,18 @@ public class HodDocumentServiceTest {
 
     @Test
     public void getDocumentContent() throws HodErrorException {
-        final BiFunction<ResourceIdentifier, String, HodGetContentRequestIndex> mockFn = (r, s) -> {
+        final BiFunction<ResourceName, String, HodGetContentRequestIndex> mockFn = (r, s) -> {
             final HodGetContentRequestIndex getContentRequestIndex = mock(HodGetContentRequestIndex.class);
             when(getContentRequestIndex.getIndex()).thenReturn(r);
             when(getContentRequestIndex.getReferences()).thenReturn(Collections.singleton(s));
             return getContentRequestIndex;
         };
-        final HodGetContentRequestIndex getContentRequestIndex = mockFn.apply(new ResourceIdentifier("x", "y"), "z");
-        final HodGetContentRequestIndex getContentRequestIndex2 = mockFn.apply(new ResourceIdentifier("a", "b"), "c");
+        final HodGetContentRequestIndex getContentRequestIndex = mockFn.apply(new ResourceName("x", "y"), "z");
+        final HodGetContentRequestIndex getContentRequestIndex2 = mockFn.apply(new ResourceName("a", "b"), "c");
         when(getContentRequest.getIndexesAndReferences()).thenReturn(new HashSet<>(Arrays.asList(getContentRequestIndex, getContentRequestIndex2)));
-        when(getContentService.getContent(anyListOf(String.class), any(ResourceIdentifier.class), any(GetContentRequestBuilder.class))).thenReturn(mockResults());
+        when(getContentService.getContent(anyListOf(String.class), any(ResourceName.class), any(GetContentRequestBuilder.class))).thenReturn(mockResults());
         documentsService.getDocumentContent(getContentRequest);
-        verify(getContentService, times(2)).getContent(anyListOf(String.class), any(ResourceIdentifier.class), any(GetContentRequestBuilder.class));
+        verify(getContentService, times(2)).getContent(anyListOf(String.class), any(ResourceName.class), any(GetContentRequestBuilder.class));
     }
 
     @Test(expected = NotImplementedException.class)
@@ -176,10 +176,10 @@ public class HodDocumentServiceTest {
     @SuppressWarnings("CastToConcreteClass")
     private QueryResults<HodSearchResult> mockResults() {
         final HodSearchResult resultWithIndexInQuery = HodSearchResult.builder()
-                .index(ResourceIdentifier.WIKI_ENG.getName())
+                .index(ResourceName.WIKI_ENG.getName())
                 .build();
         final HodSearchResult resultWithPublicIndex = HodSearchResult.builder()
-                .index(ResourceIdentifier.NEWS_ENG.getName())
+                .index(ResourceName.NEWS_ENG.getName())
                 .build();
         final HodSearchResult resultWithPrivateIndex = HodSearchResult.builder()
                 .index("SomeIndex")
