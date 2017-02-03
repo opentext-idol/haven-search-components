@@ -42,7 +42,6 @@ class AskAnswerServerServiceImpl implements AskAnswerServerService {
         processor = processorFactory.getResponseDataProcessor(AskResponsedata.class);
     }
 
-    @SuppressWarnings("IfMayBeConditional")
     @Override
     public List<AskAnswer> ask(final AskAnswerServerRequest request) {
         final AciParameters aciParameters = new AciParameters(AnswerServerActions.Ask.name());
