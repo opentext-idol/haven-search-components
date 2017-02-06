@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.PARAMETRIC_VALUES_SERVICE_BEAN_NAME;
 
@@ -97,31 +98,34 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     }
 
     @Override
-    public Set<QueryTagInfo> getAllParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
+    public Set<QueryTagInfo> getParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
         final Collection<TagName> fieldNames = new HashSet<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
+
         if (fieldNames.isEmpty()) {
             fieldNames.addAll(lookupFields());
         }
 
         final Set<QueryTagInfo> results;
+
         if (fieldNames.isEmpty()) {
             results = Collections.emptySet();
         } else {
-            final List<FlatField> fields = getFlatFields(parametricRequest, fieldNames);
-            results = new LinkedHashSet<>(fields.size());
-            for (final FlatField field : fields) {
-                final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
-                final LinkedHashSet<QueryTagCountInfo> values = new LinkedHashSet<>(valueElements.size());
-                valueElements.stream().filter(element -> VALUE_NODE_NAME.equals(element.getName().getLocalPart())).forEach(element -> {
-                    final TagValue tagValue = (TagValue) element.getValue();
-                    values.add(new QueryTagCountInfo(tagValue.getValue(), tagValue.getCount()));
-                });
-                if (!values.isEmpty()) {
-                    final TagName tagName = tagNameFactory.buildTagName(field.getName().get(0));
-                    results.add(new QueryTagInfo(tagName, values));
-                }
-            }
+            results = getFlatFields(parametricRequest, fieldNames).stream()
+                    .map(flatField -> {
+                        final Set<QueryTagCountInfo> values = flatField.getValueAndSubvalueOrValues().stream()
+                                .filter(element -> VALUE_NODE_NAME.equals(element.getName().getLocalPart()))
+                                .map(element -> {
+                                    final TagValue tagValue = (TagValue) element.getValue();
+                                    return new QueryTagCountInfo(tagValue.getValue(), tagValue.getCount());
+                                })
+                                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+                        final String name = flatField.getName().get(0);
+                        return new QueryTagInfo(tagNameFactory.buildTagName(name), values);
+                    })
+                    .filter(queryTagInfo -> !queryTagInfo.getValues().isEmpty())
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
         }
 
         return results;

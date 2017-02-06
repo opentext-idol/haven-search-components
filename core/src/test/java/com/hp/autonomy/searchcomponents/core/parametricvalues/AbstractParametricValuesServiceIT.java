@@ -57,8 +57,8 @@ public abstract class AbstractParametricValuesServiceIT<R extends ParametricRequ
     protected abstract FieldsRequestBuilder<F, ?> fieldsRequestParams(final FB fieldsRequestBuilder);
 
     @Test
-    public void getAllParametricValues() throws E {
-        final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(createParametricRequest());
+    public void getParametricValues() throws E {
+        final Set<QueryTagInfo> results = parametricValuesService.getParametricValues(createParametricRequest());
         assertThat(results, is(not(empty())));
     }
 

@@ -117,12 +117,12 @@ public class IdolParametricValuesServiceTest {
     }
 
     @Test
-    public void getAllParametricValues() {
+    public void getParametricValues() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("Some field"));
 
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
         when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(responseData);
-        final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
+        final Set<QueryTagInfo> results = parametricValuesService.getParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
     }
 
@@ -136,7 +136,7 @@ public class IdolParametricValuesServiceTest {
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
         when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(responseData);
 
-        final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
+        final Set<QueryTagInfo> results = parametricValuesService.getParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
     }
 
@@ -147,7 +147,7 @@ public class IdolParametricValuesServiceTest {
         final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptyList());
         when(fieldsService.getFields(any(), any(FieldTypeParam.class))).thenReturn(response);
 
-        final Set<QueryTagInfo> results = parametricValuesService.getAllParametricValues(idolParametricRequest);
+        final Set<QueryTagInfo> results = parametricValuesService.getParametricValues(idolParametricRequest);
         assertThat(results, is(empty()));
     }
 

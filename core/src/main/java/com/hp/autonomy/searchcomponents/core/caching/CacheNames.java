@@ -28,7 +28,7 @@ public interface CacheNames {
     String FIELDS = "fields";
 
     /**
-     * Cache identifier for {@link ParametricValuesService#getAllParametricValues(ParametricRequest)}
+     * Cache identifier for {@link ParametricValuesService#getParametricValues(ParametricRequest)}
      */
     String PARAMETRIC_VALUES = "parametric-values";
 

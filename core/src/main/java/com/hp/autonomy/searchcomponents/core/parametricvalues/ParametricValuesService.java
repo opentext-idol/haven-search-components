@@ -43,13 +43,13 @@ public interface ParametricValuesService<R extends ParametricRequest<Q>, Q exten
     String AUTN_DATE_FIELD = "AUTN_DATE";
 
     /**
-     * Returns all parametric values for the requested parametric fields
+     * Returns parametric values which match the request restrictions for the requested parametric fields specified.
      *
      * @param parametricRequest Query restrictions and field names
      * @return Parametric values and counts
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    Set<QueryTagInfo> getAllParametricValues(R parametricRequest) throws E;
+    Set<QueryTagInfo> getParametricValues(R parametricRequest) throws E;
 
     /**
      * Get Numeric or NumericDate parametric values as ranges and counts. For each field in the parametricRequest, a

@@ -74,7 +74,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
 
     @Override
     @Cacheable(value = CacheNames.PARAMETRIC_VALUES, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
-    public Set<QueryTagInfo> getAllParametricValues(final HodParametricRequest parametricRequest) throws HodErrorException {
+    public Set<QueryTagInfo> getParametricValues(final HodParametricRequest parametricRequest) throws HodErrorException {
         final Collection<TagName> fieldNames = new HashSet<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
         if (fieldNames.isEmpty()) {

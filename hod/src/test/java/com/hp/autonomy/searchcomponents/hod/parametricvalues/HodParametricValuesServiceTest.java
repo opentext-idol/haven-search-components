@@ -124,7 +124,7 @@ public class HodParametricValuesServiceTest {
 
         final HodParametricRequest testRequest = generateRequest(indexes, fieldNames);
 
-        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
+        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getParametricValues(testRequest);
 
         final Map<String, QueryTagInfo> fieldNamesMap = new HashMap<>();
 
@@ -150,7 +150,7 @@ public class HodParametricValuesServiceTest {
 
         final List<ResourceName> indexes = Collections.singletonList(ResourceName.PATENTS);
         final HodParametricRequest testRequest = generateRequest(indexes, Collections.emptyList());
-        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
+        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getParametricValues(testRequest);
         assertThat(fieldNamesSet, is(empty()));
     }
 
@@ -161,7 +161,7 @@ public class HodParametricValuesServiceTest {
 
         final List<ResourceName> indexes = Collections.singletonList(ResourceName.WIKI_ENG);
         final HodParametricRequest testRequest = generateRequest(indexes, Collections.emptyList());
-        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getAllParametricValues(testRequest);
+        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getParametricValues(testRequest);
         assertThat(fieldNamesSet, is(not(empty())));
     }
 
