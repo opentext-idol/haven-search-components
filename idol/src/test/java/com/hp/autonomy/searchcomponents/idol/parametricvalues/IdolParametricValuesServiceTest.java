@@ -281,6 +281,7 @@ public class IdolParametricValuesServiceTest {
         final IdolParametricRequestBuilder parametricRequestBuilder = mock(IdolParametricRequestBuilder.class);
         when(parametricRequestBuilder.maxValues(any())).thenReturn(parametricRequestBuilder);
         when(parametricRequestBuilder.ranges(any())).thenReturn(parametricRequestBuilder);
+        when(parametricRequestBuilder.start(any())).thenReturn(parametricRequestBuilder);
         when(parametricRequest.toBuilder()).thenReturn(parametricRequestBuilder);
         when(parametricRequestBuilder.build()).thenReturn(parametricRequest);
 

@@ -34,6 +34,7 @@ class HodParametricRequestImpl implements HodParametricRequest {
 
     @Singular
     private final List<TagName> fieldNames;
+    private final Integer start;
     private final Integer maxValues;
     private final SortParam sort;
     @Singular
@@ -45,6 +46,7 @@ class HodParametricRequestImpl implements HodParametricRequest {
     @JsonPOJOBuilder(withPrefix = "")
     static class HodParametricRequestImplBuilder implements HodParametricRequestBuilder {
         private Integer maxValues = MAX_VALUES_DEFAULT;
+        private Integer start = START_DEFAULT;
         private SortParam sort = SortParam.DocumentCount;
         private boolean modified = true;
     }

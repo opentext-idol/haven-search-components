@@ -33,6 +33,7 @@ class IdolParametricRequestImpl implements IdolParametricRequest {
 
     @Singular
     private final List<TagName> fieldNames;
+    private final Integer start;
     private final Integer maxValues;
     private final SortParam sort;
     @Singular
@@ -44,6 +45,7 @@ class IdolParametricRequestImpl implements IdolParametricRequest {
     @JsonPOJOBuilder(withPrefix = "")
     static class IdolParametricRequestImplBuilder implements IdolParametricRequestBuilder {
         private Integer maxValues = MAX_VALUES_DEFAULT;
+        private Integer start = START_DEFAULT;
         private SortParam sort = SortParam.DocumentCount;
         private boolean modified = true;
     }

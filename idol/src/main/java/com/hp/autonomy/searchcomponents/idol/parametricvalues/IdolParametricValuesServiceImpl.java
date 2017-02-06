@@ -247,6 +247,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
         final IdolParametricRequest bucketingRequest = parametricRequest.toBuilder()
                 .maxValues(null)
+                .start(1)
                 .ranges(ranges)
                 .build();
 
@@ -309,6 +310,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
         parameterHandler.addSecurityInfo(aciParameters);
         aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
+        aciParameters.add(GetQueryTagValuesParams.Start.name(), parametricRequest.getStart());
         aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), parametricRequest.getMaxValues());
         aciParameters.add(GetQueryTagValuesParams.FieldName.name(), tagNamesToFieldNamesParam(fieldNames));
         aciParameters.add(GetQueryTagValuesParams.Sort.name(), parametricRequest.getSort());

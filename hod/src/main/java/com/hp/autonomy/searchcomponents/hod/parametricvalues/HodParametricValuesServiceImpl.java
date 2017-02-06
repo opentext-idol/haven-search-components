@@ -77,22 +77,29 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
     public Set<QueryTagInfo> getParametricValues(final HodParametricRequest parametricRequest) throws HodErrorException {
         final Collection<TagName> fieldNames = new HashSet<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
+
         if (fieldNames.isEmpty()) {
             fieldNames.addAll(lookupFields(parametricRequest.getQueryRestrictions().getDatabases()));
         }
 
         final Set<QueryTagInfo> results;
+
         if (fieldNames.isEmpty()) {
             results = Collections.emptySet();
         } else {
-            final FieldNames parametricFieldNames = getParametricValues(parametricRequest, fieldNames);
+            final int start = parametricRequest.getStart();
+            final FieldNames parametricFieldNames = fetchParametricValues(parametricRequest, fieldNames);
             final Set<String> fieldNamesSet = parametricFieldNames.getFieldNames();
 
             results = new HashSet<>();
+
             for (final String name : fieldNamesSet) {
-                final Set<QueryTagCountInfo> values = new HashSet<>(parametricFieldNames.getValuesAndCountsForFieldName(name));
-                if (!values.isEmpty()) {
-                    results.add(new QueryTagInfo(tagNameFactory.buildTagName(name), values));
+                final List<QueryTagCountInfo> tagsAndCounts = parametricFieldNames.getValuesAndCountsForFieldName(name);
+
+                // HOD GetParametricValues has no start parameter, so implement our own here
+                if (tagsAndCounts.size() >= start) {
+                    final List<QueryTagCountInfo> valuesAndCounts = tagsAndCounts.subList(start - 1, tagsAndCounts.size());
+                    results.add(new QueryTagInfo(tagNameFactory.buildTagName(name), new LinkedHashSet<>(valuesAndCounts)));
                 }
             }
         }
@@ -189,7 +196,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         if (fieldNames.isEmpty()) {
             results = Collections.emptySet();
         } else {
-            final FieldNames parametricFieldNames = getParametricValues(parametricRequest, fieldNames);
+            final FieldNames parametricFieldNames = fetchParametricValues(parametricRequest, fieldNames);
             final Set<String> fieldNamesSet = parametricFieldNames.getFieldNames();
 
             results = new LinkedHashSet<>();
@@ -214,7 +221,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyMap();
         } else {
-            final FieldNames response = getParametricValues(parametricRequest, parametricRequest.getFieldNames());
+            final FieldNames response = fetchParametricValues(parametricRequest, parametricRequest.getFieldNames());
             final Map<TagName, ValueDetails> output = new LinkedHashMap<>();
 
             for (final String fieldName : response.getFieldNames()) {
@@ -249,7 +256,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         }
     }
 
-    private FieldNames getParametricValues(final ParametricRequest<HodQueryRestrictions> parametricRequest, final Collection<TagName> fieldNames) throws HodErrorException {
+    private FieldNames fetchParametricValues(final ParametricRequest<HodQueryRestrictions> parametricRequest, final Collection<TagName> tagNames) throws HodErrorException {
         final ResourceName queryProfile = parametricRequest.isModified() ? getQueryProfile() : null;
 
         final GetParametricValuesRequestBuilder parametricParams = new GetParametricValuesRequestBuilder()
@@ -261,8 +268,12 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                 .setMinScore(parametricRequest.getQueryRestrictions().getMinScore())
                 .setSecurityInfo(authenticationInformationRetriever.getPrincipal().getSecurityInfo());
 
-        return getParametricValuesService.getParametricValues(fieldNames.stream().map(TagName::getId).collect(Collectors.toList()),
-                new ArrayList<>(parametricRequest.getQueryRestrictions().getDatabases()), parametricParams);
+        final List<String> fieldNames = tagNames.stream()
+                .map(TagName::getId)
+                .collect(Collectors.toList());
+
+        final Collection<ResourceName> indexes = parametricRequest.getQueryRestrictions().getDatabases();
+        return getParametricValuesService.getParametricValues(fieldNames, indexes, parametricParams);
     }
 
     private ResourceName getQueryProfile() {

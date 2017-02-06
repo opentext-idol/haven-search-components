@@ -270,6 +270,7 @@ public class HodParametricValuesServiceTest {
         when(parametricRequest.getFieldNames()).thenReturn(tagNames);
         when(parametricRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
         when(parametricRequest.getSort()).thenReturn(SortParam.ReverseAlphabetical);
+        when(parametricRequest.getStart()).thenReturn(1);
         return parametricRequest;
     }
 
