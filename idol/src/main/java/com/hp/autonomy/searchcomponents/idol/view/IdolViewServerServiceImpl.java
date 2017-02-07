@@ -146,7 +146,7 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
                             .setPath("/")
                             .addParameter(AciConstants.PARAM_ACTION, ConnectorActions.View.name())
                             .addParameter(ConnectorViewParams.Identifier.name(), identifier)
-                            .addParameter(ConnectorViewParams.Group.name(), group)
+                            .addParameter(ConnectorViewParams.Autn_Group.name(), group)
                             .build();
 
                     reference = uri.toString();
