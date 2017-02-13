@@ -5,13 +5,12 @@
 
 package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 
+import com.hp.autonomy.aci.content.ranges.Range;
+import com.hp.autonomy.aci.content.ranges.Ranges;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.caching.CachingConfiguration;
 import com.hp.autonomy.hod.client.api.resource.ResourceName;
-import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldNames;
-import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesRequestBuilder;
-import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
-import com.hp.autonomy.hod.client.api.textindex.query.parametric.ParametricSort;
+import com.hp.autonomy.hod.client.api.textindex.query.parametric.*;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
@@ -28,6 +27,7 @@ import com.hp.autonomy.types.idol.responses.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.*;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +47,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
     private final HodFieldsService fieldsService;
     private final ObjectFactory<HodFieldsRequestBuilder> fieldsRequestBuilderFactory;
     private final GetParametricValuesService getParametricValuesService;
+    private final GetParametricRangesService getParametricRangesService;
     private final BucketingParamsHelper bucketingParamsHelper;
     private final TagNameFactory tagNameFactory;
     private final ConfigService<? extends HodSearchCapable> configService;
@@ -58,6 +59,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
             final HodFieldsService fieldsService,
             final ObjectFactory<HodFieldsRequestBuilder> fieldsRequestBuilderFactory,
             final GetParametricValuesService getParametricValuesService,
+            final GetParametricRangesService getParametricRangesService,
             final BucketingParamsHelper bucketingParamsHelper,
             final TagNameFactory tagNameFactory,
             final ConfigService<? extends HodSearchCapable> configService,
@@ -66,6 +68,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         this.fieldsService = fieldsService;
         this.fieldsRequestBuilderFactory = fieldsRequestBuilderFactory;
         this.getParametricValuesService = getParametricValuesService;
+        this.getParametricRangesService = getParametricRangesService;
         this.bucketingParamsHelper = bucketingParamsHelper;
         this.tagNameFactory = tagNameFactory;
         this.configService = configService;
@@ -82,32 +85,33 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
             fieldNames.addAll(lookupFields(parametricRequest.getQueryRestrictions().getDatabases()));
         }
 
-        final Set<QueryTagInfo> results;
-
         if (fieldNames.isEmpty()) {
-            results = Collections.emptySet();
+            return Collections.emptySet();
         } else {
             final int start = parametricRequest.getStart();
-            final FieldNames parametricFieldNames = fetchParametricValues(parametricRequest, fieldNames);
-            final Set<String> fieldNamesSet = parametricFieldNames.getFieldNames();
+            final Iterable<FieldValues> response = fetchParametricValues(parametricRequest, fieldNames);
 
-            results = new HashSet<>();
+            final Set<QueryTagInfo> output = new HashSet<>();
 
-            for (final String name : fieldNamesSet) {
-                final List<QueryTagCountInfo> tagsAndCounts = parametricFieldNames.getValuesAndCountsForFieldName(name);
+            for (final FieldValues fieldValues : response) {
+                final List<FieldValues.ValueAndCount> responseValues = fieldValues.getValues();
 
-                // HOD GetParametricValues has no start parameter, so implement our own here
-                if (tagsAndCounts.size() >= start) {
-                    final List<QueryTagCountInfo> valuesAndCounts = tagsAndCounts.subList(start - 1, tagsAndCounts.size());
-                    results.add(new QueryTagInfo(tagNameFactory.buildTagName(name), new LinkedHashSet<>(valuesAndCounts)));
+                if (responseValues.size() >= start) {
+                    // HOD GetParametricValues has no start parameter, so implement our own here
+                    final List<FieldValues.ValueAndCount> valuesInRange = responseValues.subList(start - 1, responseValues.size());
+
+                    final Set<QueryTagCountInfo> values = valuesInRange.stream()
+                            .map(valueAndCount -> new QueryTagCountInfo(valueAndCount.getValue(), valueAndCount.getCount()))
+                            .collect(Collectors.toCollection(LinkedHashSet::new));
+
+                    output.add(new QueryTagInfo(tagNameFactory.buildTagName(fieldValues.getName()), values, fieldValues.getTotalValues()));
                 }
             }
-        }
 
-        return results;
+            return output;
+        }
     }
 
-    //TODO use the same method as IDOL for bucketing, once HOD-2784 and HOD-2785 are complete
     @Override
     @Cacheable(value = CacheNames.PARAMETRIC_VALUES_IN_BUCKETS, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
     public List<RangeInfo> getNumericParametricValuesInBuckets(final HodParametricRequest parametricRequest, final Map<TagName, BucketingParams> bucketingParamsPerField) throws HodErrorException {
@@ -116,15 +120,30 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         } else {
             bucketingParamsHelper.validateBucketingParams(parametricRequest, bucketingParamsPerField);
 
-            final Set<QueryTagInfo> numericFieldInfo = getNumericParametricValues(parametricRequest);
-            final List<RangeInfo> ranges = new ArrayList<>(numericFieldInfo.size());
+            final Map<TagName, List<Double>> boundariesPerField = bucketingParamsPerField.entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> bucketingParamsHelper.calculateBoundaries(entry.getValue())));
 
-            for (final QueryTagInfo queryTagInfo : numericFieldInfo) {
-                final BucketingParams bucketingParams = bucketingParamsPerField.get(tagNameFactory.buildTagName(queryTagInfo.getId()));
-                ranges.add(parseNumericParametricValuesInBuckets(queryTagInfo, bucketingParams));
-            }
+            final List<Range> ranges = boundariesPerField.entrySet().stream()
+                    .map(entry -> new Range(entry.getKey().getId(), ArrayUtils.toPrimitive(entry.getValue().toArray(new Double[entry.getValue().size()]))))
+                    .collect(Collectors.toList());
 
-            return ranges;
+            final List<FieldRanges> response = fetchParametricRanges(parametricRequest, null, new Ranges(ranges).toString());
+
+            return response.stream()
+                    .map(fieldRanges -> {
+                        final TagName tagName = tagNameFactory.buildTagName(fieldRanges.getName());
+
+                        final List<Double> boundaries = boundariesPerField.get(tagName);
+                        // All buckets have the same size, so just use the value from the first one
+                        final double bucketSize = boundaries.get(1) - boundaries.get(0);
+
+                        final List<RangeInfo.Value> values = fieldRanges.getValueRanges().stream()
+                                .map(fieldValues -> new RangeInfo.Value(fieldValues.getCount(), fieldValues.getLowerBound(), fieldValues.getUpperBound()))
+                                .collect(Collectors.toList());
+
+                        return new RangeInfo(tagName, fieldRanges.getValueDetails().getCount(), boundaries.get(0), boundaries.get(boundaries.size() - 1), bucketSize, values);
+                    })
+                    .collect(Collectors.toList());
         }
     }
 
@@ -133,82 +152,6 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                 .databases(databases)
                 .build(), FieldTypeParam.Parametric)
                 .get(FieldTypeParam.Parametric);
-    }
-
-    // Parse a list of numeric parametric values into buckets specified by the min, max and number of buckets in the BucketingParams
-    private RangeInfo parseNumericParametricValuesInBuckets(final QueryTagInfo queryTagInfo, final BucketingParams bucketingParams) {
-        final List<Double> boundaries = bucketingParamsHelper.calculateBoundaries(bucketingParams);
-
-        // Map of bucket minimum to count
-        final Map<Double, Integer> bucketCounts = new HashMap<>();
-
-        // Boundaries includes the min and the max values, so has a minimum size of 2
-        for (int i = 0; i < boundaries.size() - 1; i++) {
-            bucketCounts.put(boundaries.get(i), 0);
-        }
-
-        int totalCount = 0;
-
-        // The index of the min value for the bucket we are currently counting
-        int currentBoundary = 0;
-
-        final Iterator<QueryTagCountInfo> iterator = queryTagInfo.getValues().iterator();
-
-        while (iterator.hasNext() && currentBoundary < boundaries.size()) {
-            final QueryTagCountInfo valueAndCount = iterator.next();
-            final double value = Double.parseDouble(valueAndCount.getValue());
-
-            // Ignore values less than the lowest bucket boundary
-            if (value >= boundaries.get(currentBoundary)) {
-                while (currentBoundary < boundaries.size() - 1) {
-                    // Check that the value is within the max boundary for the bucket, if not, check the next bucket
-                    if (value < boundaries.get(currentBoundary + 1)) {
-                        final Double min = boundaries.get(currentBoundary);
-                        totalCount += valueAndCount.getCount();
-                        bucketCounts.put(min, bucketCounts.get(min) + valueAndCount.getCount());
-
-                        break;
-                    } else {
-                        currentBoundary++;
-                    }
-                }
-            }
-        }
-
-        final List<RangeInfo.Value> buckets = new ArrayList<>(bucketingParams.getTargetNumberOfBuckets());
-
-        // Boundaries includes the min and the max values, so has a minimum size of 2
-        for (int i = 0; i < boundaries.size() - 1; i++) {
-            final double min = boundaries.get(i);
-            buckets.add(new RangeInfo.Value(bucketCounts.get(min), min, boundaries.get(i + 1)));
-        }
-
-        // All buckets have the same size, so just use the value from the first one
-        final double bucketSize = boundaries.get(1) - boundaries.get(0);
-        return new RangeInfo(tagNameFactory.buildTagName(queryTagInfo.getId()), totalCount, bucketingParams.getMin(), bucketingParams.getMax(), bucketSize, buckets);
-    }
-
-    // Get parametric values matching the given request from HOD and parse them as numeric CSVs
-    private Set<QueryTagInfo> getNumericParametricValues(final ParametricRequest<HodQueryRestrictions> parametricRequest) throws HodErrorException {
-        final Collection<TagName> fieldNames = parametricRequest.getFieldNames();
-
-        final Set<QueryTagInfo> results;
-        if (fieldNames.isEmpty()) {
-            results = Collections.emptySet();
-        } else {
-            final FieldNames parametricFieldNames = fetchParametricValues(parametricRequest, fieldNames);
-            final Set<String> fieldNamesSet = parametricFieldNames.getFieldNames();
-
-            results = new LinkedHashSet<>();
-            for (final String name : fieldNamesSet) {
-                final Set<QueryTagCountInfo> values = new LinkedHashSet<>(parametricFieldNames.getValuesAndCountsForNumericField(name));
-                if (!values.isEmpty()) {
-                    results.add(new QueryTagInfo(tagNameFactory.buildTagName(name), values));
-                }
-            }
-        }
-
-        return results;
     }
 
     @Override
@@ -221,43 +164,51 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyMap();
         } else {
-            final FieldNames response = fetchParametricValues(parametricRequest, parametricRequest.getFieldNames());
-            final Map<TagName, ValueDetails> output = new LinkedHashMap<>();
+            final List<FieldRanges> response = fetchParametricRanges(parametricRequest, 1, "");
 
-            for (final String fieldName : response.getFieldNames()) {
-                final List<QueryTagCountInfo> values = response.getValuesAndCountsForNumericField(fieldName);
-                final double firstValue = Double.parseDouble(values.get(0).getValue());
+            return response.stream()
+                    .collect(Collectors.toMap(fieldRanges -> tagNameFactory.buildTagName(fieldRanges.getName()), fieldRanges -> {
+                        final FieldRanges.ValueDetails responseValueDetails = fieldRanges.getValueDetails();
 
-                double min = firstValue;
-                double max = firstValue;
-                double sum = 0;
-                double totalCount = 0;
-
-                for (final QueryTagCountInfo countInfo : values) {
-                    final double value = Double.parseDouble(countInfo.getValue());
-                    totalCount += countInfo.getCount();
-                    sum += value * countInfo.getCount();
-                    min = Math.min(value, min);
-                    max = Math.max(value, max);
-                }
-
-                final ValueDetails valueDetails = new ValueDetails.Builder()
-                        .setMin(min)
-                        .setMax(max)
-                        .setSum(sum)
-                        .setAverage(sum / totalCount)
-                        .setTotalValues(values.size())
-                        .build();
-
-                output.put(tagNameFactory.buildTagName(fieldName), valueDetails);
-            }
-
-            return output;
+                        return new ValueDetails.Builder()
+                                .setAverage(responseValueDetails.getMean())
+                                .setMax(responseValueDetails.getMaximum())
+                                .setMin(responseValueDetails.getMinimum())
+                                .setSum(responseValueDetails.getSum())
+                                .setTotalValues(responseValueDetails.getCount())
+                                .build();
+                    }));
         }
     }
 
-    private FieldNames fetchParametricValues(final ParametricRequest<HodQueryRestrictions> parametricRequest, final Collection<TagName> tagNames) throws HodErrorException {
-        final ResourceName queryProfile = parametricRequest.isModified() ? getQueryProfile() : null;
+    private List<FieldRanges> fetchParametricRanges(
+            final ParametricRequest<HodQueryRestrictions> parametricRequest,
+            final Integer maxRanges,
+            final String ranges
+    ) throws HodErrorException {
+        final List<String> fieldNames = parametricRequest.getFieldNames().stream()
+                .map(TagName::getId)
+                .collect(Collectors.toList());
+
+        final GetParametricRangesRequestBuilder params = new GetParametricRangesRequestBuilder()
+                .setQueryProfile(getQueryProfile(parametricRequest))
+                .setText(parametricRequest.getQueryRestrictions().getQueryText())
+                .setFieldText(parametricRequest.getQueryRestrictions().getFieldText())
+                .setMinScore(parametricRequest.getQueryRestrictions().getMinScore())
+                .setSecurityInfo(authenticationInformationRetriever.getPrincipal().getSecurityInfo())
+                .setMaxRanges(maxRanges)
+                .setValueDetails(true);
+
+        return getParametricRangesService.getParametricRanges(
+                fieldNames,
+                parametricRequest.getQueryRestrictions().getDatabases(),
+                ranges,
+                params
+        );
+    }
+
+    private Iterable<FieldValues> fetchParametricValues(final ParametricRequest<HodQueryRestrictions> parametricRequest, final Collection<TagName> tagNames) throws HodErrorException {
+        final ResourceName queryProfile = getQueryProfile(parametricRequest);
 
         final GetParametricValuesRequestBuilder parametricParams = new GetParametricValuesRequestBuilder()
                 .setQueryProfile(queryProfile)
@@ -266,6 +217,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                 .setFieldText(parametricRequest.getQueryRestrictions().getFieldText())
                 .setMaxValues(parametricRequest.getMaxValues())
                 .setMinScore(parametricRequest.getQueryRestrictions().getMinScore())
+                .setTotalValues(true)
                 .setSecurityInfo(authenticationInformationRetriever.getPrincipal().getSecurityInfo());
 
         final List<String> fieldNames = tagNames.stream()
@@ -276,10 +228,13 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         return getParametricValuesService.getParametricValues(fieldNames, indexes, parametricParams);
     }
 
-    private ResourceName getQueryProfile() {
-        final String profileName = configService.getConfig().getQueryManipulation().getProfile();
-        final String domain = authenticationInformationRetriever.getPrincipal().getApplication().getDomain();
-        return new ResourceName(domain, profileName);
+    private ResourceName getQueryProfile(final ParametricRequest<HodQueryRestrictions> parametricRequest) {
+        if (parametricRequest.isModified()) {
+            final String profileName = configService.getConfig().getQueryManipulation().getProfile();
+            final String domain = authenticationInformationRetriever.getPrincipal().getApplication().getDomain();
+            return new ResourceName(domain, profileName);
+        } else {
+            return null;
+        }
     }
-
 }

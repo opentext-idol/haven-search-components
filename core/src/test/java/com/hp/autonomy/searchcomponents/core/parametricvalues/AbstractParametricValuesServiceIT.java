@@ -71,6 +71,9 @@ public abstract class AbstractParametricValuesServiceIT<
     public void getParametricValues() throws E {
         final Set<QueryTagInfo> results = parametricValuesService.getParametricValues(createParametricRequest());
         assertThat(results, is(not(empty())));
+
+        final QueryTagInfo tagInfo = results.iterator().next();
+        assertThat(tagInfo.getTotalValues(), greaterThanOrEqualTo(0));
     }
 
     @Test
