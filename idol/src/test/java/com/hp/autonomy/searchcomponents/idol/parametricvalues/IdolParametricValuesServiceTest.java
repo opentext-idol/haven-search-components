@@ -195,6 +195,24 @@ public class IdolParametricValuesServiceTest {
         assertEquals(new RangeInfo.Value(0, 5, 6), iterator.next());
     }
 
+    @Test
+    public void getRangesNoResults() {
+        mockBucketResponses(0);
+
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
+        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.buildTagName("ParametricNumericDateField"), new BucketingParams(5, 1.0, 6.0)));
+        assertThat(results, is(not(empty())));
+
+        final RangeInfo info = results.iterator().next();
+        final List<RangeInfo.Value> countInfo = info.getValues();
+        final Iterator<RangeInfo.Value> iterator = countInfo.iterator();
+        assertEquals(new RangeInfo.Value(0, 1, 2), iterator.next());
+        assertEquals(new RangeInfo.Value(0, 2, 3), iterator.next());
+        assertEquals(new RangeInfo.Value(0, 3, 4), iterator.next());
+        assertEquals(new RangeInfo.Value(0, 4, 5), iterator.next());
+        assertEquals(new RangeInfo.Value(0, 5, 6), iterator.next());
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void getNumericParametricValuesZeroBucketsZeroBuckets() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));

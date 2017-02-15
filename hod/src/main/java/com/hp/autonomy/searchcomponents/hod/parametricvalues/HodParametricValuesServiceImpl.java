@@ -137,9 +137,11 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                         // All buckets have the same size, so just use the value from the first one
                         final double bucketSize = boundaries.get(1) - boundaries.get(0);
 
-                        final List<RangeInfo.Value> values = fieldRanges.getValueRanges().stream()
-                                .map(fieldValues -> new RangeInfo.Value(fieldValues.getCount(), fieldValues.getLowerBound(), fieldValues.getUpperBound()))
-                                .collect(Collectors.toList());
+                        final List<RangeInfo.Value> values = fieldRanges.getValueRanges().isEmpty()
+                                ? bucketingParamsHelper.emptyBuckets(boundaries)
+                                : fieldRanges.getValueRanges().stream()
+                                        .map(fieldValues -> new RangeInfo.Value(fieldValues.getCount(), fieldValues.getLowerBound(), fieldValues.getUpperBound()))
+                                        .collect(Collectors.toList());
 
                         return new RangeInfo(tagName, fieldRanges.getValueDetails().getCount(), boundaries.get(0), boundaries.get(boundaries.size() - 1), bucketSize, values);
                     })

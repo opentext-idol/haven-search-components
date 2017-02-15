@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.google.common.collect.ImmutableMap;
+import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -63,5 +66,15 @@ public class BucketingParamsHelperTest {
     public void calculateBoundaries() {
         final List<Double> expectedBoundaries = Arrays.asList(0d, 1d, 2d, 3d, 4d);
         assertEquals(expectedBoundaries, bucketingParamsHelper.calculateBoundaries(new BucketingParams(4, 0, 4)));
+    }
+
+    @Test
+    public void emptyBuckets() {
+        final List<RangeInfo.Value> buckets = bucketingParamsHelper.emptyBuckets(Arrays.asList(0.0, 0.5, 1.0));
+
+        assertThat(buckets, is(Arrays.asList(
+                new RangeInfo.Value(0, 0.0, 0.5),
+                new RangeInfo.Value(0, 0.5, 1.0)
+        )));
     }
 }

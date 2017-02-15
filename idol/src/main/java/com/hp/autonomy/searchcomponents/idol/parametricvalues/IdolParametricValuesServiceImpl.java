@@ -237,6 +237,11 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
             final List<Double> boundaries = boundariesPerField.get(tagName);
 
+            // If no documents match the query parameters, GetQueryTagValues does not return any buckets
+            if (values.isEmpty()) {
+                values.addAll(bucketingParamsHelper.emptyBuckets(boundaries));
+            }
+
             // All buckets have the same size, so just use the value from the first one
             final double bucketSize = boundaries.get(1) - boundaries.get(0);
             return new RangeInfo(tagName, count, boundaries.get(0), boundaries.get(boundaries.size() - 1), bucketSize, values);

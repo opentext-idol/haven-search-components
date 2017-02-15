@@ -52,9 +52,9 @@ public abstract class AbstractParametricValuesServiceIT<
     private FieldsService<F, E> fieldsService;
     @Autowired
     private ObjectFactory<FB> fieldsRequestBuilderFactory;
-    @Autowired
-    private ObjectFactory<ParametricRequestBuilder<R, Q, ?>> parametricRequestBuilderFactory;
 
+    @Autowired
+    protected ObjectFactory<ParametricRequestBuilder<R, Q, ?>> parametricRequestBuilderFactory;
     @Autowired
     protected TagNameFactory tagNameFactory;
     @Autowired
@@ -66,6 +66,8 @@ public abstract class AbstractParametricValuesServiceIT<
 
     // Find a parametric field with 2 or more values for the parametric request used in these tests
     protected abstract TagName determinePaginatableField();
+
+    protected abstract R noResultsParametricRequest();
 
     @Test
     public void getParametricValues() throws E {
@@ -82,6 +84,18 @@ public abstract class AbstractParametricValuesServiceIT<
         final ValueDetails valueDetails = valueDetailsOutput.get(tagNameFactory.buildTagName(ParametricValuesService.AUTN_DATE_FIELD));
         final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(createNumericParametricRequest(), ImmutableMap.of(tagNameFactory.buildTagName(ParametricValuesService.AUTN_DATE_FIELD), new BucketingParams(35, valueDetails.getMin(), valueDetails.getMax())));
         assertThat(ranges, not(empty()));
+    }
+
+    @Test
+    public void rangesNoResults() throws E {
+        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(
+                noResultsParametricRequest(),
+                ImmutableMap.of(tagNameFactory.buildTagName(ParametricValuesService.AUTN_DATE_FIELD), new BucketingParams(5, 0, 1))
+        );
+
+        assertThat(ranges, hasSize(1));
+        assertThat(ranges.get(0).getValues(), hasSize(5));
+        ranges.get(0).getValues().forEach(value -> assertThat(value.getCount(), is(0)));
     }
 
     @Test
