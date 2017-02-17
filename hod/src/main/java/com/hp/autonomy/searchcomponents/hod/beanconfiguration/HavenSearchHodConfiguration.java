@@ -17,6 +17,8 @@ import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentServiceImpl;
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsService;
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsServiceImpl;
+import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricRangesService;
+import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricRangesServiceImpl;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesServiceImpl;
 import com.hp.autonomy.hod.client.api.textindex.query.search.*;
@@ -105,6 +107,12 @@ public class HavenSearchHodConfiguration {
     @ConditionalOnMissingBean(GetParametricValuesService.class)
     public GetParametricValuesService getParametricValuesService() {
         return new GetParametricValuesServiceImpl(hodServiceConfig);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(GetParametricRangesService.class)
+    public GetParametricRangesService getParametricRangesService() {
+        return new GetParametricRangesServiceImpl(hodServiceConfig);
     }
 
     @Bean

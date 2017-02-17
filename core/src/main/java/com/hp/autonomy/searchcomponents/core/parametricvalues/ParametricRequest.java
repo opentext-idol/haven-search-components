@@ -19,12 +19,19 @@ import java.util.List;
  * @param <Q> The type of the query restrictions object
  */
 public interface ParametricRequest<Q extends QueryRestrictions<?>> extends RequestObject<ParametricRequest<Q>, ParametricRequestBuilder<?, Q, ?>> {
+    int START_DEFAULT = 1;
+
     /**
      * Fields for which to retrieve parametric values
      *
      * @return Idol field names
      */
     List<TagName> getFieldNames();
+
+    /**
+     * @return Index of first value to return for each field (1-based)
+     */
+    Integer getStart();
 
     /**
      * Max results to return

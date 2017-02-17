@@ -46,6 +46,12 @@ public interface ParametricRequestBuilder<P extends ParametricRequest<Q>, Q exte
     B clearFieldNames();
 
     /**
+     * @param start The first value to return
+     * @return The builder (for chaining)
+     */
+    B start(Integer start);
+
+    /**
      * Sets max results to return
      *
      * @param maxValues Max results to return
