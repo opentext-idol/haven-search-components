@@ -11,6 +11,7 @@ import com.hp.autonomy.hod.client.api.authentication.EntityType;
 import com.hp.autonomy.hod.client.api.resource.ResourcesService;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
 import com.hp.autonomy.hod.client.api.textindex.query.fields.RetrieveIndexFieldsService;
+import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricRangesService;
 import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.Document;
 import com.hp.autonomy.hod.client.api.textindex.query.search.FindRelatedConceptsService;
@@ -77,6 +78,10 @@ class HodCustomConfiguration {
         return mock(GetParametricValuesService.class);
     }
 
+    @Bean
+    public GetParametricRangesService getParametricRangesService() {
+        return mock(GetParametricRangesService.class);
+    }
 
     @Bean
     public ViewDocumentService viewDocumentService() {

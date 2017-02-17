@@ -1,6 +1,7 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import org.springframework.stereotype.Component;
 
@@ -47,5 +48,16 @@ class BucketingParamsHelperImpl implements BucketingParamsHelper {
         }
 
         return boundaries;
+    }
+
+    @Override
+    public List<RangeInfo.Value> emptyBuckets(final List<Double> boundaries) {
+        final List<RangeInfo.Value> values = new LinkedList<>();
+
+        for (int i = 0; i < boundaries.size() - 1; i++) {
+            values.add(new RangeInfo.Value(0, boundaries.get(i), boundaries.get(i + 1)));
+        }
+
+        return values;
     }
 }
