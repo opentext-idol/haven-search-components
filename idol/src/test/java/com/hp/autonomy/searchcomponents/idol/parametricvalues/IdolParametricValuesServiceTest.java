@@ -15,7 +15,11 @@ import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsService;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.search.QueryExecutor;
-import com.hp.autonomy.types.idol.responses.*;
+import com.hp.autonomy.types.idol.responses.FlatField;
+import com.hp.autonomy.types.idol.responses.GetQueryTagValuesResponseData;
+import com.hp.autonomy.types.idol.responses.RecursiveField;
+import com.hp.autonomy.types.idol.responses.TagValue;
+import com.hp.autonomy.types.idol.responses.Values;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
@@ -38,7 +42,14 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
@@ -50,7 +61,6 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -93,6 +103,7 @@ public class IdolParametricValuesServiceTest {
     @Before
     public void setUp() {
         when(fieldsRequestBuilderFactory.getObject()).thenReturn(fieldsRequestBuilder);
+        when(fieldsRequestBuilder.fieldType(any())).thenReturn(fieldsRequestBuilder);
 
         parametricValuesService = new IdolParametricValuesServiceImpl(
                 parameterHandler,
@@ -118,8 +129,8 @@ public class IdolParametricValuesServiceTest {
     public void getFieldNamesFirst() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
-        final ImmutableMap<FieldTypeParam, List<TagName>> fieldsResponse = ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(tagNameFactory.buildTagName("CATEGORY")));
-        when(fieldsService.getFields(any(), eq(FieldTypeParam.Parametric))).thenReturn(fieldsResponse);
+        final ImmutableMap<FieldTypeParam, Set<TagName>> fieldsResponse = ImmutableMap.of(FieldTypeParam.Parametric, Collections.singleton(tagNameFactory.buildTagName("CATEGORY")));
+        when(fieldsService.getFields(any())).thenReturn(fieldsResponse);
 
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
         when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(responseData);
@@ -132,8 +143,8 @@ public class IdolParametricValuesServiceTest {
     public void parametricValuesNotConfigured() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
-        final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptyList());
-        when(fieldsService.getFields(any(), any(FieldTypeParam.class))).thenReturn(response);
+        final Map<FieldTypeParam, Set<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptySet());
+        when(fieldsService.getFields(any())).thenReturn(response);
 
         final Set<QueryTagInfo> results = parametricValuesService.getParametricValues(idolParametricRequest);
         assertThat(results, is(empty()));
@@ -246,8 +257,8 @@ public class IdolParametricValuesServiceTest {
     public void getDependentValuesFieldNamesFirst() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
-        final ImmutableMap<FieldTypeParam, List<TagName>> fieldsResponse = ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(tagNameFactory.buildTagName("CATEGORY")));
-        when(fieldsService.getFields(any(), eq(FieldTypeParam.Parametric))).thenReturn(fieldsResponse);
+        final ImmutableMap<FieldTypeParam, Set<TagName>> fieldsResponse = ImmutableMap.of(FieldTypeParam.Parametric, Collections.singleton(tagNameFactory.buildTagName("CATEGORY")));
+        when(fieldsService.getFields(any())).thenReturn(fieldsResponse);
 
         final GetQueryTagValuesResponseData responseData = mockRecursiveResponse();
         when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(responseData);
@@ -260,8 +271,8 @@ public class IdolParametricValuesServiceTest {
     public void dependentParametricValuesNotConfigured() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
-        final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptyList());
-        when(fieldsService.getFields(any(), any(FieldTypeParam.class))).thenReturn(response);
+        final Map<FieldTypeParam, Set<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptySet());
+        when(fieldsService.getFields(any())).thenReturn(response);
 
         final Collection<RecursiveField> results = parametricValuesService.getDependentParametricValues(idolParametricRequest);
         assertThat(results, is(empty()));

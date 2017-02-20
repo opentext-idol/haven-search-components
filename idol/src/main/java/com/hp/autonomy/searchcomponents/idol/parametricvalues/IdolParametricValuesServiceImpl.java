@@ -209,7 +209,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     }
 
     private Collection<TagName> lookupFields() {
-        return fieldsService.getFields(fieldsRequestBuilderFactory.getObject().build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
+        return fieldsService.getFields(fieldsRequestBuilderFactory.getObject().fieldType(FieldTypeParam.Parametric).build()).get(FieldTypeParam.Parametric);
     }
 
     private Function<FlatField, RangeInfo> flatFieldToRangeInfo(final Map<TagName, List<Double>> boundariesPerField) {

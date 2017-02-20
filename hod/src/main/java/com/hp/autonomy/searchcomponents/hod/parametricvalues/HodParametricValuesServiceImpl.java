@@ -151,8 +151,9 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
 
     private Collection<TagName> lookupFields(final Collection<ResourceName> databases) throws HodErrorException {
         return fieldsService.getFields(fieldsRequestBuilderFactory.getObject()
+                .fieldType(FieldTypeParam.Parametric)
                 .databases(databases)
-                .build(), FieldTypeParam.Parametric)
+                .build())
                 .get(FieldTypeParam.Parametric);
     }
 

@@ -158,7 +158,8 @@ public abstract class AbstractParametricValuesServiceIT<
 
     protected R createParametricRequest() throws E {
         final FieldsRequestBuilder<F, ?> fieldsRequestBuilder = fieldsRequestParams(fieldsRequestBuilderFactory.getObject());
-        final List<TagName> fields = fieldsService.getFields(fieldsRequestBuilder.build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
+        fieldsRequestBuilder.fieldType(FieldTypeParam.Parametric);
+        final Set<TagName> fields = fieldsService.getFields(fieldsRequestBuilder.build()).get(FieldTypeParam.Parametric);
 
         return parametricRequestBuilderFactory.getObject()
                 .fieldNames(fields)

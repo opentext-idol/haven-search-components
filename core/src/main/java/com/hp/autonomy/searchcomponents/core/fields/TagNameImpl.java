@@ -6,12 +6,18 @@
 package com.hp.autonomy.searchcomponents.core.fields;
 
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  * Default implementation of {@link TagName}
  */
-@Data
+@Getter
+@EqualsAndHashCode(of = "id")
+@ToString
+@RequiredArgsConstructor
 class TagNameImpl implements TagName {
     private static final long serialVersionUID = -6221132711228529797L;
     private final String id;

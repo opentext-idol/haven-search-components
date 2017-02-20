@@ -17,8 +17,8 @@ import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -29,19 +29,17 @@ import static org.hamcrest.Matchers.*;
 @AutoConfigureJsonTesters(enabled = false)
 public abstract class AbstractFieldsServiceIT<R extends FieldsRequest, B extends FieldsRequestBuilder<R, ?>, Q extends QueryRestrictions<?>, E extends Exception> {
     @Autowired
-    private FieldsService<R, E> fieldsService;
-
-    @Autowired
     protected ObjectFactory<B> fieldRequestBuilderFactory;
-
     @Autowired
     protected TestUtils<Q> testUtils;
+    @Autowired
+    private FieldsService<R, E> fieldsService;
 
     protected abstract R createFieldsRequest();
 
     @Test
     public void getFields() throws E {
-        final Map<FieldTypeParam, List<TagName>> results = fieldsService.getFields(createFieldsRequest(), FieldTypeParam.Parametric);
+        final Map<FieldTypeParam, Set<TagName>> results = fieldsService.getFields(createFieldsRequest());
         assertThat(results.get(FieldTypeParam.Parametric), is(not(empty())));
     }
 }

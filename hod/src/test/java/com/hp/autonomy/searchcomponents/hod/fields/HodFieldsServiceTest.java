@@ -19,8 +19,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -50,7 +50,7 @@ public class HodFieldsServiceTest {
     @Test
     public void getFields() throws HodErrorException {
         when(retrieveIndexFieldsService.retrieveIndexFields(anyListOf(ResourceName.class), any(RetrieveIndexFieldsRequestBuilder.class))).thenReturn(response);
-        final Map<FieldTypeParam, List<TagName>> results = fieldsService.getFields(mock(HodFieldsRequest.class), FieldTypeParam.Parametric);
+        final Map<FieldTypeParam, Set<TagName>> results = fieldsService.getFields(mock(HodFieldsRequest.class));
         assertThat(results.get(FieldTypeParam.Parametric), is(not(empty())));
     }
 }

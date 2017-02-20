@@ -155,8 +155,8 @@ public class HodParametricValuesServiceTest {
 
     @Test
     public void emptyFieldNamesReturnEmptyParametricValues() throws HodErrorException {
-        final Map<FieldTypeParam, List<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptyList());
-        when(fieldsService.getFields(any(), any(FieldTypeParam.class))).thenReturn(response);
+        final Map<FieldTypeParam, Set<TagName>> response = ImmutableMap.of(FieldTypeParam.Parametric, Collections.emptySet());
+        when(fieldsService.getFields(any())).thenReturn(response);
 
         final List<ResourceName> indexes = Collections.singletonList(ResourceName.PATENTS);
         final HodParametricRequest testRequest = generateRequest(indexes, Collections.emptyList());
@@ -166,8 +166,8 @@ public class HodParametricValuesServiceTest {
 
     @Test
     public void lookupFieldNames() throws HodErrorException {
-        final ImmutableMap<FieldTypeParam, List<TagName>> fieldsResponse = ImmutableMap.of(FieldTypeParam.Parametric, Collections.singletonList(tagNameFactory.buildTagName("grassy field")));
-        when(fieldsService.getFields(any(), eq(FieldTypeParam.Parametric))).thenReturn(fieldsResponse);
+        final ImmutableMap<FieldTypeParam, Set<TagName>> fieldsResponse = ImmutableMap.of(FieldTypeParam.Parametric, Collections.singleton(tagNameFactory.buildTagName("grassy field")));
+        when(fieldsService.getFields(any())).thenReturn(fieldsResponse);
 
         final List<ResourceName> indexes = Collections.singletonList(ResourceName.WIKI_ENG);
         final HodParametricRequest testRequest = generateRequest(indexes, Collections.emptyList());
@@ -294,6 +294,7 @@ public class HodParametricValuesServiceTest {
         return parametricRequest;
     }
 
+    @SuppressWarnings("SameParameterValue")
     private List<FieldRanges> mockRangesResponse(final String field, final Integer count, final List<FieldRanges.ValueRange> valueRanges) {
         final FieldRanges.ValueDetails valueDetails = FieldRanges.ValueDetails.builder()
                 .count(count)
@@ -308,7 +309,7 @@ public class HodParametricValuesServiceTest {
         return Collections.singletonList(fieldRanges);
     }
 
-    private List<FieldRanges> mockValueDetailsResponse(final String field, final FieldRanges.ValueDetails valueDetails) throws HodErrorException {
+    private List<FieldRanges> mockValueDetailsResponse(final String field, final FieldRanges.ValueDetails valueDetails) {
         final FieldRanges.ValueRange range = FieldRanges.ValueRange.builder()
                 .count(valueDetails.getCount())
                 .lowerBound(valueDetails.getMinimum())
