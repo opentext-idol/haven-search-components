@@ -13,6 +13,7 @@ import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadConstants;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
+import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.TypeAheadResponseData;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.TypeAheadActions;
@@ -35,15 +36,17 @@ class QmsTypeAheadService implements IdolTypeAheadService {
     private final ConfigService<? extends IdolSearchCapable> configService;
     private final AciService qmsAciService;
     private final Processor<TypeAheadResponseData> processor;
+    private final HavenSearchAciParameterHandler havenSearchAciParameterHandler;
 
     @Autowired
     QmsTypeAheadService(
             final ConfigService<? extends IdolSearchCapable> configService,
             final AciService qmsAciService,
-            final ProcessorFactory processorFactory
-    ) {
+            final ProcessorFactory processorFactory,
+            final HavenSearchAciParameterHandler havenSearchAciParameterHandler) {
         this.configService = configService;
         this.qmsAciService = qmsAciService;
+        this.havenSearchAciParameterHandler = havenSearchAciParameterHandler;
         processor = processorFactory.getResponseDataProcessor(TypeAheadResponseData.class);
     }
 
@@ -55,6 +58,7 @@ class QmsTypeAheadService implements IdolTypeAheadService {
         parameters.add(TypeAheadParams.Mode.name(), mode);
         parameters.add(TypeAheadParams.MaxResults.name(), TypeAheadConstants.MAX_RESULTS);
         parameters.add(TypeAheadParams.Text.name(), text);
+        havenSearchAciParameterHandler.addSecurityInfo(parameters);
 
         final TypeAheadResponseData response = qmsAciService.executeAction(parameters, processor);
 
