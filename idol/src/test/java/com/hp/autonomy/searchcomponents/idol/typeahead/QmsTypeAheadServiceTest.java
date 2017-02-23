@@ -10,6 +10,7 @@ import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
+import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.TypeAheadResponseData;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.params.ModeParam;
@@ -40,11 +41,14 @@ public class QmsTypeAheadServiceTest {
     @Mock
     private IdolSearchCapable config;
 
+    @Mock
+    private HavenSearchAciParameterHandler havenSearchAciParameterHandler;
+
     private QmsTypeAheadService qmsTypeAheadService;
 
     @Before
     public void setUp() {
-        qmsTypeAheadService = new QmsTypeAheadService(configService, qmsAciService, processorFactory);
+        qmsTypeAheadService = new QmsTypeAheadService(configService, qmsAciService, processorFactory, havenSearchAciParameterHandler);
         when(configService.getConfig()).thenReturn(config);
     }
 
