@@ -5,6 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.core.fields;
 
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
@@ -26,5 +27,5 @@ public interface FieldPathNormaliser {
      * @param fieldPath the field path to normalise
      * @return the normalised path
      */
-    String normaliseFieldPath(String fieldPath);
+    FieldPath normaliseFieldPath(String fieldPath);
 }

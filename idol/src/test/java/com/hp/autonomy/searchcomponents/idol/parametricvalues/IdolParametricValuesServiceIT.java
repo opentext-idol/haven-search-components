@@ -13,6 +13,7 @@ import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictionsBuilder;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import org.springframework.beans.factory.ObjectFactory;
@@ -32,14 +33,15 @@ public class IdolParametricValuesServiceIT extends AbstractParametricValuesServi
     }
 
     @Override
-    protected TagName determinePaginatableField() {
+    protected FieldPath determinePaginatableField() {
         final Map<TagName, ValueDetails> valueDetails = parametricValuesService.getValueDetails(createParametricRequest());
 
         return valueDetails.entrySet().stream()
                 .filter(entry -> entry.getValue().getTotalValues() >= 2)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Pagination test requires a parametric field with more than 2 values"))
-                .getKey();
+                .getKey()
+                .getId();
     }
 
     @Override
@@ -51,7 +53,7 @@ public class IdolParametricValuesServiceIT extends AbstractParametricValuesServi
 
         return parametricRequestBuilderFactory.getObject()
                 .queryRestrictions(queryRestrictions)
-                .fieldName(tagNameFactory.buildTagName(ParametricValuesService.AUTN_DATE_FIELD))
+                .fieldName(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD))
                 .build();
     }
 }

@@ -50,7 +50,7 @@ public class HodParametricRequestTest extends ParametricRequestTest<HodQueryRest
     @Override
     protected HodParametricRequest constructObject() {
         return HodParametricRequestImpl.builder()
-                .fieldNames(Arrays.asList(tagNameFactory.buildTagName("field1"), tagNameFactory.buildTagName("field2")))
+                .fieldNames(Arrays.asList(tagNameFactory.getFieldPath("field1"), tagNameFactory.getFieldPath("field2")))
                 .maxValues(10)
                 .sort(SortParam.Alphabetical)
                 .queryRestrictions(HodQueryRestrictionsImpl.builder()

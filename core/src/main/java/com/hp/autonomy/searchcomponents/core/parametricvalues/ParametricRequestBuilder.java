@@ -8,7 +8,7 @@ package com.hp.autonomy.searchcomponents.core.parametricvalues;
 import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObjectBuilder;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 
 import java.util.Collection;
@@ -28,7 +28,7 @@ public interface ParametricRequestBuilder<P extends ParametricRequest<Q>, Q exte
      * @param fieldName Field for which to retrieve parametric values
      * @return the builder (for chaining)
      */
-    B fieldName(TagName fieldName);
+    B fieldName(FieldPath fieldName);
 
     /**
      * Sets fields for which to retrieve parametric values
@@ -36,7 +36,7 @@ public interface ParametricRequestBuilder<P extends ParametricRequest<Q>, Q exte
      * @param fieldNames Fields for which to retrieve parametric values
      * @return the builder (for chaining)
      */
-    B fieldNames(Collection<? extends TagName> fieldNames);
+    B fieldNames(Collection<? extends FieldPath> fieldNames);
 
     /**
      * Clears collection of fields for which to retrieve parametric values

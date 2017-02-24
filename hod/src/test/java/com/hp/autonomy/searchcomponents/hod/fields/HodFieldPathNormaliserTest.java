@@ -32,16 +32,16 @@ public class HodFieldPathNormaliserTest {
 
     @Test
     public void anyOldValue() {
-        assertEquals("FOO", fieldPathNormaliser.normaliseFieldPath("FOO"));
+        assertEquals("FOO", fieldPathNormaliser.normaliseFieldPath("FOO").getNormalisedPath());
     }
 
     @Test
     public void autnDate() {
-        assertEquals(AUTN_DATE_FIELD.toLowerCase(), fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD.toLowerCase()));
+        assertEquals(AUTN_DATE_FIELD.toLowerCase(), fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD.toLowerCase()).getNormalisedPath());
     }
 
     @Test
     public void upperCaseAutnDate() {
-        assertEquals(AUTN_DATE_FIELD.toLowerCase(), fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD));
+        assertEquals(AUTN_DATE_FIELD.toLowerCase(), fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD).getNormalisedPath());
     }
 }

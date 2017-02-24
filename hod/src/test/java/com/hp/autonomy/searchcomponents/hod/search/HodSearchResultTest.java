@@ -6,15 +6,29 @@
 package com.hp.autonomy.searchcomponents.hod.search;
 
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
+import com.hp.autonomy.searchcomponents.core.config.FieldValue;
+import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.core.search.SearchResultTest;
+import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import org.joda.time.DateTime;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JsonContent;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 
+import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class HodSearchResultTest extends SearchResultTest {
+    @Autowired
+    private FieldPathNormaliser fieldPathNormaliser;
+
     @Override
     protected void validateJson(final JsonContent<SearchResult> jsonContent) throws IOException {
         jsonContent.assertThat()
@@ -40,7 +54,9 @@ public class HodSearchResultTest extends SearchResultTest {
                 .title("Fiji")
                 .summary("Fiji is an island country")
                 .weight(11.7)
-                .fieldEntry("CUSTOM_FIELD", FieldInfo.builder().name("CUSTOM_FIELD").value("CUSTOM_VALUE").build())
+                .fieldEntry("CUSTOM_FIELD", FieldInfo.builder()
+                        .name(fieldPathNormaliser.normaliseFieldPath("CUSTOM_FIELD"))
+                        .value(new FieldValue<>("CUSTOM_VALUE", "Custom Value")).build())
                 .date(DateTime.parse("2016-11-16T17:46:00Z"))
                 .promotionCategory(PromotionCategory.NONE)
                 .domain("PUBLIC_INDEXES")

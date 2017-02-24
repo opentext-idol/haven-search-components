@@ -35,91 +35,91 @@ public class IdolFieldPathNormaliserTest {
 
     @Test
     public void autnDate() {
-        assertEquals(AUTN_DATE_FIELD, fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD));
+        assertEquals(AUTN_DATE_FIELD, fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD).getNormalisedPath());
     }
 
     @Test
     public void lowerCaseAutnDate() {
-        assertEquals(AUTN_DATE_FIELD, fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD.toLowerCase()));
+        assertEquals(AUTN_DATE_FIELD, fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD.toLowerCase()).getNormalisedPath());
     }
 
     @Test
     public void normalisedFullPathIdx() {
-        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/DOCUMENT/MY_FIELD"));
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/DOCUMENT/MY_FIELD").getNormalisedPath());
     }
 
     @Test
     public void fullPathIdx() {
-        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("DOCUMENT/MY_FIELD"));
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("DOCUMENT/MY_FIELD").getNormalisedPath());
     }
 
     @Test
     public void nameWithSlashIdx() {
-        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/MY_FIELD"));
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/MY_FIELD").getNormalisedPath());
     }
 
     @Test
     public void nameOnlyIdx() {
-        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("MY_FIELD"));
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("MY_FIELD").getNormalisedPath());
     }
 
     @Test
     public void normalisedFullPathIdxLowerCase() {
-        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/document/my_field"));
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/document/my_field").getNormalisedPath());
     }
 
     @Test
     public void fullPathIdxLowerCase() {
-        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("document/my_field"));
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("document/my_field").getNormalisedPath());
     }
 
     @Test
     public void nameWithSlashIdxLowerCase() {
-        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/my_field"));
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/my_field").getNormalisedPath());
     }
 
     @Test
     public void nameOnlyIdxLowerCase() {
-        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("my_field"));
+        assertEquals(EXPECTED_NORMALISED_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("my_field").getNormalisedPath());
     }
 
     @Test
     public void normalisedFullPathXml() {
-        assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/DOCUMENTS/DOCUMENT/MY_FIELD1/MY_FIELD2"));
+        assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/DOCUMENTS/DOCUMENT/MY_FIELD1/MY_FIELD2").getNormalisedPath());
     }
 
     @Test
     public void fullPathXml() {
-        assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("DOCUMENTS/DOCUMENT/MY_FIELD1/MY_FIELD2"));
+        assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("DOCUMENTS/DOCUMENT/MY_FIELD1/MY_FIELD2").getNormalisedPath());
     }
 
     @Test
     public void nameWithSlashXml() {
-        assertEquals("/DOCUMENT/MY_FIELD1/MY_FIELD2", fieldPathNormaliser.normaliseFieldPath("/MY_FIELD1/MY_FIELD2"));
+        assertEquals("/DOCUMENT/MY_FIELD1/MY_FIELD2", fieldPathNormaliser.normaliseFieldPath("/MY_FIELD1/MY_FIELD2").getNormalisedPath());
     }
 
     @Test
     public void nameOnlyXml() {
-        assertEquals("/DOCUMENT/MY_FIELD1/MY_FIELD2", fieldPathNormaliser.normaliseFieldPath("MY_FIELD1/MY_FIELD2"));
+        assertEquals("/DOCUMENT/MY_FIELD1/MY_FIELD2", fieldPathNormaliser.normaliseFieldPath("MY_FIELD1/MY_FIELD2").getNormalisedPath());
     }
 
     @Test
     public void normalisedFullPathXmlLowerCase() {
-        assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/documents/document/my_field1/my_field2"));
+        assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/documents/document/my_field1/my_field2").getNormalisedPath());
     }
 
     @Test
     public void fullPathXmlLowerCase() {
-        assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("documents/document/my_field1/my_field2"));
+        assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("documents/document/my_field1/my_field2").getNormalisedPath());
     }
 
     @Test
     public void nameWithSlashXmlLowerCase() {
-        assertEquals("/DOCUMENT/MY_FIELD1/MY_FIELD2", fieldPathNormaliser.normaliseFieldPath("/my_field1/my_field2"));
+        assertEquals("/DOCUMENT/MY_FIELD1/MY_FIELD2", fieldPathNormaliser.normaliseFieldPath("/my_field1/my_field2").getNormalisedPath());
     }
 
     @Test
     public void nameOnlyXmlLowerCase() {
-        assertEquals("/DOCUMENT/MY_FIELD1/MY_FIELD2", fieldPathNormaliser.normaliseFieldPath("my_field1/my_field2"));
+        assertEquals("/DOCUMENT/MY_FIELD1/MY_FIELD2", fieldPathNormaliser.normaliseFieldPath("my_field1/my_field2").getNormalisedPath());
     }
 }

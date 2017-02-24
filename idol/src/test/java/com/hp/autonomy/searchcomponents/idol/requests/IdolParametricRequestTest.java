@@ -49,7 +49,7 @@ public class IdolParametricRequestTest extends ParametricRequestTest<IdolQueryRe
     @Override
     protected IdolParametricRequest constructObject() {
         return IdolParametricRequestImpl.builder()
-                .fieldNames(Arrays.asList(tagNameFactory.buildTagName("/DOCUMENT/FIELD1"), tagNameFactory.buildTagName("/DOCUMENT/FIELD2")))
+                .fieldNames(Arrays.asList(tagNameFactory.getFieldPath("/DOCUMENT/FIELD1"), tagNameFactory.getFieldPath("/DOCUMENT/FIELD2")))
                 .maxValues(10)
                 .sort(SortParam.Alphabetical)
                 .queryRestrictions(IdolQueryRestrictionsImpl.builder()

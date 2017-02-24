@@ -8,9 +8,11 @@ package com.hp.autonomy.searchcomponents.core.config;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.frontend.configuration.SimpleComponent;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,7 +37,8 @@ public class FieldsInfo extends SimpleComponent<FieldsInfo> implements Serializa
     private static final long serialVersionUID = 7627012722603736269L;
 
     private final LinkedHashMap<String, FieldInfo<?>> fieldConfig;
-    private final LinkedHashMap<String, FieldInfo<?>> fieldConfigByName;
+    @JsonIgnore
+    private final LinkedHashMap<FieldPath, FieldInfo<?>> fieldConfigByName;
 
     @JsonAnyGetter
     public LinkedHashMap<String, FieldInfo<?>> getFieldConfig() {
@@ -46,7 +49,8 @@ public class FieldsInfo extends SimpleComponent<FieldsInfo> implements Serializa
     @JsonPOJOBuilder(withPrefix = "")
     public static class FieldsInfoBuilder {
         private LinkedHashMap<String, FieldInfo<?>> fieldConfig = new LinkedHashMap<>();
-        private LinkedHashMap<String, FieldInfo<?>> fieldConfigByName = new LinkedHashMap<>();
+        @JsonIgnore
+        private LinkedHashMap<FieldPath, FieldInfo<?>> fieldConfigByName = new LinkedHashMap<>();
 
         @JsonAnySetter
         public FieldsInfoBuilder populateResponseMap(final String key, final FieldInfo<?> value) {

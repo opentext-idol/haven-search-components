@@ -29,7 +29,7 @@ import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CL
 @RunWith(SpringRunner.class)
 @JsonTest
 @AutoConfigureJsonTesters(enabled = false)
-@SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY)
+@SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class TagNameTest extends SimpleRequestResponseObjectTest<TagName> {
     @Autowired
     private ObjectMapper springObjectMapper;
@@ -41,7 +41,7 @@ public class TagNameTest extends SimpleRequestResponseObjectTest<TagName> {
 
     @Override
     protected TagName constructObject() {
-        return new TagNameImpl("/DOCUMENT/FOO_BAR", "Foo Bar");
+        return new TagNameImpl(new FieldPathImpl("/DOCUMENT/FOO_BAR", "FOO_BAR"), "Foo Bar");
     }
 
     @Override
@@ -53,7 +53,7 @@ public class TagNameTest extends SimpleRequestResponseObjectTest<TagName> {
     protected void validateJson(final JsonContent<TagName> jsonContent) throws IOException {
         jsonContent.assertThat()
                 .hasJsonPathStringValue("$.id", "/DOCUMENT/FOO_BAR")
-                .hasJsonPathStringValue("$.name", "Foo Bar");
+                .hasJsonPathStringValue("$.displayName", "Foo Bar");
     }
 
     @Override

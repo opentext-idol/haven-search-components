@@ -6,8 +6,8 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public interface BucketingParamsHelper {
      * Verify that the fields specified in the parametric request are matched by a valid entry in the bucketing params.
      */
     <R extends ParametricRequest<Q>, Q extends QueryRestrictions<?>> void validateBucketingParams(R parametricRequest,
-                                                                                                  Map<TagName, BucketingParams> bucketingParamsPerField);
+                                                                                                  Map<FieldPath, BucketingParams> bucketingParamsPerField);
 
     /**
      * Calculate the boundary values (including both the min and the max) of the buckets specified in the BucketingParams.
@@ -40,6 +40,7 @@ public interface BucketingParamsHelper {
     /**
      * Generate empty buckets for the given boundaries. This is useful because GetQueryTagValues returns no buckets if
      * no documents matched the query restrictions.
+     *
      * @param boundaries Bucket boundaries
      * @return List of empty buckets
      */

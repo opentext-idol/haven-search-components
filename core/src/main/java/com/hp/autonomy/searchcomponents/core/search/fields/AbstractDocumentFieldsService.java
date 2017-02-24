@@ -9,10 +9,12 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Skeletal implementation of {@link DocumentFieldsService} containing a default implementation of {@link DocumentFieldsService#getPrintFields(Collection)}
@@ -28,18 +30,11 @@ public abstract class AbstractDocumentFieldsService implements DocumentFieldsSer
     public List<String> getPrintFields(final Collection<String> selectedFields) {
         final FieldsInfo fieldsInfo = configService.getConfig().getFieldsInfo();
 
-        final List<String> fields = new ArrayList<>();
-
-        getHardCodedFields().stream()
-                .filter(field -> selectedFields.isEmpty() || selectedFields.contains(field.getId()))
-                .forEach(field -> fields.addAll(field.getNames()));
-
         final Collection<FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfig().values();
-
-        fieldConfig.stream()
+        return Stream.concat(getHardCodedFields().stream(), fieldConfig.stream())
                 .filter(field -> selectedFields.isEmpty() || selectedFields.contains(field.getId()))
-                .forEach(field -> fields.addAll(field.getNames()));
-
-        return fields;
+                .flatMap(field -> field.getNames().stream())
+                .map(FieldPath::getNormalisedPath)
+                .collect(Collectors.toList());
     }
 }

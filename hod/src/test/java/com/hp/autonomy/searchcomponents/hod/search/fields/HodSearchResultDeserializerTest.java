@@ -7,12 +7,13 @@ package com.hp.autonomy.searchcomponents.hod.search.fields;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
+import com.hp.autonomy.searchcomponents.core.fields.FieldDisplayNameGenerator;
+import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
+import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
 import com.hp.autonomy.types.requests.Documents;
@@ -23,52 +24,61 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
+import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
+import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings("unused")
+@RunWith(SpringRunner.class)
+@JsonTest
+@AutoConfigureJsonTesters(enabled = false)
+@SpringBootTest(
+        classes = {CoreTestContext.class, HodSearchResultDeserializer.class},
+        properties = CORE_CLASSES_PROPERTY,
+        webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class HodSearchResultDeserializerTest {
     private static String sampleJson;
+    @MockBean
+    private ConfigService<HodSearchCapable> configService;
+    @Autowired
+    private FieldPathNormaliser fieldPathNormaliser;
+    @Autowired
+    private FieldDisplayNameGenerator fieldDisplayNameGenerator;
+    @Mock
+    private HodSearchCapable config;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeClass
     public static void init() throws IOException {
         sampleJson = IOUtils.toString(HodSearchResultDeserializerTest.class.getResourceAsStream("/sampleHodQueryResponse.json"));
     }
 
-    @Mock
-    private ConfigService<HodSearchCapable> configService;
-
-    @Mock
-    private HodSearchCapable config;
-
-    private ObjectMapper objectMapper;
-
     @Before
     public void setUp() {
-        objectMapper = new ObjectMapper();
-        final SimpleModule customModule = new SimpleModule();
-        customModule.addDeserializer(HodSearchResult.class, new HodSearchResultDeserializer(configService));
-        objectMapper.registerModule(customModule);
-        objectMapper.registerModule(new JodaModule());
-
         final FieldsInfo fieldsInfo = FieldsInfo.builder()
                 .populateResponseMap("modifiedDate", FieldInfo.<DateTime>builder()
                         .id("modifiedDate")
-                        .names(Arrays.asList("modified_date", "date_modified"))
+                        .name(fieldPathNormaliser.normaliseFieldPath("modified_date"))
+                        .name(fieldPathNormaliser.normaliseFieldPath("date_modified"))
                         .type(FieldType.DATE)
                         .advanced(true)
                         .build())
                 .populateResponseMap("links", FieldInfo.<String>builder()
                         .id("links")
-                        .name("links")
+                        .name(fieldPathNormaliser.normaliseFieldPath("links"))
                         .advanced(true)
                         .build())
                 .build();

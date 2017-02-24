@@ -139,7 +139,7 @@ public class HodParametricValuesServiceTest {
         final Map<String, QueryTagInfo> fieldNamesMap = new HashMap<>();
 
         for (final QueryTagInfo parametricFieldName : fieldNamesSet) {
-            fieldNamesMap.put(parametricFieldName.getName(), parametricFieldName);
+            fieldNamesMap.put(parametricFieldName.getDisplayName(), parametricFieldName);
         }
 
         assertThat(fieldNamesMap, hasKey("Grassy Field"));
@@ -150,7 +150,7 @@ public class HodParametricValuesServiceTest {
 
         final QueryTagInfo grassyField = fieldNamesMap.get("Grassy Field");
 
-        assertThat(grassyField.getValues(), hasItem(new QueryTagCountInfo("snakes", 33)));
+        assertThat(grassyField.getValues(), hasItem(new QueryTagCountInfo("snakes", "snakes", 33)));
     }
 
     @Test
@@ -225,7 +225,7 @@ public class HodParametricValuesServiceTest {
 
         final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(
                 hodParametricRequest,
-                ImmutableMap.of(tagNameFactory.buildTagName("ParametricNumericDateField"), new BucketingParams(9, 3.0, 12.0))
+                ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams(9, 3.0, 12.0))
         );
 
         assertThat(results, hasSize(1));
@@ -236,21 +236,21 @@ public class HodParametricValuesServiceTest {
         assertThat(info.getMax(), is(12d));
 
         final Iterator<RangeInfo.Value> iterator = info.getValues().iterator();
-        assertEquals(new RangeInfo.Value(2, 3, 4), iterator.next());
-        assertEquals(new RangeInfo.Value(0, 4, 5), iterator.next());
-        assertEquals(new RangeInfo.Value(0, 5, 6), iterator.next());
-        assertEquals(new RangeInfo.Value(1, 6, 7), iterator.next());
-        assertEquals(new RangeInfo.Value(0, 7, 8), iterator.next());
-        assertEquals(new RangeInfo.Value(0, 8, 9), iterator.next());
-        assertEquals(new RangeInfo.Value(0, 9, 10), iterator.next());
-        assertEquals(new RangeInfo.Value(0, 10, 11), iterator.next());
-        assertEquals(new RangeInfo.Value(1, 11, 12), iterator.next());
+        assertEquals(new RangeInfo.Value( 3, 4, 2), iterator.next());
+        assertEquals(new RangeInfo.Value( 4, 5, 0), iterator.next());
+        assertEquals(new RangeInfo.Value( 5, 6, 0), iterator.next());
+        assertEquals(new RangeInfo.Value( 6, 7, 1), iterator.next());
+        assertEquals(new RangeInfo.Value( 7, 8, 0), iterator.next());
+        assertEquals(new RangeInfo.Value( 8, 9, 0), iterator.next());
+        assertEquals(new RangeInfo.Value( 9, 10, 0), iterator.next());
+        assertEquals(new RangeInfo.Value( 10, 11, 0), iterator.next());
+        assertEquals(new RangeInfo.Value( 11, 12, 1), iterator.next());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void getNumericParametricValuesZeroBucketsZeroBuckets() throws HodErrorException {
         final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
-        parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, ImmutableMap.of(tagNameFactory.buildTagName("ParametricNumericDateField"), new BucketingParams(0, 10.0, 11.0)));
+        parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams(0, 10.0, 11.0)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -271,7 +271,7 @@ public class HodParametricValuesServiceTest {
 
         final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(
                 hodParametricRequest,
-                ImmutableMap.of(tagNameFactory.buildTagName("ParametricNumericDateField"), new BucketingParams(3, 1.5, 5.5))
+                ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams(3, 1.5, 5.5))
         );
 
         MatcherAssert.assertThat(results, empty());
@@ -286,8 +286,8 @@ public class HodParametricValuesServiceTest {
         final HodQueryRestrictions queryRestrictions = mock(HodQueryRestrictions.class);
         when(queryRestrictions.getDatabases()).thenReturn(indexes);
         final HodParametricRequest parametricRequest = mock(HodParametricRequest.class);
-        final List<TagName> tagNames = fieldNames.stream().map(tagNameFactory::buildTagName).collect(Collectors.toList());
-        when(parametricRequest.getFieldNames()).thenReturn(tagNames);
+        final List<FieldPath> fieldPaths = fieldNames.stream().map(tagNameFactory::getFieldPath).collect(Collectors.toList());
+        when(parametricRequest.getFieldNames()).thenReturn(fieldPaths);
         when(parametricRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
         when(parametricRequest.getSort()).thenReturn(SortParam.ReverseAlphabetical);
         when(parametricRequest.getStart()).thenReturn(1);
