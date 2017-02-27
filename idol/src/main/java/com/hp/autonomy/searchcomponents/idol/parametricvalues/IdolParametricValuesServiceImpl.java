@@ -165,6 +165,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
             aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), 1);
             aciParameters.add(GetQueryTagValuesParams.FieldName.name(), tagNamesToFieldNamesParam(parametricRequest.getFieldNames()));
             aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
+            aciParameters.add("predict", true);
 
             final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
             final Collection<FlatField> fields = responseData.getField();
