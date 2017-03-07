@@ -132,9 +132,8 @@ public class HodParametricValuesServiceTest {
                 .add("football field")
                 .build();
 
-        final HodParametricRequest testRequest = generateRequest(indexes, fieldNames);
-
-        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getParametricValues(testRequest);
+        final HodParametricRequest request = generateRequest(indexes, fieldNames);
+        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getParametricValues(request);
 
         final Map<String, QueryTagInfo> fieldNamesMap = new HashMap<>();
 
@@ -151,6 +150,45 @@ public class HodParametricValuesServiceTest {
         final QueryTagInfo grassyField = fieldNamesMap.get("Grassy Field");
 
         assertThat(grassyField.getValues(), hasItem(new QueryTagCountInfo("snakes", "snakes", 33)));
+    }
+
+    @Test
+    public void getsParametricValuesWithFilter() throws HodErrorException {
+        final List<ResourceName> indexes = Arrays.asList(ResourceName.WIKI_ENG, ResourceName.PATENTS);
+
+        final List<String> fieldNames = ImmutableList.<String>builder()
+                .add("grassy field")
+                .add("wasteland")
+                .add("football field")
+                .build();
+
+        final HodParametricRequest request = generateRequest(indexes, fieldNames);
+        when(request.getValueRestrictions()).thenReturn(Collections.singletonList("*LUG*"));
+        when(request.getMaxValues()).thenReturn(5);
+        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getParametricValues(request);
+        assertThat(fieldNamesSet, hasSize(1));
+        final QueryTagInfo queryTagInfo = fieldNamesSet.iterator().next();
+        assertThat(queryTagInfo.getId(), is("football field"));
+        assertThat(queryTagInfo.getValues(), hasSize(1));
+        assertThat(queryTagInfo.getValues().iterator().next().getValue(), is("slugs"));
+    }
+
+    @Test
+    public void getsParametricValuesWithFilterAndMaxValues() throws HodErrorException {
+        final List<ResourceName> indexes = Arrays.asList(ResourceName.WIKI_ENG, ResourceName.PATENTS);
+
+        final List<String> fieldNames = ImmutableList.<String>builder()
+                .add("grassy field")
+                .add("wasteland")
+                .add("football field")
+                .build();
+
+        final HodParametricRequest request = generateRequest(indexes, fieldNames);
+        when(request.getValueRestrictions()).thenReturn(Collections.singletonList("*s*"));
+        when(request.getMaxValues()).thenReturn(1);
+        final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getParametricValues(request);
+        assertThat(fieldNamesSet, hasSize(3));
+        assertThat(fieldNamesSet.iterator().next().getValues(), hasSize(1));
     }
 
     @Test

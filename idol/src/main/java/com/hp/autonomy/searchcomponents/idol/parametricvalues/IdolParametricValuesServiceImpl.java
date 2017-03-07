@@ -322,6 +322,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         aciParameters.add(GetQueryTagValuesParams.Ranges.name(), new Ranges(parametricRequest.getRanges()));
         aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
         aciParameters.add(GetQueryTagValuesParams.TotalValues.name(), true);
+        aciParameters.add(GetQueryTagValuesParams.ValueRestriction.name(), StringUtils.join(",", parametricRequest.getValueRestrictions()));
 
         final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
         return responseData.getField();

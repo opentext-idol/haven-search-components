@@ -52,6 +52,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.PARAMETRIC_VALUES_SERVICE_BEAN_NAME;
@@ -61,6 +62,9 @@ import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricV
  */
 @Service(PARAMETRIC_VALUES_SERVICE_BEAN_NAME)
 class HodParametricValuesServiceImpl implements HodParametricValuesService {
+    private static final int HOD_MAX_VALUES = 10000;
+    private static final Pattern WILDCARD_PATTERN = Pattern.compile("\\*");
+
     private final HodFieldsService fieldsService;
     private final ObjectFactory<HodFieldsRequestBuilder> fieldsRequestBuilderFactory;
     private final GetParametricValuesService getParametricValuesService;
@@ -253,7 +257,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                 .setSort(ParametricSort.fromParam(parametricRequest.getSort()))
                 .setText(parametricRequest.getQueryRestrictions().getQueryText())
                 .setFieldText(parametricRequest.getQueryRestrictions().getFieldText())
-                .setMaxValues(parametricRequest.getMaxValues())
+                .setMaxValues(parametricRequest.getValueRestrictions().isEmpty() ? Math.min(parametricRequest.getMaxValues(), HOD_MAX_VALUES) : HOD_MAX_VALUES)
                 .setMinScore(parametricRequest.getQueryRestrictions().getMinScore())
                 .setTotalValues(true)
                 .setSecurityInfo(authenticationInformationRetriever.getPrincipal().getSecurityInfo());
@@ -263,7 +267,22 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                 .collect(Collectors.toList());
 
         final Collection<ResourceName> indexes = parametricRequest.getQueryRestrictions().getDatabases();
-        return getParametricValuesService.getParametricValues(fieldNames, indexes, parametricParams);
+        final List<FieldValues> parametricValues = getParametricValuesService.getParametricValues(fieldNames, indexes, parametricParams);
+        return parametricRequest.getValueRestrictions().isEmpty() ? parametricValues : parametricValues.stream()
+                .map(fieldValues -> {
+                    final List<FieldValues.ValueAndCount> values = fieldValues.getValues();
+                    return fieldValues.toBuilder()
+                            .clearValues()
+                            .values(values
+                                    .stream()
+                                    .filter(valueAndCount -> parametricRequest.getValueRestrictions().stream()
+                                            .anyMatch(restriction -> valueAndCount.getValue().toLowerCase().matches(WILDCARD_PATTERN.matcher(restriction.toLowerCase()).replaceAll(".*"))))
+                                    .limit(parametricRequest.getMaxValues())
+                                    .collect(Collectors.toList()))
+                            .build();
+                })
+                .filter(fieldValues -> !fieldValues.getValues().isEmpty())
+                .collect(Collectors.toList());
     }
 
     private ResourceName getQueryProfile(final ParametricRequest<HodQueryRestrictions> parametricRequest) {

@@ -55,6 +55,13 @@ public interface ParametricRequest<Q extends QueryRestrictions<?>> extends Reque
     List<Range> getRanges();
 
     /**
+     * Wildcard restrictions for values
+     *
+     * @return Wildcard restrictions for values
+     */
+    List<String> getValueRestrictions();
+
+    /**
      * Restrictions on the underlying query
      *
      * @return Restrictions on the underlying query

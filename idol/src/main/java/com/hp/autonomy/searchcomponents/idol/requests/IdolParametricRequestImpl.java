@@ -38,6 +38,8 @@ class IdolParametricRequestImpl implements IdolParametricRequest {
     private final SortParam sort;
     @Singular
     private final List<Range> ranges;
+    @Singular
+    private final List<String> valueRestrictions;
     private final IdolQueryRestrictions queryRestrictions;
     private final boolean modified;
 

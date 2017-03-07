@@ -91,6 +91,29 @@ public interface ParametricRequestBuilder<P extends ParametricRequest<Q>, Q exte
     B clearRanges();
 
     /**
+     * Sets a wildcard restriction for values
+     *
+     * @param restriction Wildcard restriction for values
+     * @return the builder (for chaining)
+     */
+    B valueRestriction(String restriction);
+
+    /**
+     * Sets wildcard restrictions for values
+     *
+     * @param restrictions Wildcard restrictions for values
+     * @return the builder (for chaining)
+     */
+    B valueRestrictions(Collection<? extends String> restrictions);
+
+    /**
+     * Clears collection of wildcard restrictions for values
+     *
+     * @return the builder (for chaining)
+     */
+    B clearValueRestrictions();
+
+    /**
      * Sets the restrictions on the underlying query
      *
      * @param queryRestrictions The restrictions on the underlying query

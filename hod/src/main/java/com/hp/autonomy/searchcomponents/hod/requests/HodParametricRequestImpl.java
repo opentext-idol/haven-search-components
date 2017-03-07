@@ -38,6 +38,8 @@ class HodParametricRequestImpl implements HodParametricRequest {
     private final SortParam sort;
     @Singular
     private final List<Range> ranges;
+    @Singular
+    private final List<String> valueRestrictions;
     private final HodQueryRestrictions queryRestrictions;
     private final boolean modified;
 
