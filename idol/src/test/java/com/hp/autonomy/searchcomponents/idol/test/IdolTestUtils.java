@@ -14,13 +14,16 @@ import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictionsBuilder
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 
+@SuppressWarnings("WeakerAccess")
 @Component
 public class IdolTestUtils implements TestUtils<IdolQueryRestrictions> {
-    private static final String KNOWN_TEST_DATABASE = "Wookiepedia";
+    public static final String TEST_DATABASE_PROPERTY = "test.database";
+    public static final String DEFAULT_TEST_DATABASE = "Wookiepedia";
 
     @Autowired
     private ObjectFactory<IdolQueryRestrictionsBuilder> queryRestrictionsBuilderFactory;
@@ -28,13 +31,15 @@ public class IdolTestUtils implements TestUtils<IdolQueryRestrictions> {
     private ObjectFactory<IdolGetContentRequestBuilder> getContentRequestBuilderFactory;
     @Autowired
     private ObjectFactory<IdolGetContentRequestIndexBuilder> getContentRequestIndexBuilderFactory;
+    @Autowired
+    private Environment environment;
 
     @Override
     public IdolQueryRestrictions buildQueryRestrictions() {
         return queryRestrictionsBuilderFactory.getObject()
                 .queryText("*")
                 .fieldText("")
-                .database(KNOWN_TEST_DATABASE)
+                .database(environment.getProperty(TEST_DATABASE_PROPERTY, DEFAULT_TEST_DATABASE))
                 .minDate(null)
                 .maxDate(DateTime.now())
                 .minScore(0)
@@ -50,7 +55,7 @@ public class IdolTestUtils implements TestUtils<IdolQueryRestrictions> {
         @SuppressWarnings("unchecked")
         final RC getContentRequest = (RC) getContentRequestBuilderFactory.getObject()
                 .indexAndReferences(getContentRequestIndexBuilderFactory.getObject()
-                        .index(KNOWN_TEST_DATABASE)
+                        .index(environment.getProperty(TEST_DATABASE_PROPERTY, DEFAULT_TEST_DATABASE))
                         .reference(reference)
                         .build())
                 .build();
