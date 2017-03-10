@@ -185,6 +185,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
             aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), 1);
             aciParameters.add(GetQueryTagValuesParams.FieldName.name(), fieldPathsToFieldNamesParam(parametricRequest.getFieldNames()));
             aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
+            aciParameters.add(GetQueryTagValuesParams.Predict.name(), true);
 
             final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
             final Collection<FlatField> fields = responseData.getField();
@@ -322,7 +323,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         aciParameters.add(GetQueryTagValuesParams.Ranges.name(), new Ranges(parametricRequest.getRanges()));
         aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
         aciParameters.add(GetQueryTagValuesParams.TotalValues.name(), true);
-        aciParameters.add(GetQueryTagValuesParams.ValueRestriction.name(), StringUtils.join(",", parametricRequest.getValueRestrictions()));
+        aciParameters.add(GetQueryTagValuesParams.ValueRestriction.name(), String.join(",", parametricRequest.getValueRestrictions()));
 
         final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
         return responseData.getField();
