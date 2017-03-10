@@ -17,12 +17,12 @@ import com.hp.autonomy.hod.client.api.textindex.query.search.*;
 import com.hp.autonomy.hod.client.error.HodErrorCode;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
+import com.hp.autonomy.searchcomponents.core.search.DocumentTitleResolver;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,7 +58,6 @@ class HodViewServerServiceImpl implements HodViewServerService {
     private static final String TITLE_FIELD = "static_title";
     private static final String REFERENCE_FIELD = "static_reference";
     private static final String HOD_RULE_CATEGORY = "default";
-    private static final Pattern SLASH_PATTERN = Pattern.compile("/|\\\\");
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("\n", Pattern.LITERAL);
 
     private final ViewDocumentService viewDocumentService;
@@ -80,25 +79,15 @@ class HodViewServerServiceImpl implements HodViewServerService {
         this.authenticationInformationRetriever = authenticationInformationRetriever;
     }
 
-    private String resolveTitle(final Document document) {
-        if (StringUtils.isBlank(document.getTitle())) {
-            // If there is no title field, assume the reference is a path and take the last part (the "file name")
-            final String[] splitReference = SLASH_PATTERN.split(document.getReference());
-            final String lastPart = splitReference[splitReference.length - 1];
-
-            return StringUtils.isBlank(lastPart) ? document.getReference() : lastPart;
-        } else {
-            return document.getTitle();
-        }
-    }
-
     private String escapeAndAddLineBreaks(final String input) {
         return input == null ? "" : NEWLINE_PATTERN.matcher(StringEscapeUtils.escapeHtml(input)).replaceAll(Matcher.quoteReplacement("<br>"));
     }
 
     // Format the document's content for display in a browser
     private InputStream formatRawContent(final Document document) {
-        final String body = "<h1>" + escapeAndAddLineBreaks(resolveTitle(document)) + "</h1>"
+        final String title = DocumentTitleResolver.resolveTitle(document.getTitle(), document.getReference());
+
+        final String body = "<h1>" + escapeAndAddLineBreaks(title) + "</h1>"
                 + "<p>" + escapeAndAddLineBreaks(document.getContent()) + "</p>";
 
         return IOUtils.toInputStream(body, StandardCharsets.UTF_8);
