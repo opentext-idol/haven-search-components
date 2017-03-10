@@ -25,6 +25,11 @@ public interface BucketingParamsHelper {
 
     /**
      * Verify that the fields specified in the parametric request are matched by a valid entry in the bucketing params.
+     *
+     * @param parametricRequest Query restrictions and field names
+     * @param bucketingParamsPerField Map of fully qualified field name to min, max and number of buckets
+     * @param <R> The request type to use
+     * @param <Q> The type of the query restrictions object
      */
     <R extends ParametricRequest<Q>, Q extends QueryRestrictions<?>> void validateBucketingParams(R parametricRequest,
                                                                                                   Map<FieldPath, BucketingParams> bucketingParamsPerField);

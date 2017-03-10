@@ -43,8 +43,9 @@ public interface FieldDisplayNameGenerator {
      * Generates a display value for the given field path and value
      *
      * @param fieldPath field path
-     * @param value a field value
-     * @param type value type
+     * @param value     a field value
+     * @param type      value type
+     * @param <T>       field value type
      * @return a tag name object with a unique path id and a prettified display name
      */
     <T extends Serializable> String generateDisplayValue(FieldPath fieldPath, T value, FieldType type);
@@ -52,9 +53,10 @@ public interface FieldDisplayNameGenerator {
     /**
      * Generates a display value for the given field id and value
      *
-     * @param id a field id (as used in configuration to map multiple Idol fields together)
+     * @param id    a field id (as used in configuration to map multiple Idol fields together)
      * @param value a field value
-     * @param type value type
+     * @param type  value type
+     * @param <T>   field value type
      * @return a tag name object with a unique path id and a prettified display name
      */
     <T extends Serializable> String generateDisplayValueFromId(String id, T value, FieldType type);
