@@ -14,7 +14,7 @@ import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequest;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictionsBuilder;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Test;
 import org.springframework.beans.factory.ObjectFactory;
@@ -32,9 +32,9 @@ public class HodParametricValuesServiceIT extends AbstractParametricValuesServic
     }
 
     @Override
-    protected TagName determinePaginatableField() {
+    protected FieldPath determinePaginatableField() {
         // Can't use value details for non-numeric fields on HOD, but we know the tests use wiki_eng
-        return tagNameFactory.buildTagName("WIKIPEDIA_CATEGORY");
+        return tagNameFactory.getFieldPath("WIKIPEDIA_CATEGORY");
     }
 
     @Override
@@ -47,7 +47,7 @@ public class HodParametricValuesServiceIT extends AbstractParametricValuesServic
 
         return parametricRequestBuilderFactory.getObject()
                 .queryRestrictions(queryRestrictions)
-                .fieldName(tagNameFactory.buildTagName(ParametricValuesService.AUTN_DATE_FIELD))
+                .fieldName(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD))
                 .build();
     }
 

@@ -9,7 +9,10 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
+import com.hp.autonomy.searchcomponents.core.fields.FieldDisplayNameGenerator;
+import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
+import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import com.hp.autonomy.types.idol.responses.DocContent;
@@ -18,44 +21,53 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import java.util.Map;
 
+import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings("unused")
+@RunWith(SpringRunner.class)
+@SpringBootTest(
+        classes = {CoreTestContext.class, FieldsParserImpl.class, IdolDocumentFieldsServiceImpl.class},
+        properties = CORE_CLASSES_PROPERTY,
+        webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class FieldsParserTest {
-    @Mock
+    @MockBean
     private ConfigService<IdolSearchCapable> configService;
-
-    @Mock
+    @MockBean
     private IdolSearchCapable config;
-
+    @Autowired
+    private FieldPathNormaliser fieldPathNormaliser;
+    @MockBean
+    private FieldDisplayNameGenerator fieldDisplayNameGenerator;
+    @Autowired
     private FieldsParser fieldsParser;
 
     @Before
     public void setUp() {
-        fieldsParser = new FieldsParserImpl(configService);
-
         final FieldsInfo fieldsInfo = FieldsInfo.builder()
                 .populateResponseMap("Custom Date", FieldInfo.<DateTime>builder()
                         .id("Custom Date")
-                        .name("CUSTOM_DATE")
+                        .name(fieldPathNormaliser.normaliseFieldPath("CUSTOM_DATE"))
                         .type(FieldType.DATE)
                         .advanced(true)
                         .build())
                 .populateResponseMap("author", FieldInfo.<String>builder()
                         .id("author")
-                        .name("CUSTOM_ARRAY")
+                        .name(fieldPathNormaliser.normaliseFieldPath("CUSTOM_ARRAY"))
                         .build())
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
@@ -108,15 +120,15 @@ public class FieldsParserTest {
         mockNodeListEntry(childNodes, 3, "UNKNOWN", "c");
         when(element.getChildNodes()).thenReturn(childNodes);
 
-        mockHardCodedField(element, IdolDocumentFieldsService.QMS_ID_FIELD.toUpperCase(), "123");
-        when(element.getElementsByTagName(IdolDocumentFieldsService.INJECTED_PROMOTION_FIELD.toUpperCase())).thenReturn(mock(NodeList.class));
+        mockHardCodedField(element, IdolDocumentFieldsServiceImpl.QMS_ID_FIELD, "123");
+        when(element.getElementsByTagName(IdolDocumentFieldsServiceImpl.INJECTED_PROMOTION_FIELD)).thenReturn(mock(NodeList.class));
 
         hit.setContent(content);
 
         return hit;
     }
 
-    private void mockHardCodedField(final Element element, final String name, final String value) {
+    private void mockHardCodedField(final Element element, final String name, @SuppressWarnings("SameParameterValue") final String value) {
         final NodeList childNodes = mock(NodeList.class);
         when(childNodes.getLength()).thenReturn(1);
         mockNodeListEntry(childNodes, 0, name, value);
@@ -147,7 +159,7 @@ public class FieldsParserTest {
 
         final NodeList childNodes = mock(NodeList.class);
         when(childNodes.getLength()).thenReturn(1);
-        final String name = IdolDocumentFieldsService.INJECTED_PROMOTION_FIELD.toUpperCase();
+        final String name = IdolDocumentFieldsServiceImpl.INJECTED_PROMOTION_FIELD.toUpperCase();
         mockNodeListEntry(childNodes, 0, name, "true");
         when(element.getElementsByTagName(anyString())).thenReturn(mock(NodeList.class));
         when(element.getElementsByTagName(name)).thenReturn(childNodes);

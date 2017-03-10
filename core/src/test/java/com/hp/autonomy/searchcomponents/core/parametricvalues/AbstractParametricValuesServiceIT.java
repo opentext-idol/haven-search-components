@@ -13,6 +13,7 @@ import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
 import com.hp.autonomy.types.idol.responses.RecursiveField;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -65,7 +67,7 @@ public abstract class AbstractParametricValuesServiceIT<
     protected abstract FieldsRequestBuilder<F, ?> fieldsRequestParams(final FB fieldsRequestBuilder);
 
     // Find a parametric field with 2 or more values for the parametric request used in these tests
-    protected abstract TagName determinePaginatableField();
+    protected abstract FieldPath determinePaginatableField();
 
     protected abstract R noResultsParametricRequest();
 
@@ -82,7 +84,7 @@ public abstract class AbstractParametricValuesServiceIT<
     public void ranges() throws E {
         final Map<TagName, ValueDetails> valueDetailsOutput = parametricValuesService.getValueDetails(createNumericParametricRequest());
         final ValueDetails valueDetails = valueDetailsOutput.get(tagNameFactory.buildTagName(ParametricValuesService.AUTN_DATE_FIELD));
-        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(createNumericParametricRequest(), ImmutableMap.of(tagNameFactory.buildTagName(ParametricValuesService.AUTN_DATE_FIELD), new BucketingParams(35, valueDetails.getMin(), valueDetails.getMax())));
+        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(createNumericParametricRequest(), ImmutableMap.of(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD), new BucketingParams(35, valueDetails.getMin(), valueDetails.getMax())));
         assertThat(ranges, not(empty()));
     }
 
@@ -90,7 +92,7 @@ public abstract class AbstractParametricValuesServiceIT<
     public void rangesNoResults() throws E {
         final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(
                 noResultsParametricRequest(),
-                ImmutableMap.of(tagNameFactory.buildTagName(ParametricValuesService.AUTN_DATE_FIELD), new BucketingParams(5, 0, 1))
+                ImmutableMap.of(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD), new BucketingParams(5, 0, 1))
         );
 
         assertThat(ranges, hasSize(1));
@@ -101,7 +103,7 @@ public abstract class AbstractParametricValuesServiceIT<
     @Test
     public void getDependentParametricValues() throws E {
         final R request = createParametricRequest();
-        final Collection<RecursiveField> results = parametricValuesService.getDependentParametricValues(request);
+        final Collection<DependentParametricField> results = parametricValuesService.getDependentParametricValues(request);
         assertThat(results, is(not(empty())));
     }
 
@@ -123,7 +125,7 @@ public abstract class AbstractParametricValuesServiceIT<
 
     @Test
     public void getPaginatedParametricValues() throws E {
-        final TagName fieldName = determinePaginatableField();
+        final FieldPath fieldName = determinePaginatableField();
 
         final R page1Request = parametricRequestBuilderFactory.getObject()
                 .queryRestrictions(testUtils.buildQueryRestrictions())
@@ -150,7 +152,7 @@ public abstract class AbstractParametricValuesServiceIT<
 
     private R createNumericParametricRequest() {
         return parametricRequestBuilderFactory.getObject()
-                .fieldName(tagNameFactory.buildTagName(ParametricValuesService.AUTN_DATE_FIELD))
+                .fieldName(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD))
                 .queryRestrictions(testUtils.buildQueryRestrictions())
                 .sort(SortParam.ReverseDate)
                 .build();
@@ -158,7 +160,11 @@ public abstract class AbstractParametricValuesServiceIT<
 
     protected R createParametricRequest() throws E {
         final FieldsRequestBuilder<F, ?> fieldsRequestBuilder = fieldsRequestParams(fieldsRequestBuilderFactory.getObject());
-        final List<TagName> fields = fieldsService.getFields(fieldsRequestBuilder.build(), FieldTypeParam.Parametric).get(FieldTypeParam.Parametric);
+        fieldsRequestBuilder.fieldType(FieldTypeParam.Parametric);
+        final Set<FieldPath> fields = fieldsService.getFields(fieldsRequestBuilder.build()).get(FieldTypeParam.Parametric)
+                .stream()
+                .map(TagName::getId)
+                .collect(Collectors.toSet());
 
         return parametricRequestBuilderFactory.getObject()
                 .fieldNames(fields)

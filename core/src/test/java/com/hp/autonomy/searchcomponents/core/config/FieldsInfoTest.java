@@ -7,27 +7,40 @@ package com.hp.autonomy.searchcomponents.core.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.autonomy.frontend.configuration.ConfigurationComponentTest;
+import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
+import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import org.apache.commons.io.IOUtils;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
+import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.boot.test.json.ObjectContent;
 import org.springframework.core.ResolvableType;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.util.Map;
 
+import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
+@RunWith(SpringRunner.class)
+@JsonTest
+@AutoConfigureJsonTesters(enabled = false)
+@SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class FieldsInfoTest extends ConfigurationComponentTest<FieldsInfo> {
+    @Autowired
+    private FieldPathNormaliser fieldPathNormaliser;
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Override
     public void setUp() {
-        final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.addMixIn(FieldInfo.class, FieldInfoConfigMixins.class);
         json = new JacksonTester<>(getClass(), ResolvableType.forClass(getType()), objectMapper);
     }
@@ -42,7 +55,8 @@ public class FieldsInfoTest extends ConfigurationComponentTest<FieldsInfo> {
         return FieldsInfo.builder()
                 .populateResponseMap("someNumberField", FieldInfo.builder().build())
                 .populateResponseMap("anotherField", FieldInfo.builder()
-                        .name("ANOTHER_FIELD")
+                        .name(fieldPathNormaliser.normaliseFieldPath("ANOTHER_FIELD"))
+                        .displayName("Another Field")
                         .advanced(true)
                         .build())
                 .build();
@@ -55,8 +69,9 @@ public class FieldsInfoTest extends ConfigurationComponentTest<FieldsInfo> {
 
     @Override
     protected void validateJson(final JsonContent<FieldsInfo> jsonContent) {
-        jsonContent.assertThat().hasEmptyJsonPathValue("@.someNumberField");
+        jsonContent.assertThat().hasJsonPathValue("@.someNumberField");
         jsonContent.assertThat().hasJsonPathArrayValue("@.anotherField.names", "ANOTHER_FIELD");
+        jsonContent.assertThat().hasJsonPathStringValue("@.anotherField.displayName", "Another Field");
         jsonContent.assertThat().hasJsonPathBooleanValue("@.anotherField.advanced", true);
     }
 
@@ -67,6 +82,8 @@ public class FieldsInfoTest extends ConfigurationComponentTest<FieldsInfo> {
         final FieldInfo<?> someField = fieldInfoMap.get("someField");
         assertThat(someField.getNames(), hasSize(2));
         assertEquals(FieldType.STRING, someField.getType());
+        assertEquals("SomeValue", someField.getValues().get(0).getValue());
+        assertEquals("Some Value", someField.getValues().get(0).getDisplayValue());
         assertThat(fieldInfoMap, hasKey("someNumberField"));
         final FieldInfo<?> numberField = fieldInfoMap.get("someNumberField");
         assertThat(numberField.getNames(), hasSize(1));
@@ -82,6 +99,8 @@ public class FieldsInfoTest extends ConfigurationComponentTest<FieldsInfo> {
         final FieldInfo<?> someField = fieldInfoMap.get("someField");
         assertThat(someField.getNames(), hasSize(2));
         assertEquals(FieldType.STRING, someField.getType());
+        assertEquals("SomeValue", someField.getValues().get(0).getValue());
+        assertEquals("Some Value", someField.getValues().get(0).getDisplayValue());
         assertThat(fieldInfoMap, hasKey("someNumberField"));
         final FieldInfo<?> numberField = fieldInfoMap.get("someNumberField");
         assertThat(numberField.getNames(), empty());

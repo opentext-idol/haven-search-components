@@ -5,7 +5,12 @@
 
 package com.hp.autonomy.searchcomponents.core.test;
 
+import com.hp.autonomy.frontend.configuration.ConfigService;
+import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
+import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
+import com.hp.autonomy.searchcomponents.core.fields.AbstractFieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +18,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,8 +31,22 @@ public class CoreTestContext {
     @Bean
     @ConditionalOnMissingBean(FieldPathNormaliser.class)
     public FieldPathNormaliser fieldPathNormaliser() {
-        final FieldPathNormaliser fieldPathNormaliser = mock(FieldPathNormaliser.class);
-        when(fieldPathNormaliser.normaliseFieldPath(anyString())).thenAnswer(x -> x.getArgumentAt(0, String.class));
-        return fieldPathNormaliser;
+        return new AbstractFieldPathNormaliser() {
+            @Override
+            public FieldPath normaliseFieldPath(final String fieldPath) {
+                return newFieldPath(fieldPath, fieldPath);
+            }
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    @Bean
+    @ConditionalOnMissingBean(ConfigService.class)
+    public ConfigService<HavenSearchCapable> configService() {
+        final ConfigService<HavenSearchCapable> configService = mock(ConfigService.class);
+        final HavenSearchCapable config = mock(HavenSearchCapable.class);
+        when(config.getFieldsInfo()).thenReturn(FieldsInfo.builder().build());
+        when(configService.getConfig()).thenReturn(config);
+        return configService;
     }
 }

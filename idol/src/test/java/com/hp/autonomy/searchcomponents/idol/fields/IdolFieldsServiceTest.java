@@ -48,14 +48,21 @@ public class IdolFieldsServiceTest {
     @Test
     public void getFields() {
         when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockTagNamesResponse());
-        assertThat(idolFieldsService.getFields(mock(IdolFieldsRequest.class), FieldTypeParam.Date, FieldTypeParam.Numeric), hasEntry(is(FieldTypeParam.Numeric), not(empty())));
+        assertThat(idolFieldsService.getFields(mock(IdolFieldsRequest.class)), hasEntry(is(FieldTypeParam.Numeric), not(empty())));
     }
 
     private GetTagNamesResponseData mockTagNamesResponse() {
         final GetTagNamesResponseData responseData = new GetTagNamesResponseData();
-        final GetTagNamesResponseData.Name name = new GetTagNamesResponseData.Name();
-        name.setValue("DOCUMENT/CATEGORY");
-        responseData.getName().add(name);
+        responseData.getName().add(mockNameResponse(null, "DOCUMENT"));
+        responseData.getName().add(mockNameResponse("numeric", "DOCUMENT/DREREFERENCE"));
+        responseData.getName().add(mockNameResponse("reference,trimspaces", "DOCUMENT/CATEGORY"));
         return responseData;
+    }
+
+    private GetTagNamesResponseData.Name mockNameResponse(final String types, final String value) {
+        final GetTagNamesResponseData.Name name = new GetTagNamesResponseData.Name();
+        name.setTypes(types);
+        name.setValue(value);
+        return name;
     }
 }

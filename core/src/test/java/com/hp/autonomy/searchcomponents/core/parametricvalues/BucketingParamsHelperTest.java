@@ -6,8 +6,8 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.google.common.collect.ImmutableMap;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,16 +27,14 @@ public class BucketingParamsHelperTest {
     @Mock
     private ParametricRequest<?> parametricRequest;
     @Mock
-    private TagName field1;
+    private FieldPath field1;
     @Mock
-    private TagName field2;
+    private FieldPath field2;
 
     private BucketingParamsHelper bucketingParamsHelper;
 
     @Before
     public void setUp() {
-        when(field1.getId()).thenReturn("field1");
-        when(field2.getId()).thenReturn("field2");
         when(parametricRequest.getFieldNames()).thenReturn(Arrays.asList(field1, field2));
 
         bucketingParamsHelper = new BucketingParamsHelperImpl();
@@ -73,8 +71,8 @@ public class BucketingParamsHelperTest {
         final List<RangeInfo.Value> buckets = bucketingParamsHelper.emptyBuckets(Arrays.asList(0.0, 0.5, 1.0));
 
         assertThat(buckets, is(Arrays.asList(
-                new RangeInfo.Value(0, 0.0, 0.5),
-                new RangeInfo.Value(0, 0.5, 1.0)
+                new RangeInfo.Value(0.0, 0.5, 0),
+                new RangeInfo.Value(0.5, 1.0, 0)
         )));
     }
 }

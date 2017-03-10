@@ -9,10 +9,13 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
+import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
 
@@ -20,16 +23,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
 public abstract class AbstractDocumentFieldsServiceTest {
-    @Mock
+    @MockBean
     protected ConfigService<HavenSearchCapable> configService;
-
     @Mock
     protected HavenSearchCapable config;
-
-    protected AbstractDocumentFieldsService documentFieldsService;
     protected int numberOfHardCodedFields;
+    @Autowired
+    private FieldPathNormaliser fieldPathNormaliser;
+    @Autowired
+    private DocumentFieldsService documentFieldsService;
     private FieldsInfo fieldsInfo;
 
     @Test
@@ -44,10 +48,10 @@ public abstract class AbstractDocumentFieldsServiceTest {
     public void getAllPrintFields() {
         fieldsInfo = FieldsInfo.builder()
                 .populateResponseMap("Some Id", FieldInfo.<String>builder()
-                        .name("SomeField")
+                        .name(fieldPathNormaliser.normaliseFieldPath("SomeField"))
                         .build())
                 .populateResponseMap("Some other Id", FieldInfo.<String>builder()
-                        .name("SomeOtherField")
+                        .name(fieldPathNormaliser.normaliseFieldPath("SomeOtherField"))
                         .build())
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
@@ -59,10 +63,10 @@ public abstract class AbstractDocumentFieldsServiceTest {
     public void getAllPrintFieldsWithUserRestrictedFields() {
         fieldsInfo = FieldsInfo.builder()
                 .populateResponseMap("Some Id", FieldInfo.<String>builder()
-                        .name("SomeField")
+                        .name(fieldPathNormaliser.normaliseFieldPath("SomeField"))
                         .build())
                 .populateResponseMap("Some other Id", FieldInfo.<String>builder()
-                        .name("SomeOtherField")
+                        .name(fieldPathNormaliser.normaliseFieldPath("SomeOtherField"))
                         .build())
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);

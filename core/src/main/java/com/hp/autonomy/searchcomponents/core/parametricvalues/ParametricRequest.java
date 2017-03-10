@@ -8,7 +8,7 @@ package com.hp.autonomy.searchcomponents.core.parametricvalues;
 import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public interface ParametricRequest<Q extends QueryRestrictions<?>> extends Reque
      *
      * @return Idol field names
      */
-    List<TagName> getFieldNames();
+    List<FieldPath> getFieldNames();
 
     /**
      * @return Index of first value to return for each field (1-based)
@@ -53,6 +53,13 @@ public interface ParametricRequest<Q extends QueryRestrictions<?>> extends Reque
      * @return Range information for numeric bucketing per field
      */
     List<Range> getRanges();
+
+    /**
+     * Wildcard restrictions for values
+     *
+     * @return Wildcard restrictions for values
+     */
+    List<String> getValueRestrictions();
 
     /**
      * Restrictions on the underlying query

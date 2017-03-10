@@ -6,12 +6,16 @@
 package com.hp.autonomy.searchcomponents.hod.search.fields;
 
 import com.hp.autonomy.searchcomponents.core.search.fields.AbstractDocumentFieldsServiceTest;
+import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import org.junit.Before;
+import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
+
+@SpringBootTest(classes = {CoreTestContext.class, HodDocumentFieldsService.class}, properties = CORE_CLASSES_PROPERTY, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class HodDocumentFieldsServiceTest extends AbstractDocumentFieldsServiceTest {
     @Before
     public void setUp() {
-        documentFieldsService = new HodDocumentFieldsService(configService);
         numberOfHardCodedFields = 0;
     }
 }

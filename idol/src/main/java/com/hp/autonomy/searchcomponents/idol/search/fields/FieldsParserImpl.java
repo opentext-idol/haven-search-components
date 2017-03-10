@@ -8,12 +8,16 @@ package com.hp.autonomy.searchcomponents.idol.search.fields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
+import com.hp.autonomy.searchcomponents.core.config.FieldValue;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
+import com.hp.autonomy.searchcomponents.core.fields.FieldDisplayNameGenerator;
+import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import com.hp.autonomy.types.idol.responses.DocContent;
 import com.hp.autonomy.types.idol.responses.Hit;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,16 +43,25 @@ import static com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser.F
 @Component(FIELDS_PARSER_BEAN_NAME)
 class FieldsParserImpl implements FieldsParser {
     private final ConfigService<? extends IdolSearchCapable> configService;
+    private final FieldPathNormaliser fieldPathNormaliser;
+    private final FieldDisplayNameGenerator fieldDisplayNameGenerator;
+    private final IdolDocumentFieldsService documentFieldsService;
 
     @Autowired
-    FieldsParserImpl(final ConfigService<? extends IdolSearchCapable> configService) {
+    FieldsParserImpl(final ConfigService<? extends IdolSearchCapable> configService,
+                     final FieldPathNormaliser fieldPathNormaliser,
+                     final FieldDisplayNameGenerator fieldDisplayNameGenerator,
+                     final IdolDocumentFieldsService documentFieldsService) {
         this.configService = configService;
+        this.fieldPathNormaliser = fieldPathNormaliser;
+        this.fieldDisplayNameGenerator = fieldDisplayNameGenerator;
+        this.documentFieldsService = documentFieldsService;
     }
 
     @Override
     public void parseDocumentFields(final Hit hit, final IdolSearchResult.IdolSearchResultBuilder searchResultBuilder) {
         final FieldsInfo fieldsInfo = configService.getConfig().getFieldsInfo();
-        final Map<String, FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfigByName();
+        final Map<FieldPath, FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfigByName();
 
         final DocContent content = hit.getContent();
         Map<String, FieldInfo<?>> fieldMap = Collections.emptyMap();
@@ -60,7 +74,7 @@ class FieldsParserImpl implements FieldsParser {
                 fieldMap = new HashMap<>(childNodes.getLength());
 
                 parseAllFields(fieldConfig, childNodes, fieldMap, docContent.getNodeName());
-                qmsId = parseField(docContent, IdolDocumentFieldsService.QMS_ID_FIELD_INFO, String.class);
+                qmsId = parseField(docContent, documentFieldsService.getQmsIdFieldInfo(), String.class);
                 promotionCategory = determinePromotionCategory(docContent, hit.getPromotionname(), hit.getDatabase());
             }
         }
@@ -71,32 +85,36 @@ class FieldsParserImpl implements FieldsParser {
                 .promotionCategory(promotionCategory);
     }
 
-    private void parseAllFields(final Map<String, FieldInfo<?>> fieldConfig, final NodeList childNodes, final Map<String, FieldInfo<?>> fieldMap, final String name) {
+    private void parseAllFields(final Map<FieldPath, FieldInfo<?>> fieldConfig, final NodeList childNodes, final Map<String, FieldInfo<?>> fieldMap, final String name) {
+        final FieldPath fieldPath = fieldPathNormaliser.normaliseFieldPath(name);
         for (int i = 0; i < childNodes.getLength(); i++) {
             final Node node = childNodes.item(i);
             if (node instanceof Text) {
                 final String stringValue = node.getNodeValue();
                 if (StringUtils.isNotBlank(stringValue)) {
-                    final FieldInfo<?> fieldInfo = getFieldInfo(fieldConfig, name);
+                    final FieldInfo<?> fieldInfo = getFieldInfo(fieldConfig, fieldPath);
                     final String id = fieldInfo.getId();
+                    final String displayName = fieldDisplayNameGenerator.generateDisplayNameFromId(id);
                     final FieldType fieldType = fieldInfo.getType();
-                    final Object value = fieldType.parseValue(fieldType.getType(), stringValue);
+                    final Serializable value = (Serializable) fieldType.parseValue(fieldType.getType(), stringValue);
+                    final String displayValue = fieldDisplayNameGenerator.generateDisplayValueFromId(id, value, fieldType);
                     if (fieldMap.containsKey(id)) {
                         @SuppressWarnings({"unchecked", "CastToConcreteClass"})
-                        final FieldInfo<?> updatedFieldInfo = ((FieldInfo<Object>) fieldMap.get(id)).toBuilder()
-                                .name(name)
-                                .value(value)
+                        final FieldInfo<?> updatedFieldInfo = ((FieldInfo<Serializable>) fieldMap.get(id)).toBuilder()
+                                .name(fieldPath)
+                                .value(new FieldValue<>(value, displayValue))
                                 .build();
                         fieldMap.put(id, updatedFieldInfo);
                     } else {
-                        final Collection<String> names = new ArrayList<>(fieldInfo.getNames().size());
-                        names.add(name);
-                        final FieldInfo<Object> fieldInfoWithValue = FieldInfo.builder()
+                        final Collection<FieldPath> names = new ArrayList<>(fieldInfo.getNames().size());
+                        names.add(fieldPath);
+                        final FieldInfo<Serializable> fieldInfoWithValue = FieldInfo.builder()
                                 .id(id)
                                 .names(names)
+                                .displayName(displayName)
                                 .type(fieldInfo.getType())
                                 .advanced(fieldInfo.isAdvanced())
-                                .value(value)
+                                .value(new FieldValue<>(value, displayValue))
                                 .build();
                         fieldMap.put(id, fieldInfoWithValue);
                     }
@@ -107,17 +125,17 @@ class FieldsParserImpl implements FieldsParser {
         }
     }
 
-    private FieldInfo<?> getFieldInfo(final Map<String, FieldInfo<?>> fieldConfig, final String name) {
-        return fieldConfig.containsKey(name) ? fieldConfig.get(name) : FieldInfo.builder()
-                .id(name)
-                .name(name)
+    private FieldInfo<?> getFieldInfo(final Map<FieldPath, FieldInfo<?>> fieldConfig, final FieldPath fieldPath) {
+        return fieldConfig.containsKey(fieldPath) ? fieldConfig.get(fieldPath) : FieldInfo.builder()
+                .id(fieldPath.getNormalisedPath())
+                .name(fieldPath)
                 .advanced(true)
                 .build();
     }
 
     private PromotionCategory determinePromotionCategory(final Element docContent, final CharSequence promotionName, final CharSequence database) {
         final PromotionCategory promotionCategory;
-        final Boolean injectedPromotion = parseField(docContent, IdolDocumentFieldsService.INJECTED_PROMOTION_FIELD_INFO, Boolean.class);
+        final Boolean injectedPromotion = parseField(docContent, documentFieldsService.getInjectedPromotionFieldInfo(), Boolean.class);
         if (injectedPromotion != null && injectedPromotion) {
             promotionCategory = PromotionCategory.CARDINAL_PLACEMENT;
         } else if (StringUtils.isNotEmpty(promotionName)) {
@@ -130,8 +148,8 @@ class FieldsParserImpl implements FieldsParser {
         return promotionCategory;
     }
 
-    private <T> List<T> parseFields(final Element node, final String name, final FieldType fieldType, final Class<T> type) {
-        final NodeList childNodes = node.getElementsByTagName(name.toUpperCase());
+    private <T> List<T> parseFields(final Element node, final FieldPath fieldPath, final FieldType fieldType, final Class<T> type) {
+        final NodeList childNodes = node.getElementsByTagName(fieldPath.getFieldName());
         final int length = childNodes.getLength();
         final List<T> values = new ArrayList<>(length);
 
@@ -143,7 +161,7 @@ class FieldsParserImpl implements FieldsParser {
         return values;
     }
 
-    private <T> T parseField(final Element node, final FieldInfo<T> fieldInfo, final Class<T> type) {
+    private <T extends Serializable> T parseField(final Element node, final FieldInfo<T> fieldInfo, final Class<T> type) {
         final List<T> fields = parseFields(node, fieldInfo.getNames().iterator().next(), fieldInfo.getType(), type);
         return CollectionUtils.isNotEmpty(fields) ? fields.get(0) : null;
     }

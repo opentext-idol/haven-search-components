@@ -12,7 +12,7 @@ import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesSe
 import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricRequest;
 import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricRequestBuilder;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import lombok.Builder;
 import lombok.Data;
@@ -28,17 +28,18 @@ import java.util.List;
 @Builder(toBuilder = true)
 @JsonDeserialize(builder = HodParametricRequestImpl.HodParametricRequestImplBuilder.class)
 class HodParametricRequestImpl implements HodParametricRequest {
-    private static final long serialVersionUID = 2235023046934181036L;
-
     public static final int MAX_VALUES_DEFAULT = 5;
+    private static final long serialVersionUID = -7181783205453758678L;
 
     @Singular
-    private final List<TagName> fieldNames;
+    private final List<FieldPath> fieldNames;
     private final Integer start;
     private final Integer maxValues;
     private final SortParam sort;
     @Singular
     private final List<Range> ranges;
+    @Singular
+    private final List<String> valueRestrictions;
     private final HodQueryRestrictions queryRestrictions;
     private final boolean modified;
 
