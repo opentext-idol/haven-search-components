@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObjectBuilder;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ import lombok.Setter;
 import lombok.Singular;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,24 +37,30 @@ import java.util.Set;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = FieldInfo.FieldInfoBuilder.class)
-public class FieldInfo<T> implements RequestObject<FieldInfo<T>, FieldInfo.FieldInfoBuilder<T>> {
+public class FieldInfo<T extends Serializable> implements RequestObject<FieldInfo<T>, FieldInfo.FieldInfoBuilder<T>> {
     private static final long serialVersionUID = -5649457890413743332L;
 
     private final String id;
     private final FieldType type;
     private final boolean advanced;
     @Singular
-    private final Set<String> names;
+    private final Set<FieldPath> names;
+    private final String displayName;
     @SuppressWarnings({"NonSerializableFieldInSerializableClass", "MismatchedQueryAndUpdateOfCollection"})
     @Singular
-    private final List<T> values;
+    private final List<FieldValue<T>> values;
 
     private FieldInfo(final FieldInfoBuilder<T> builder) {
         id = builder.id;
         type = builder.type;
         advanced = builder.advanced;
         names = builder.names;
+        displayName = builder.displayName;
         values = builder.values;
+    }
+
+    public static <T extends Serializable> FieldInfoBuilder<T> builder() {
+        return new FieldInfoBuilder<>();
     }
 
     public String getId() {
@@ -70,11 +78,11 @@ public class FieldInfo<T> implements RequestObject<FieldInfo<T>, FieldInfo.Field
     }
 
     @SuppressWarnings("unused")
-    public Set<String> getNamesIfNotEmpty() {
+    public Set<FieldPath> getNamesIfNotEmpty() {
         return names.isEmpty() ? null : names;
     }
 
-    public List<T> getValues() {
+    public List<FieldValue<T>> getValues() {
         return Collections.unmodifiableList(values);
     }
 
@@ -83,27 +91,25 @@ public class FieldInfo<T> implements RequestObject<FieldInfo<T>, FieldInfo.Field
         return new FieldInfoBuilder<>(this);
     }
 
-    public static <T> FieldInfoBuilder<T> builder() {
-        return new FieldInfoBuilder<>();
-    }
-
     @SuppressWarnings({"WeakerAccess", "unused", "FieldMayBeFinal"})
     @Accessors(fluent = true)
     @Setter
     @NoArgsConstructor(access = AccessLevel.PACKAGE)
     @JsonPOJOBuilder(withPrefix = "")
-    public static class FieldInfoBuilder<T> implements RequestObjectBuilder<FieldInfo<T>, FieldInfoBuilder<T>> {
+    public static class FieldInfoBuilder<T extends Serializable> implements RequestObjectBuilder<FieldInfo<T>, FieldInfoBuilder<T>> {
         private String id;
         private FieldType type = FieldType.STRING;
         private boolean advanced;
-        private Set<String> names = new HashSet<>();
-        private List<T> values = new ArrayList<>();
+        private Set<FieldPath> names = new HashSet<>();
+        private String displayName;
+        private List<FieldValue<T>> values = new ArrayList<>();
 
         private FieldInfoBuilder(final FieldInfo<T> fieldInfo) {
             id = fieldInfo.id;
             type = fieldInfo.type;
             advanced = fieldInfo.advanced;
             names = fieldInfo.names;
+            displayName = fieldInfo.displayName;
             values = fieldInfo.values;
         }
 
@@ -113,12 +119,12 @@ public class FieldInfo<T> implements RequestObject<FieldInfo<T>, FieldInfo.Field
             return this;
         }
 
-        public FieldInfoBuilder<T> name(final String name) {
+        public FieldInfoBuilder<T> name(final FieldPath name) {
             names.add(name);
             return this;
         }
 
-        public FieldInfoBuilder<T> names(final Collection<? extends String> names) {
+        public FieldInfoBuilder<T> names(final Collection<? extends FieldPath> names) {
             this.names.addAll(names);
             return this;
         }
@@ -128,12 +134,12 @@ public class FieldInfo<T> implements RequestObject<FieldInfo<T>, FieldInfo.Field
             return this;
         }
 
-        public FieldInfoBuilder<T> value(final T value) {
+        public FieldInfoBuilder<T> value(final FieldValue<T> value) {
             values.add(value);
             return this;
         }
 
-        public FieldInfoBuilder<T> values(final Collection<? extends T> values) {
+        public FieldInfoBuilder<T> values(final Collection<? extends FieldValue<T>> values) {
             this.values.addAll(values);
             return this;
         }

@@ -10,7 +10,6 @@ import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
-import com.hp.autonomy.searchcomponents.core.fields.FieldsRequest;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
@@ -20,14 +19,16 @@ import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetTagNamesParams;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.fields.FieldsService.FIELD_SERVICE_BEAN_NAME;
 
@@ -53,29 +54,28 @@ class IdolFieldsServiceImpl implements IdolFieldsService {
 
     @Override
     @Cacheable(CacheNames.FIELDS)
-    public Map<FieldTypeParam, List<TagName>> getFields(final IdolFieldsRequest request, final FieldTypeParam... fieldTypes) throws AciErrorException {
-        final Map<FieldTypeParam, List<TagName>> results = new EnumMap<>(FieldTypeParam.class);
-        for (final FieldTypeParam fieldType : fieldTypes) {
-            results.put(fieldType, getTagNames(request, fieldType));
-        }
-
-        return results;
-    }
-
-    private List<TagName> getTagNames(final FieldsRequest request, final FieldTypeParam fieldType) {
+    public Map<FieldTypeParam, Set<TagName>> getFields(final IdolFieldsRequest request) throws AciErrorException {
         final AciParameters aciParameters = new AciParameters(TagActions.GetTagNames.name());
-        aciParameters.add(GetTagNamesParams.FieldType.name(), fieldType);
+        Optional.ofNullable(request.getFieldTypes()).ifPresent(fieldTypes ->
+                aciParameters.add(GetTagNamesParams.FieldType.name(), String.join(",", fieldTypes.stream().map(FieldTypeParam::name).collect(Collectors.toList()))));
         aciParameters.add(GetTagNamesParams.MaxValues.name(), request.getMaxValues());
+        aciParameters.add(GetTagNamesParams.TypeDetails.name(), true);
 
         final GetTagNamesResponseData responseData = contentAciService.executeAction(aciParameters, tagNamesResponseProcessor);
 
-        final List<GetTagNamesResponseData.Name> names = responseData.getName();
-        final List<TagName> tagNames = new ArrayList<>(names.size());
-        for (final GetTagNamesResponseData.Name name : names) {
-            final String value = name.getValue();
-            tagNames.add(tagNameFactory.buildTagName(value));
-        }
+        return responseData.getName().stream()
+                .filter(name -> name.getTypes() != null)
+                .flatMap(name -> Arrays.stream(name.getTypes().split(",")).map(type -> new ImmutablePair<>(type, name.getValue())))
+                .filter(entry -> recognisableType(entry.getLeft()))
+                .collect(Collectors.groupingBy(entry -> FieldTypeParam.fromValue(entry.getKey()), Collectors.mapping(entry -> tagNameFactory.buildTagName(entry.getValue()), Collectors.toSet())));
+    }
 
-        return tagNames;
+    private boolean recognisableType(final String type) {
+        try {
+            FieldTypeParam.fromValue(type);
+            return true;
+        } catch (final IllegalArgumentException ignored) {
+            return false;
+        }
     }
 }

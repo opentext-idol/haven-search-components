@@ -5,6 +5,8 @@
 
 package com.hp.autonomy.searchcomponents.core.fields;
 
+import com.hp.autonomy.searchcomponents.core.config.FieldType;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,8 @@ public class TagNameFactoryImpl implements TagNameFactory {
     private final FieldDisplayNameGenerator fieldDisplayNameGenerator;
 
     @Autowired
-    public TagNameFactoryImpl(final FieldPathNormaliser fieldPathNormaliser, final FieldDisplayNameGenerator fieldDisplayNameGenerator) {
+    public TagNameFactoryImpl(final FieldPathNormaliser fieldPathNormaliser,
+                              final FieldDisplayNameGenerator fieldDisplayNameGenerator) {
         this.fieldPathNormaliser = fieldPathNormaliser;
         this.fieldDisplayNameGenerator = fieldDisplayNameGenerator;
     }
@@ -30,9 +33,26 @@ public class TagNameFactoryImpl implements TagNameFactory {
      */
     @Override
     public TagName buildTagName(final String path) {
-        final String normalisedPath = fieldPathNormaliser.normaliseFieldPath(path);
-        final String displayName = fieldDisplayNameGenerator.generateDisplayName(normalisedPath);
+        final FieldPath fieldPath = getFieldPath(path);
+        final String displayName = fieldDisplayNameGenerator.generateDisplayName(fieldPath);
 
-        return new TagNameImpl(normalisedPath, displayName);
+        return new TagNameImpl(fieldPath, displayName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldPath getFieldPath(final String path) {
+        return fieldPathNormaliser.normaliseFieldPath(path);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTagDisplayValue(final String path, final String value) {
+        final FieldPath fieldPath = getFieldPath(path);
+        return fieldDisplayNameGenerator.generateDisplayValue(fieldPath, value, FieldType.STRING);
     }
 }

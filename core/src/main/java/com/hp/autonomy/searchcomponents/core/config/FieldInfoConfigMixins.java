@@ -7,8 +7,8 @@ package com.hp.autonomy.searchcomponents.core.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -29,8 +29,5 @@ public interface FieldInfoConfigMixins<T> {
     Boolean isAdvancedIfNotDefault();
 
     @JsonProperty("names")
-    Set<String> getNamesIfNotEmpty();
-
-    @JsonIgnore
-    List<T> getValues();
+    Set<FieldPath> getNamesIfNotEmpty();
 }

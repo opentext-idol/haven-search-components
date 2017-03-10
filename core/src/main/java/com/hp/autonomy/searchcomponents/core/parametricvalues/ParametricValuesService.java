@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
-import com.hp.autonomy.types.idol.responses.RecursiveField;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
@@ -61,7 +61,7 @@ public interface ParametricValuesService<R extends ParametricRequest<Q>, Q exten
      * @throws E The error thrown in the event of the platform returning an error response
      */
 
-    List<RangeInfo> getNumericParametricValuesInBuckets(R parametricRequest, final Map<TagName, BucketingParams> bucketingParamsPerField) throws E;
+    List<RangeInfo> getNumericParametricValuesInBuckets(R parametricRequest, final Map<FieldPath, BucketingParams> bucketingParamsPerField) throws E;
 
     /**
      * Returns parametric values in a hierarchy
@@ -70,7 +70,7 @@ public interface ParametricValuesService<R extends ParametricRequest<Q>, Q exten
      * @return The parametric values and counts in a hierarchy
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    List<RecursiveField> getDependentParametricValues(R parametricRequest) throws E;
+    List<DependentParametricField> getDependentParametricValues(R parametricRequest) throws E;
 
     /**
      * Get the value details for the fields and restrictions in the given parametric request.

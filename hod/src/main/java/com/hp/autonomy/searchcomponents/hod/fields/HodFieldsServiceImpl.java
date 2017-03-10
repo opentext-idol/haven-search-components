@@ -19,10 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.fields.FieldsService.FIELD_SERVICE_BEAN_NAME;
@@ -30,7 +30,6 @@ import static com.hp.autonomy.searchcomponents.core.fields.FieldsService.FIELD_S
 /**
  * Default HoD implementation of {@link FieldsService}: retrieves lists of field names for the supplied types
  */
-@SuppressWarnings("WeakerAccess")
 @Service(FIELD_SERVICE_BEAN_NAME)
 class HodFieldsServiceImpl implements HodFieldsService {
     private final RetrieveIndexFieldsService retrieveIndexFieldsService;
@@ -44,19 +43,15 @@ class HodFieldsServiceImpl implements HodFieldsService {
 
     @Override
     @Cacheable(CacheNames.FIELDS)
-    public Map<FieldTypeParam, List<TagName>> getFields(final HodFieldsRequest request, final FieldTypeParam... fieldTypes) throws HodErrorException {
-        final Collection<FieldType> fieldTypeList = new ArrayList<>(fieldTypes.length);
-
-        for (final FieldTypeParam fieldType : fieldTypes) {
-            fieldTypeList.add(FieldType.fromParam(fieldType));
-        }
+    public Map<FieldTypeParam, Set<TagName>> getFields(final HodFieldsRequest request) throws HodErrorException {
+        final Collection<FieldType> fieldTypeList = request.getFieldTypes().stream()
+                .map(FieldType::fromParam)
+                .collect(Collectors.toList());
 
         final Map<FieldTypeParam, List<String>> fields = retrieveIndexFields(request, fieldTypeList).getFields();
 
         return fields.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> {
-                    return e.getValue().stream().map(tagNameFactory::buildTagName).collect(Collectors.toList());
-                }));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream().map(tagNameFactory::buildTagName).collect(Collectors.toSet())));
     }
 
     private RetrieveIndexFieldsResponse retrieveIndexFields(final HodFieldsRequest request, final Collection<FieldType> fieldTypes) throws HodErrorException {

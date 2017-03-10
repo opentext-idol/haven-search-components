@@ -5,8 +5,10 @@
 
 package com.hp.autonomy.searchcomponents.idol.fields;
 
+import com.hp.autonomy.searchcomponents.core.fields.AbstractFieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -18,12 +20,12 @@ import static com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser.F
  * Default Idol implementation of {@link FieldPathNormaliser}
  */
 @Component(FIELD_PATH_NORMALISER_BEAN_NAME)
-class IdolFieldPathNormaliserImpl implements FieldPathNormaliser {
+class IdolFieldPathNormaliserImpl extends AbstractFieldPathNormaliser {
     private static final String FULL_PATH_IDENTIFIER = "DOCUMENT/";
     private static final Pattern FIELD_NAME_PATTERN = Pattern.compile("(/?[^/]+)+");
 
     @Override
-    public String normaliseFieldPath(final String fieldPath) {
+    public FieldPath normaliseFieldPath(final String fieldPath) {
         if (StringUtils.isBlank(fieldPath) || !FIELD_NAME_PATTERN.matcher(fieldPath.trim()).matches()) {
             throw new IllegalArgumentException("Field names may not be blank or contain only forward slashes");
         }
@@ -37,6 +39,8 @@ class IdolFieldPathNormaliserImpl implements FieldPathNormaliser {
             normalisedFieldName = '/' + FULL_PATH_IDENTIFIER + (fieldPath.startsWith("/") ? fieldPath.substring(1) : fieldPath);
         }
 
-        return normalisedFieldName.toUpperCase();
+        final String fullyNormalisedPath = normalisedFieldName.toUpperCase();
+        final String fieldName = fullyNormalisedPath.contains("/") ? fullyNormalisedPath.substring(fullyNormalisedPath.lastIndexOf('/') + 1) : fullyNormalisedPath;
+        return newFieldPath(fullyNormalisedPath, fieldName);
     }
 }

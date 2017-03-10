@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public interface CacheNames {
     /**
-     * Cache identifier for {@link FieldsService#getFields(FieldsRequest, FieldTypeParam...)}
+     * Cache identifier for {@link FieldsService#getFields(FieldsRequest)}
      */
     String FIELDS = "fields";
 
