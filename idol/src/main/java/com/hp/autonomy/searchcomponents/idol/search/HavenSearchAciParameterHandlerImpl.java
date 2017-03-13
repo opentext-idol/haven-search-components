@@ -146,9 +146,8 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         if (database != null) {
             parameters.add(GetContentParams.DatabaseMatch.name(), new Databases(database));
         }
+
         parameters.add(GetContentParams.Reference.name(), new Reference(documentReference));
-        parameters.add(GetContentParams.Print.name(), PrintParam.Fields);
-        parameters.add(GetContentParams.PrintFields.name(), new PrintFields(referenceField, AUTN_IDENTIFIER, AUTN_GROUP));
     }
 
     @Override

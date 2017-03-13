@@ -6,12 +6,12 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
+import com.hp.autonomy.searchcomponents.core.search.DocumentTitleResolver;
 import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
 import java.util.HashMap;
@@ -61,14 +61,7 @@ public class IdolSearchResult implements SearchResult {
         promotionName = builder.promotionName;
         promotionCategory = builder.promotionCategory == null ? PromotionCategory.NONE : builder.promotionCategory;
 
-        if (builder.title == null && reference != null) {
-            // If there is no title, assume the reference is a path and take the last part (the "file name")
-            final String[] splitReference = PATH_SEPARATOR_REGEX.split(reference);
-            final String lastPart = splitReference[splitReference.length - 1];
-            title = StringUtils.isBlank(lastPart) || reference.endsWith("/") || reference.endsWith("\\") ? reference : lastPart;
-        } else {
-            title = builder.title;
-        }
+        title = DocumentTitleResolver.resolveTitle(builder.title, builder.reference);
     }
 
     public static class IdolSearchResultBuilder implements SearchResultBuilder {

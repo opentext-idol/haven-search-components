@@ -5,16 +5,13 @@
 
 package com.hp.autonomy.searchcomponents.idol.view;
 
-
-import com.autonomy.aci.client.services.AciConstants;
-import com.autonomy.aci.client.services.AciErrorException;
-import com.autonomy.aci.client.services.AciService;
-import com.autonomy.aci.client.services.AciServiceException;
-import com.autonomy.aci.client.services.Processor;
+import com.autonomy.aci.client.services.*;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.server.ServerConfig;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
+import com.hp.autonomy.searchcomponents.core.view.raw.RawContentViewer;
+import com.hp.autonomy.searchcomponents.core.view.raw.RawDocument;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
@@ -30,7 +27,7 @@ import com.hp.autonomy.types.requests.idol.actions.connector.params.ConnectorVie
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +36,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 
 import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.VIEW_SERVER_SERVICE_BEAN_NAME;
 
@@ -52,18 +51,28 @@ import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.VIEW_
 @Service(VIEW_SERVER_SERVICE_BEAN_NAME)
 @IdolService
 class IdolViewServerServiceImpl implements IdolViewServerService {
+    private static final String CONTENT_FIELD = "DRECONTENT";
     private final AciService contentAciService;
     private final AciService viewAciService;
     private final HavenSearchAciParameterHandler parameterHandler;
     private final Processor<GetContentResponseData> getContentResponseProcessor;
     private final ConfigService<? extends ViewCapable> configService;
+    private final RawContentViewer rawContentViewer;
 
     @Autowired
-    IdolViewServerServiceImpl(final AciService contentAciService, final AciService viewAciService, final ProcessorFactory processorFactory, final HavenSearchAciParameterHandler parameterHandler, final ConfigService<? extends ViewCapable> configService) {
+    IdolViewServerServiceImpl(
+            final AciService contentAciService,
+            final AciService viewAciService,
+            final ProcessorFactory processorFactory,
+            final HavenSearchAciParameterHandler parameterHandler,
+            final ConfigService<? extends ViewCapable> configService,
+            final RawContentViewer rawContentViewer
+    ) {
         this.contentAciService = contentAciService;
         this.viewAciService = viewAciService;
         this.parameterHandler = parameterHandler;
         this.configService = configService;
+        this.rawContentViewer = rawContentViewer;
 
         getContentResponseProcessor = processorFactory.getResponseDataProcessor(GetContentResponseData.class);
     }
@@ -75,21 +84,34 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
      * @param request      options
      * @param outputStream The ViewServer output
      * @throws ViewDocumentNotFoundException If the given document reference does not exist in IDOL
-     * @throws ViewNoReferenceFieldException If the document with the given reference does not have the required reference field
-     * @throws ReferenceFieldBlankException  If the configured reference field name is blank
      * @throws ViewServerErrorException      If ViewServer returns a status code outside the 200 range
      */
     @Override
-    public void viewDocument(final IdolViewRequest request, final OutputStream outputStream) throws ViewDocumentNotFoundException, ViewNoReferenceFieldException, ReferenceFieldBlankException {
-        final String reference = getReferenceFieldValue(request.getDocumentReference(), request.getDatabase());
+    public void viewDocument(final IdolViewRequest request, final OutputStream outputStream) throws ViewDocumentNotFoundException, IOException {
+        final Hit document = loadDocument(request.getDocumentReference(), request.getDatabase());
+        final Optional<String> maybeUrl = readViewUrl(document);
 
-        final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
-        parameterHandler.addViewParameters(viewParameters, reference, request);
+        if (maybeUrl.isPresent()) {
+            final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
+            parameterHandler.addViewParameters(viewParameters, maybeUrl.get(), request);
 
-        try {
-            viewAciService.executeAction(viewParameters, new CopyResponseProcessor(outputStream));
-        } catch (final AciServiceException e) {
-            throw new ViewServerErrorException(request.getDocumentReference(), e);
+            try {
+                viewAciService.executeAction(viewParameters, new CopyResponseProcessor(outputStream));
+            } catch (final AciServiceException e) {
+                throw new ViewServerErrorException(request.getDocumentReference(), e);
+            }
+        } else {
+            final String content = parseFieldValue(document, CONTENT_FIELD).orElse("");
+
+            final RawDocument rawDocument = RawDocument.builder()
+                    .reference(document.getReference())
+                    .title(document.getTitle())
+                    .content(content)
+                    .build();
+
+            try (final InputStream inputStream = rawContentViewer.formatRawContent(rawDocument)) {
+                IOUtils.copy(inputStream, outputStream);
+            }
         }
     }
 
@@ -98,22 +120,16 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
         throw new NotImplementedException("Viewing static content promotions on premise is not yet possible");
     }
 
-    private String getReferenceFieldValue(final String documentReference, final String database) throws ReferenceFieldBlankException, ViewDocumentNotFoundException, ViewNoReferenceFieldException {
+    private Hit loadDocument(final String documentReference, final String database) {
         final ViewConfig viewConfig = configService.getConfig().getViewConfig();
         final String referenceField = viewConfig.getReferenceField();
-
-        final ViewingMode viewingMode = viewConfig.getViewingMode();
-
-        // fail fast if there's a misconfiguration
-        if (viewingMode == ViewingMode.FIELD && StringUtils.isEmpty(referenceField)) {
-            throw new ReferenceFieldBlankException();
-        }
 
         // do a GetContent to check for document visibility and to read out required fields
         final AciParameters parameters = new AciParameters(QueryActions.GetContent.name());
         parameterHandler.addGetContentOutputParameters(parameters, database, documentReference, referenceField);
 
         final GetContentResponseData queryResponse;
+
         try {
             queryResponse = contentAciService.executeAction(parameters, getContentResponseProcessor);
         } catch (final AciErrorException e) {
@@ -121,20 +137,23 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
         }
 
         final List<Hit> documents = queryResponse.getHits();
+
         if (documents.isEmpty()) {
             throw new ViewDocumentNotFoundException(documentReference);
         }
 
-        return getReference(documentReference, viewConfig, referenceField, viewingMode, documents);
+        return documents.get(0);
     }
 
-    private String getReference(final String documentReference, final ViewConfig viewConfig, final String referenceField, final ViewingMode viewingMode, final List<Hit> documents) {
-        final String reference;
+    private Optional<String> readViewUrl(final Hit document) {
+        final ViewConfig viewConfig = configService.getConfig().getViewConfig();
+        final ViewingMode viewingMode = viewConfig.getViewingMode();
 
-        switch (viewingMode) {
-            case CONNECTOR:
-                final String identifier = parseFieldValue(AUTN_IDENTIFIER, documents);
-                final String group = parseFieldValue(AUTN_GROUP, documents);
+        if (viewingMode == ViewingMode.CONNECTOR) {
+            final Optional<String> maybeIdentifier = parseFieldValue(document, AUTN_IDENTIFIER);
+            final Optional<String> maybeGroup = parseFieldValue(document, AUTN_GROUP);
+
+            if (maybeGroup.isPresent() && maybeIdentifier.isPresent()) {
                 final ServerConfig connectorConfig = viewConfig.getConnector();
 
                 try {
@@ -145,44 +164,40 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
                             // need to set the path because of ACI's weird format
                             .setPath("/")
                             .addParameter(AciConstants.PARAM_ACTION, ConnectorActions.View.name())
-                            .addParameter(ConnectorViewParams.Identifier.name(), identifier)
-                            .addParameter(ConnectorViewParams.Autn_Group.name(), group)
+                            .addParameter(ConnectorViewParams.Identifier.name(), maybeIdentifier.get())
+                            .addParameter(ConnectorViewParams.Autn_Group.name(), maybeGroup.get())
                             .build();
 
-                    reference = uri.toString();
+                    return Optional.of(uri.toString());
                 } catch (final URISyntaxException e) {
                     // this should never happen
                     throw new ConnectorUriSyntaxException("Error constructing Connector URI", e);
                 }
-                break;
-            case FIELD:
-            default:
-                reference = parseFieldValue(referenceField, documents);
-                if (reference == null) {
-                    throw new ViewNoReferenceFieldException(documentReference, referenceField);
-                }
+            } else {
+                return Optional.empty();
+            }
+        } else {
+            final String referenceField = viewConfig.getReferenceField();
+            return parseFieldValue(document, referenceField);
         }
-
-        return reference;
     }
 
-    private String parseFieldValue(final String referenceField, final List<Hit> documents) {
-        final Hit document = documents.get(0);
-
-        String referenceFieldValue = null;
-        // Assume the field names are case insensitive
+    private Optional<String> parseFieldValue(final Hit document, final String fieldName) {
         final DocContent documentContent = document.getContent();
+
         if (documentContent != null && CollectionUtils.isNotEmpty(documentContent.getContent())) {
             final NodeList fields = ((Node) documentContent.getContent().get(0)).getChildNodes();
+
             for (int i = 0; i < fields.getLength(); i++) {
-                final Node field = fields.item(i);
-                if (field.getLocalName().equalsIgnoreCase(referenceField)) {
-                    referenceFieldValue = field.getFirstChild() == null ? null : field.getFirstChild().getNodeValue();
-                    break;
+                final Node fieldNode = fields.item(i);
+
+                // Assume the field names are case insensitive
+                if (fieldNode.getLocalName().equalsIgnoreCase(fieldName)) {
+                    return Optional.ofNullable(fieldNode.getFirstChild()).map(Node::getNodeValue);
                 }
             }
         }
-        return referenceFieldValue;
-    }
 
+        return Optional.empty();
+    }
 }
