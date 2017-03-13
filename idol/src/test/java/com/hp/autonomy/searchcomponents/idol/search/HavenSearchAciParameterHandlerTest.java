@@ -104,7 +104,7 @@ public class HavenSearchAciParameterHandlerTest {
     @Test
     public void addGetContentOutputParameters() {
         parameterHandler.addGetContentOutputParameters(aciParameters, "Database1", "ref", "field");
-        assertThat(aciParameters, hasSize(5));
+        assertThat(aciParameters, hasSize(3));
     }
 
     @Test
