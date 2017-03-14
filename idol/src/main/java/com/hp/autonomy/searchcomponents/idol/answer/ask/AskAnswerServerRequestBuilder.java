@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * Builder for {@link AskAnswerServerRequest}
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "SameParameterValue"})
 public interface AskAnswerServerRequestBuilder extends RequestObjectBuilder<AskAnswerServerRequest, AskAnswerServerRequestBuilder> {
     /**
      * Sets the query text
@@ -44,6 +44,15 @@ public interface AskAnswerServerRequestBuilder extends RequestObjectBuilder<AskA
      * @return the builder (for chaining)
      */
     AskAnswerServerRequestBuilder clearSystemNames();
+
+
+    /**
+     * Sets the first result to return
+     *
+     * @param firstResult The index of the first result to return
+     * @return the builder (for chaining)
+     */
+    AskAnswerServerRequestBuilder firstResult(Integer firstResult);
 
     /**
      * Sets the maximum number of results to return
