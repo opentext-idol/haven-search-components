@@ -29,6 +29,7 @@ class AskAnswerServerRequestImpl implements AskAnswerServerRequest {
     private final AskSortParam sort;
     @Singular
     private final Set<String> systemNames;
+    private final Integer firstResult;
     private final Integer maxResults;
     private final Double minScore;
 

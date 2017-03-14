@@ -37,6 +37,13 @@ public interface AskAnswerServerRequest extends RequestObject<AskAnswerServerReq
     Set<String> getSystemNames();
 
     /**
+     * The first result to return (allows pagination)
+     *
+     * @return The index of the first result to return
+     */
+    Integer getFirstResult();
+
+    /**
      * The maximum number of results to return
      *
      * @return The maximum number of results to return

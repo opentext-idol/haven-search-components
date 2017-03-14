@@ -48,6 +48,7 @@ class AskAnswerServerServiceImpl implements AskAnswerServerService {
         aciParameters.add(AskParams.Text.name(), request.getText());
         aciParameters.add(AskParams.Sort.name(), Optional.ofNullable(request.getSort()).map(AskSortParam::value).orElse(null));
         aciParameters.add(AskParams.SystemNames.name(), String.join(",", request.getSystemNames()));
+        aciParameters.add(AskParams.FirstResult.name(), request.getFirstResult());
         aciParameters.add(AskParams.MaxResults.name(), request.getMaxResults());
         aciParameters.add(AskParams.MinScore.name(), request.getMinScore());
 
