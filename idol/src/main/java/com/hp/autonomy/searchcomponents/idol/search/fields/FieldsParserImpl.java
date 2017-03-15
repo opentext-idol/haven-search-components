@@ -120,7 +120,7 @@ class FieldsParserImpl implements FieldsParser {
                     }
                 }
             } else if (node.getChildNodes().getLength() > 0) {
-                parseAllFields(fieldConfig, node.getChildNodes(), fieldMap, node.getNodeName());
+                parseAllFields(fieldConfig, node.getChildNodes(), fieldMap, name + '/' + node.getNodeName());
             }
         }
     }

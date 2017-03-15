@@ -38,7 +38,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "SpringJavaAutowiredMembersInspection"})
 @RunWith(SpringRunner.class)
 @SpringBootTest(
         classes = {CoreTestContext.class, FieldsParserImpl.class, IdolDocumentFieldsServiceImpl.class},
@@ -61,13 +61,13 @@ public class FieldsParserTest {
         final FieldsInfo fieldsInfo = FieldsInfo.builder()
                 .populateResponseMap("Custom Date", FieldInfo.<DateTime>builder()
                         .id("Custom Date")
-                        .name(fieldPathNormaliser.normaliseFieldPath("CUSTOM_DATE"))
+                        .name(fieldPathNormaliser.normaliseFieldPath("DOCUMENT/CUSTOM_DATE"))
                         .type(FieldType.DATE)
                         .advanced(true)
                         .build())
                 .populateResponseMap("author", FieldInfo.<String>builder()
                         .id("author")
-                        .name(fieldPathNormaliser.normaliseFieldPath("CUSTOM_ARRAY"))
+                        .name(fieldPathNormaliser.normaliseFieldPath("DOCUMENT/CUSTOM_ARRAY"))
                         .build())
                 .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
@@ -111,6 +111,7 @@ public class FieldsParserTest {
         final Element element = mock(Element.class);
         content.getContent().add(element);
 
+        when(element.getNodeName()).thenReturn("DOCUMENT");
         when(element.hasChildNodes()).thenReturn(true);
         final NodeList childNodes = mock(NodeList.class);
         when(childNodes.getLength()).thenReturn(4);
