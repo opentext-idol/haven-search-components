@@ -28,6 +28,15 @@ public interface IdolSearchCapable extends HavenSearchCapable, ViewCapable {
     String ANSWER_SERVER_VALIDATOR_BEAN_NAME = "answerServerConfigValidator";
 
     /**
+     * Gets the name for an Idol component based upon its host name and port
+     *
+     * @param host component host name
+     * @param port component port
+     * @return friendly component name
+     */
+    String lookupComponentNameByHostAndPort(final String host, final int port);
+
+    /**
      * Returns details of Idol Content engine
      *
      * @return Content engine configuration

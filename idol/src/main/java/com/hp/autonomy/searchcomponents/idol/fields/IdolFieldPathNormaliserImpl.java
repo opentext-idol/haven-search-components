@@ -12,6 +12,7 @@ import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser.FIELD_PATH_NORMALISER_BEAN_NAME;
@@ -21,8 +22,11 @@ import static com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser.F
  */
 @Component(FIELD_PATH_NORMALISER_BEAN_NAME)
 class IdolFieldPathNormaliserImpl extends AbstractFieldPathNormaliser {
-    private static final String FULL_PATH_IDENTIFIER = "DOCUMENT/";
+    private static final String IDX_PREFIX = "DOCUMENT/";
+    private static final String XML_PREFIX = "DOCUMENTS/";
     private static final Pattern FIELD_NAME_PATTERN = Pattern.compile("(/?[^/]+)+");
+    private static final Pattern IDX_PATH_PATTERN = Pattern.compile("^/?(?:" + IDX_PREFIX + ")?(?<fieldPath>[^/]+)$");
+    private static final Pattern XML_PATH_PATTERN = Pattern.compile("^/?(?:" + XML_PREFIX + ")?(?:" + IDX_PREFIX + ")?(?<fieldPath>[^/]+(?:/[^/]+)+)$");
 
     @Override
     public FieldPath normaliseFieldPath(final String fieldPath) {
@@ -30,17 +34,20 @@ class IdolFieldPathNormaliserImpl extends AbstractFieldPathNormaliser {
             throw new IllegalArgumentException("Field names may not be blank or contain only forward slashes");
         }
 
-        String normalisedFieldName = fieldPath;
-        if (fieldPath.contains(FULL_PATH_IDENTIFIER) || fieldPath.contains(FULL_PATH_IDENTIFIER.toLowerCase())) {
-            if (!fieldPath.startsWith("/")) {
-                normalisedFieldName = '/' + fieldPath;
+        String normalisedFieldName = fieldPath.toUpperCase();
+        if (!ParametricValuesService.AUTN_DATE_FIELD.equals(normalisedFieldName)) {
+            final Matcher idxMatcher = IDX_PATH_PATTERN.matcher(normalisedFieldName);
+            if (idxMatcher.find()) {
+                normalisedFieldName = '/' + IDX_PREFIX + idxMatcher.group("fieldPath");
+            } else {
+                final Matcher xmlMatcher = XML_PATH_PATTERN.matcher(normalisedFieldName);
+                if (xmlMatcher.find()) {
+                    normalisedFieldName = '/' + XML_PREFIX + IDX_PREFIX + xmlMatcher.group("fieldPath");
+                }
             }
-        } else if (!ParametricValuesService.AUTN_DATE_FIELD.equalsIgnoreCase(fieldPath)) {
-            normalisedFieldName = '/' + FULL_PATH_IDENTIFIER + (fieldPath.startsWith("/") ? fieldPath.substring(1) : fieldPath);
         }
 
-        final String fullyNormalisedPath = normalisedFieldName.toUpperCase();
-        final String fieldName = fullyNormalisedPath.contains("/") ? fullyNormalisedPath.substring(fullyNormalisedPath.lastIndexOf('/') + 1) : fullyNormalisedPath;
-        return newFieldPath(fullyNormalisedPath, fieldName);
+        final String fieldName = normalisedFieldName.contains("/") ? normalisedFieldName.substring(normalisedFieldName.lastIndexOf('/') + 1) : normalisedFieldName;
+        return newFieldPath(normalisedFieldName, fieldName);
     }
 }

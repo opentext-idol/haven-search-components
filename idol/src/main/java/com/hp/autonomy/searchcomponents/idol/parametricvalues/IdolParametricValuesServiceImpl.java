@@ -36,7 +36,6 @@ import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectFactory;
@@ -50,7 +49,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -167,7 +165,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
             final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
 
             results = !responseData.getField().isEmpty() && responseData.getValues() != null
-                    ? addDisplayNamesToRecursiveFields(responseData.getValues().getField(), responseData.getField().get(0).getName().iterator())
+                    ? addDisplayNamesToRecursiveFields(responseData.getValues().getField(), responseData.getField().get(0).getName())
                     : Collections.emptyList();
         }
 
@@ -340,23 +338,16 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         );
     }
 
-    private List<DependentParametricField> addDisplayNamesToRecursiveFields(final Collection<RecursiveField> recursiveFields, final Iterator<String> fieldNameIterator) {
-        final List<DependentParametricField> recursiveFieldsWithDisplayValues;
-
-        if (CollectionUtils.isNotEmpty(recursiveFields) && fieldNameIterator.hasNext()) {
-            final String fieldPath = fieldNameIterator.next();
-            recursiveFieldsWithDisplayValues = recursiveFields.stream()
+    private List<DependentParametricField> addDisplayNamesToRecursiveFields(final Collection<RecursiveField> recursiveFields, final List<String> fieldNames) {
+        return fieldNames.isEmpty()
+                ? Collections.emptyList()
+                : recursiveFields.stream()
                     .map(recursiveField -> DependentParametricField.builder()
                             .value(recursiveField.getValue())
-                            .displayValue(tagNameFactory.getTagDisplayValue(fieldPath, recursiveField.getValue()))
+                            .displayValue(tagNameFactory.getTagDisplayValue(fieldNames.get(0), recursiveField.getValue()))
                             .count(recursiveField.getCount())
-                            .subFields(addDisplayNamesToRecursiveFields(recursiveField.getField(), fieldNameIterator))
+                            .subFields(addDisplayNamesToRecursiveFields(recursiveField.getField(), fieldNames.subList(1, fieldNames.size())))
                             .build())
                     .collect(Collectors.toList());
-        } else {
-            recursiveFieldsWithDisplayValues = Collections.emptyList();
-        }
-
-        return recursiveFieldsWithDisplayValues;
     }
 }
