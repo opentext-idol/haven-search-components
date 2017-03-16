@@ -56,6 +56,7 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
         final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
         final Map<String, FieldInfo<?>> fieldMap = new HashMap<>(fieldConfig.size());
+
         for (final FieldInfo<?> fieldInfo : fieldConfig.values()) {
             for (final FieldPath fieldPath : fieldInfo.getNames()) {
                 final String[] stringValues = parseAsStringArray(node, fieldPath.getNormalisedPath());
@@ -63,7 +64,9 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
                 if (ArrayUtils.isNotEmpty(stringValues)) {
                     final String id = fieldInfo.getId();
                     final FieldType fieldType = fieldInfo.getType();
+
                     final Collection<FieldValue<Serializable>> values = new ArrayList<>(stringValues.length);
+
                     for (final String stringValue : stringValues) {
                         final Serializable value = (Serializable) fieldType.parseValue(fieldType.getType(), stringValue);
                         final String displayValue = fieldDisplayNameGenerator.generateDisplayValueFromId(id, value, fieldType);
@@ -71,6 +74,7 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
                     }
 
                     final String displayName = fieldDisplayNameGenerator.generateDisplayNameFromId(id);
+
                     if (fieldMap.containsKey(id)) {
                         final FieldInfo<?> existingFieldInfo = fieldMap.get(id);
                         @SuppressWarnings({"unchecked", "rawtypes"})
@@ -86,7 +90,7 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
                                 .name(fieldPath)
                                 .displayName(displayName)
                                 .type(fieldInfo.getType())
-                                .advanced(true)
+                                .advanced(fieldInfo.isAdvanced())
                                 .values((Collection) values)
                                 .build();
                         fieldMap.put(id, newFieldInfo);
