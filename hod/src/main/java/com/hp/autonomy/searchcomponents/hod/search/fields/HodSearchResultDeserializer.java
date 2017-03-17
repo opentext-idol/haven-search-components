@@ -7,17 +7,21 @@ package com.hp.autonomy.searchcomponents.hod.search.fields;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.textindex.query.search.PromotionType;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.searchcomponents.core.config.FieldValue;
-import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.core.fields.FieldDisplayNameGenerator;
+import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
 import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
@@ -29,75 +33,79 @@ import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @JsonComponent
 public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResult> {
+    /**
+     * Properties on JSON documents returned from HOD which should not be added to the HodSearchResult fields map. Fields
+     * that are not JSON arrays do not need to be listed here.
+     */
+    private static final Set<String> IGNORED_PROPERTIES = ImmutableSet.<String>builder()
+            .add("links")
+            .build();
+
     private final ConfigService<? extends HodSearchCapable> configService;
     private final FieldDisplayNameGenerator fieldDisplayNameGenerator;
+    private final FieldPathNormaliser fieldPathNormaliser;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
-    public HodSearchResultDeserializer(final ConfigService<? extends HodSearchCapable> configService,
-                                       final FieldDisplayNameGenerator fieldDisplayNameGenerator) {
+    public HodSearchResultDeserializer(
+            final ConfigService<? extends HodSearchCapable> configService,
+            final FieldDisplayNameGenerator fieldDisplayNameGenerator,
+            final FieldPathNormaliser fieldPathNormaliser
+    ) {
         this.configService = configService;
         this.fieldDisplayNameGenerator = fieldDisplayNameGenerator;
+        this.fieldPathNormaliser = fieldPathNormaliser;
     }
 
     @Override
     public HodSearchResult deserialize(final JsonParser jsonParser, final DeserializationContext deserializationContext) throws IOException {
-        final FieldsInfo fieldsInfo = configService.getConfig().getFieldsInfo();
-        final Map<String, FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfig();
+        final Map<FieldPath, FieldInfo<?>> fieldConfigByName = configService.getConfig().getFieldsInfo().getFieldConfigByName();
 
         final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
+        final Iterator<Map.Entry<String, JsonNode>> fieldsIterator = node.fields();
+        final Iterable<Map.Entry<String, JsonNode>> entryIterable = () -> fieldsIterator;
+        final Stream<Map.Entry<String, JsonNode>> entryStream = StreamSupport.stream(entryIterable.spliterator(), false);
 
-        final Map<String, FieldInfo<?>> fieldMap = new HashMap<>(fieldConfig.size());
+        final Map<String, FieldInfo<?>> fieldMap = entryStream
+                .filter(entry -> {
+                    return entry.getValue().getNodeType() == JsonNodeType.ARRAY && !IGNORED_PROPERTIES.contains(entry.getKey());
+                })
+                .reduce(
+                        ImmutableMap.of(),
+                        (map, entry) -> {
+                            final FieldPath fieldPath = fieldPathNormaliser.normaliseFieldPath(entry.getKey());
+                            final List<String> stringValues = parseNodeAsStringList(entry.getValue());
 
-        for (final FieldInfo<?> fieldInfo : fieldConfig.values()) {
-            for (final FieldPath fieldPath : fieldInfo.getNames()) {
-                final String[] stringValues = parseAsStringArray(node, fieldPath.getNormalisedPath());
+                            // Config field info may or may not have a display name and it may contain friendly value names
+                            final Optional<FieldInfo<?>> maybeConfigFieldInfo = Optional.ofNullable(fieldConfigByName.get(fieldPath));
 
-                if (ArrayUtils.isNotEmpty(stringValues)) {
-                    final String id = fieldInfo.getId();
-                    final FieldType fieldType = fieldInfo.getType();
+                            // If there is a config entry for this field, we may have seen one with the same ID already
+                            final Optional<FieldInfo<?>> maybeExistingFieldInfo = maybeConfigFieldInfo.flatMap(configFieldInfo -> {
+                                return Optional.ofNullable(map.get(configFieldInfo.getId()));
+                            });
 
-                    final Collection<FieldValue<Serializable>> values = new ArrayList<>(stringValues.length);
+                            final FieldInfo<?> newFieldInfo = reduceFieldInfo(fieldPath, stringValues, maybeConfigFieldInfo, maybeExistingFieldInfo);
+                            final String id = newFieldInfo.getId();
 
-                    for (final String stringValue : stringValues) {
-                        final Serializable value = (Serializable) fieldType.parseValue(fieldType.getType(), stringValue);
-                        final String displayValue = fieldDisplayNameGenerator.generateDisplayValueFromId(id, value, fieldType);
-                        values.add(new FieldValue<>(value, displayValue));
-                    }
+                            final ImmutableMap.Builder<String, FieldInfo<?>> builder = ImmutableMap.builder();
+                            builder.put(id, newFieldInfo);
 
-                    final String displayName = fieldDisplayNameGenerator.generateDisplayNameFromId(id);
+                            map.entrySet().stream()
+                                    .filter(existingEntry -> !existingEntry.getKey().equals(id))
+                                    .forEach(builder::put);
 
-                    if (fieldMap.containsKey(id)) {
-                        final FieldInfo<?> existingFieldInfo = fieldMap.get(id);
-                        @SuppressWarnings({"unchecked", "rawtypes"})
-                        final FieldInfo<?> updatedFieldInfo = existingFieldInfo.toBuilder()
-                                .name(fieldPath)
-                                .values((Collection) values)
-                                .build();
-                        fieldMap.put(id, updatedFieldInfo);
-                    } else {
-                        @SuppressWarnings({"unchecked", "rawtypes"})
-                        final FieldInfo<?> newFieldInfo = FieldInfo.builder()
-                                .id(id)
-                                .name(fieldPath)
-                                .displayName(displayName)
-                                .type(fieldInfo.getType())
-                                .advanced(fieldInfo.isAdvanced())
-                                .values((Collection) values)
-                                .build();
-                        fieldMap.put(id, newFieldInfo);
-                    }
-                }
-            }
-        }
+                            return builder.build();
+                        },
+                        this::mergeMaps
+                );
 
         return HodSearchResult.builder()
                 .reference(parseAsString(node, "reference"))
@@ -109,6 +117,67 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
                 .date(parseAsDateFromArray(node, "date"))
                 .promotionCategory(parsePromotionCategory(node, "promotion"))
                 .build();
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private FieldInfo<?> reduceFieldInfo(
+            final FieldPath fieldPath,
+            final Collection<String> stringValues,
+            final Optional<FieldInfo<?>> maybeConfigFieldInfo,
+            final Optional<FieldInfo<?>> maybeExistingFieldInfo
+    ) {
+        if (maybeExistingFieldInfo.isPresent()) {
+            final FieldInfo<?> existingFieldInfo = maybeExistingFieldInfo.get();
+            final String id = existingFieldInfo.getId();
+            final FieldType fieldType = existingFieldInfo.getType();
+
+            return existingFieldInfo.toBuilder()
+                    .name(fieldPath)
+                    .values(parseValues(fieldType, id, stringValues))
+                    .build();
+        } else {
+            final String id;
+            final FieldType fieldType;
+            final boolean advanced;
+
+            if (maybeConfigFieldInfo.isPresent()) {
+                final FieldInfo<?> configFieldInfo = maybeConfigFieldInfo.get();
+                id = configFieldInfo.getId();
+                advanced = configFieldInfo.isAdvanced();
+                fieldType = configFieldInfo.getType();
+            } else {
+                id = fieldPath.getNormalisedPath();
+                advanced = true;
+                fieldType = FieldType.STRING;
+            }
+
+            return FieldInfo.builder()
+                    .id(id)
+                    .name(fieldPath)
+                    .displayName(fieldDisplayNameGenerator.generateDisplayNameFromId(id))
+                    .type(fieldType)
+                    .values(parseValues(fieldType, id, stringValues))
+                    .advanced(advanced)
+                    .build();
+        }
+    }
+
+    private <K, V> ImmutableMap<K, V> mergeMaps(final Map<K, V> map1, final Map<K, V> map2) {
+        return ImmutableMap.<K, V>builder()
+                .putAll(map1)
+                .putAll(map2)
+                .build();
+    }
+
+    private <T extends Serializable> Collection<FieldValue<T>> parseValues(final FieldType fieldType, final String fieldId, final Collection<String> stringValues) {
+        return stringValues.stream()
+                .map(stringValue -> {
+                    @SuppressWarnings("unchecked")
+                    final T value = (T) fieldType.parseValue(fieldType.getType(), stringValue);
+                    final String displayValue = fieldDisplayNameGenerator.generateDisplayValueFromId(fieldId, value, fieldType);
+                    return new FieldValue<>(value, displayValue);
+                })
+                .collect(Collectors.toList());
     }
 
     private String parseAsString(@SuppressWarnings("TypeMayBeWeakened") final JsonNode node, final String fieldName) throws JsonProcessingException {
@@ -136,6 +205,14 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
     private DateTime parseAsDateFromArray(@SuppressWarnings("TypeMayBeWeakened") final JsonNode node, final String fieldName) throws JsonProcessingException {
         final String value = parseAsStringFromArray(node, fieldName);
         return value != null ? FieldType.DATE.parseValue(DateTime.class, value) : null;
+    }
+
+    private List<String> parseNodeAsStringList(final TreeNode node) {
+        try {
+            return Arrays.asList(objectMapper.treeToValue(node, String[].class));
+        } catch (final JsonProcessingException e) {
+            throw new IllegalStateException("Failed to parse JSON array", e);
+        }
     }
 
     @SuppressWarnings("SameParameterValue")

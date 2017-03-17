@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
+import com.hp.autonomy.searchcomponents.core.config.FieldValue;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.core.fields.FieldDisplayNameGenerator;
 import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
@@ -39,7 +40,6 @@ import java.util.Map;
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"unused", "SpringJavaAutowiredMembersInspection"})
@@ -80,8 +80,10 @@ public class HodSearchResultDeserializerTest {
                         .build())
                 .populateResponseMap("authors", FieldInfo.<String>builder()
                         .id("authors")
+                        .displayName("Chief Creative")
                         .name(fieldPathNormaliser.normaliseFieldPath("authors"))
                         .name(fieldPathNormaliser.normaliseFieldPath("writers"))
+                        .value(new FieldValue<>("Trump", "Orange"))
                         .advanced(false)
                         .build())
                 .populateResponseMap("collaborators", FieldInfo.<String>builder()
@@ -98,7 +100,7 @@ public class HodSearchResultDeserializerTest {
     @Test
     public void deserialization() throws IOException {
         final List<HodSearchResult> documents = deserialize();
-        assertThat(documents, is(not(empty())));
+        assertThat(documents, hasSize(2));
 
         final HodSearchResult firstResult = documents.get(0);
 
@@ -108,29 +110,31 @@ public class HodSearchResultDeserializerTest {
         assertThat(firstResult.getPromotionCategory(), is(PromotionCategory.NONE));
 
         final Map<String, FieldInfo<?>> fieldMap = firstResult.getFieldMap();
-        assertThat(fieldMap.keySet(), hasSize(3));
+        assertThat(fieldMap.keySet(), hasSize(4));
 
         final FieldInfo<?> collaborators = fieldMap.get("collaborators");
         assertThat(collaborators, not(nullValue()));
+        assertThat(collaborators.getDisplayName(), is("Collaborators"));
         assertThat(collaborators.isAdvanced(), is(true));
         assertThat(collaborators.getValues(), hasSize(1));
 
         final FieldInfo<?> modifiedDate = fieldMap.get("modifiedDate");
         assertThat(modifiedDate, not(nullValue()));
+        assertThat(modifiedDate.getDisplayName(), is("Modifieddate"));
         assertThat(modifiedDate.isAdvanced(), is(false));
         assertThat(modifiedDate.getValues(), hasSize(1));
 
         final FieldInfo<?> authors = fieldMap.get("authors");
         assertThat(authors, not(nullValue()));
+        assertThat(authors.getDisplayName(), is("Chief Creative"));
         assertThat(authors.isAdvanced(), is(false));
         assertThat(authors.getValues(), hasSize(3));
-    }
 
-    @Test
-    public void serialization() throws IOException {
-        final List<HodSearchResult> documents = deserialize();
-        final String json = objectMapper.writeValueAsString(documents);
-        assertNotNull(json);
+        final FieldInfo<?> contentType = fieldMap.get("content_type");
+        assertThat(contentType, not(nullValue()));
+        assertThat(contentType.getDisplayName(), is("Content Type"));
+        assertThat(contentType.isAdvanced(), is(true));
+        assertThat(contentType.getValues(), hasSize(1));
     }
 
     private List<HodSearchResult> deserialize() throws IOException {
