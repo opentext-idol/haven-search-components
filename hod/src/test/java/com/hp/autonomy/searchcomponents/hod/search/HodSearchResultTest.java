@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.hod.search;
 
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
+import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.searchcomponents.core.config.FieldValue;
 import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
@@ -41,6 +42,10 @@ public class HodSearchResultTest extends SearchResultTest {
                 .hasJsonPathStringValue("$.fieldMap.CUSTOM_FIELD.type", "STRING")
                 .hasJsonPathBooleanValue("$.fieldMap.CUSTOM_FIELD.advanced", false)
                 .hasJsonPathArrayValue("$.fieldMap.CUSTOM_FIELD.names", "CUSTOM_VALUE")
+                .hasJsonPathArrayValue("$.fieldMap.DATE_FIELD.names", "DATE_FIELD")
+                .hasJsonPathStringValue("$.fieldMap.DATE_FIELD.type", "DATE")
+                .hasJsonPathBooleanValue("$.fieldMap.DATE_FIELD.advanced", false)
+                .hasJsonPathNumberValue("$.fieldMap.DATE_FIELD.values[0].value", 1479318360000L)
                 .hasJsonPathNumberValue("$.date", 1479318360000L)
                 .hasJsonPathStringValue("$.promotionCategory", "NONE")
                 .hasJsonPathStringValue("$.domain", "PUBLIC_INDEXES");
@@ -57,6 +62,11 @@ public class HodSearchResultTest extends SearchResultTest {
                 .fieldEntry("CUSTOM_FIELD", FieldInfo.builder()
                         .name(fieldPathNormaliser.normaliseFieldPath("CUSTOM_FIELD"))
                         .value(new FieldValue<>("CUSTOM_VALUE", "Custom Value")).build())
+                .fieldEntry("DATE_FIELD", FieldInfo.builder()
+                        .name(fieldPathNormaliser.normaliseFieldPath("DATE_FIELD"))
+                        .type(FieldType.DATE)
+                        .value(new FieldValue<>(DateTime.parse("2016-11-16T17:46:00Z"), "2016-11-16T17:46:00Z"))
+                        .build())
                 .date(DateTime.parse("2016-11-16T17:46:00Z"))
                 .promotionCategory(PromotionCategory.NONE)
                 .domain("PUBLIC_INDEXES")
