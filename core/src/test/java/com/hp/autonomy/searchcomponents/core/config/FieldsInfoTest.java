@@ -29,6 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
 @JsonTest
 @AutoConfigureJsonTesters(enabled = false)
@@ -42,6 +43,7 @@ public class FieldsInfoTest extends ConfigurationComponentTest<FieldsInfo> {
     @Override
     public void setUp() {
         objectMapper.addMixIn(FieldInfo.class, FieldInfoConfigMixins.class);
+        objectMapper.addMixIn(FieldValue.class, FieldValueConfigMixins.class);
         json = new JacksonTester<>(getClass(), ResolvableType.forClass(getType()), objectMapper);
     }
 
