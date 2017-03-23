@@ -8,7 +8,6 @@ import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.user.params.SecurityParams;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -68,7 +67,6 @@ public class IdolLoggingAspect {
         final int port = serverDetails.getPort();
 
         final String query = parameters.stream()
-                .filter(parameter -> !QueryParams.SecurityInfo.name().equalsIgnoreCase(parameter.getName()) && StringUtils.isNotEmpty(parameter.getValue()))
                 .map(parameter -> parameter.getName() + NAME_VALUE_SEPARATOR + getParameterValue(parameter))
                 .sorted()
                 .collect(Collectors.joining(PARAMETER_SEPARATOR));
@@ -103,7 +101,7 @@ public class IdolLoggingAspect {
     }
 
     private String getParameterValue(final AciParameter parameter) {
-        return parameter.getName().equalsIgnoreCase(SecurityParams.UserName.name()) || parameter.getName().equalsIgnoreCase(SecurityParams.Password.name())
+        return parameter.getName().equalsIgnoreCase(QueryParams.SecurityInfo.name()) || parameter.getName().equalsIgnoreCase(SecurityParams.Password.name())
                 ? HIDDEN_VALUE
                 : parameter.getValue();
     }
