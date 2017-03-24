@@ -14,7 +14,6 @@ import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictionsBuilder;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +33,13 @@ public class IdolParametricValuesServiceIT extends AbstractParametricValuesServi
 
     @Override
     protected FieldPath determinePaginatableField() {
-        final Map<TagName, ValueDetails> valueDetails = parametricValuesService.getValueDetails(createParametricRequest());
+        final Map<FieldPath, ValueDetails> valueDetails = parametricValuesService.getValueDetails(createParametricRequest());
 
         return valueDetails.entrySet().stream()
                 .filter(entry -> entry.getValue().getTotalValues() >= 2)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Pagination test requires a parametric field with more than 2 values"))
-                .getKey()
-                .getId();
+                .getKey();
     }
 
     @Override

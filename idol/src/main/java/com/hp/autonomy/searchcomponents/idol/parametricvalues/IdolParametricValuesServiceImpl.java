@@ -36,6 +36,7 @@ import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectFactory;
@@ -134,6 +135,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                     .maxValues(null)
                     .start(1)
                     .ranges(ranges)
+                    .sort(SortParam.NumberIncreasing)
                     .build();
 
             return getFlatFields(bucketingRequest, parametricRequest.getFieldNames()).stream()
@@ -173,7 +175,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     }
 
     @Override
-    public Map<TagName, ValueDetails> getValueDetails(final IdolParametricRequest parametricRequest) throws AciErrorException {
+    public Map<FieldPath, ValueDetails> getValueDetails(final IdolParametricRequest parametricRequest) throws AciErrorException {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyMap();
         } else {
@@ -188,7 +190,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
             final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
             final Collection<FlatField> fields = responseData.getField();
 
-            final Map<TagName, ValueDetails> output = new LinkedHashMap<>();
+            final Map<FieldPath, ValueDetails> output = new LinkedHashMap<>();
 
             for (final FlatField field : fields) {
                 final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
@@ -210,8 +212,8 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                     }
                 }
 
-                final TagName tagName = tagNameFactory.buildTagName(field.getName().get(0));
-                output.put(tagName, builder.build());
+                final FieldPath fieldPath = tagNameFactory.getFieldPath(field.getName().get(0));
+                output.put(fieldPath, builder.build());
             }
 
             return output;
