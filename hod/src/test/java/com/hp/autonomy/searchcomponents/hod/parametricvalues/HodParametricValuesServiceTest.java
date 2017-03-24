@@ -233,9 +233,9 @@ public class HodParametricValuesServiceTest {
                 any(GetParametricRangesRequestBuilder.class)
         )).thenReturn(response);
 
-        final Map<TagName, ValueDetails> valueDetails = parametricValuesService.getValueDetails(parametricRequest);
+        final Map<FieldPath, ValueDetails> valueDetails = parametricValuesService.getValueDetails(parametricRequest);
         assertThat(valueDetails.size(), is(1));
-        assertThat(valueDetails, hasEntry(tagNameFactory.buildTagName(field), new ValueDetails(0.8, 21, 6, 54, 6)));
+        assertThat(valueDetails, hasEntry(tagNameFactory.getFieldPath(field), new ValueDetails(0.8, 21, 6, 54, 6)));
     }
 
     @Test

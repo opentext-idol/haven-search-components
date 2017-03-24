@@ -175,11 +175,11 @@ public class IdolParametricValuesServiceTest {
 
         when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(response);
 
-        final Map<TagName, ValueDetails> valueDetails = parametricValuesService.getValueDetails(parametricRequest);
+        final Map<FieldPath, ValueDetails> valueDetails = parametricValuesService.getValueDetails(parametricRequest);
         assertThat(valueDetails.size(), is(3));
-        assertThat(valueDetails, hasEntry(equalTo(tagNameFactory.buildTagName(elevation)), equalTo(new ValueDetails(-50, 1242, 500.5, 12314, 3))));
-        assertThat(valueDetails, hasEntry(equalTo(tagNameFactory.buildTagName(age)), equalTo(new ValueDetails(0, 96, 26, 1314, 100))));
-        assertThat(valueDetails, hasEntry(equalTo(tagNameFactory.buildTagName(notThere)), equalTo(new ValueDetails(0d, 0d, 0d, 0d, 0))));
+        assertThat(valueDetails, hasEntry(equalTo(tagNameFactory.getFieldPath(elevation)), equalTo(new ValueDetails(-50, 1242, 500.5, 12314, 3))));
+        assertThat(valueDetails, hasEntry(equalTo(tagNameFactory.getFieldPath(age)), equalTo(new ValueDetails(0, 96, 26, 1314, 100))));
+        assertThat(valueDetails, hasEntry(equalTo(tagNameFactory.getFieldPath(notThere)), equalTo(new ValueDetails(0d, 0d, 0d, 0d, 0))));
     }
 
     @Test
@@ -289,6 +289,7 @@ public class IdolParametricValuesServiceTest {
         when(parametricRequestBuilder.maxValues(any())).thenReturn(parametricRequestBuilder);
         when(parametricRequestBuilder.ranges(any())).thenReturn(parametricRequestBuilder);
         when(parametricRequestBuilder.start(any())).thenReturn(parametricRequestBuilder);
+        when(parametricRequestBuilder.sort(any())).thenReturn(parametricRequestBuilder);
         when(parametricRequest.toBuilder()).thenReturn(parametricRequestBuilder);
         when(parametricRequestBuilder.build()).thenReturn(parametricRequest);
 

@@ -202,14 +202,14 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
     }
 
     @Override
-    public Map<TagName, ValueDetails> getValueDetails(final HodParametricRequest parametricRequest) throws HodErrorException {
+    public Map<FieldPath, ValueDetails> getValueDetails(final HodParametricRequest parametricRequest) throws HodErrorException {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyMap();
         } else {
             final List<FieldRanges> response = fetchParametricRanges(parametricRequest, 1, "");
 
             return response.stream()
-                    .collect(Collectors.toMap(fieldRanges -> tagNameFactory.buildTagName(fieldRanges.getName()), fieldRanges -> {
+                    .collect(Collectors.toMap(fieldRanges -> tagNameFactory.getFieldPath(fieldRanges.getName()), fieldRanges -> {
                         final FieldRanges.ValueDetails responseValueDetails = fieldRanges.getValueDetails();
 
                         return new ValueDetails.Builder()

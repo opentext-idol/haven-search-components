@@ -9,7 +9,6 @@ import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -79,5 +78,5 @@ public interface ParametricValuesService<R extends ParametricRequest<Q>, Q exten
      * @return A map of field name to value details
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    Map<TagName, ValueDetails> getValueDetails(R parametricRequest) throws E;
+    Map<FieldPath, ValueDetails> getValueDetails(R parametricRequest) throws E;
 }

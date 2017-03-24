@@ -12,7 +12,6 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
-import com.hp.autonomy.types.idol.responses.RecursiveField;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
@@ -82,8 +81,8 @@ public abstract class AbstractParametricValuesServiceIT<
 
     @Test
     public void ranges() throws E {
-        final Map<TagName, ValueDetails> valueDetailsOutput = parametricValuesService.getValueDetails(createNumericParametricRequest());
-        final ValueDetails valueDetails = valueDetailsOutput.get(tagNameFactory.buildTagName(ParametricValuesService.AUTN_DATE_FIELD));
+        final Map<FieldPath, ValueDetails> valueDetailsOutput = parametricValuesService.getValueDetails(createNumericParametricRequest());
+        final ValueDetails valueDetails = valueDetailsOutput.get(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD));
         final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(createNumericParametricRequest(), ImmutableMap.of(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD), new BucketingParams(35, valueDetails.getMin(), valueDetails.getMax())));
         assertThat(ranges, not(empty()));
     }
@@ -109,11 +108,11 @@ public abstract class AbstractParametricValuesServiceIT<
 
     @Test
     public void getValueDetails() throws E {
-        final Map<TagName, ValueDetails> valueDetailsMap = parametricValuesService.getValueDetails(createNumericParametricRequest());
+        final Map<FieldPath, ValueDetails> valueDetailsMap = parametricValuesService.getValueDetails(createNumericParametricRequest());
         assertThat(valueDetailsMap.size(), is(not(0)));
 
-        for (final Map.Entry<TagName, ValueDetails> entry : valueDetailsMap.entrySet()) {
-            assertThat(entry.getKey().getId(), not(nullValue()));
+        for (final Map.Entry<FieldPath, ValueDetails> entry : valueDetailsMap.entrySet()) {
+            assertThat(entry.getKey(), not(nullValue()));
 
             final ValueDetails valueDetails = entry.getValue();
 
