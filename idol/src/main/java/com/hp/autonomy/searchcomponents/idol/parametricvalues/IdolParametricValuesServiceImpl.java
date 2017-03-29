@@ -55,6 +55,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -195,9 +196,9 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
             for (final FlatField field : fields) {
                 final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
 
-                final ValueDetails.Builder builder = new ValueDetails.Builder()
-                        .setTotalValues(flatFieldTotalValues(field));
+                final ValueDetails.Builder builder = new ValueDetails.Builder();
 
+                Integer values = null;
                 for (final JAXBElement<?> element : valueElements) {
                     final String elementLocalName = element.getName().getLocalPart();
 
@@ -209,8 +210,11 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                         builder.setAverage((Double) element.getValue());
                     } else if (VALUE_SUM_NODE_NAME.equals(elementLocalName)) {
                         builder.setSum((Double) element.getValue());
+                    } else if (VALUES_NODE_NAME.equals(elementLocalName)) {
+                        values = (Integer) element.getValue();
                     }
                 }
+                builder.setTotalValues(flatFieldTotalValues(field, values));
 
                 final FieldPath fieldPath = tagNameFactory.getFieldPath(field.getName().get(0));
                 output.put(fieldPath, builder.build());
@@ -297,13 +301,16 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                 .id(tagName.getId().getNormalisedPath())
                 .displayName(tagName.getDisplayName())
                 .values(values)
-                .totalValues(flatFieldTotalValues(flatField))
+                .totalValues(flatFieldTotalValues(flatField, null))
                 .build();
     }
 
-    private int flatFieldTotalValues(final FlatField flatField) {
+    private int flatFieldTotalValues(final FlatField flatField, final Integer values) {
         // If no values are returned for a field, IDOL does not return a <total_values> element
-        return flatField.getTotalValues() == null ? 0 : flatField.getTotalValues();
+        // For (non-parametric) numeric fields we should use values as total_values won't be populated
+        return Optional.ofNullable(flatField.getTotalValues())
+                .orElse(Optional.ofNullable(values)
+                        .orElse(0));
     }
 
     private Collection<FlatField> getFlatFields(final IdolParametricRequest parametricRequest, final Collection<FieldPath> fieldNames) {
@@ -344,12 +351,12 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         return fieldNames.isEmpty()
                 ? Collections.emptyList()
                 : recursiveFields.stream()
-                    .map(recursiveField -> DependentParametricField.builder()
-                            .value(recursiveField.getValue())
-                            .displayValue(tagNameFactory.getTagDisplayValue(fieldNames.get(0), recursiveField.getValue()))
-                            .count(recursiveField.getCount())
-                            .subFields(addDisplayNamesToRecursiveFields(recursiveField.getField(), fieldNames.subList(1, fieldNames.size())))
-                            .build())
-                    .collect(Collectors.toList());
+                .map(recursiveField -> DependentParametricField.builder()
+                        .value(recursiveField.getValue())
+                        .displayValue(tagNameFactory.getTagDisplayValue(fieldNames.get(0), recursiveField.getValue()))
+                        .count(recursiveField.getCount())
+                        .subFields(addDisplayNamesToRecursiveFields(recursiveField.getField(), fieldNames.subList(1, fieldNames.size())))
+                        .build())
+                .collect(Collectors.toList());
     }
 }
