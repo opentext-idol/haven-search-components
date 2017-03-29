@@ -5,11 +5,14 @@
 
 package com.hp.autonomy.searchcomponents.core.fields;
 
+import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.Serializable;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Generates display names for given field paths
@@ -46,7 +49,7 @@ public interface FieldDisplayNameGenerator {
      * @param value     a field value
      * @param type      value type
      * @param <T>       field value type
-     * @return a tag name object with a unique path id and a prettified display name
+     * @return the display value
      */
     <T extends Serializable> String generateDisplayValue(FieldPath fieldPath, T value, FieldType type);
 
@@ -57,7 +60,25 @@ public interface FieldDisplayNameGenerator {
      * @param value a field value
      * @param type  value type
      * @param <T>   field value type
-     * @return a tag name object with a unique path id and a prettified display name
+     * @return the display value
      */
     <T extends Serializable> String generateDisplayValueFromId(String id, T value, FieldType type);
+
+    /**
+     * Prettifies a field name without accessing configuration
+     *
+     * @param fieldPath any field path
+     * @return field name with underscores replaced by spaces and words capitalised
+     */
+    String prettifyFieldName(String fieldPath);
+
+    /**
+     * Parses a display value from supplied field info for a given value
+     *
+     * @param getFieldInfo supplier for field information potentially containing value mapping
+     * @param value field value
+     * @param <T> field value type
+     * @return the parsed display value
+     */
+    <T extends Serializable> String parseDisplayValue(Supplier<Optional<FieldInfo<? extends Serializable>>> getFieldInfo, T value);
 }

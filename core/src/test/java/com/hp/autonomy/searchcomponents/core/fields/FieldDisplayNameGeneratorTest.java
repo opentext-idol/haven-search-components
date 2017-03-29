@@ -23,7 +23,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
+import java.util.Optional;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 import static org.junit.Assert.assertEquals;
@@ -103,7 +105,7 @@ public class FieldDisplayNameGeneratorTest {
         final FieldPath path = fieldPathNormaliser.normaliseFieldPath("/DOCUMENT/FOO");
         final String id = "foo_bar";
         final String displayName = "Bar";
-        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>(ImmutableMap.<FieldPath, FieldInfo<?>>of(path, FieldInfo.builder()
+        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(path, FieldInfo.builder()
                 .id(id)
                 .displayName(displayName)
                 .name(path)
@@ -115,7 +117,7 @@ public class FieldDisplayNameGeneratorTest {
     public void generateDefaultDisplayNameFromConfig() {
         final FieldPath path = fieldPathNormaliser.normaliseFieldPath("/DOCUMENT/FOO");
         final String id = "foo_bar";
-        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>(ImmutableMap.<FieldPath, FieldInfo<?>>of(path, FieldInfo.builder()
+        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(path, FieldInfo.builder()
                 .id(id)
                 .name(path)
                 .build())));
@@ -126,7 +128,7 @@ public class FieldDisplayNameGeneratorTest {
     public void generateDisplayNameFromConfigById() {
         final String id = "foo_bar";
         final String displayName = "Bar";
-        when(fieldsInfo.getFieldConfig()).thenReturn(new LinkedHashMap<>(ImmutableMap.<String, FieldInfo<?>>of(id, FieldInfo.builder()
+        when(fieldsInfo.getFieldConfig()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(id, FieldInfo.builder()
                 .id(id)
                 .displayName(displayName)
                 .build())));
@@ -136,7 +138,7 @@ public class FieldDisplayNameGeneratorTest {
     @Test
     public void generateDefaultDisplayNameFromConfigById() {
         final String id = "foo_bar";
-        when(fieldsInfo.getFieldConfig()).thenReturn(new LinkedHashMap<>(ImmutableMap.<String, FieldInfo<?>>of(id, FieldInfo.builder()
+        when(fieldsInfo.getFieldConfig()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(id, FieldInfo.builder()
                 .id(id)
                 .build())));
         assertEquals("Foo Bar", fieldDisplayNameGenerator.generateDisplayNameFromId(id));
@@ -154,7 +156,7 @@ public class FieldDisplayNameGeneratorTest {
         final FieldPath path = fieldPathNormaliser.normaliseFieldPath("/DOCUMENT/FOO");
         final String value = "Foo";
         final String displayValue = "Bar";
-        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>(ImmutableMap.<FieldPath, FieldInfo<?>>of(path, FieldInfo.builder()
+        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(path, FieldInfo.builder()
                 .name(path)
                 .value(new FieldValue<>(value, displayValue))
                 .build())));
@@ -164,7 +166,7 @@ public class FieldDisplayNameGeneratorTest {
     @Test
     public void generateDefaultDisplayValueFromConfig() {
         final FieldPath path = fieldPathNormaliser.normaliseFieldPath("/DOCUMENT/FOO");
-        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>(ImmutableMap.<FieldPath, FieldInfo<?>>of(path, FieldInfo.builder()
+        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(path, FieldInfo.builder()
                 .name(path)
                 .build())));
         final String value = "Foo";
@@ -182,7 +184,7 @@ public class FieldDisplayNameGeneratorTest {
     @Test
     public void generateDisplayValueForNullValue() {
         final FieldPath path = fieldPathNormaliser.normaliseFieldPath("/DOCUMENT/FOO");
-        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>(ImmutableMap.<FieldPath, FieldInfo<?>>of(path, FieldInfo.builder()
+        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(path, FieldInfo.builder()
                 .name(path)
                 .build())));
         assertEquals(null, fieldDisplayNameGenerator.generateDisplayValue(path, null, FieldType.STRING));
@@ -193,7 +195,7 @@ public class FieldDisplayNameGeneratorTest {
         final String id = "foo_bar";
         final String value = "Foo";
         final String displayValue = "Bar";
-        when(fieldsInfo.getFieldConfig()).thenReturn(new LinkedHashMap<>(ImmutableMap.<String, FieldInfo<?>>of(id, FieldInfo.builder()
+        when(fieldsInfo.getFieldConfig()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(id, FieldInfo.builder()
                 .id(id)
                 .value(new FieldValue<>(value, displayValue))
                 .build())));
@@ -203,7 +205,7 @@ public class FieldDisplayNameGeneratorTest {
     @Test
     public void generateDefaultDisplayValueFromConfigById() {
         final String id = "foo_bar";
-        when(fieldsInfo.getFieldConfig()).thenReturn(new LinkedHashMap<>(ImmutableMap.<String, FieldInfo<?>>of(id, FieldInfo.builder()
+        when(fieldsInfo.getFieldConfig()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(id, FieldInfo.builder()
                 .id(id)
                 .build())));
         final String value = "Foo";
@@ -221,9 +223,27 @@ public class FieldDisplayNameGeneratorTest {
     @Test
     public void generateDisplayValueFromIdForNullValue() {
         final String id = "foo_bar";
-        when(fieldsInfo.getFieldConfig()).thenReturn(new LinkedHashMap<>(ImmutableMap.<String, FieldInfo<?>>of(id, FieldInfo.builder()
+        when(fieldsInfo.getFieldConfig()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(id, FieldInfo.builder()
                 .id(id)
                 .build())));
         assertEquals(null, fieldDisplayNameGenerator.generateDisplayValueFromId(id, null, FieldType.STRING));
+    }
+
+    @Test
+    public void prettifyFieldPath() {
+        final String path = "/x/y/foo_bar";
+        assertEquals("Foo Bar", fieldDisplayNameGenerator.prettifyFieldName(path));
+    }
+
+    @Test
+    public void parseDisplayValueFromConfig() {
+        final FieldPath path = fieldPathNormaliser.normaliseFieldPath("/DOCUMENT/FOO");
+        final String value = "Foo";
+        final String displayValue = "Bar";
+        final FieldInfo<Serializable> fieldInfo = FieldInfo.builder()
+                .name(path)
+                .value(new FieldValue<>(value, displayValue))
+                .build();
+        assertEquals(displayValue, fieldDisplayNameGenerator.parseDisplayValue(() -> Optional.of(fieldInfo), value));
     }
 }
