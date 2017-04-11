@@ -157,11 +157,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         if (fieldNames.isEmpty()) {
             results = Collections.emptyList();
         } else {
-            final AciParameters aciParameters = createAciParameters(parametricRequest.getQueryRestrictions(), parametricRequest.isModified());
-
-            parameterHandler.addSecurityInfo(aciParameters);
-            aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
-            aciParameters.add(GetQueryTagValuesParams.FieldName.name(), fieldPathsToFieldNamesParam(fieldNames));
+            final AciParameters aciParameters = createAciParameters(parametricRequest, fieldNames);
             aciParameters.add(GetQueryTagValuesParams.FieldDependence.name(), true);
             aciParameters.add(GetQueryTagValuesParams.FieldDependenceMultiLevel.name(), true);
 
@@ -180,13 +176,10 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyMap();
         } else {
-            final AciParameters aciParameters = createAciParameters(parametricRequest.getQueryRestrictions(), parametricRequest.isModified());
+            final AciParameters aciParameters = createAciParameters(parametricRequest, parametricRequest.getFieldNames());
 
-            parameterHandler.addSecurityInfo(aciParameters);
             aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), 1);
-            aciParameters.add(GetQueryTagValuesParams.FieldName.name(), fieldPathsToFieldNamesParam(parametricRequest.getFieldNames()));
             aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
-            aciParameters.add(GetQueryTagValuesParams.Predict.name(), true);
 
             final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
             final Collection<FlatField> fields = responseData.getField();
@@ -224,12 +217,18 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         }
     }
 
-    private AciParameters createAciParameters(final IdolQueryRestrictions queryRestrictions, final boolean modified) {
+    private AciParameters createAciParameters(final IdolParametricRequest parametricRequest, final Collection<FieldPath> fieldNames) {
         final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
-        parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
-        if (modified) {
-            parameterHandler.addQmsParameters(aciParameters, queryRestrictions);
+        parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
+        if (parametricRequest.isModified()) {
+            parameterHandler.addQmsParameters(aciParameters, parametricRequest.getQueryRestrictions());
         }
+        parameterHandler.addSecurityInfo(aciParameters);
+
+        aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
+        aciParameters.add(GetQueryTagValuesParams.FieldName.name(), StringUtils.join(fieldNames.stream().map(FieldPath::getNormalisedPath).toArray(String[]::new), ','));
+        aciParameters.add(GetQueryTagValuesParams.Predict.name(), true);
+
         return aciParameters;
     }
 
@@ -314,18 +313,10 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     }
 
     private Collection<FlatField> getFlatFields(final IdolParametricRequest parametricRequest, final Collection<FieldPath> fieldNames) {
-        final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
-        parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
+        final AciParameters aciParameters = createAciParameters(parametricRequest, fieldNames);
 
-        if (parametricRequest.isModified()) {
-            parameterHandler.addQmsParameters(aciParameters, parametricRequest.getQueryRestrictions());
-        }
-
-        parameterHandler.addSecurityInfo(aciParameters);
-        aciParameters.add(GetQueryTagValuesParams.DocumentCount.name(), true);
         aciParameters.add(GetQueryTagValuesParams.Start.name(), parametricRequest.getStart());
         aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), parametricRequest.getMaxValues());
-        aciParameters.add(GetQueryTagValuesParams.FieldName.name(), fieldPathsToFieldNamesParam(fieldNames));
         aciParameters.add(GetQueryTagValuesParams.Sort.name(), parametricRequest.getSort());
         aciParameters.add(GetQueryTagValuesParams.Ranges.name(), new Ranges(parametricRequest.getRanges()));
         aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
@@ -334,10 +325,6 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
         final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
         return responseData.getField();
-    }
-
-    private String fieldPathsToFieldNamesParam(final Collection<FieldPath> fieldNames) {
-        return StringUtils.join(fieldNames.stream().map(FieldPath::getNormalisedPath).toArray(String[]::new), ',');
     }
 
     private GetQueryTagValuesResponseData executeAction(final ParametricRequest<IdolQueryRestrictions> idolParametricRequest, final AciParameters aciParameters) {
