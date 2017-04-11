@@ -41,8 +41,6 @@ import java.util.Set;
 import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_END_TAG;
 import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_START_TAG;
 import static com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler.PARAMETER_HANDLER_BEAN_NAME;
-import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerService.AUTN_GROUP;
-import static com.hp.autonomy.searchcomponents.idol.view.IdolViewServerService.AUTN_IDENTIFIER;
 
 /**
  * Default implementation of {@link HavenSearchAciParameterHandler}
@@ -99,7 +97,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         aciParameters.add(QueryParams.MaxResults.name(), searchRequest.getMaxResults());
         aciParameters.add(QueryParams.Summary.name(), SummaryParam.fromValue(searchRequest.getSummary(), null));
         aciParameters.add(QueryParams.Characters.name(), searchRequest.getSummaryCharacters());
-        aciParameters.add(QueryParams.Predict.name(), false);
+        aciParameters.add(QueryParams.Predict.name(), true);
         aciParameters.add(QueryParams.Sort.name(), searchRequest.getSort());
         aciParameters.add(QueryParams.TotalResults.name(), true);
         aciParameters.add(QueryParams.XMLMeta.name(), true);
