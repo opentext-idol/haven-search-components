@@ -30,7 +30,6 @@ import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.joda.time.ReadableInstant;
-import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,7 +46,6 @@ import static com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParamet
  */
 @Component(PARAMETER_HANDLER_BEAN_NAME)
 class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
-    private static final String IDOL_DATE_PARAMETER_FORMAT = "HH:mm:ss dd/MM/yyyy";
     private static final String GET_CONTENT_QUERY_TEXT = "*";
 
     private final ConfigService<? extends IdolSearchCapable> configService;
@@ -206,6 +204,6 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     private String formatDate(final ReadableInstant date) {
-        return date == null ? null : DateTimeFormat.forPattern(IDOL_DATE_PARAMETER_FORMAT).print(date);
+        return date == null ? null : date.getMillis() / 1000 + "e";
     }
 }
