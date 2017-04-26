@@ -13,8 +13,9 @@ import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricV
 import static org.junit.Assert.assertEquals;
 
 public class IdolFieldPathNormaliserTest {
-    private static final String EXPECTED_NORMALISED_FIELD_PATH = "/DOCUMENT/MY_FIELD";
-    private static final String EXPECTED_NORMALISED_XML_FIELD_PATH = "/DOCUMENTS/DOCUMENT/MY_FIELD1/MY_FIELD2";
+    private static final String EXPECTED_NORMALISED_FIELD_PATH = "MY_FIELD";
+    private static final String AMBIGUOUS_XML_FIELD_PATH = "MY_FIELD";
+    private static final String EXPECTED_NORMALISED_XML_FIELD_PATH = "MY_FIELD1/MY_FIELD2";
 
     private FieldPathNormaliser fieldPathNormaliser;
 
@@ -84,6 +85,26 @@ public class IdolFieldPathNormaliserTest {
     }
 
     @Test
+    public void normalisedFullPathAmbiguousXml() {
+        assertEquals(AMBIGUOUS_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/DOCUMENTS/DOCUMENT/MY_FIELD").getNormalisedPath());
+    }
+
+    @Test
+    public void fullPathAmbiguousXml() {
+        assertEquals(AMBIGUOUS_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("DOCUMENTS/DOCUMENT/MY_FIELD").getNormalisedPath());
+    }
+
+    @Test
+    public void normalisedFullPathAmbiguousXmlLowerCase() {
+        assertEquals(AMBIGUOUS_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/documents/document/my_field").getNormalisedPath());
+    }
+
+    @Test
+    public void fullPathAmbiguousXmlLowerCase() {
+        assertEquals(AMBIGUOUS_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("documents/document/my_field").getNormalisedPath());
+    }
+
+    @Test
     public void normalisedFullPathXml() {
         assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("/DOCUMENTS/DOCUMENT/MY_FIELD1/MY_FIELD2").getNormalisedPath());
     }
@@ -99,7 +120,7 @@ public class IdolFieldPathNormaliserTest {
     }
 
     @Test
-    public void paritalPathXml() {
+    public void partialPathXml() {
         assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("DOCUMENT/MY_FIELD1/MY_FIELD2").getNormalisedPath());
     }
 
@@ -129,7 +150,7 @@ public class IdolFieldPathNormaliserTest {
     }
 
     @Test
-    public void paritalPathXmLowerCasel() {
+    public void partialPathXmLowerCase() {
         assertEquals(EXPECTED_NORMALISED_XML_FIELD_PATH, fieldPathNormaliser.normaliseFieldPath("document/my_field1/my_field2").getNormalisedPath());
     }
 
