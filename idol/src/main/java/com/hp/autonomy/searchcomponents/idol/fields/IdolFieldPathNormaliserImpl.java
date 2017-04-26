@@ -26,7 +26,7 @@ class IdolFieldPathNormaliserImpl extends AbstractFieldPathNormaliser {
     private static final String XML_PREFIX = "DOCUMENTS/";
     private static final Pattern FIELD_NAME_PATTERN = Pattern.compile("(/?[^/]+)+");
     private static final Pattern IDX_PATH_PATTERN = Pattern.compile("^/?(?:" + IDX_PREFIX + ")?(?<fieldPath>[^/]+)$");
-    private static final Pattern XML_PATH_PATTERN = Pattern.compile("^/?(?:" + XML_PREFIX + ")?(?:" + IDX_PREFIX + ")?(?<fieldPath>[^/]+(?:/[^/]+)+)$");
+    private static final Pattern XML_PATH_PATTERN = Pattern.compile("^/?(?:" + XML_PREFIX + ")?(?:" + IDX_PREFIX + ")?(?<fieldPath>[^/]+(?:/[^/]+)*)$");
 
     @Override
     public FieldPath normaliseFieldPath(final String fieldPath) {
@@ -38,11 +38,11 @@ class IdolFieldPathNormaliserImpl extends AbstractFieldPathNormaliser {
         if (!ParametricValuesService.AUTN_DATE_FIELD.equals(normalisedFieldName)) {
             final Matcher idxMatcher = IDX_PATH_PATTERN.matcher(normalisedFieldName);
             if (idxMatcher.find()) {
-                normalisedFieldName = '/' + IDX_PREFIX + idxMatcher.group("fieldPath");
+                normalisedFieldName = idxMatcher.group("fieldPath");
             } else {
                 final Matcher xmlMatcher = XML_PATH_PATTERN.matcher(normalisedFieldName);
                 if (xmlMatcher.find()) {
-                    normalisedFieldName = '/' + XML_PREFIX + IDX_PREFIX + xmlMatcher.group("fieldPath");
+                    normalisedFieldName = xmlMatcher.group("fieldPath");
                 }
             }
         }
