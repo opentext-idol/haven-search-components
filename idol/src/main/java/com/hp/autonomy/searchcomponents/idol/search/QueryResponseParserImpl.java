@@ -41,10 +41,8 @@ import static com.hp.autonomy.searchcomponents.idol.search.QueryResponseParser.Q
 @SuppressWarnings("WeakerAccess")
 @Component(QUERY_RESPONSE_PARSER_BEAN_NAME)
 class QueryResponseParserImpl implements QueryResponseParser {
-    private static final Pattern SPELLING_SEPARATOR_PATTERN = Pattern.compile(", ");
-
     static final String MISSING_DATABASE_WARNING = "At least one of the databases provided in the query does not exist";
-
+    private static final Pattern SPELLING_SEPARATOR_PATTERN = Pattern.compile(", ");
     private final FieldsParser fieldsParser;
     private final IdolDatabasesService databasesService;
     private final ObjectFactory<IdolDatabasesRequestBuilder> databasesRequestBuilderFactory;
@@ -125,7 +123,7 @@ class QueryResponseParserImpl implements QueryResponseParser {
                     .index(hit.getDatabase())
                     .title(hit.getTitle())
                     .summary(hit.getSummary())
-                    .date(hit.getDatestring() != null ? new DateTime(hit.getDatestring()) : null)
+                    .date(hit.getDate() != null ? new DateTime(hit.getDate() * 1000) : null)
                     .weight(hit.getWeight())
                     .promotionName(hit.getPromotionname());
 
