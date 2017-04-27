@@ -20,6 +20,7 @@ import com.hp.autonomy.types.requests.Spelling;
 import com.hp.autonomy.types.requests.Warnings;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -123,7 +124,7 @@ class QueryResponseParserImpl implements QueryResponseParser {
                     .index(hit.getDatabase())
                     .title(hit.getTitle())
                     .summary(hit.getSummary())
-                    .date(hit.getDate() != null ? new DateTime(hit.getDate() * 1000) : null)
+                    .date(hit.getDate() != null ? new DateTime(hit.getDatestring().toInstant().toEpochMilli(), DateTimeZone.UTC) : null)
                     .weight(hit.getWeight())
                     .promotionName(hit.getPromotionname());
 
