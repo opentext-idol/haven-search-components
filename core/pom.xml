@@ -63,7 +63,7 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-authentication</artifactId>
-            <version>0.6.0</version>
+            <version>0.8.0</version>
         </dependency>
         <dependency>
             <groupId>com.hp.bigdata.frontend</groupId>
