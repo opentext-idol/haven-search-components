@@ -30,12 +30,13 @@ import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsService;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
+import com.hp.autonomy.types.requests.idol.actions.tags.DateValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
-import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.apache.commons.lang3.ArrayUtils;
@@ -45,6 +46,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -96,6 +100,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         this.authenticationInformationRetriever = authenticationInformationRetriever;
     }
 
+    @SuppressWarnings("SpringCacheableComponentsInspection")
     @Override
     @Cacheable(value = CacheNames.PARAMETRIC_VALUES, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
     public Set<QueryTagInfo> getParametricValues(final HodParametricRequest parametricRequest) throws HodErrorException {
@@ -140,6 +145,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         }
     }
 
+    @SuppressWarnings("SpringCacheableComponentsInspection")
     @Override
     @Cacheable(value = CacheNames.PARAMETRIC_VALUES_IN_BUCKETS, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
     public List<RangeInfo> getNumericParametricValuesInBuckets(final HodParametricRequest parametricRequest, final Map<FieldPath, BucketingParams> bucketingParamsPerField) throws HodErrorException {
@@ -202,7 +208,7 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
     }
 
     @Override
-    public Map<FieldPath, ValueDetails> getValueDetails(final HodParametricRequest parametricRequest) throws HodErrorException {
+    public Map<FieldPath, NumericValueDetails> getNumericValueDetails(final HodParametricRequest parametricRequest) throws HodErrorException {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyMap();
         } else {
@@ -212,15 +218,31 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                     .collect(Collectors.toMap(fieldRanges -> tagNameFactory.getFieldPath(fieldRanges.getName()), fieldRanges -> {
                         final FieldRanges.ValueDetails responseValueDetails = fieldRanges.getValueDetails();
 
-                        return new ValueDetails.Builder()
-                                .setAverage(responseValueDetails.getMean())
-                                .setMax(responseValueDetails.getMaximum())
-                                .setMin(responseValueDetails.getMinimum())
-                                .setSum(responseValueDetails.getSum())
-                                .setTotalValues(responseValueDetails.getCount())
+                        return NumericValueDetails.builder()
+                                .average(responseValueDetails.getMean())
+                                .max(responseValueDetails.getMaximum())
+                                .min(responseValueDetails.getMinimum())
+                                .sum(responseValueDetails.getSum())
+                                .totalValues(responseValueDetails.getCount())
                                 .build();
                     }));
         }
+    }
+
+    @Override
+    public Map<FieldPath, DateValueDetails> getDateValueDetails(final HodParametricRequest parametricRequest) throws HodErrorException {
+        return getNumericValueDetails(parametricRequest).entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> DateValueDetails.builder()
+                        .min(epochToZonedDateTime(e.getValue().getMin()))
+                        .max(epochToZonedDateTime(e.getValue().getMax()))
+                        .average(epochToZonedDateTime(e.getValue().getAverage()))
+                        .sum(e.getValue().getSum())
+                        .totalValues(e.getValue().getTotalValues())
+                        .build()));
+    }
+
+    private ZonedDateTime epochToZonedDateTime(final double epochTime) {
+        return ZonedDateTime.ofInstant(Instant.ofEpochSecond((long) epochTime), ZoneOffset.UTC);
     }
 
     private List<FieldRanges> fetchParametricRanges(

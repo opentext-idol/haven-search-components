@@ -9,8 +9,14 @@ import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 /**
  * Idol extension to {@link ParametricValuesService}
  */
 public interface IdolParametricValuesService extends ParametricValuesService<IdolParametricRequest, IdolQueryRestrictions, AciErrorException> {
+    String DATE_PATTERN = "HH:mm:ss dd/MM/yyyy";
+    DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH).withZone(ZoneOffset.UTC);
 }

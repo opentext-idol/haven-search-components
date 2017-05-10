@@ -216,11 +216,11 @@ public class HodParametricValuesServiceTest {
     @Test
     public void getValueDetailsNoFields() throws HodErrorException {
         final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.emptyList());
-        assertThat(parametricValuesService.getValueDetails(parametricRequest).size(), is(0));
+        assertThat(parametricValuesService.getNumericValueDetails(parametricRequest).size(), is(0));
     }
 
     @Test
-    public void getValueDetails() throws HodErrorException {
+    public void getNumericValueDetails() throws HodErrorException {
         final String field = "MyField";
         final HodParametricRequest parametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList(field));
 
@@ -233,9 +233,15 @@ public class HodParametricValuesServiceTest {
                 any(GetParametricRangesRequestBuilder.class)
         )).thenReturn(response);
 
-        final Map<FieldPath, ValueDetails> valueDetails = parametricValuesService.getValueDetails(parametricRequest);
+        final Map<FieldPath, NumericValueDetails> valueDetails = parametricValuesService.getNumericValueDetails(parametricRequest);
         assertThat(valueDetails.size(), is(1));
-        assertThat(valueDetails, hasEntry(tagNameFactory.getFieldPath(field), new ValueDetails(0.8, 21, 6, 54, 6)));
+        assertThat(valueDetails, hasEntry(tagNameFactory.getFieldPath(field), NumericValueDetails.builder()
+                .min(0.8)
+                .max(21D)
+                .average(6D)
+                .sum(54D)
+                .totalValues(6)
+                .build()));
     }
 
     @Test

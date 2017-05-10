@@ -12,7 +12,9 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
+import com.hp.autonomy.types.requests.idol.actions.tags.DateValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
@@ -37,7 +39,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-@SuppressWarnings("SpringJavaAutowiredMembersInspection")
+@SuppressWarnings({"SpringJavaAutowiredMembersInspection", "SpringJavaAutowiringInspection"})
 @RunWith(SpringRunner.class)
 @JsonTest
 @AutoConfigureJsonTesters(enabled = false)
@@ -48,12 +50,7 @@ public abstract class AbstractParametricValuesServiceIT<
         Q extends QueryRestrictions<S>,
         S extends Serializable,
         E extends Exception
-> {
-    @Autowired
-    private FieldsService<F, E> fieldsService;
-    @Autowired
-    private ObjectFactory<FB> fieldsRequestBuilderFactory;
-
+        > {
     @Autowired
     protected ObjectFactory<ParametricRequestBuilder<R, Q, ?>> parametricRequestBuilderFactory;
     @Autowired
@@ -62,6 +59,10 @@ public abstract class AbstractParametricValuesServiceIT<
     protected ParametricValuesService<R, Q, E> parametricValuesService;
     @Autowired
     protected TestUtils<Q> testUtils;
+    @Autowired
+    private FieldsService<F, E> fieldsService;
+    @Autowired
+    private ObjectFactory<FB> fieldsRequestBuilderFactory;
 
     protected abstract FieldsRequestBuilder<F, ?> fieldsRequestParams(final FB fieldsRequestBuilder);
 
@@ -81,9 +82,11 @@ public abstract class AbstractParametricValuesServiceIT<
 
     @Test
     public void ranges() throws E {
-        final Map<FieldPath, ValueDetails> valueDetailsOutput = parametricValuesService.getValueDetails(createNumericParametricRequest());
-        final ValueDetails valueDetails = valueDetailsOutput.get(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD));
-        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(createNumericParametricRequest(), ImmutableMap.of(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD), new BucketingParams(35, valueDetails.getMin(), valueDetails.getMax())));
+        final R numericParametricRequest = createNumericParametricRequest();
+        final Map<FieldPath, NumericValueDetails> valueDetailsOutput = parametricValuesService.getNumericValueDetails(numericParametricRequest);
+        final Map<FieldPath, BucketingParams> bucketingParamsPerField = valueDetailsOutput.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams(35, e.getValue().getMin(), e.getValue().getMax())));
+        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(numericParametricRequest, bucketingParamsPerField);
         assertThat(ranges, not(empty()));
     }
 
@@ -107,18 +110,31 @@ public abstract class AbstractParametricValuesServiceIT<
     }
 
     @Test
-    public void getValueDetails() throws E {
-        final Map<FieldPath, ValueDetails> valueDetailsMap = parametricValuesService.getValueDetails(createNumericParametricRequest());
+    public void getNumericValueDetails() throws E {
+        final Map<FieldPath, NumericValueDetails> valueDetailsMap = parametricValuesService.getNumericValueDetails(createNumericParametricRequest());
+        validateValueDetails(valueDetailsMap);
+    }
+
+    @Test
+    public void getDateValueDetails() throws E {
+        final Map<FieldPath, DateValueDetails> valueDetailsMap = parametricValuesService.getDateValueDetails(createDateParametricRequest());
+        validateValueDetails(valueDetailsMap);
+    }
+
+    private <T extends Comparable<T>, U extends T, V extends ValueDetails<U>> void validateValueDetails(final Map<FieldPath, V> valueDetailsMap) {
         assertThat(valueDetailsMap.size(), is(not(0)));
 
-        for (final Map.Entry<FieldPath, ValueDetails> entry : valueDetailsMap.entrySet()) {
+        for (final Map.Entry<FieldPath, V> entry : valueDetailsMap.entrySet()) {
             assertThat(entry.getKey(), not(nullValue()));
 
-            final ValueDetails valueDetails = entry.getValue();
+            final V valueDetails = entry.getValue();
 
             // min <= average <= max
-            assertThat(valueDetails.getMin(), lessThanOrEqualTo(valueDetails.getAverage()));
-            assertThat(valueDetails.getAverage(), lessThanOrEqualTo(valueDetails.getMax()));
+            final T max = valueDetails.getMax();
+            final T min = valueDetails.getMin();
+            final T average = valueDetails.getAverage();
+            assertThat(min, lessThanOrEqualTo(average));
+            assertThat(average, lessThanOrEqualTo(max));
         }
     }
 
@@ -149,7 +165,17 @@ public abstract class AbstractParametricValuesServiceIT<
         assertThat(page1, not(equalTo(page2)));
     }
 
-    private R createNumericParametricRequest() {
+    private R createNumericParametricRequest() throws E {
+        final Set<FieldPath> fields = getFieldsOfType(FieldTypeParam.Numeric);
+
+        return parametricRequestBuilderFactory.getObject()
+                .fieldNames(fields)
+                .queryRestrictions(testUtils.buildQueryRestrictions())
+                .sort(SortParam.ReverseDate)
+                .build();
+    }
+
+    private R createDateParametricRequest() {
         return parametricRequestBuilderFactory.getObject()
                 .fieldName(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD))
                 .queryRestrictions(testUtils.buildQueryRestrictions())
@@ -158,16 +184,20 @@ public abstract class AbstractParametricValuesServiceIT<
     }
 
     protected R createParametricRequest() throws E {
-        final FieldsRequestBuilder<F, ?> fieldsRequestBuilder = fieldsRequestParams(fieldsRequestBuilderFactory.getObject());
-        fieldsRequestBuilder.fieldType(FieldTypeParam.Parametric);
-        final Set<FieldPath> fields = fieldsService.getFields(fieldsRequestBuilder.build()).get(FieldTypeParam.Parametric)
-                .stream()
-                .map(TagName::getId)
-                .collect(Collectors.toSet());
+        final Set<FieldPath> fields = getFieldsOfType(FieldTypeParam.Parametric);
 
         return parametricRequestBuilderFactory.getObject()
                 .fieldNames(fields)
                 .queryRestrictions(testUtils.buildQueryRestrictions())
                 .build();
+    }
+
+    private Set<FieldPath> getFieldsOfType(final FieldTypeParam typeParam) throws E {
+        final FieldsRequestBuilder<F, ?> fieldsRequestBuilder = fieldsRequestParams(fieldsRequestBuilderFactory.getObject());
+        fieldsRequestBuilder.fieldType(typeParam);
+        return fieldsService.getFields(fieldsRequestBuilder.build()).get(typeParam)
+                .stream()
+                .map(TagName::getId)
+                .collect(Collectors.toSet());
     }
 }

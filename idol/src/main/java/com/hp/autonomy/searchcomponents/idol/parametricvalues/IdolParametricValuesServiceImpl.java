@@ -23,17 +23,21 @@ import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsService;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.QueryExecutor;
+import com.hp.autonomy.types.idol.responses.DateOrNumber;
 import com.hp.autonomy.types.idol.responses.FlatField;
 import com.hp.autonomy.types.idol.responses.GetQueryTagValuesResponseData;
 import com.hp.autonomy.types.idol.responses.RecursiveField;
 import com.hp.autonomy.types.idol.responses.TagValue;
+import com.hp.autonomy.types.requests.idol.actions.tags.DateValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
+import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetailsBuilder;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
@@ -46,6 +50,7 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBElement;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,6 +63,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.PARAMETRIC_VALUES_SERVICE_BEAN_NAME;
@@ -172,7 +178,18 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     }
 
     @Override
-    public Map<FieldPath, ValueDetails> getValueDetails(final IdolParametricRequest parametricRequest) throws AciErrorException {
+    public Map<FieldPath, NumericValueDetails> getNumericValueDetails(final IdolParametricRequest parametricRequest) throws AciErrorException {
+        return getValueDetails(parametricRequest, NumericValueDetails::builder, this::numberFromValueDetailsElement);
+    }
+
+    @Override
+    public Map<FieldPath, DateValueDetails> getDateValueDetails(final IdolParametricRequest parametricRequest) throws AciErrorException {
+        return getValueDetails(parametricRequest, DateValueDetails::builder, this::zonedDateTimeFromValueDetailsElement);
+    }
+
+    private <T extends Comparable<? super T>, V extends ValueDetails<T>, B extends ValueDetailsBuilder<T, V, B>> Map<FieldPath, V> getValueDetails(final IdolParametricRequest parametricRequest,
+                                                                                                                                                   final Supplier<B> valueDetailsBuilderSupplier,
+                                                                                                                                                   final Function<JAXBElement<?>, T> parseElement) {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyMap();
         } else {
@@ -184,30 +201,30 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
             final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
             final Collection<FlatField> fields = responseData.getField();
 
-            final Map<FieldPath, ValueDetails> output = new LinkedHashMap<>();
+            final Map<FieldPath, V> output = new LinkedHashMap<>();
 
             for (final FlatField field : fields) {
                 final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
 
-                final ValueDetails.Builder builder = new ValueDetails.Builder();
+                final B builder = valueDetailsBuilderSupplier.get();
 
                 Integer values = null;
                 for (final JAXBElement<?> element : valueElements) {
                     final String elementLocalName = element.getName().getLocalPart();
 
                     if (VALUE_MIN_NODE_NAME.equals(elementLocalName)) {
-                        builder.setMin((Double) element.getValue());
+                        builder.min(parseElement.apply(element));
                     } else if (VALUE_MAX_NODE_NAME.equals(elementLocalName)) {
-                        builder.setMax((Double) element.getValue());
+                        builder.max(parseElement.apply(element));
                     } else if (VALUE_AVERAGE_NODE_NAME.equals(elementLocalName)) {
-                        builder.setAverage((Double) element.getValue());
+                        builder.average(parseElement.apply(element));
                     } else if (VALUE_SUM_NODE_NAME.equals(elementLocalName)) {
-                        builder.setSum((Double) element.getValue());
+                        builder.sum((Double) element.getValue());
                     } else if (VALUES_NODE_NAME.equals(elementLocalName)) {
                         values = (Integer) element.getValue();
                     }
                 }
-                builder.setTotalValues(flatFieldTotalValues(field, values));
+                builder.totalValues(flatFieldTotalValues(field, values));
 
                 final FieldPath fieldPath = tagNameFactory.getFieldPath(field.getName().get(0));
                 output.put(fieldPath, builder.build());
@@ -345,5 +362,13 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                         .subFields(addDisplayNamesToRecursiveFields(recursiveField.getField(), fieldNames.subList(1, fieldNames.size())))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private double numberFromValueDetailsElement(final JAXBElement<?> element) {
+        return ((DateOrNumber) element.getValue()).getValue();
+    }
+
+    private ZonedDateTime zonedDateTimeFromValueDetailsElement(final JAXBElement<?> element) {
+        return ZonedDateTime.parse(((DateOrNumber) element.getValue()).getDate(), DATE_FORMAT);
     }
 }
