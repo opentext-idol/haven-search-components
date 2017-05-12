@@ -7,7 +7,6 @@ package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametricValuesServiceIT;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
@@ -19,6 +18,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Collection;
 import java.util.Map;
 
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class)
@@ -43,7 +43,7 @@ public class IdolParametricValuesServiceIT extends AbstractParametricValuesServi
     }
 
     @Override
-    protected IdolParametricRequest noResultsParametricRequest() {
+    protected IdolParametricRequest noResultsParametricRequest(final Collection<FieldPath> fieldPaths) {
         final IdolQueryRestrictions queryRestrictions = queryRestrictionsBuilderFactory.getObject()
                 // No documents will match this text (probably)
                 .queryText("sfoiewsfoseinf")
@@ -51,7 +51,7 @@ public class IdolParametricValuesServiceIT extends AbstractParametricValuesServi
 
         return parametricRequestBuilderFactory.getObject()
                 .queryRestrictions(queryRestrictions)
-                .fieldName(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD))
+                .fieldNames(fieldPaths)
                 .build();
     }
 }

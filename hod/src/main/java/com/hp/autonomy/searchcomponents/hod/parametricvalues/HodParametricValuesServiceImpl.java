@@ -5,6 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 
+import com.hp.autonomy.aci.content.ranges.NumericRange;
 import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.aci.content.ranges.Ranges;
 import com.hp.autonomy.frontend.configuration.ConfigService;
@@ -30,22 +31,24 @@ import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsService;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
+import com.hp.autonomy.types.requests.idol.actions.tags.DateRangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.DateValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericRangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -56,6 +59,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -147,18 +151,25 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
 
     @SuppressWarnings("SpringCacheableComponentsInspection")
     @Override
-    @Cacheable(value = CacheNames.PARAMETRIC_VALUES_IN_BUCKETS, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
-    public List<RangeInfo> getNumericParametricValuesInBuckets(final HodParametricRequest parametricRequest, final Map<FieldPath, BucketingParams> bucketingParamsPerField) throws HodErrorException {
+    @Cacheable(value = CacheNames.NUMERIC_PARAMETRIC_VALUES_IN_BUCKETS, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
+    public List<NumericRangeInfo> getNumericParametricValuesInBuckets(final HodParametricRequest parametricRequest, final Map<FieldPath, BucketingParams<Double>> bucketingParamsPerField) throws HodErrorException {
+        return getParametricValuesInBuckets(parametricRequest, bucketingParamsPerField, bucketingParamsHelper::calculateNumericBoundaries, Function.identity());
+    }
+
+    private <T extends Comparable<? super T> & Serializable> List<NumericRangeInfo> getParametricValuesInBuckets(final ParametricRequest<HodQueryRestrictions> parametricRequest,
+                                                                                                                 final Map<FieldPath, BucketingParams<T>> bucketingParamsPerField,
+                                                                                                                 final Function<BucketingParams<T>, List<T>> calculateBoundaries,
+                                                                                                                 final Function<List<T>, List<Double>> convertBoundaries) throws HodErrorException {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyList();
         } else {
             bucketingParamsHelper.validateBucketingParams(parametricRequest, bucketingParamsPerField);
 
             final Map<FieldPath, List<Double>> boundariesPerField = bucketingParamsPerField.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> bucketingParamsHelper.calculateBoundaries(entry.getValue())));
+                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> convertBoundaries.apply(calculateBoundaries.apply(entry.getValue()))));
 
             final List<Range> ranges = boundariesPerField.entrySet().stream()
-                    .map(entry -> new Range(entry.getKey().getNormalisedPath(), ArrayUtils.toPrimitive(entry.getValue().toArray(new Double[entry.getValue().size()]))))
+                    .map(entry -> new NumericRange(entry.getKey().getNormalisedPath(), entry.getValue()))
                     .collect(Collectors.toList());
 
             final List<FieldRanges> response = fetchParametricRanges(parametricRequest, null, new Ranges(ranges).toString());
@@ -171,13 +182,14 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                         // All buckets have the same size, so just use the value from the first one
                         final double bucketSize = boundaries.get(1) - boundaries.get(0);
 
-                        final List<RangeInfo.Value> values = fieldRanges.getValueRanges().isEmpty()
-                                ? bucketingParamsHelper.emptyBuckets(boundaries)
+                        @SuppressWarnings("RedundantTypeArguments") // presumably Java bug
+                        final List<NumericRangeInfo.Value> values = fieldRanges.getValueRanges().isEmpty()
+                                ? bucketingParamsHelper.<Double, Double, NumericRangeInfo.Value>emptyBuckets(boundaries, NumericRangeInfo.Value::new)
                                 : fieldRanges.getValueRanges().stream()
-                                .map(fieldValues -> new RangeInfo.Value(fieldValues.getLowerBound(), fieldValues.getUpperBound(), fieldValues.getCount()))
+                                .map(fieldValues -> new NumericRangeInfo.Value(fieldValues.getLowerBound(), fieldValues.getUpperBound(), fieldValues.getCount()))
                                 .collect(Collectors.toList());
 
-                        return RangeInfo.builder()
+                        return NumericRangeInfo.builder()
                                 .id(tagName.getId().getNormalisedPath())
                                 .displayName(tagName.getDisplayName())
                                 .count(fieldRanges.getValueDetails().getCount())
@@ -189,6 +201,28 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
                     })
                     .collect(Collectors.toList());
         }
+    }
+
+    @SuppressWarnings("SpringCacheableComponentsInspection")
+    @Override
+    @Cacheable(value = CacheNames.NUMERIC_PARAMETRIC_VALUES_IN_BUCKETS, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
+    public List<DateRangeInfo> getDateParametricValuesInBuckets(final HodParametricRequest parametricRequest, final Map<FieldPath, BucketingParams<ZonedDateTime>> bucketingParamsPerField) throws HodErrorException {
+        final Function<List<ZonedDateTime>, List<Double>> convertBoundaries = dateBoundaries -> dateBoundaries.stream()
+                .map(boundary -> (double) boundary.toEpochSecond())
+                .collect(Collectors.toList());
+        return getParametricValuesInBuckets(parametricRequest, bucketingParamsPerField, bucketingParamsHelper::calculateDateBoundaries, convertBoundaries).stream()
+                .map(r -> DateRangeInfo.builder()
+                        .id(r.getId())
+                        .displayName(r.getDisplayName())
+                        .count(r.getCount())
+                        .min(epochToZonedDateTime(r.getMin()))
+                        .max(epochToZonedDateTime(r.getMax()))
+                        .bucketSize(Duration.ofSeconds((long) (double) r.getBucketSize()))
+                        .values(r.getValues().stream()
+                                .map(v -> new DateRangeInfo.Value(epochToZonedDateTime(v.getMin()), epochToZonedDateTime(v.getMax()), v.getCount()))
+                                .collect(Collectors.toList()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private Collection<FieldPath> lookupFields(final Collection<ResourceName> databases) throws HodErrorException {

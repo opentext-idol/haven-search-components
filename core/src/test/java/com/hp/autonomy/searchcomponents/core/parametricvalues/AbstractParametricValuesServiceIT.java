@@ -12,15 +12,17 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
+import com.hp.autonomy.types.requests.idol.actions.tags.DateRangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.DateValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericRangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.ObjectFactory;
@@ -30,10 +32,13 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -69,7 +74,7 @@ public abstract class AbstractParametricValuesServiceIT<
     // Find a parametric field with 2 or more values for the parametric request used in these tests
     protected abstract FieldPath determinePaginatableField();
 
-    protected abstract R noResultsParametricRequest();
+    protected abstract R noResultsParametricRequest(final Collection<FieldPath> fields);
 
     @Test
     public void getParametricValues() throws E {
@@ -81,20 +86,60 @@ public abstract class AbstractParametricValuesServiceIT<
     }
 
     @Test
-    public void ranges() throws E {
+    public void numericRanges() throws E {
         final R numericParametricRequest = createNumericParametricRequest();
         final Map<FieldPath, NumericValueDetails> valueDetailsOutput = parametricValuesService.getNumericValueDetails(numericParametricRequest);
-        final Map<FieldPath, BucketingParams> bucketingParamsPerField = valueDetailsOutput.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams(35, e.getValue().getMin(), e.getValue().getMax())));
-        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(numericParametricRequest, bucketingParamsPerField);
+        final Map<FieldPath, BucketingParams<Double>> bucketingParamsPerField = valueDetailsOutput.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams<>(35, e.getValue().getMin(), e.getValue().getMax())));
+        final List<NumericRangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(numericParametricRequest, bucketingParamsPerField);
         assertThat(ranges, not(empty()));
     }
 
     @Test
-    public void rangesNoResults() throws E {
-        final List<RangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(
-                noResultsParametricRequest(),
-                ImmutableMap.of(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD), new BucketingParams(5, 0, 1))
+    public void numericRangesNoResults() throws E {
+        final Set<FieldPath> fields = getFieldsOfType(FieldTypeParam.Numeric);
+        final List<NumericRangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(
+                noResultsParametricRequest(fields),
+                fields.stream().collect(Collectors.toMap(Function.identity(), x -> new BucketingParams<>(5, 0D, 1D)))
+        );
+
+        assertThat(ranges, hasSize(fields.size()));
+        assertThat(ranges.get(0).getValues(), hasSize(5));
+        ranges.get(0).getValues().forEach(value -> assertThat(value.getCount(), is(0)));
+    }
+
+    @Test
+    public void dateRanges() throws E {
+        final R dateParametricRequest = createDateParametricRequest();
+        final Map<FieldPath, DateValueDetails> valueDetailsOutput = parametricValuesService.getDateValueDetails(dateParametricRequest);
+        final Map<FieldPath, BucketingParams<ZonedDateTime>> bucketingParamsPerField = valueDetailsOutput.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams<>(35, e.getValue().getMin(), e.getValue().getMax())));
+        final List<DateRangeInfo> ranges = parametricValuesService.getDateParametricValuesInBuckets(dateParametricRequest, bucketingParamsPerField);
+        assertThat(ranges, not(empty()));
+    }
+
+    @Test
+    @Ignore //TODO: enable once FIND-1351 and FIND-1352 are complete
+    public void dateRangesOutside1970and2038() throws E {
+        final ZonedDateTime min = ZonedDateTime.parse("0001-01-01T01:01:00Z");
+        final ZonedDateTime max = ZonedDateTime.parse("3000-03-03T03:03:00Z");
+
+        final R dateParametricRequest = createDateParametricRequest();
+        final Map<FieldPath, DateValueDetails> valueDetailsOutput = parametricValuesService.getDateValueDetails(dateParametricRequest);
+        final Map<FieldPath, BucketingParams<ZonedDateTime>> bucketingParamsPerField = valueDetailsOutput.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams<>(35, min, max)));
+        final List<DateRangeInfo> ranges = parametricValuesService.getDateParametricValuesInBuckets(dateParametricRequest, bucketingParamsPerField);
+        assertThat(ranges, not(empty()));
+        assertThat(ranges.get(0).getMin(), lessThanOrEqualTo(min));
+        assertThat(ranges.get(0).getMax(), greaterThanOrEqualTo(max));
+    }
+
+    @Test
+    public void dateRangesNoResults() throws E {
+        final FieldPath fieldPath = tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD);
+        final List<DateRangeInfo> ranges = parametricValuesService.getDateParametricValuesInBuckets(
+                noResultsParametricRequest(Collections.singleton(fieldPath)),
+                ImmutableMap.of(fieldPath, new BucketingParams<>(5, ZonedDateTime.now().minusMinutes(5), ZonedDateTime.now()))
         );
 
         assertThat(ranges, hasSize(1));

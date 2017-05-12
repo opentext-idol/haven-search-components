@@ -9,7 +9,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.client.api.resource.ResourceName;
-import com.hp.autonomy.hod.client.api.textindex.query.parametric.*;
+import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldRanges;
+import com.hp.autonomy.hod.client.api.textindex.query.parametric.FieldValues;
+import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricRangesRequestBuilder;
+import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricRangesService;
+import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesRequestBuilder;
+import com.hp.autonomy.hod.client.api.textindex.query.parametric.GetParametricValuesService;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
@@ -22,7 +27,12 @@ import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.hod.fields.HodFieldsService;
 import com.hp.autonomy.searchcomponents.hod.requests.HodRequestBuilderConfiguration;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
-import com.hp.autonomy.types.requests.idol.actions.tags.*;
+import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericRangeInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
+import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
@@ -41,7 +51,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
@@ -53,7 +70,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -267,34 +284,34 @@ public class HodParametricValuesServiceTest {
 
         final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
 
-        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(
+        final List<NumericRangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(
                 hodParametricRequest,
-                ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams(9, 3.0, 12.0))
+                ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(9, 3.0, 12.0))
         );
 
         assertThat(results, hasSize(1));
 
-        final RangeInfo info = results.iterator().next();
+        final NumericRangeInfo info = results.iterator().next();
         assertThat(info.getCount(), is(4));
         assertThat(info.getMin(), is(3d));
         assertThat(info.getMax(), is(12d));
 
-        final Iterator<RangeInfo.Value> iterator = info.getValues().iterator();
-        assertEquals(new RangeInfo.Value( 3, 4, 2), iterator.next());
-        assertEquals(new RangeInfo.Value( 4, 5, 0), iterator.next());
-        assertEquals(new RangeInfo.Value( 5, 6, 0), iterator.next());
-        assertEquals(new RangeInfo.Value( 6, 7, 1), iterator.next());
-        assertEquals(new RangeInfo.Value( 7, 8, 0), iterator.next());
-        assertEquals(new RangeInfo.Value( 8, 9, 0), iterator.next());
-        assertEquals(new RangeInfo.Value( 9, 10, 0), iterator.next());
-        assertEquals(new RangeInfo.Value( 10, 11, 0), iterator.next());
-        assertEquals(new RangeInfo.Value( 11, 12, 1), iterator.next());
+        final Iterator<NumericRangeInfo.Value> iterator = info.getValues().iterator();
+        assertEquals(new NumericRangeInfo.Value(3D, 4D, 2), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(4D, 5D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(5D, 6D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(6D, 7D, 1), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(7D, 8D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(8D, 9D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(9D, 10D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(10D, 11D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(11D, 12D, 1), iterator.next());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void getNumericParametricValuesZeroBucketsZeroBuckets() throws HodErrorException {
         final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
-        parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams(0, 10.0, 11.0)));
+        parametricValuesService.getNumericParametricValuesInBuckets(hodParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(0, 10.0, 11.0)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -313,9 +330,9 @@ public class HodParametricValuesServiceTest {
                 any(GetParametricValuesRequestBuilder.class)
         )).thenReturn(Collections.emptyList());
 
-        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(
+        final List<NumericRangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(
                 hodParametricRequest,
-                ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams(3, 1.5, 5.5))
+                ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(3, 1.5, 5.5))
         );
 
         MatcherAssert.assertThat(results, empty());

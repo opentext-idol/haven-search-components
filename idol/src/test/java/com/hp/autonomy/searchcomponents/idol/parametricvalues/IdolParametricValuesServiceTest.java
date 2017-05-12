@@ -22,11 +22,12 @@ import com.hp.autonomy.types.idol.responses.GetQueryTagValuesResponseData;
 import com.hp.autonomy.types.idol.responses.RecursiveField;
 import com.hp.autonomy.types.idol.responses.TagValue;
 import com.hp.autonomy.types.idol.responses.Values;
+import com.hp.autonomy.types.requests.idol.actions.tags.DateRangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.DateValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericRangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
@@ -256,43 +257,43 @@ public class IdolParametricValuesServiceTest {
         );
 
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams(5, 1.0, 6.0)));
+        final List<NumericRangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(5, 1.0, 6.0)));
         assertThat(results, is(not(empty())));
-        final RangeInfo info = results.iterator().next();
-        final List<RangeInfo.Value> countInfo = info.getValues();
+        final NumericRangeInfo info = results.iterator().next();
+        final List<NumericRangeInfo.Value> countInfo = info.getValues();
         assertEquals(7, info.getCount());
         assertEquals(1, info.getMin(), 0);
         assertEquals(6d, info.getMax(), 0);
-        final Iterator<RangeInfo.Value> iterator = countInfo.iterator();
-        assertEquals(new RangeInfo.Value(1, 2, 0), iterator.next());
-        assertEquals(new RangeInfo.Value(2, 3, 5), iterator.next());
-        assertEquals(new RangeInfo.Value(3, 4, 2), iterator.next());
-        assertEquals(new RangeInfo.Value(4, 5, 0), iterator.next());
-        assertEquals(new RangeInfo.Value(5, 6, 0), iterator.next());
+        final Iterator<NumericRangeInfo.Value> iterator = countInfo.iterator();
+        assertEquals(new NumericRangeInfo.Value(1D, 2D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(2D, 3D, 5), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(3D, 4D, 2), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(4D, 5D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(5D, 6D, 0), iterator.next());
     }
 
     @Test
-    public void getRangesNoResults() {
+    public void getNumericRangesNoResults() {
         mockBucketResponses(0);
 
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams(5, 1.0, 6.0)));
+        final List<NumericRangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(5, 1.0, 6.0)));
         assertThat(results, is(not(empty())));
 
-        final RangeInfo info = results.iterator().next();
-        final List<RangeInfo.Value> countInfo = info.getValues();
-        final Iterator<RangeInfo.Value> iterator = countInfo.iterator();
-        assertEquals(new RangeInfo.Value(1, 2, 0), iterator.next());
-        assertEquals(new RangeInfo.Value(2, 3, 0), iterator.next());
-        assertEquals(new RangeInfo.Value(3, 4, 0), iterator.next());
-        assertEquals(new RangeInfo.Value(4, 5, 0), iterator.next());
-        assertEquals(new RangeInfo.Value(5, 6, 0), iterator.next());
+        final NumericRangeInfo info = results.iterator().next();
+        final List<NumericRangeInfo.Value> countInfo = info.getValues();
+        final Iterator<NumericRangeInfo.Value> iterator = countInfo.iterator();
+        assertEquals(new NumericRangeInfo.Value(1D, 2D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(2D, 3D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(3D, 4D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(4D, 5D, 0), iterator.next());
+        assertEquals(new NumericRangeInfo.Value(5D, 6D, 0), iterator.next());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void getNumericParametricValuesZeroBucketsZeroBuckets() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams(0, 1.0, 5.0)));
+        parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(0, 1.0, 5.0)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -302,9 +303,72 @@ public class IdolParametricValuesServiceTest {
     }
 
     @Test
-    public void bucketParametricValuesNoFields() {
+    public void bucketNumericParametricValuesNoFields() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
-        final List<RangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, Collections.emptyMap());
+        final List<NumericRangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, Collections.emptyMap());
+        assertThat(results, is(empty()));
+    }
+
+    @Test
+    public void getDateParametricValues() {
+        final ZonedDateTime max = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS);
+        final ZonedDateTime min = max.minusMinutes(3);
+        mockBucketResponses(7,
+                mockTagValue(min, min.plusMinutes(1), 0),
+                mockTagValue(min.plusMinutes(1), max.minusMinutes(1), 5),
+                mockTagValue(max.minusMinutes(1), max, 2)
+        );
+
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
+        final List<DateRangeInfo> results = parametricValuesService.getDateParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(5, min, max)));
+        assertThat(results, is(not(empty())));
+        final DateRangeInfo info = results.iterator().next();
+        final List<DateRangeInfo.Value> countInfo = info.getValues();
+        assertEquals(7, info.getCount());
+        assertEquals(min, info.getMin());
+        assertEquals(max, info.getMax());
+        final Iterator<DateRangeInfo.Value> iterator = countInfo.iterator();
+        assertEquals(new DateRangeInfo.Value(min, min.plusMinutes(1), 0), iterator.next());
+        assertEquals(new DateRangeInfo.Value(min.plusMinutes(1), max.minusMinutes(1), 5), iterator.next());
+        assertEquals(new DateRangeInfo.Value(max.minusMinutes(1), max, 2), iterator.next());
+    }
+
+    @Test
+    public void getDateRangesNoResults() {
+        mockBucketResponses(0);
+
+        final ZonedDateTime max = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS);
+        final ZonedDateTime min = max.minusSeconds(7);
+
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
+        final List<DateRangeInfo> results = parametricValuesService.getDateParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(3, min, max)));
+        assertThat(results, is(not(empty())));
+
+        final DateRangeInfo info = results.iterator().next();
+        final List<DateRangeInfo.Value> countInfo = info.getValues();
+        final Iterator<DateRangeInfo.Value> iterator = countInfo.iterator();
+        assertEquals(new DateRangeInfo.Value(min.minusSeconds(1), min.plusSeconds(2), 0), iterator.next());
+        assertEquals(new DateRangeInfo.Value(min.plusSeconds(2), max.minusSeconds(2), 0), iterator.next());
+        assertEquals(new DateRangeInfo.Value(max.minusSeconds(2), max.plusSeconds(1), 0), iterator.next());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getDateParametricValuesZeroBucketsZeroBuckets() {
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
+        final ZonedDateTime now = ZonedDateTime.now();
+        parametricValuesService.getDateParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(0, now.minusMinutes(5), now)));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getDateParametricValuesNoParams() {
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
+        parametricValuesService.getDateParametricValuesInBuckets(idolParametricRequest, Collections.emptyMap());
+    }
+
+    @Test
+    public void bucketDateParametricValuesNoFields() {
+        final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
+        final List<DateRangeInfo> results = parametricValuesService.getDateParametricValuesInBuckets(idolParametricRequest, Collections.emptyMap());
         assertThat(results, is(empty()));
     }
 
@@ -412,8 +476,7 @@ public class IdolParametricValuesServiceTest {
     }
 
     private JAXBElement<Serializable> mockJAXBElement(final String name, final double value) {
-        @SuppressWarnings("unchecked")
-        final JAXBElement<Serializable> jaxbElement = mock(JAXBElement.class);
+        @SuppressWarnings("unchecked") final JAXBElement<Serializable> jaxbElement = mock(JAXBElement.class);
 
         when(jaxbElement.getName()).thenReturn(new QName("", name));
         when(jaxbElement.getValue()).thenReturn(value);
@@ -444,10 +507,21 @@ public class IdolParametricValuesServiceTest {
         when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(responseData);
     }
 
+    private TagValue mockTagValue(final ChronoZonedDateTime<?> min, final ChronoZonedDateTime<?> max, final int count) {
+        return mockTagValue(min.toEpochSecond() + "," + max.toEpochSecond(), min, count);
+    }
+
     private TagValue mockTagValue(final String value, final int count) {
+        return mockTagValue(value, null, count);
+    }
+
+    private TagValue mockTagValue(final String value, final TemporalAccessor min, final int count) {
         final TagValue tagValue = new TagValue();
         tagValue.setValue(value);
         tagValue.setCount(count);
+        if (min != null) {
+            tagValue.setDate(IdolParametricValuesService.DATE_FORMAT.format(min));
+        }
         return tagValue;
     }
 

@@ -13,7 +13,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.Serializable;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 /**
  * Simple abstract test class for any object intended to be passed to a HavenSearch controller endpoint
@@ -36,7 +37,7 @@ public abstract class SimpleRequestObjectTest<O extends Serializable> extends Se
 
     @Test
     public void fromJson() throws IOException {
-        assertEquals(object, readJson());
+        assertThat(readJson(), equalTo(object));
     }
 
     protected Object readJson() throws IOException {

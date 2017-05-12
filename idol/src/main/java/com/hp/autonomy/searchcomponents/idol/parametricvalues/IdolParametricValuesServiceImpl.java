@@ -7,6 +7,8 @@ package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.util.AciParameters;
+import com.hp.autonomy.aci.content.ranges.DateRange;
+import com.hp.autonomy.aci.content.ranges.NumericRange;
 import com.hp.autonomy.aci.content.ranges.Range;
 import com.hp.autonomy.aci.content.ranges.Ranges;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
@@ -28,12 +30,16 @@ import com.hp.autonomy.types.idol.responses.FlatField;
 import com.hp.autonomy.types.idol.responses.GetQueryTagValuesResponseData;
 import com.hp.autonomy.types.idol.responses.RecursiveField;
 import com.hp.autonomy.types.idol.responses.TagValue;
+import com.hp.autonomy.types.requests.idol.actions.tags.DateRangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.DateValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericRangeInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfoBuilder;
+import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfoValue;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
@@ -41,7 +47,6 @@ import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetailsBuilder;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +55,9 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBElement;
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -124,18 +132,18 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     }
 
     @Override
-    @Cacheable(CacheNames.PARAMETRIC_VALUES_IN_BUCKETS)
-    public List<RangeInfo> getNumericParametricValuesInBuckets(final IdolParametricRequest parametricRequest, final Map<FieldPath, BucketingParams> bucketingParamsPerField) throws AciErrorException {
+    @Cacheable(CacheNames.NUMERIC_PARAMETRIC_VALUES_IN_BUCKETS)
+    public List<NumericRangeInfo> getNumericParametricValuesInBuckets(final IdolParametricRequest parametricRequest, final Map<FieldPath, BucketingParams<Double>> bucketingParamsPerField) throws AciErrorException {
         if (parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyList();
         } else {
             bucketingParamsHelper.validateBucketingParams(parametricRequest, bucketingParamsPerField);
 
             final Map<FieldPath, List<Double>> boundariesPerField = bucketingParamsPerField.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> bucketingParamsHelper.calculateBoundaries(entry.getValue())));
+                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> bucketingParamsHelper.calculateNumericBoundaries(entry.getValue())));
 
             final List<Range> ranges = boundariesPerField.entrySet().stream()
-                    .map(entry -> new Range(entry.getKey().getNormalisedPath(), ArrayUtils.toPrimitive(entry.getValue().toArray(new Double[entry.getValue().size()]))))
+                    .map(entry -> new NumericRange(entry.getKey().getNormalisedPath(), entry.getValue()))
                     .collect(Collectors.toList());
 
             final IdolParametricRequest bucketingRequest = parametricRequest.toBuilder()
@@ -145,9 +153,41 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                     .sort(SortParam.NumberIncreasing)
                     .build();
 
-            return getFlatFields(bucketingRequest, parametricRequest.getFieldNames()).stream()
-                    .map(flatFieldToRangeInfo(boundariesPerField))
+            @SuppressWarnings("RedundantTypeArguments") // presumably Java bug
+            final List<NumericRangeInfo> results = getFlatFields(bucketingRequest, parametricRequest.getFieldNames()).stream()
+                    .map(this.<Double, Double, NumericRangeInfo.Value, NumericRangeInfo, NumericRangeInfo.NumericRangeInfoBuilder>flatFieldToRangeInfo(boundariesPerField, this::parseNumericRange, NumericRangeInfo::builder, NumericRangeInfo.Value::new))
                     .collect(Collectors.toList());
+            return results;
+        }
+    }
+
+    @Override
+    @Cacheable(CacheNames.DATE_PARAMETRIC_VALUES_IN_BUCKETS)
+    public List<DateRangeInfo> getDateParametricValuesInBuckets(final IdolParametricRequest parametricRequest, final Map<FieldPath, BucketingParams<ZonedDateTime>> bucketingParamsPerField) throws AciErrorException {
+        if (parametricRequest.getFieldNames().isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            bucketingParamsHelper.validateBucketingParams(parametricRequest, bucketingParamsPerField);
+
+            final Map<FieldPath, List<ZonedDateTime>> boundariesPerField = bucketingParamsPerField.entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> bucketingParamsHelper.calculateDateBoundaries(entry.getValue())));
+
+            final List<Range> ranges = boundariesPerField.entrySet().stream()
+                    .map(entry -> new DateRange(entry.getKey().getNormalisedPath(), entry.getValue()))
+                    .collect(Collectors.toList());
+
+            final IdolParametricRequest bucketingRequest = parametricRequest.toBuilder()
+                    .maxValues(null)
+                    .start(1)
+                    .ranges(ranges)
+                    .sort(SortParam.NumberIncreasing)
+                    .build();
+
+            @SuppressWarnings("RedundantTypeArguments") // presumably Java bug
+            final List<DateRangeInfo> results = getFlatFields(bucketingRequest, parametricRequest.getFieldNames()).stream()
+                    .map(this.<ZonedDateTime, Duration, DateRangeInfo.Value, DateRangeInfo, DateRangeInfo.DateRangeInfoBuilder>flatFieldToRangeInfo(boundariesPerField, this::parseDateRange, DateRangeInfo::builder, DateRangeInfo.Value::new))
+                    .collect(Collectors.toList());
+            return results;
         }
     }
 
@@ -256,39 +296,41 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                 .collect(Collectors.toList());
     }
 
-    private Function<FlatField, RangeInfo> flatFieldToRangeInfo(final Map<FieldPath, List<Double>> boundariesPerField) {
+    private <T extends Comparable<? super T> & Serializable, D extends Comparable<D> & Serializable, V extends RangeInfoValue<T, D>, R extends RangeInfo<T, D, V, R, B>, B extends RangeInfoBuilder<T, D, V, R, B>>
+    Function<FlatField, R> flatFieldToRangeInfo(final Map<FieldPath, List<T>> boundariesPerField,
+                                                final Function<TagValue, T[]> parseValue,
+                                                final Supplier<B> builderConstructor,
+                                                final RangeInfoValue.Constructor<T, D, V> valueConstructor) {
         return flatField -> {
             final TagName tagName = tagNameFactory.buildTagName(flatField.getName().get(0));
 
             final List<JAXBElement<? extends Serializable>> valueElements = flatField.getValueAndSubvalueOrValues();
             int count = 0;
 
-            final Collection<RangeInfo.Value> values = new LinkedList<>();
+            final List<V> values = new LinkedList<>();
 
             for (final JAXBElement<?> element : valueElements) {
                 final String elementLocalName = element.getName().getLocalPart();
 
                 if (VALUE_NODE_NAME.equals(elementLocalName)) {
                     final TagValue tagValue = (TagValue) element.getValue();
-                    final String[] rangeValues = tagValue.getValue().split(",");
-                    final double min = Double.parseDouble(rangeValues[0]);
-                    final double max = Double.parseDouble(rangeValues[1]);
-                    values.add(new RangeInfo.Value(min, max, tagValue.getCount()));
+                    final T[] minAndMax = parseValue.apply(tagValue);
+                    values.add(valueConstructor.apply(minAndMax[0], minAndMax[1], tagValue.getCount()));
                 } else if (VALUES_NODE_NAME.equals(elementLocalName)) {
                     count = (Integer) element.getValue();
                 }
             }
 
-            final List<Double> boundaries = boundariesPerField.get(tagName.getId());
+            final List<T> boundaries = boundariesPerField.get(tagName.getId());
 
             // If no documents match the query parameters, GetQueryTagValues does not return any buckets
             if (values.isEmpty()) {
-                values.addAll(bucketingParamsHelper.emptyBuckets(boundaries));
+                values.addAll(bucketingParamsHelper.emptyBuckets(boundaries, valueConstructor));
             }
 
             // All buckets have the same size, so just use the value from the first one
-            final double bucketSize = boundaries.get(1) - boundaries.get(0);
-            return RangeInfo.builder()
+            final D bucketSize = values.get(0).getBucketSize();
+            return builderConstructor.get()
                     .id(tagName.getId().getNormalisedPath())
                     .displayName(tagName.getDisplayName())
                     .count(count)
@@ -298,6 +340,20 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                     .values(values)
                     .build();
         };
+    }
+
+    private Double[] parseNumericRange(final TagValue tagValue) {
+        final String[] rangeValues = tagValue.getValue().split(",");
+        final Double min = Double.valueOf(rangeValues[0]);
+        final Double max = Double.valueOf(rangeValues[1]);
+        return new Double[]{min, max};
+    }
+
+    private ZonedDateTime[] parseDateRange(final TagValue tagValue) {
+        final ZonedDateTime min = ZonedDateTime.parse(tagValue.getDate(), DATE_FORMAT);
+        //TODO: get proper max which supports values outside 1970-2038 as part of FIND-1351
+        final ZonedDateTime max = ZonedDateTime.ofInstant(Instant.ofEpochSecond(Long.parseLong(tagValue.getValue().split(",")[1])), ZoneOffset.UTC);
+        return new ZonedDateTime[]{min, max};
     }
 
     private QueryTagInfo flatFieldToTagInfo(final FlatField flatField) {
