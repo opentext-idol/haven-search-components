@@ -22,7 +22,6 @@ import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.ObjectFactory;
@@ -119,9 +118,8 @@ public abstract class AbstractParametricValuesServiceIT<
     }
 
     @Test
-    @Ignore //TODO: enable once FIND-1351 and FIND-1352 are complete
     public void dateRangesOutside1970and2038() throws E {
-        final ZonedDateTime min = ZonedDateTime.parse("0001-01-01T01:01:00Z");
+        final ZonedDateTime min = ZonedDateTime.parse("-0001-01-01T01:01:00Z");
         final ZonedDateTime max = ZonedDateTime.parse("3000-03-03T03:03:00Z");
 
         final R dateParametricRequest = createDateParametricRequest();
@@ -130,8 +128,13 @@ public abstract class AbstractParametricValuesServiceIT<
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams<>(35, min, max)));
         final List<DateRangeInfo> ranges = parametricValuesService.getDateParametricValuesInBuckets(dateParametricRequest, bucketingParamsPerField);
         assertThat(ranges, not(empty()));
-        assertThat(ranges.get(0).getMin(), lessThanOrEqualTo(min));
-        assertThat(ranges.get(0).getMax(), greaterThanOrEqualTo(max));
+        final DateRangeInfo dateRangeInfo = ranges.get(0);
+        assertThat(dateRangeInfo.getMin(), lessThanOrEqualTo(min));
+        assertThat(dateRangeInfo.getMax(), greaterThanOrEqualTo(max));
+        assertThat(dateRangeInfo.getValues(), hasSize(35));
+        assertThat(dateRangeInfo.getValues().get(0).getMin(), equalTo(dateRangeInfo.getMin().withSecond(0)));
+        //TODO: enable once FIND-1351 is complete
+//        assertThat(dateRangeInfo.getValues().get(34).getMax(), equalTo(dateRangeInfo.getMax().withSecond(0)));
     }
 
     @Test

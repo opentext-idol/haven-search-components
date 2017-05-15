@@ -180,7 +180,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                     .maxValues(null)
                     .start(1)
                     .ranges(ranges)
-                    .sort(SortParam.NumberIncreasing)
+                    .sort(SortParam.ReverseDate)
                     .build();
 
             @SuppressWarnings("RedundantTypeArguments") // presumably Java bug

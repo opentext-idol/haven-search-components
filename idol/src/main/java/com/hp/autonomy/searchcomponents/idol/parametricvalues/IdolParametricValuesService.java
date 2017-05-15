@@ -17,6 +17,6 @@ import java.util.Locale;
  * Idol extension to {@link ParametricValuesService}
  */
 public interface IdolParametricValuesService extends ParametricValuesService<IdolParametricRequest, IdolQueryRestrictions, AciErrorException> {
-    String DATE_PATTERN = "HH:mm:ss dd/MM/yyyy";
+    String DATE_PATTERN = "HH:mm:ss dd/MM/y[ G]";
     DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH).withZone(ZoneOffset.UTC);
 }
