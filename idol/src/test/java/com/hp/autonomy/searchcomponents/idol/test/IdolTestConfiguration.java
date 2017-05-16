@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 
 import static org.mockito.Mockito.mock;
@@ -47,8 +46,12 @@ public class IdolTestConfiguration {
     private Environment environment;
 
     @Bean
-    @Primary
-    public ConfigService<IdolSearchCapable> configService() {
+    public IdolSearchCapable testConfig() {
+        return mock(IdolSearchCapable.class);
+    }
+
+    @Bean
+    public ConfigService<IdolSearchCapable> testConfigService(final IdolSearchCapable config) {
         final QueryManipulation queryManipulationConfig = QueryManipulation.builder()
                 .enabled(false)
                 .build();
@@ -71,8 +74,6 @@ public class IdolTestConfiguration {
                 getProperty(CONTENT_HOST_PROPERTY, CONTENT_HOST),
                 getIntProperty(CONTENT_PORT_PROPERTY, CONTENT_PORT)
         );
-
-        final IdolSearchCapable config = mock(IdolSearchCapable.class);
 
         when(config.getContentAciServerDetails()).thenReturn(contentAciServerDetails);
         when(config.getQueryManipulation()).thenReturn(queryManipulationConfig);
