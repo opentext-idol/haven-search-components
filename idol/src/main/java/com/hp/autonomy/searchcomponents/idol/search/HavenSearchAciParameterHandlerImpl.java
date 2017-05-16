@@ -29,10 +29,13 @@ import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-import org.joda.time.ReadableInstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -47,6 +50,7 @@ import static com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParamet
 @Component(PARAMETER_HANDLER_BEAN_NAME)
 class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
     private static final String GET_CONTENT_QUERY_TEXT = "*";
+    private static final ZonedDateTime oneAD = ZonedDateTime.of(1, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
 
     private final ConfigService<? extends IdolSearchCapable> configService;
     private final DocumentFieldsService documentFieldsService;
@@ -203,7 +207,8 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         aciParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
     }
 
-    private String formatDate(final ReadableInstant date) {
-        return date == null ? null : date.getMillis() / 1000 + "e";
+    private String formatDate(final ZonedDateTime date) {
+        // IDOL ISO date time does not have a year 0 whereas Java ISO date time does
+        return date == null ? null : DateTimeFormatter.ISO_INSTANT.format((date.isBefore(oneAD) ? date.minusYears(1) : date).truncatedTo(ChronoUnit.SECONDS));
     }
 }

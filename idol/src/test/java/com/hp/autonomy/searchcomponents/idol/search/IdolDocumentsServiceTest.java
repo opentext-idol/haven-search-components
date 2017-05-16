@@ -14,13 +14,13 @@ import com.hp.autonomy.types.idol.responses.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -161,7 +161,7 @@ public class IdolDocumentsServiceTest {
     private IdolQueryRequest mockQueryParams(final QueryRequest.QueryType queryType) {
         when(queryRestrictions.getQueryText()).thenReturn("*");
         when(queryRestrictions.getDatabases()).thenReturn(Arrays.asList("Database1", "Database2"));
-        when(queryRestrictions.getMaxDate()).thenReturn(DateTime.now());
+        when(queryRestrictions.getMaxDate()).thenReturn(ZonedDateTime.now());
 
         when(queryRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
         when(queryRequest.getStart()).thenReturn(1);

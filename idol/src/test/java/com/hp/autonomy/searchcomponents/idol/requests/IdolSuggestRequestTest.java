@@ -13,10 +13,10 @@ import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
 import org.junit.Before;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 public class IdolSuggestRequestTest extends SuggestRequestTest<IdolQueryRestrictions> {
     @Override
@@ -34,8 +34,8 @@ public class IdolSuggestRequestTest extends SuggestRequestTest<IdolQueryRestrict
                         .queryText("*")
                         .fieldText("NOT(EMPTY):{FIELD}")
                         .database("Database1")
-                        .minDate(DateTime.parse("2016-11-15T16:07:00Z"))
-                        .maxDate(DateTime.parse("2016-11-15T16:07:01Z"))
+                        .minDate(ZonedDateTime.parse("2016-11-15T16:07:00Z[UTC]"))
+                        .maxDate(ZonedDateTime.parse("2016-11-15T16:07:01Z[UTC]"))
                         .minScore(5)
                         .languageType("englishUtf8")
                         .anyLanguage(false)

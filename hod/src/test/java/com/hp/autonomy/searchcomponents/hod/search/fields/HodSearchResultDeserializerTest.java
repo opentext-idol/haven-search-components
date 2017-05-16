@@ -20,7 +20,6 @@ import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
 import com.hp.autonomy.types.requests.Documents;
 import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,6 +33,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +71,7 @@ public class HodSearchResultDeserializerTest {
     @Before
     public void setUp() {
         final FieldsInfo fieldsInfo = FieldsInfo.builder()
-                .populateResponseMap("modifiedDate", FieldInfo.<DateTime>builder()
+                .populateResponseMap("modifiedDate", FieldInfo.<ZonedDateTime>builder()
                         .id("modifiedDate")
                         .name(fieldPathNormaliser.normaliseFieldPath("modified_date"))
                         .name(fieldPathNormaliser.normaliseFieldPath("date_modified"))

@@ -11,7 +11,15 @@ import com.hp.autonomy.hod.caching.CachingConfiguration;
 import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentRequestBuilder;
 import com.hp.autonomy.hod.client.api.textindex.query.content.GetContentService;
-import com.hp.autonomy.hod.client.api.textindex.query.search.*;
+import com.hp.autonomy.hod.client.api.textindex.query.search.CheckSpelling;
+import com.hp.autonomy.hod.client.api.textindex.query.search.FindSimilarService;
+import com.hp.autonomy.hod.client.api.textindex.query.search.Highlight;
+import com.hp.autonomy.hod.client.api.textindex.query.search.Print;
+import com.hp.autonomy.hod.client.api.textindex.query.search.QueryRequestBuilder;
+import com.hp.autonomy.hod.client.api.textindex.query.search.QueryResults;
+import com.hp.autonomy.hod.client.api.textindex.query.search.QueryTextIndexService;
+import com.hp.autonomy.hod.client.api.textindex.query.search.Sort;
+import com.hp.autonomy.hod.client.api.textindex.query.search.Summary;
 import com.hp.autonomy.hod.client.error.HodErrorException;
 import com.hp.autonomy.hod.client.warning.HodWarning;
 import com.hp.autonomy.hod.sso.HodAuthenticationPrincipal;
@@ -26,11 +34,19 @@ import com.hp.autonomy.types.requests.Documents;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.NotImplementedException;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.time.chrono.ChronoZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.DOCUMENTS_SERVICE_BEAN_NAME;
 
@@ -129,6 +145,7 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
         }
     }
 
+    @SuppressWarnings("SpringCacheableComponentsInspection")
     @Cacheable(value = CacheNames.GET_DOCUMENT_CONTENT, cacheResolver = CachingConfiguration.PER_USER_CACHE_RESOLVER_NAME)
     @Override
     public List<HodSearchResult> getDocumentContent(final HodGetContentRequest request) throws HodErrorException {
@@ -174,8 +191,8 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
                 .setIndexes(searchRequest.getQueryRestrictions().getDatabases())
                 .setFieldText(searchRequest.getQueryRestrictions().getFieldText())
                 .setSort(Optional.ofNullable(searchRequest.getSort()).map(Sort::valueOf).orElse(null))
-                .setMinDate(searchRequest.getQueryRestrictions().getMinDate())
-                .setMaxDate(searchRequest.getQueryRestrictions().getMaxDate())
+                .setMinDate(zonedDateTimeToJodaTime(searchRequest.getQueryRestrictions().getMinDate()))
+                .setMaxDate(zonedDateTimeToJodaTime(searchRequest.getQueryRestrictions().getMaxDate()))
                 .setPrint(print)
                 .setMinScore(searchRequest.getQueryRestrictions().getMinScore())
                 .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
@@ -196,6 +213,11 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
         }
 
         return queryRequestBuilder;
+    }
+
+    //TODO: update hod client to use Java8 time
+    private DateTime zonedDateTimeToJodaTime(final ChronoZonedDateTime<?> date) {
+        return date == null ? null : new DateTime(date.toInstant().toEpochMilli(), DateTimeZone.UTC);
     }
 
     private void addDomainToSearchResults(final Collection<HodSearchResult> documentList, final Iterable<ResourceName> indexIdentifiers, final Iterable<HodSearchResult> documents) {

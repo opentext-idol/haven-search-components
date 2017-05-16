@@ -18,13 +18,13 @@ import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.hamcrest.Matchers;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -74,7 +74,7 @@ public class HavenSearchAciParameterHandlerTest {
         when(queryRestrictions.getDatabases()).thenReturn(Collections.singletonList("Database1"));
         when(queryRestrictions.getStateMatchIds()).thenReturn(Collections.singletonList("stateID1"));
         when(queryRestrictions.getStateDontMatchIds()).thenReturn(Collections.singletonList("stateID2"));
-        when(queryRestrictions.getMaxDate()).thenReturn(DateTime.now());
+        when(queryRestrictions.getMaxDate()).thenReturn(ZonedDateTime.now());
         when(queryRestrictions.isAnyLanguage()).thenReturn(true);
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
         assertThat(aciParameters, hasSize(10));

@@ -13,7 +13,6 @@ import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.core.search.SearchResultTest;
 import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
-import org.joda.time.DateTime;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +20,7 @@ import org.springframework.boot.test.json.JsonContent;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 
@@ -66,9 +66,9 @@ public class IdolSearchResultTest extends SearchResultTest {
                 .fieldEntry("DATE_FIELD", FieldInfo.builder()
                         .name(fieldPathNormaliser.normaliseFieldPath("DATE_FIELD"))
                         .type(FieldType.DATE)
-                        .value(new FieldValue<>(DateTime.parse("2016-11-16T17:46:00Z"), "2016-11-16T17:46:00Z"))
+                        .value(new FieldValue<>(ZonedDateTime.parse("2016-11-16T17:46:00Z[UTC]"), "2016-11-16T17:46:00Z"))
                         .build())
-                .date(DateTime.parse("2016-11-16T17:46:00Z"))
+                .date(ZonedDateTime.parse("2016-11-16T17:46:00Z[UTC]"))
                 .promotionCategory(PromotionCategory.NONE)
                 .qmsId("0")
                 .promotionName("SomeName")

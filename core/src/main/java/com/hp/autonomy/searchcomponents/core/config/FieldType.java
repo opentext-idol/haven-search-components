@@ -5,8 +5,9 @@
 
 package com.hp.autonomy.searchcomponents.core.config;
 
-import org.joda.time.DateTime;
-
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.function.Function;
 
 /**
@@ -14,14 +15,14 @@ import java.util.function.Function;
  */
 public enum FieldType {
     STRING(String.class, value -> value),
-    DATE(DateTime.class, value -> {
+    DATE(ZonedDateTime.class, value -> {
             try {
-                final long epoch = Long.parseLong(value) * 1000;
-                return new DateTime(epoch);
+                final long epoch = Long.parseLong(value);
+                return ZonedDateTime.ofInstant(Instant.ofEpochSecond(epoch), ZoneOffset.UTC);
             } catch (final NumberFormatException ignore) {
                 try {
                     // HOD handles date fields inconsistently; attempt to detect this here
-                    return new DateTime(value);
+                    return ZonedDateTime.parse(value);
                 } catch (final IllegalArgumentException ignored) {
                     return null;
                 }

@@ -6,7 +6,7 @@
 package com.hp.autonomy.searchcomponents.core.requests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public abstract class SimpleRequestObjectTest<O extends Serializable> extends Se
 
     @Before
     public void setUpObjectMapper() {
-        objectMapper.registerModule(new JodaModule());
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     /**

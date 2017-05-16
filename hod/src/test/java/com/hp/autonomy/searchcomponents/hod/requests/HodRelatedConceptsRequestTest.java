@@ -11,10 +11,10 @@ import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequestTest;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.searchcomponents.hod.search.HodRelatedConceptsRequest;
 import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
 import org.junit.Before;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 public class HodRelatedConceptsRequestTest extends RelatedConceptsRequestTest<HodQueryRestrictions> {
     @Override
@@ -31,8 +31,8 @@ public class HodRelatedConceptsRequestTest extends RelatedConceptsRequestTest<Ho
                         .queryText("*")
                         .fieldText("NOT(EMPTY):{FIELD}")
                         .database(ResourceName.WIKI_ENG)
-                        .minDate(DateTime.parse("2016-11-15T16:07:00Z"))
-                        .maxDate(DateTime.parse("2016-11-15T16:07:01Z"))
+                        .minDate(ZonedDateTime.parse("2016-11-15T16:07:00Z[UTC]"))
+                        .maxDate(ZonedDateTime.parse("2016-11-15T16:07:01Z[UTC]"))
                         .minScore(5)
                         .languageType("englishUtf8")
                         .anyLanguage(false)

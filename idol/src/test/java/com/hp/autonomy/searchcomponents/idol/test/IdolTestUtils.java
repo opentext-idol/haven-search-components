@@ -11,12 +11,12 @@ import com.hp.autonomy.searchcomponents.idol.search.IdolGetContentRequestBuilder
 import com.hp.autonomy.searchcomponents.idol.search.IdolGetContentRequestIndexBuilder;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictionsBuilder;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.time.ZonedDateTime;
 import java.util.Collections;
 
 @SuppressWarnings("WeakerAccess")
@@ -41,7 +41,7 @@ public class IdolTestUtils implements TestUtils<IdolQueryRestrictions> {
                 .fieldText("")
                 .database(environment.getProperty(TEST_DATABASE_PROPERTY, DEFAULT_TEST_DATABASE))
                 .minDate(null)
-                .maxDate(DateTime.now())
+                .maxDate(ZonedDateTime.now())
                 .minScore(0)
                 .languageType(null)
                 .anyLanguage(true)
@@ -52,8 +52,7 @@ public class IdolTestUtils implements TestUtils<IdolQueryRestrictions> {
 
     @Override
     public <RC extends GetContentRequest<?>> RC buildGetContentRequest(final String reference) {
-        @SuppressWarnings("unchecked")
-        final RC getContentRequest = (RC) getContentRequestBuilderFactory.getObject()
+        @SuppressWarnings("unchecked") final RC getContentRequest = (RC) getContentRequestBuilderFactory.getObject()
                 .indexAndReferences(getContentRequestIndexBuilderFactory.getObject()
                         .index(environment.getProperty(TEST_DATABASE_PROPERTY, DEFAULT_TEST_DATABASE))
                         .reference(reference)

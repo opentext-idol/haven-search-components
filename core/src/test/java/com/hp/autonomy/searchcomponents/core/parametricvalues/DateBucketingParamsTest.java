@@ -1,7 +1,6 @@
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hp.autonomy.searchcomponents.core.requests.SimpleRequestObjectTest;
 
 import java.io.IOException;
@@ -18,14 +17,9 @@ public class DateBucketingParamsTest extends SimpleRequestObjectTest<BucketingPa
     }
 
     @Override
-    public void setUpObjectMapper() {
-        super.setUpObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-    }
-
-    @Override
     protected Object readJson() throws IOException {
-        return objectMapper.readValue(json(), new TypeReference<BucketingParams<ZonedDateTime>>() {});
+        return objectMapper.readValue(json(), new TypeReference<BucketingParams<ZonedDateTime>>() {
+        });
     }
 
     @Override

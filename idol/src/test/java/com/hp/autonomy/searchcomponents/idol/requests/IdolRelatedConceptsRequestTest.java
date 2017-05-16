@@ -10,10 +10,10 @@ import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequestTest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolRelatedConceptsRequest;
 import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
 import org.junit.Before;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 public class IdolRelatedConceptsRequestTest extends RelatedConceptsRequestTest<IdolQueryRestrictions> {
     @Override
@@ -30,8 +30,8 @@ public class IdolRelatedConceptsRequestTest extends RelatedConceptsRequestTest<I
                         .queryText("*")
                         .fieldText("NOT(EMPTY):{FIELD}")
                         .database("Database1")
-                        .minDate(DateTime.parse("2016-11-15T16:07:00Z"))
-                        .maxDate(DateTime.parse("2016-11-15T16:07:01Z"))
+                        .minDate(ZonedDateTime.parse("2016-11-15T16:07:00Z[UTC]"))
+                        .maxDate(ZonedDateTime.parse("2016-11-15T16:07:01Z[UTC]"))
                         .minScore(5)
                         .languageType("englishUtf8")
                         .anyLanguage(false)

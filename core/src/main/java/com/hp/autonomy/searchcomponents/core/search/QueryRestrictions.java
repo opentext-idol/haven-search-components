@@ -6,10 +6,10 @@
 package com.hp.autonomy.searchcomponents.core.search;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -50,14 +50,14 @@ public interface QueryRestrictions<S extends Serializable> extends RequestObject
      *
      * @return The minimum date of results (uses configured date field)
      */
-    DateTime getMinDate();
+    ZonedDateTime getMinDate();
 
     /**
      * The maximum date of results (uses configured date field)
      *
      * @return The maximum date of results (uses configured date field)
      */
-    DateTime getMaxDate();
+    ZonedDateTime getMaxDate();
 
     /**
      * The minimum score threshold to apply

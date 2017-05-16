@@ -27,13 +27,19 @@ import com.hp.autonomy.searchcomponents.hod.configuration.HodSearchCapable;
 import com.hp.autonomy.searchcomponents.hod.search.HodSearchResult;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import org.apache.commons.lang.ArrayUtils;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -75,9 +81,7 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
         final Stream<Map.Entry<String, JsonNode>> entryStream = StreamSupport.stream(entryIterable.spliterator(), false);
 
         final Map<String, FieldInfo<?>> fieldMap = entryStream
-                .filter(entry -> {
-                    return entry.getValue().getNodeType() == JsonNodeType.ARRAY && !IGNORED_PROPERTIES.contains(entry.getKey());
-                })
+                .filter(entry -> entry.getValue().getNodeType() == JsonNodeType.ARRAY && !IGNORED_PROPERTIES.contains(entry.getKey()))
                 .reduce(
                         ImmutableMap.of(),
                         (map, entry) -> {
@@ -88,9 +92,7 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
                             final Optional<FieldInfo<?>> maybeConfigFieldInfo = Optional.ofNullable(fieldConfigByName.get(fieldPath));
 
                             // If there is a config entry for this field, we may have seen one with the same ID already
-                            final Optional<FieldInfo<?>> maybeExistingFieldInfo = maybeConfigFieldInfo.flatMap(configFieldInfo -> {
-                                return Optional.ofNullable(map.get(configFieldInfo.getId()));
-                            });
+                            final Optional<FieldInfo<?>> maybeExistingFieldInfo = maybeConfigFieldInfo.flatMap(configFieldInfo -> Optional.ofNullable(map.get(configFieldInfo.getId())));
 
                             final FieldInfo<?> newFieldInfo = reduceFieldInfo(fieldPath, stringValues, maybeConfigFieldInfo, maybeExistingFieldInfo);
                             final String id = newFieldInfo.getId();
@@ -172,8 +174,7 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
     private <T extends Serializable> Collection<FieldValue<T>> parseValues(final FieldType fieldType, final String fieldId, final Collection<String> stringValues) {
         return stringValues.stream()
                 .map(stringValue -> {
-                    @SuppressWarnings("unchecked")
-                    final T value = (T) fieldType.parseValue(fieldType.getType(), stringValue);
+                    @SuppressWarnings("unchecked") final T value = (T) fieldType.parseValue(fieldType.getType(), stringValue);
                     final String displayValue = fieldDisplayNameGenerator.generateDisplayValueFromId(fieldId, value, fieldType);
                     return new FieldValue<>(value, displayValue);
                 })
@@ -202,9 +203,9 @@ public class HodSearchResultDeserializer extends JsonDeserializer<HodSearchResul
     }
 
     @SuppressWarnings("SameParameterValue")
-    private DateTime parseAsDateFromArray(@SuppressWarnings("TypeMayBeWeakened") final JsonNode node, final String fieldName) throws JsonProcessingException {
+    private ZonedDateTime parseAsDateFromArray(@SuppressWarnings("TypeMayBeWeakened") final JsonNode node, final String fieldName) throws JsonProcessingException {
         final String value = parseAsStringFromArray(node, fieldName);
-        return value != null ? FieldType.DATE.parseValue(DateTime.class, value) : null;
+        return value != null ? FieldType.DATE.parseValue(ZonedDateTime.class, value) : null;
     }
 
     private List<String> parseNodeAsStringList(final TreeNode node) {

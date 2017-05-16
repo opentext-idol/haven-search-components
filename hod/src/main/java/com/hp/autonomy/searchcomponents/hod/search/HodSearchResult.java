@@ -12,8 +12,8 @@ import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-import org.joda.time.DateTime;
 
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -37,7 +37,7 @@ public class HodSearchResult implements SearchResult {
     @Singular("fieldEntry")
     private final Map<String, FieldInfo<?>> fieldMap;
 
-    private final DateTime date;
+    private final ZonedDateTime date;
 
     private final PromotionCategory promotionCategory;
 

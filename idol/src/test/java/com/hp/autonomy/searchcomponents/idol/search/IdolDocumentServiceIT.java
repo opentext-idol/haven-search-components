@@ -11,12 +11,12 @@ import com.hp.autonomy.searchcomponents.core.search.AutoCorrectException;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
-import org.joda.time.DateTime;
 import org.junit.Test;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.ZonedDateTime;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.*;
@@ -48,7 +48,7 @@ public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<IdolQueryRe
                         .fieldText("")
                         .databases(integrationTestUtils.buildQueryRestrictions().getDatabases())
                         .minDate(null)
-                        .maxDate(DateTime.now())
+                        .maxDate(ZonedDateTime.now())
                         .minScore(0)
                         .languageType(null)
                         .anyLanguage(true)

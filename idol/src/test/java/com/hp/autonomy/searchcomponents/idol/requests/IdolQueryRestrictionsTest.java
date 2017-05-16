@@ -7,11 +7,10 @@ package com.hp.autonomy.searchcomponents.idol.requests;
 
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictionsTest;
-import com.hp.autonomy.searchcomponents.idol.requests.IdolQueryRestrictionsImpl;
 import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 public class IdolQueryRestrictionsTest extends QueryRestrictionsTest<String> {
     @Override
@@ -20,8 +19,8 @@ public class IdolQueryRestrictionsTest extends QueryRestrictionsTest<String> {
                 .queryText("*")
                 .fieldText("NOT(EMPTY):{FIELD}")
                 .database("Database1")
-                .minDate(DateTime.parse("2016-11-15T16:07:00Z"))
-                .maxDate(DateTime.parse("2016-11-15T16:07:01Z"))
+                .minDate(ZonedDateTime.parse("2016-11-15T16:07:00Z[UTC]"))
+                .maxDate(ZonedDateTime.parse("2016-11-15T16:07:01Z[UTC]"))
                 .minScore(5)
                 .languageType("englishUtf8")
                 .anyLanguage(false)

@@ -17,7 +17,6 @@ import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import com.hp.autonomy.types.idol.responses.DocContent;
 import com.hp.autonomy.types.idol.responses.Hit;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +28,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
@@ -59,7 +59,7 @@ public class FieldsParserTest {
     @Before
     public void setUp() {
         final FieldsInfo fieldsInfo = FieldsInfo.builder()
-                .populateResponseMap("Custom Date", FieldInfo.<DateTime>builder()
+                .populateResponseMap("Custom Date", FieldInfo.<ZonedDateTime>builder()
                         .id("Custom Date")
                         .name(fieldPathNormaliser.normaliseFieldPath("DOCUMENT/CUSTOM_DATE"))
                         .type(FieldType.DATE)
@@ -115,7 +115,7 @@ public class FieldsParserTest {
         when(element.hasChildNodes()).thenReturn(true);
         final NodeList childNodes = mock(NodeList.class);
         when(childNodes.getLength()).thenReturn(4);
-        mockNodeListEntry(childNodes, 0, "CUSTOM_DATE", "2016-02-03T11:42:00");
+        mockNodeListEntry(childNodes, 0, "CUSTOM_DATE", "2016-02-03T11:42:00Z");
         mockNodeListEntry(childNodes, 1, "CUSTOM_ARRAY", "a");
         mockNodeListEntry(childNodes, 2, "CUSTOM_ARRAY", "b");
         mockNodeListEntry(childNodes, 3, "UNKNOWN", "c");

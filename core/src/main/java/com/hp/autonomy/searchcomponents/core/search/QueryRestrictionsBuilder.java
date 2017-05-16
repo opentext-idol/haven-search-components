@@ -6,9 +6,9 @@
 package com.hp.autonomy.searchcomponents.core.search;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObjectBuilder;
-import org.joda.time.DateTime;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 
 /**
@@ -62,7 +62,7 @@ public interface QueryRestrictionsBuilder<Q extends QueryRestrictions<S>, S exte
      * @param minDate The minimum date of results (uses configured date field)
      * @return the builder (for chaining)
      */
-    B minDate(DateTime minDate);
+    B minDate(ZonedDateTime minDate);
 
     /**
      * Sets the maximum date of results (uses configured date field)
@@ -70,7 +70,7 @@ public interface QueryRestrictionsBuilder<Q extends QueryRestrictions<S>, S exte
      * @param maxDate The maximum date of results (uses configured date field)
      * @return the builder (for chaining)
      */
-    B maxDate(DateTime maxDate);
+    B maxDate(ZonedDateTime maxDate);
 
     /**
      * Sets the minimum score threshold to apply
