@@ -133,8 +133,7 @@ public abstract class AbstractParametricValuesServiceIT<
         assertThat(dateRangeInfo.getMax(), greaterThanOrEqualTo(max));
         assertThat(dateRangeInfo.getValues(), hasSize(35));
         assertThat(dateRangeInfo.getValues().get(0).getMin(), equalTo(dateRangeInfo.getMin().withSecond(0)));
-        //TODO: enable once FIND-1351 is complete
-//        assertThat(dateRangeInfo.getValues().get(34).getMax(), equalTo(dateRangeInfo.getMax().withSecond(0)));
+        assertThat(dateRangeInfo.getValues().get(34).getMax(), equalTo(dateRangeInfo.getMax().withSecond(0)));
     }
 
     @Test

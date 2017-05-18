@@ -56,8 +56,6 @@ import org.springframework.stereotype.Service;
 import javax.xml.bind.JAXBElement;
 import java.io.Serializable;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -351,8 +349,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
     private ZonedDateTime[] parseDateRange(final TagValue tagValue) {
         final ZonedDateTime min = ZonedDateTime.parse(tagValue.getDate(), DATE_FORMAT);
-        //TODO: get proper max which supports values outside 1970-2038 as part of FIND-1351
-        final ZonedDateTime max = ZonedDateTime.ofInstant(Instant.ofEpochSecond(Long.parseLong(tagValue.getValue().split(",")[1])), ZoneOffset.UTC);
+        final ZonedDateTime max = ZonedDateTime.parse(tagValue.getEndDate(), DATE_FORMAT);
         return new ZonedDateTime[]{min, max};
     }
 

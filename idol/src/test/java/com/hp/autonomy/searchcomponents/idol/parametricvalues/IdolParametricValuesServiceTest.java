@@ -508,19 +508,22 @@ public class IdolParametricValuesServiceTest {
     }
 
     private TagValue mockTagValue(final ChronoZonedDateTime<?> min, final ChronoZonedDateTime<?> max, final int count) {
-        return mockTagValue(min.toEpochSecond() + "," + max.toEpochSecond(), min, count);
+        return mockTagValue(min.toEpochSecond() + "," + max.toEpochSecond(), min, max, count);
     }
 
     private TagValue mockTagValue(final String value, final int count) {
-        return mockTagValue(value, null, count);
+        return mockTagValue(value, null, null, count);
     }
 
-    private TagValue mockTagValue(final String value, final TemporalAccessor min, final int count) {
+    private TagValue mockTagValue(final String value, final TemporalAccessor min, final TemporalAccessor max, final int count) {
         final TagValue tagValue = new TagValue();
         tagValue.setValue(value);
         tagValue.setCount(count);
         if (min != null) {
             tagValue.setDate(IdolParametricValuesService.DATE_FORMAT.format(min));
+        }
+        if (max != null) {
+            tagValue.setEndDate(IdolParametricValuesService.DATE_FORMAT.format(max));
         }
         return tagValue;
     }
