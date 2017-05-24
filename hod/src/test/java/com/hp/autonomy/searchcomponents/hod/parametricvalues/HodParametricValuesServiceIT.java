@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -41,15 +41,15 @@ public class HodParametricValuesServiceIT extends AbstractParametricValuesServic
     @Override
     protected HodParametricRequest noResultsParametricRequest(final Collection<FieldPath> fieldPaths) {
         final HodQueryRestrictions queryRestrictions = queryRestrictionsBuilderFactory.getObject()
-                // No documents will match this text (probably)
-                .queryText("sfoiewsfoseinf")
-                .database(ResourceName.WIKI_ENG)
-                .build();
+            // No documents will match this text (probably)
+            .queryText("sfoiewsfoseinf")
+            .database(ResourceName.WIKI_ENG)
+            .build();
 
         return parametricRequestBuilderFactory.getObject()
-                .queryRestrictions(queryRestrictions)
-                .fieldNames(fieldPaths)
-                .build();
+            .queryRestrictions(queryRestrictions)
+            .fieldNames(fieldPaths)
+            .build();
     }
 
     @SuppressWarnings("RedundantMethodOverride")

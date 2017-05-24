@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -97,12 +97,12 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     @SuppressWarnings("ConstructorWithTooManyParameters")
     @Autowired
     IdolParametricValuesServiceImpl(
-            final HavenSearchAciParameterHandler parameterHandler,
-            final IdolFieldsService fieldsService,
-            final ObjectFactory<IdolFieldsRequestBuilder> fieldsRequestBuilderFactory,
-            final BucketingParamsHelper bucketingParamsHelper,
-            final TagNameFactory tagNameFactory,
-            final QueryExecutor queryExecutor
+        final HavenSearchAciParameterHandler parameterHandler,
+        final IdolFieldsService fieldsService,
+        final ObjectFactory<IdolFieldsRequestBuilder> fieldsRequestBuilderFactory,
+        final BucketingParamsHelper bucketingParamsHelper,
+        final TagNameFactory tagNameFactory,
+        final QueryExecutor queryExecutor
     ) {
         this.parameterHandler = parameterHandler;
         this.fieldsService = fieldsService;
@@ -117,44 +117,44 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         final Collection<FieldPath> fieldNames = new HashSet<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
 
-        if (fieldNames.isEmpty()) {
+        if(fieldNames.isEmpty()) {
             fieldNames.addAll(lookupFields());
         }
 
         return fieldNames.isEmpty()
-                ? Collections.emptySet()
-                : getFlatFields(parametricRequest, fieldNames).stream()
-                .map(this::flatFieldToTagInfo)
-                .filter(queryTagInfo -> !queryTagInfo.getValues().isEmpty())
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+            ? Collections.emptySet()
+            : getFlatFields(parametricRequest, fieldNames).stream()
+            .map(this::flatFieldToTagInfo)
+            .filter(queryTagInfo -> !queryTagInfo.getValues().isEmpty())
+            .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override
     @Cacheable(CacheNames.NUMERIC_PARAMETRIC_VALUES_IN_BUCKETS)
     public List<NumericRangeInfo> getNumericParametricValuesInBuckets(final IdolParametricRequest parametricRequest, final Map<FieldPath, BucketingParams<Double>> bucketingParamsPerField) throws AciErrorException {
-        if (parametricRequest.getFieldNames().isEmpty()) {
+        if(parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyList();
         } else {
             bucketingParamsHelper.validateBucketingParams(parametricRequest, bucketingParamsPerField);
 
             final Map<FieldPath, List<Double>> boundariesPerField = bucketingParamsPerField.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> bucketingParamsHelper.calculateNumericBoundaries(entry.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> bucketingParamsHelper.calculateNumericBoundaries(entry.getValue())));
 
             final List<Range> ranges = boundariesPerField.entrySet().stream()
-                    .map(entry -> new NumericRange(entry.getKey().getNormalisedPath(), entry.getValue()))
-                    .collect(Collectors.toList());
+                .map(entry -> new NumericRange(entry.getKey().getNormalisedPath(), entry.getValue()))
+                .collect(Collectors.toList());
 
             final IdolParametricRequest bucketingRequest = parametricRequest.toBuilder()
-                    .maxValues(null)
-                    .start(1)
-                    .ranges(ranges)
-                    .sort(SortParam.NumberIncreasing)
-                    .build();
+                .maxValues(null)
+                .start(1)
+                .ranges(ranges)
+                .sort(SortParam.NumberIncreasing)
+                .build();
 
             @SuppressWarnings("RedundantTypeArguments") // presumably Java bug
             final List<NumericRangeInfo> results = getFlatFields(bucketingRequest, parametricRequest.getFieldNames()).stream()
-                    .map(this.<Double, Double, NumericRangeInfo.Value, NumericRangeInfo, NumericRangeInfo.NumericRangeInfoBuilder>flatFieldToRangeInfo(boundariesPerField, this::parseNumericRange, NumericRangeInfo::builder, NumericRangeInfo.Value::new))
-                    .collect(Collectors.toList());
+                .map(this.<Double, Double, NumericRangeInfo.Value, NumericRangeInfo, NumericRangeInfo.NumericRangeInfoBuilder>flatFieldToRangeInfo(boundariesPerField, this::parseNumericRange, NumericRangeInfo::builder, NumericRangeInfo.Value::new))
+                .collect(Collectors.toList());
             return results;
         }
     }
@@ -162,29 +162,29 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     @Override
     @Cacheable(CacheNames.DATE_PARAMETRIC_VALUES_IN_BUCKETS)
     public List<DateRangeInfo> getDateParametricValuesInBuckets(final IdolParametricRequest parametricRequest, final Map<FieldPath, BucketingParams<ZonedDateTime>> bucketingParamsPerField) throws AciErrorException {
-        if (parametricRequest.getFieldNames().isEmpty()) {
+        if(parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyList();
         } else {
             bucketingParamsHelper.validateBucketingParams(parametricRequest, bucketingParamsPerField);
 
             final Map<FieldPath, List<ZonedDateTime>> boundariesPerField = bucketingParamsPerField.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> bucketingParamsHelper.calculateDateBoundaries(entry.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> bucketingParamsHelper.calculateDateBoundaries(entry.getValue())));
 
             final List<Range> ranges = boundariesPerField.entrySet().stream()
-                    .map(entry -> new DateRange(entry.getKey().getNormalisedPath(), entry.getValue()))
-                    .collect(Collectors.toList());
+                .map(entry -> new DateRange(entry.getKey().getNormalisedPath(), entry.getValue()))
+                .collect(Collectors.toList());
 
             final IdolParametricRequest bucketingRequest = parametricRequest.toBuilder()
-                    .maxValues(null)
-                    .start(1)
-                    .ranges(ranges)
-                    .sort(SortParam.ReverseDate)
-                    .build();
+                .maxValues(null)
+                .start(1)
+                .ranges(ranges)
+                .sort(SortParam.ReverseDate)
+                .build();
 
             @SuppressWarnings("RedundantTypeArguments") // presumably Java bug
             final List<DateRangeInfo> results = getFlatFields(bucketingRequest, parametricRequest.getFieldNames()).stream()
-                    .map(this.<ZonedDateTime, Duration, DateRangeInfo.Value, DateRangeInfo, DateRangeInfo.DateRangeInfoBuilder>flatFieldToRangeInfo(boundariesPerField, this::parseDateRange, DateRangeInfo::builder, DateRangeInfo.Value::new))
-                    .collect(Collectors.toList());
+                .map(this.<ZonedDateTime, Duration, DateRangeInfo.Value, DateRangeInfo, DateRangeInfo.DateRangeInfoBuilder>flatFieldToRangeInfo(boundariesPerField, this::parseDateRange, DateRangeInfo::builder, DateRangeInfo.Value::new))
+                .collect(Collectors.toList());
             return results;
         }
     }
@@ -193,12 +193,12 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     public List<DependentParametricField> getDependentParametricValues(final IdolParametricRequest parametricRequest) throws AciErrorException {
         final Collection<FieldPath> fieldNames = new ArrayList<>();
         fieldNames.addAll(parametricRequest.getFieldNames());
-        if (fieldNames.isEmpty()) {
+        if(fieldNames.isEmpty()) {
             fieldNames.addAll(lookupFields());
         }
 
         final List<DependentParametricField> results;
-        if (fieldNames.isEmpty()) {
+        if(fieldNames.isEmpty()) {
             results = Collections.emptyList();
         } else {
             final AciParameters aciParameters = createAciParameters(parametricRequest, fieldNames);
@@ -208,8 +208,8 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
             final GetQueryTagValuesResponseData responseData = executeAction(parametricRequest, aciParameters);
 
             results = !responseData.getField().isEmpty() && responseData.getValues() != null
-                    ? addDisplayNamesToRecursiveFields(responseData.getValues().getField(), responseData.getField().get(0).getName())
-                    : Collections.emptyList();
+                ? addDisplayNamesToRecursiveFields(responseData.getValues().getField(), responseData.getField().get(0).getName())
+                : Collections.emptyList();
         }
 
         return results;
@@ -228,7 +228,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     private <T extends Comparable<? super T>, V extends ValueDetails<T>, B extends ValueDetailsBuilder<T, V, B>> Map<FieldPath, V> getValueDetails(final IdolParametricRequest parametricRequest,
                                                                                                                                                    final Supplier<B> valueDetailsBuilderSupplier,
                                                                                                                                                    final Function<JAXBElement<?>, T> parseElement) {
-        if (parametricRequest.getFieldNames().isEmpty()) {
+        if(parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyMap();
         } else {
             final AciParameters aciParameters = createAciParameters(parametricRequest, parametricRequest.getFieldNames());
@@ -241,25 +241,25 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
             final Map<FieldPath, V> output = new LinkedHashMap<>();
 
-            for (final FlatField field : fields) {
+            for(final FlatField field : fields) {
                 final List<JAXBElement<? extends Serializable>> valueElements = field.getValueAndSubvalueOrValues();
 
                 final B builder = valueDetailsBuilderSupplier.get();
 
                 Integer values = null;
-                for (final JAXBElement<?> element : valueElements) {
+                for(final JAXBElement<?> element : valueElements) {
                     final String elementLocalName = element.getName().getLocalPart();
 
-                    if (VALUE_MIN_NODE_NAME.equals(elementLocalName)) {
+                    if(VALUE_MIN_NODE_NAME.equals(elementLocalName)) {
                         builder.min(parseElement.apply(element));
-                    } else if (VALUE_MAX_NODE_NAME.equals(elementLocalName)) {
+                    } else if(VALUE_MAX_NODE_NAME.equals(elementLocalName)) {
                         builder.max(parseElement.apply(element));
-                    } else if (VALUE_AVERAGE_NODE_NAME.equals(elementLocalName)) {
+                    } else if(VALUE_AVERAGE_NODE_NAME.equals(elementLocalName)) {
                         builder.average(parseElement.apply(element));
-                    } else if (VALUE_SUM_NODE_NAME.equals(elementLocalName)) {
-                        builder.sum((Double) element.getValue());
-                    } else if (VALUES_NODE_NAME.equals(elementLocalName)) {
-                        values = (Integer) element.getValue();
+                    } else if(VALUE_SUM_NODE_NAME.equals(elementLocalName)) {
+                        builder.sum((Double)element.getValue());
+                    } else if(VALUES_NODE_NAME.equals(elementLocalName)) {
+                        values = (Integer)element.getValue();
                     }
                 }
                 builder.totalValues(flatFieldTotalValues(field, values));
@@ -275,7 +275,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     private AciParameters createAciParameters(final IdolParametricRequest parametricRequest, final Collection<FieldPath> fieldNames) {
         final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
         parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
-        if (parametricRequest.isModified()) {
+        if(parametricRequest.isModified()) {
             parameterHandler.addQmsParameters(aciParameters, parametricRequest.getQueryRestrictions());
         }
         parameterHandler.addSecurityInfo(aciParameters);
@@ -289,9 +289,9 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
     private Collection<FieldPath> lookupFields() {
         return fieldsService.getFields(fieldsRequestBuilderFactory.getObject().fieldType(FieldTypeParam.Parametric).build()).get(FieldTypeParam.Parametric)
-                .stream()
-                .map(TagName::getId)
-                .collect(Collectors.toList());
+            .stream()
+            .map(TagName::getId)
+            .collect(Collectors.toList());
     }
 
     private <T extends Comparable<? super T> & Serializable, D extends Comparable<D> & Serializable, V extends RangeInfoValue<T, D>, R extends RangeInfo<T, D, V, R, B>, B extends RangeInfoBuilder<T, D, V, R, B>>
@@ -307,36 +307,36 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
             final List<V> values = new LinkedList<>();
 
-            for (final JAXBElement<?> element : valueElements) {
+            for(final JAXBElement<?> element : valueElements) {
                 final String elementLocalName = element.getName().getLocalPart();
 
-                if (VALUE_NODE_NAME.equals(elementLocalName)) {
-                    final TagValue tagValue = (TagValue) element.getValue();
+                if(VALUE_NODE_NAME.equals(elementLocalName)) {
+                    final TagValue tagValue = (TagValue)element.getValue();
                     final T[] minAndMax = parseValue.apply(tagValue);
                     values.add(valueConstructor.apply(minAndMax[0], minAndMax[1], tagValue.getCount()));
-                } else if (VALUES_NODE_NAME.equals(elementLocalName)) {
-                    count = (Integer) element.getValue();
+                } else if(VALUES_NODE_NAME.equals(elementLocalName)) {
+                    count = (Integer)element.getValue();
                 }
             }
 
             final List<T> boundaries = boundariesPerField.get(tagName.getId());
 
             // If no documents match the query parameters, GetQueryTagValues does not return any buckets
-            if (values.isEmpty()) {
+            if(values.isEmpty()) {
                 values.addAll(bucketingParamsHelper.emptyBuckets(boundaries, valueConstructor));
             }
 
             // All buckets have the same size, so just use the value from the first one
             final D bucketSize = values.get(0).getBucketSize();
             return builderConstructor.get()
-                    .id(tagName.getId().getNormalisedPath())
-                    .displayName(tagName.getDisplayName())
-                    .count(count)
-                    .min(boundaries.get(0))
-                    .max(boundaries.get(boundaries.size() - 1))
-                    .bucketSize(bucketSize)
-                    .values(values)
-                    .build();
+                .id(tagName.getId().getNormalisedPath())
+                .displayName(tagName.getDisplayName())
+                .count(count)
+                .min(boundaries.get(0))
+                .max(boundaries.get(boundaries.size() - 1))
+                .bucketSize(bucketSize)
+                .values(values)
+                .build();
         };
     }
 
@@ -356,29 +356,29 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     private QueryTagInfo flatFieldToTagInfo(final FlatField flatField) {
         final String name = flatField.getName().get(0);
         final Set<QueryTagCountInfo> values = flatField.getValueAndSubvalueOrValues().stream()
-                .filter(element -> VALUE_NODE_NAME.equals(element.getName().getLocalPart()))
-                .map(element -> {
-                    final TagValue tagValue = (TagValue) element.getValue();
-                    final String value = tagValue.getValue();
-                    final String displayValue = tagNameFactory.getTagDisplayValue(name, value);
-                    return new QueryTagCountInfo(value, displayValue, tagValue.getCount());
-                })
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+            .filter(element -> VALUE_NODE_NAME.equals(element.getName().getLocalPart()))
+            .map(element -> {
+                final TagValue tagValue = (TagValue)element.getValue();
+                final String value = tagValue.getValue();
+                final String displayValue = tagNameFactory.getTagDisplayValue(name, value);
+                return new QueryTagCountInfo(value, displayValue, tagValue.getCount());
+            })
+            .collect(Collectors.toCollection(LinkedHashSet::new));
 
         final TagName tagName = tagNameFactory.buildTagName(name);
         return QueryTagInfo.builder()
-                .id(tagName.getId().getNormalisedPath())
-                .displayName(tagName.getDisplayName())
-                .values(values)
-                .totalValues(flatFieldTotalValues(flatField, null))
-                .build();
+            .id(tagName.getId().getNormalisedPath())
+            .displayName(tagName.getDisplayName())
+            .values(values)
+            .totalValues(flatFieldTotalValues(flatField, null))
+            .build();
     }
 
     private int flatFieldTotalValues(final FlatField flatField, final Integer values) {
         // If no values are returned for a field, IDOL does not return a <total_values> element
         // For (non-parametric) numeric fields we should use values as total_values won't be populated
         return Optional.ofNullable(flatField.getTotalValues())
-                .orElse(Optional.ofNullable(values)
+            .orElse(Optional.ofNullable(values)
                         .orElse(0));
     }
 
@@ -399,29 +399,29 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
     private GetQueryTagValuesResponseData executeAction(final ParametricRequest<IdolQueryRestrictions> idolParametricRequest, final AciParameters aciParameters) {
         return queryExecutor.executeGetQueryTagValues(
-                aciParameters,
-                idolParametricRequest.isModified() ? QueryRequest.QueryType.MODIFIED : QueryRequest.QueryType.RAW
+            aciParameters,
+            idolParametricRequest.isModified() ? QueryRequest.QueryType.MODIFIED : QueryRequest.QueryType.RAW
         );
     }
 
     private List<DependentParametricField> addDisplayNamesToRecursiveFields(final Collection<RecursiveField> recursiveFields, final List<String> fieldNames) {
         return fieldNames.isEmpty()
-                ? Collections.emptyList()
-                : recursiveFields.stream()
-                .map(recursiveField -> DependentParametricField.builder()
-                        .value(recursiveField.getValue())
-                        .displayValue(tagNameFactory.getTagDisplayValue(fieldNames.get(0), recursiveField.getValue()))
-                        .count(recursiveField.getCount())
-                        .subFields(addDisplayNamesToRecursiveFields(recursiveField.getField(), fieldNames.subList(1, fieldNames.size())))
-                        .build())
-                .collect(Collectors.toList());
+            ? Collections.emptyList()
+            : recursiveFields.stream()
+            .map(recursiveField -> DependentParametricField.builder()
+                .value(recursiveField.getValue())
+                .displayValue(tagNameFactory.getTagDisplayValue(fieldNames.get(0), recursiveField.getValue()))
+                .count(recursiveField.getCount())
+                .subFields(addDisplayNamesToRecursiveFields(recursiveField.getField(), fieldNames.subList(1, fieldNames.size())))
+                .build())
+            .collect(Collectors.toList());
     }
 
     private double numberFromValueDetailsElement(final JAXBElement<?> element) {
-        return ((DateOrNumber) element.getValue()).getValue();
+        return ((DateOrNumber)element.getValue()).getValue();
     }
 
     private ZonedDateTime zonedDateTimeFromValueDetailsElement(final JAXBElement<?> element) {
-        return ZonedDateTime.parse(((DateOrNumber) element.getValue()).getDate(), DATE_FORMAT);
+        return ZonedDateTime.parse(((DateOrNumber)element.getValue()).getDate(), DATE_FORMAT);
     }
 }

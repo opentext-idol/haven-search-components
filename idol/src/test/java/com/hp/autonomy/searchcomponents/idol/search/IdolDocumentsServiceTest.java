@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -155,7 +155,7 @@ public class IdolDocumentsServiceTest {
 
         final StateTokenAndResultCount stateTokenAndResultCount = idolDocumentsService.getStateTokenAndResultCount(mockQueryParams(QueryRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
         assertThat(stateTokenAndResultCount.getTypedStateToken().getStateToken(), is(MOCK_STATE_TOKEN));
-        assertThat(stateTokenAndResultCount.getResultCount(), is((long) MOCK_TOTAL_HITS));
+        assertThat(stateTokenAndResultCount.getResultCount(), is((long)MOCK_TOTAL_HITS));
     }
 
     private IdolQueryRequest mockQueryParams(final QueryRequest.QueryType queryType) {

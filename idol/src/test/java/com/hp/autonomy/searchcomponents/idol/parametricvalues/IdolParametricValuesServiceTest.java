@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -118,12 +118,12 @@ public class IdolParametricValuesServiceTest {
         when(fieldsRequestBuilder.fieldType(any())).thenReturn(fieldsRequestBuilder);
 
         parametricValuesService = new IdolParametricValuesServiceImpl(
-                parameterHandler,
-                fieldsService,
-                fieldsRequestBuilderFactory,
-                bucketingParamsHelper,
-                tagNameFactory,
-                queryExecutor
+            parameterHandler,
+            fieldsService,
+            fieldsRequestBuilderFactory,
+            bucketingParamsHelper,
+            tagNameFactory,
+            queryExecutor
         );
     }
 
@@ -182,26 +182,26 @@ public class IdolParametricValuesServiceTest {
         final IdolParametricRequest parametricRequest = mockRequest(Arrays.asList(elevation, age, notThere));
 
         final NumericValueDetails elevationValueDetails = NumericValueDetails.builder()
-                .min(-50D)
-                .max(1242D)
-                .average(500.5)
-                .sum(12314D)
-                .totalValues(3)
-                .build();
+            .min(-50D)
+            .max(1242D)
+            .average(500.5)
+            .sum(12314D)
+            .totalValues(3)
+            .build();
         final NumericValueDetails ageValueDetails = NumericValueDetails.builder()
-                .min(0D)
-                .max(96D)
-                .average(26D)
-                .sum(1314D)
-                .totalValues(100)
-                .build();
+            .min(0D)
+            .max(96D)
+            .average(26D)
+            .sum(1314D)
+            .totalValues(100)
+            .build();
         final NumericValueDetails notThereValueDetails = NumericValueDetails.builder()
-                .min(0D)
-                .max(0D)
-                .average(0D)
-                .sum(0D)
-                .totalValues(0)
-                .build();
+            .min(0D)
+            .max(0D)
+            .average(0D)
+            .sum(0D)
+            .totalValues(0)
+            .build();
 
         final List<FlatField> responseFields = new LinkedList<>();
         responseFields.add(mockFlatField(elevation, elevationValueDetails, this::mockDateOrNumberJAXBElement));
@@ -228,12 +228,12 @@ public class IdolParametricValuesServiceTest {
         final List<FlatField> responseFields = new LinkedList<>();
         final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS);
         final DateValueDetails dateValueDetails = DateValueDetails.builder()
-                .min(now)
-                .max(now)
-                .average(now)
-                .sum(1234567D)
-                .totalValues(1)
-                .build();
+            .min(now)
+            .max(now)
+            .average(now)
+            .sum(1234567D)
+            .totalValues(1)
+            .build();
         responseFields.add(mockFlatField(date, dateValueDetails, this::mockDateOrNumberJAXBElement));
 
         final GetQueryTagValuesResponseData response = mock(GetQueryTagValuesResponseData.class);
@@ -249,11 +249,11 @@ public class IdolParametricValuesServiceTest {
     @Test
     public void getNumericParametricValues() {
         mockBucketResponses(7,
-                mockTagValue("1,2", 0),
-                mockTagValue("2,3", 5),
-                mockTagValue("3,4", 2),
-                mockTagValue("4,5", 0),
-                mockTagValue("5,6", 0)
+                            mockTagValue("1,2", 0),
+                            mockTagValue("2,3", 5),
+                            mockTagValue("3,4", 2),
+                            mockTagValue("4,5", 0),
+                            mockTagValue("5,6", 0)
         );
 
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
@@ -314,9 +314,9 @@ public class IdolParametricValuesServiceTest {
         final ZonedDateTime max = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS);
         final ZonedDateTime min = max.minusMinutes(3);
         mockBucketResponses(7,
-                mockTagValue(min, min.plusMinutes(1), 0),
-                mockTagValue(min.plusMinutes(1), max.minusMinutes(1), 5),
-                mockTagValue(max.minusMinutes(1), max, 2)
+                            mockTagValue(min, min.plusMinutes(1), 0),
+                            mockTagValue(min.plusMinutes(1), max.minusMinutes(1), 5),
+                            mockTagValue(max.minusMinutes(1), max, 2)
         );
 
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
@@ -467,7 +467,7 @@ public class IdolParametricValuesServiceTest {
 
         when(jaxbElement.getName()).thenReturn(new QName("", name));
         final DateOrNumber dateOrNumber = new DateOrNumber();
-        if (date != null) {
+        if(date != null) {
             dateOrNumber.setDate(IdolParametricValuesService.DATE_FORMAT.format(date));
         }
         dateOrNumber.setValue(number);
@@ -485,13 +485,13 @@ public class IdolParametricValuesServiceTest {
 
     private void mockBucketResponses(final int count, final TagValue... tagValues) {
         when(element.getName()).thenReturn(
-                new QName("", IdolParametricValuesServiceImpl.VALUES_NODE_NAME),
-                new QName("", IdolParametricValuesServiceImpl.VALUE_NODE_NAME)
+            new QName("", IdolParametricValuesServiceImpl.VALUES_NODE_NAME),
+            new QName("", IdolParametricValuesServiceImpl.VALUE_NODE_NAME)
         );
 
         OngoingStubbing<Serializable> stub = when(element.getValue()).thenReturn(count);
 
-        for (final TagValue tagValue : tagValues) {
+        for(final TagValue tagValue : tagValues) {
             stub = stub.thenReturn(tagValue);
         }
 
@@ -499,7 +499,7 @@ public class IdolParametricValuesServiceTest {
         final FlatField field2 = new FlatField();
         field2.getName().add("ParametricNumericDateField");
         field2.getValueAndSubvalueOrValues().add(element);
-        for (final TagValue ignored : tagValues) {
+        for(final TagValue ignored : tagValues) {
             field2.getValueAndSubvalueOrValues().add(element);
         }
         responseData.getField().add(field2);
@@ -519,10 +519,10 @@ public class IdolParametricValuesServiceTest {
         final TagValue tagValue = new TagValue();
         tagValue.setValue(value);
         tagValue.setCount(count);
-        if (min != null) {
+        if(min != null) {
             tagValue.setDate(IdolParametricValuesService.DATE_FORMAT.format(min));
         }
-        if (max != null) {
+        if(max != null) {
             tagValue.setEndDate(IdolParametricValuesService.DATE_FORMAT.format(max));
         }
         return tagValue;

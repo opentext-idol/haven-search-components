@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -51,8 +51,8 @@ public class HodSearchResult implements SearchResult {
         weight = builder.weight;
         fieldMap = new HashMap<>();
 
-        if (builder.fieldMap$key != null && builder.fieldMap$value != null) {
-            for (int i = 0; i < builder.fieldMap$key.size() & i < builder.fieldMap$value.size(); i++) {
+        if(builder.fieldMap$key != null && builder.fieldMap$value != null) {
+            for(int i = 0; i < builder.fieldMap$key.size() & i < builder.fieldMap$value.size(); i++) {
                 fieldMap.put(builder.fieldMap$key.get(i), builder.fieldMap$value.get(i));
             }
         }

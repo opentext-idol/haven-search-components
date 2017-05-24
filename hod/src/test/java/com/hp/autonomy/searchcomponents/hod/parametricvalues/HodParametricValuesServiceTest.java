@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -62,7 +62,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -119,14 +121,14 @@ public class HodParametricValuesServiceTest {
     @Before
     public void setUp() throws HodErrorException {
         parametricValuesService = new HodParametricValuesServiceImpl(
-                fieldsService,
-                fieldsRequestBuilderFactory,
-                getParametricValuesService(),
-                getParametricRangesService,
-                bucketingParamsHelper,
-                tagNameFactory,
-                configService,
-                authenticationInformationRetriever
+            fieldsService,
+            fieldsRequestBuilderFactory,
+            getParametricValuesService(),
+            getParametricRangesService,
+            bucketingParamsHelper,
+            tagNameFactory,
+            configService,
+            authenticationInformationRetriever
         );
     }
 
@@ -144,17 +146,17 @@ public class HodParametricValuesServiceTest {
         final List<ResourceName> indexes = Arrays.asList(ResourceName.WIKI_ENG, ResourceName.PATENTS);
 
         final List<String> fieldNames = ImmutableList.<String>builder()
-                .add("grassy field")
-                .add("wasteland")
-                .add("football field")
-                .build();
+            .add("grassy field")
+            .add("wasteland")
+            .add("football field")
+            .build();
 
         final HodParametricRequest request = generateRequest(indexes, fieldNames);
         final Set<QueryTagInfo> fieldNamesSet = parametricValuesService.getParametricValues(request);
 
         final Map<String, QueryTagInfo> fieldNamesMap = new HashMap<>();
 
-        for (final QueryTagInfo parametricFieldName : fieldNamesSet) {
+        for(final QueryTagInfo parametricFieldName : fieldNamesSet) {
             fieldNamesMap.put(parametricFieldName.getDisplayName(), parametricFieldName);
         }
 
@@ -174,10 +176,10 @@ public class HodParametricValuesServiceTest {
         final List<ResourceName> indexes = Arrays.asList(ResourceName.WIKI_ENG, ResourceName.PATENTS);
 
         final List<String> fieldNames = ImmutableList.<String>builder()
-                .add("grassy field")
-                .add("wasteland")
-                .add("football field")
-                .build();
+            .add("grassy field")
+            .add("wasteland")
+            .add("football field")
+            .build();
 
         final HodParametricRequest request = generateRequest(indexes, fieldNames);
         when(request.getValueRestrictions()).thenReturn(Collections.singletonList("*LUG*"));
@@ -195,10 +197,10 @@ public class HodParametricValuesServiceTest {
         final List<ResourceName> indexes = Arrays.asList(ResourceName.WIKI_ENG, ResourceName.PATENTS);
 
         final List<String> fieldNames = ImmutableList.<String>builder()
-                .add("grassy field")
-                .add("wasteland")
-                .add("football field")
-                .build();
+            .add("grassy field")
+            .add("wasteland")
+            .add("football field")
+            .build();
 
         final HodParametricRequest request = generateRequest(indexes, fieldNames);
         when(request.getValueRestrictions()).thenReturn(Collections.singletonList("*s*"));
@@ -244,49 +246,49 @@ public class HodParametricValuesServiceTest {
         final List<FieldRanges> response = mockValueDetailsResponse(field, FieldRanges.ValueDetails.builder().minimum(0.8).maximum(21D).mean(6D).sum(54D).count(6).build());
 
         when(getParametricRangesService.getParametricRanges(
-                anyCollectionOf(String.class),
-                anyCollectionOf(ResourceName.class),
-                any(String.class),
-                any(GetParametricRangesRequestBuilder.class)
+            anyCollectionOf(String.class),
+            anyCollectionOf(ResourceName.class),
+            any(String.class),
+            any(GetParametricRangesRequestBuilder.class)
         )).thenReturn(response);
 
         final Map<FieldPath, NumericValueDetails> valueDetails = parametricValuesService.getNumericValueDetails(parametricRequest);
         assertThat(valueDetails.size(), is(1));
         assertThat(valueDetails, hasEntry(tagNameFactory.getFieldPath(field), NumericValueDetails.builder()
-                .min(0.8)
-                .max(21D)
-                .average(6D)
-                .sum(54D)
-                .totalValues(6)
-                .build()));
+            .min(0.8)
+            .max(21D)
+            .average(6D)
+            .sum(54D)
+            .totalValues(6)
+            .build()));
     }
 
     @Test
     public void getNumericParametricValuesInBuckets() throws HodErrorException {
         final List<FieldRanges> response = mockRangesResponse("ParametricNumericDateField", 4, Arrays.asList(
-                FieldRanges.ValueRange.builder().count(2).lowerBound(3D).upperBound(4D).build(),
-                FieldRanges.ValueRange.builder().count(0).lowerBound(4D).upperBound(5D).build(),
-                FieldRanges.ValueRange.builder().count(0).lowerBound(5D).upperBound(6D).build(),
-                FieldRanges.ValueRange.builder().count(1).lowerBound(6D).upperBound(7D).build(),
-                FieldRanges.ValueRange.builder().count(0).lowerBound(7D).upperBound(8D).build(),
-                FieldRanges.ValueRange.builder().count(0).lowerBound(8D).upperBound(9D).build(),
-                FieldRanges.ValueRange.builder().count(0).lowerBound(9D).upperBound(10D).build(),
-                FieldRanges.ValueRange.builder().count(0).lowerBound(10D).upperBound(11D).build(),
-                FieldRanges.ValueRange.builder().count(1).lowerBound(11D).upperBound(12D).build()
+            FieldRanges.ValueRange.builder().count(2).lowerBound(3D).upperBound(4D).build(),
+            FieldRanges.ValueRange.builder().count(0).lowerBound(4D).upperBound(5D).build(),
+            FieldRanges.ValueRange.builder().count(0).lowerBound(5D).upperBound(6D).build(),
+            FieldRanges.ValueRange.builder().count(1).lowerBound(6D).upperBound(7D).build(),
+            FieldRanges.ValueRange.builder().count(0).lowerBound(7D).upperBound(8D).build(),
+            FieldRanges.ValueRange.builder().count(0).lowerBound(8D).upperBound(9D).build(),
+            FieldRanges.ValueRange.builder().count(0).lowerBound(9D).upperBound(10D).build(),
+            FieldRanges.ValueRange.builder().count(0).lowerBound(10D).upperBound(11D).build(),
+            FieldRanges.ValueRange.builder().count(1).lowerBound(11D).upperBound(12D).build()
         ));
 
         when(getParametricRangesService.getParametricRanges(
-                anyCollectionOf(String.class),
-                anyCollectionOf(ResourceName.class),
-                any(String.class),
-                any(GetParametricRangesRequestBuilder.class))
+            anyCollectionOf(String.class),
+            anyCollectionOf(ResourceName.class),
+            any(String.class),
+            any(GetParametricRangesRequestBuilder.class))
         ).thenReturn(response);
 
         final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
 
         final List<NumericRangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(
-                hodParametricRequest,
-                ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(9, 3.0, 12.0))
+            hodParametricRequest,
+            ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(9, 3.0, 12.0))
         );
 
         assertThat(results, hasSize(1));
@@ -325,14 +327,14 @@ public class HodParametricValuesServiceTest {
         final HodParametricRequest hodParametricRequest = generateRequest(Collections.singletonList(ResourceName.WIKI_ENG), Collections.singletonList("ParametricNumericDateField"));
 
         when(getParametricValuesService.getParametricValues(
-                anyCollectionOf(String.class),
-                anyCollectionOf(ResourceName.class),
-                any(GetParametricValuesRequestBuilder.class)
+            anyCollectionOf(String.class),
+            anyCollectionOf(ResourceName.class),
+            any(GetParametricValuesRequestBuilder.class)
         )).thenReturn(Collections.emptyList());
 
         final List<NumericRangeInfo> results = parametricValuesService.getNumericParametricValuesInBuckets(
-                hodParametricRequest,
-                ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(3, 1.5, 5.5))
+            hodParametricRequest,
+            ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(3, 1.5, 5.5))
         );
 
         MatcherAssert.assertThat(results, empty());
@@ -358,61 +360,61 @@ public class HodParametricValuesServiceTest {
     @SuppressWarnings("SameParameterValue")
     private List<FieldRanges> mockRangesResponse(final String field, final Integer count, final List<FieldRanges.ValueRange> valueRanges) {
         final FieldRanges.ValueDetails valueDetails = FieldRanges.ValueDetails.builder()
-                .count(count)
-                .build();
+            .count(count)
+            .build();
 
         final FieldRanges fieldRanges = FieldRanges.builder()
-                .name(field)
-                .valueDetails(valueDetails)
-                .valueRanges(valueRanges)
-                .build();
+            .name(field)
+            .valueDetails(valueDetails)
+            .valueRanges(valueRanges)
+            .build();
 
         return Collections.singletonList(fieldRanges);
     }
 
     private List<FieldRanges> mockValueDetailsResponse(final String field, final FieldRanges.ValueDetails valueDetails) {
         final FieldRanges.ValueRange range = FieldRanges.ValueRange.builder()
-                .count(valueDetails.getCount())
-                .lowerBound(valueDetails.getMinimum())
-                .upperBound(valueDetails.getMaximum())
-                .build();
+            .count(valueDetails.getCount())
+            .lowerBound(valueDetails.getMinimum())
+            .upperBound(valueDetails.getMaximum())
+            .build();
 
         final FieldRanges fieldRanges = FieldRanges.builder()
-                .name(field)
-                .valueDetails(valueDetails)
-                .valueRanges(Collections.singletonList(range))
-                .build();
+            .name(field)
+            .valueDetails(valueDetails)
+            .valueRanges(Collections.singletonList(range))
+            .build();
 
         return Collections.singletonList(fieldRanges);
     }
 
     private GetParametricValuesService getParametricValuesService() throws HodErrorException {
         final List<FieldValues.ValueAndCount> fieldsOfFootball = Arrays.asList(
-                FieldValues.ValueAndCount.builder().value("worms").count(100).build(),
-                FieldValues.ValueAndCount.builder().value("slugs").count(50).build()
+            FieldValues.ValueAndCount.builder().value("worms").count(100).build(),
+            FieldValues.ValueAndCount.builder().value("slugs").count(50).build()
         );
 
         final List<FieldValues.ValueAndCount> fieldsOfGrass = Arrays.asList(
-                FieldValues.ValueAndCount.builder().value("birds").count(65).build(),
-                FieldValues.ValueAndCount.builder().value("snakes").count(33).build()
+            FieldValues.ValueAndCount.builder().value("birds").count(65).build(),
+            FieldValues.ValueAndCount.builder().value("snakes").count(33).build()
         );
 
         final List<FieldValues.ValueAndCount> fieldsOfWaste = Arrays.asList(
-                FieldValues.ValueAndCount.builder().value("humans").count(153).build(),
-                FieldValues.ValueAndCount.builder().value("mutants").count(45).build()
+            FieldValues.ValueAndCount.builder().value("humans").count(153).build(),
+            FieldValues.ValueAndCount.builder().value("mutants").count(45).build()
         );
 
         final List<FieldValues> response = Arrays.asList(
-                FieldValues.builder().name("football field").values(fieldsOfFootball).totalValues(200).build(),
-                FieldValues.builder().name("grassy field").values(fieldsOfGrass).totalValues(98).build(),
-                FieldValues.builder().name("wasteland").values(fieldsOfWaste).totalValues(198).build(),
-                FieldValues.builder().name("empty field").build()
+            FieldValues.builder().name("football field").values(fieldsOfFootball).totalValues(200).build(),
+            FieldValues.builder().name("grassy field").values(fieldsOfGrass).totalValues(98).build(),
+            FieldValues.builder().name("wasteland").values(fieldsOfWaste).totalValues(198).build(),
+            FieldValues.builder().name("empty field").build()
         );
 
         when(getParametricValuesService.getParametricValues(
-                anyCollectionOf(String.class),
-                anyCollectionOf(ResourceName.class),
-                any(GetParametricValuesRequestBuilder.class)
+            anyCollectionOf(String.class),
+            anyCollectionOf(ResourceName.class),
+            any(GetParametricValuesRequestBuilder.class)
         )).thenReturn(response);
 
         return getParametricValuesService;

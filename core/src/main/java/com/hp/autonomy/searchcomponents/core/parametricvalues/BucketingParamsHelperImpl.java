@@ -1,3 +1,8 @@
+/*
+ * Copyright 2016-2017 Hewlett Packard Enterprise Development Company, L.P.
+ * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
+ */
+
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
@@ -20,20 +25,22 @@ import static com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingPa
 @Component(BUCKETING_PARAMS_HELPER_BEAN_NAME)
 class BucketingParamsHelperImpl implements BucketingParamsHelper {
     @Override
-    public <T extends Comparable<? super T> & Serializable> void validateBucketingParams(final ParametricRequest<?> parametricRequest,
-                                                                                         final Map<FieldPath, BucketingParams<T>> bucketingParamsPerField) {
-        for (final FieldPath fieldPath : parametricRequest.getFieldNames()) {
+    public <T extends Comparable<? super T> & Serializable> void validateBucketingParams(
+        final ParametricRequest<?> parametricRequest,
+        final Map<FieldPath, BucketingParams<T>> bucketingParamsPerField
+    ) {
+        for(final FieldPath fieldPath : parametricRequest.getFieldNames()) {
             final BucketingParams<T> bucketingParams = bucketingParamsPerField.get(fieldPath);
 
-            if (bucketingParams == null) {
+            if(bucketingParams == null) {
                 throw new IllegalArgumentException("Missing bucketing params for " + fieldPath);
             }
 
-            if (bucketingParams.getTargetNumberOfBuckets() <= 0) {
+            if(bucketingParams.getTargetNumberOfBuckets() <= 0) {
                 throw new IllegalArgumentException("Invalid target number of buckets for " + fieldPath);
             }
 
-            if (bucketingParams.getMin().compareTo(bucketingParams.getMax()) > 0) {
+            if(bucketingParams.getMin().compareTo(bucketingParams.getMax()) > 0) {
                 throw new IllegalArgumentException("Invalid range for " + fieldPath);
             }
         }
@@ -44,7 +51,7 @@ class BucketingParamsHelperImpl implements BucketingParamsHelper {
         final List<Double> boundaries = new LinkedList<>();
         final double bucketSize = (bucketingParams.getMax() - bucketingParams.getMin()) / bucketingParams.getTargetNumberOfBuckets();
         // Generate boundaries, including both the bucket min and max (hence <=)
-        for (int i = 0; i <= bucketingParams.getTargetNumberOfBuckets(); i++) {
+        for(int i = 0; i <= bucketingParams.getTargetNumberOfBuckets(); i++) {
             final double boundary = bucketingParams.getMin() + bucketSize * i;
             boundaries.add(boundary);
         }
@@ -58,13 +65,13 @@ class BucketingParamsHelperImpl implements BucketingParamsHelper {
         final ZonedDateTime max = bucketingParams.getMax().plusSeconds(1).minusNanos(1).truncatedTo(ChronoUnit.SECONDS);
 
         int targetNumberOfBuckets = bucketingParams.getTargetNumberOfBuckets();
-        double bucketSize = (double) (max.toEpochSecond() - min.toEpochSecond()) / targetNumberOfBuckets;
-        if ((long) bucketSize == 0) {
+        double bucketSize = (double)(max.toEpochSecond() - min.toEpochSecond()) / targetNumberOfBuckets;
+        if((long)bucketSize == 0) {
             bucketSize = 1;
-            targetNumberOfBuckets = (int) (max.toEpochSecond() - min.toEpochSecond());
+            targetNumberOfBuckets = (int)(max.toEpochSecond() - min.toEpochSecond());
         }
 
-        final Duration bucketDuration = Duration.ofSeconds((long) Math.ceil(bucketSize));
+        final Duration bucketDuration = Duration.ofSeconds((long)Math.ceil(bucketSize));
         final Duration totalBucketedDuration = bucketDuration.multipliedBy(targetNumberOfBuckets);
         final Duration totalDesiredDuration = Duration.between(min, max);
         final Duration padding = totalBucketedDuration.minus(totalDesiredDuration).dividedBy(2);
@@ -76,7 +83,7 @@ class BucketingParamsHelperImpl implements BucketingParamsHelper {
         do {
             boundaries.add(boundary);
             boundary = boundary.plus(bucketDuration);
-        } while (boundaries.size() <= targetNumberOfBuckets);
+        } while(boundaries.size() <= targetNumberOfBuckets);
 
         return boundaries;
     }
@@ -86,7 +93,7 @@ class BucketingParamsHelperImpl implements BucketingParamsHelper {
     emptyBuckets(final List<T> boundaries, final RangeInfoValue.Constructor<T, D, V> constructor) {
         final List<V> values = new LinkedList<>();
 
-        for (int i = 0; i < boundaries.size() - 1; i++) {
+        for(int i = 0; i < boundaries.size() - 1; i++) {
             values.add(constructor.apply(boundaries.get(i), boundaries.get(i + 1), 0));
         }
 

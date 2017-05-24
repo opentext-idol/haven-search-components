@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -39,7 +39,10 @@ import java.util.Map;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"unused", "SpringJavaAutowiredMembersInspection"})
@@ -47,9 +50,9 @@ import static org.mockito.Mockito.when;
 @JsonTest
 @AutoConfigureJsonTesters(enabled = false)
 @SpringBootTest(
-        classes = {CoreTestContext.class, HodSearchResultDeserializer.class},
-        properties = CORE_CLASSES_PROPERTY,
-        webEnvironment = SpringBootTest.WebEnvironment.NONE)
+    classes = {CoreTestContext.class, HodSearchResultDeserializer.class},
+    properties = CORE_CLASSES_PROPERTY,
+    webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class HodSearchResultDeserializerTest {
     private static String sampleJson;
     @MockBean
@@ -71,27 +74,27 @@ public class HodSearchResultDeserializerTest {
     @Before
     public void setUp() {
         final FieldsInfo fieldsInfo = FieldsInfo.builder()
-                .populateResponseMap("modifiedDate", FieldInfo.<ZonedDateTime>builder()
-                        .id("modifiedDate")
-                        .name(fieldPathNormaliser.normaliseFieldPath("modified_date"))
-                        .name(fieldPathNormaliser.normaliseFieldPath("date_modified"))
-                        .type(FieldType.DATE)
-                        .advanced(false)
-                        .build())
-                .populateResponseMap("authors", FieldInfo.<String>builder()
-                        .id("authors")
-                        .displayName("Chief Creative")
-                        .name(fieldPathNormaliser.normaliseFieldPath("authors"))
-                        .name(fieldPathNormaliser.normaliseFieldPath("writers"))
-                        .value(new FieldValue<>("Trump", "Orange"))
-                        .advanced(false)
-                        .build())
-                .populateResponseMap("collaborators", FieldInfo.<String>builder()
-                        .id("collaborators")
-                        .name(fieldPathNormaliser.normaliseFieldPath("collaborators"))
-                        .advanced(true)
-                        .build())
-                .build();
+            .populateResponseMap("modifiedDate", FieldInfo.<ZonedDateTime>builder()
+                .id("modifiedDate")
+                .name(fieldPathNormaliser.normaliseFieldPath("modified_date"))
+                .name(fieldPathNormaliser.normaliseFieldPath("date_modified"))
+                .type(FieldType.DATE)
+                .advanced(false)
+                .build())
+            .populateResponseMap("authors", FieldInfo.<String>builder()
+                .id("authors")
+                .displayName("Chief Creative")
+                .name(fieldPathNormaliser.normaliseFieldPath("authors"))
+                .name(fieldPathNormaliser.normaliseFieldPath("writers"))
+                .value(new FieldValue<>("Trump", "Orange"))
+                .advanced(false)
+                .build())
+            .populateResponseMap("collaborators", FieldInfo.<String>builder()
+                .id("collaborators")
+                .name(fieldPathNormaliser.normaliseFieldPath("collaborators"))
+                .advanced(true)
+                .build())
+            .build();
 
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);

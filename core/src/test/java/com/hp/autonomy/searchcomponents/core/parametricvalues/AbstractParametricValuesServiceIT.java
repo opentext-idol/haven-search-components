@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -41,20 +41,27 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 
 @SuppressWarnings({"SpringJavaAutowiredMembersInspection", "SpringJavaAutowiringInspection"})
 @RunWith(SpringRunner.class)
 @JsonTest
 @AutoConfigureJsonTesters(enabled = false)
 public abstract class AbstractParametricValuesServiceIT<
-        R extends ParametricRequest<Q>,
-        F extends FieldsRequest,
-        FB extends FieldsRequestBuilder<F, ?>,
-        Q extends QueryRestrictions<S>,
-        S extends Serializable,
-        E extends Exception
-        > {
+    R extends ParametricRequest<Q>,
+    F extends FieldsRequest,
+    FB extends FieldsRequestBuilder<F, ?>,
+    Q extends QueryRestrictions<S>,
+    S extends Serializable,
+    E extends Exception
+    > {
     @Autowired
     protected ObjectFactory<ParametricRequestBuilder<R, Q, ?>> parametricRequestBuilderFactory;
     @Autowired
@@ -89,7 +96,7 @@ public abstract class AbstractParametricValuesServiceIT<
         final R numericParametricRequest = createNumericParametricRequest();
         final Map<FieldPath, NumericValueDetails> valueDetailsOutput = parametricValuesService.getNumericValueDetails(numericParametricRequest);
         final Map<FieldPath, BucketingParams<Double>> bucketingParamsPerField = valueDetailsOutput.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams<>(35, e.getValue().getMin(), e.getValue().getMax())));
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams<>(35, e.getValue().getMin(), e.getValue().getMax())));
         final List<NumericRangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(numericParametricRequest, bucketingParamsPerField);
         assertThat(ranges, not(empty()));
     }
@@ -98,8 +105,8 @@ public abstract class AbstractParametricValuesServiceIT<
     public void numericRangesNoResults() throws E {
         final Set<FieldPath> fields = getFieldsOfType(FieldTypeParam.Numeric);
         final List<NumericRangeInfo> ranges = parametricValuesService.getNumericParametricValuesInBuckets(
-                noResultsParametricRequest(fields),
-                fields.stream().collect(Collectors.toMap(Function.identity(), x -> new BucketingParams<>(5, 0D, 1D)))
+            noResultsParametricRequest(fields),
+            fields.stream().collect(Collectors.toMap(Function.identity(), x -> new BucketingParams<>(5, 0D, 1D)))
         );
 
         assertThat(ranges, hasSize(fields.size()));
@@ -112,7 +119,7 @@ public abstract class AbstractParametricValuesServiceIT<
         final R dateParametricRequest = createDateParametricRequest();
         final Map<FieldPath, DateValueDetails> valueDetailsOutput = parametricValuesService.getDateValueDetails(dateParametricRequest);
         final Map<FieldPath, BucketingParams<ZonedDateTime>> bucketingParamsPerField = valueDetailsOutput.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams<>(35, e.getValue().getMin(), e.getValue().getMax())));
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams<>(35, e.getValue().getMin(), e.getValue().getMax())));
         final List<DateRangeInfo> ranges = parametricValuesService.getDateParametricValuesInBuckets(dateParametricRequest, bucketingParamsPerField);
         assertThat(ranges, not(empty()));
     }
@@ -125,7 +132,7 @@ public abstract class AbstractParametricValuesServiceIT<
         final R dateParametricRequest = createDateParametricRequest();
         final Map<FieldPath, DateValueDetails> valueDetailsOutput = parametricValuesService.getDateValueDetails(dateParametricRequest);
         final Map<FieldPath, BucketingParams<ZonedDateTime>> bucketingParamsPerField = valueDetailsOutput.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams<>(35, min, max)));
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> new BucketingParams<>(35, min, max)));
         final List<DateRangeInfo> ranges = parametricValuesService.getDateParametricValuesInBuckets(dateParametricRequest, bucketingParamsPerField);
         assertThat(ranges, not(empty()));
         final DateRangeInfo dateRangeInfo = ranges.get(0);
@@ -140,8 +147,8 @@ public abstract class AbstractParametricValuesServiceIT<
     public void dateRangesNoResults() throws E {
         final FieldPath fieldPath = tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD);
         final List<DateRangeInfo> ranges = parametricValuesService.getDateParametricValuesInBuckets(
-                noResultsParametricRequest(Collections.singleton(fieldPath)),
-                ImmutableMap.of(fieldPath, new BucketingParams<>(5, ZonedDateTime.now().minusMinutes(5), ZonedDateTime.now()))
+            noResultsParametricRequest(Collections.singleton(fieldPath)),
+            ImmutableMap.of(fieldPath, new BucketingParams<>(5, ZonedDateTime.now().minusMinutes(5), ZonedDateTime.now()))
         );
 
         assertThat(ranges, hasSize(1));
@@ -171,7 +178,7 @@ public abstract class AbstractParametricValuesServiceIT<
     private <T extends Comparable<T>, U extends T, V extends ValueDetails<U>> void validateValueDetails(final Map<FieldPath, V> valueDetailsMap) {
         assertThat(valueDetailsMap.size(), is(not(0)));
 
-        for (final Map.Entry<FieldPath, V> entry : valueDetailsMap.entrySet()) {
+        for(final Map.Entry<FieldPath, V> entry : valueDetailsMap.entrySet()) {
             assertThat(entry.getKey(), not(nullValue()));
 
             final V valueDetails = entry.getValue();
@@ -190,20 +197,20 @@ public abstract class AbstractParametricValuesServiceIT<
         final FieldPath fieldName = determinePaginatableField();
 
         final R page1Request = parametricRequestBuilderFactory.getObject()
-                .queryRestrictions(testUtils.buildQueryRestrictions())
-                .fieldName(fieldName)
-                .start(1)
-                .maxValues(1)
-                .build();
+            .queryRestrictions(testUtils.buildQueryRestrictions())
+            .fieldName(fieldName)
+            .start(1)
+            .maxValues(1)
+            .build();
 
         final Set<QueryTagInfo> page1 = parametricValuesService.getParametricValues(page1Request);
 
         final R page2Request = parametricRequestBuilderFactory.getObject()
-                .queryRestrictions(testUtils.buildQueryRestrictions())
-                .fieldName(fieldName)
-                .start(2)
-                .maxValues(2)
-                .build();
+            .queryRestrictions(testUtils.buildQueryRestrictions())
+            .fieldName(fieldName)
+            .start(2)
+            .maxValues(2)
+            .build();
 
         final Set<QueryTagInfo> page2 = parametricValuesService.getParametricValues(page2Request);
 
@@ -216,35 +223,35 @@ public abstract class AbstractParametricValuesServiceIT<
         final Set<FieldPath> fields = getFieldsOfType(FieldTypeParam.Numeric);
 
         return parametricRequestBuilderFactory.getObject()
-                .fieldNames(fields)
-                .queryRestrictions(testUtils.buildQueryRestrictions())
-                .sort(SortParam.ReverseDate)
-                .build();
+            .fieldNames(fields)
+            .queryRestrictions(testUtils.buildQueryRestrictions())
+            .sort(SortParam.ReverseDate)
+            .build();
     }
 
     private R createDateParametricRequest() {
         return parametricRequestBuilderFactory.getObject()
-                .fieldName(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD))
-                .queryRestrictions(testUtils.buildQueryRestrictions())
-                .sort(SortParam.ReverseDate)
-                .build();
+            .fieldName(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD))
+            .queryRestrictions(testUtils.buildQueryRestrictions())
+            .sort(SortParam.ReverseDate)
+            .build();
     }
 
     protected R createParametricRequest() throws E {
         final Set<FieldPath> fields = getFieldsOfType(FieldTypeParam.Parametric);
 
         return parametricRequestBuilderFactory.getObject()
-                .fieldNames(fields)
-                .queryRestrictions(testUtils.buildQueryRestrictions())
-                .build();
+            .fieldNames(fields)
+            .queryRestrictions(testUtils.buildQueryRestrictions())
+            .build();
     }
 
     private Set<FieldPath> getFieldsOfType(final FieldTypeParam typeParam) throws E {
         final FieldsRequestBuilder<F, ?> fieldsRequestBuilder = fieldsRequestParams(fieldsRequestBuilderFactory.getObject());
         fieldsRequestBuilder.fieldType(typeParam);
         return fieldsService.getFields(fieldsRequestBuilder.build()).get(typeParam)
-                .stream()
-                .map(TagName::getId)
-                .collect(Collectors.toSet());
+            .stream()
+            .map(TagName::getId)
+            .collect(Collectors.toSet());
     }
 }

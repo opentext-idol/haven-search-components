@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2016-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -154,8 +154,8 @@ public class BucketingParamsHelperTest {
         final List<NumericRangeInfo.Value> buckets = bucketingParamsHelper.<Double, Double, NumericRangeInfo.Value>emptyBuckets(Arrays.asList(0.0, 0.5, 1.0), NumericRangeInfo.Value::new);
 
         assertThat(buckets, is(Arrays.asList(
-                new NumericRangeInfo.Value(0.0, 0.5, 0),
-                new NumericRangeInfo.Value(0.5, 1.0, 0)
+            new NumericRangeInfo.Value(0.0, 0.5, 0),
+            new NumericRangeInfo.Value(0.5, 1.0, 0)
         )));
     }
 }

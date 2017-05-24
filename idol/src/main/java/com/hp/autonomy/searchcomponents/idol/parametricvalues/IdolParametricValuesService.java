@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -17,6 +17,6 @@ import java.util.Locale;
  * Idol extension to {@link ParametricValuesService}
  */
 public interface IdolParametricValuesService extends ParametricValuesService<IdolParametricRequest, IdolQueryRestrictions, AciErrorException> {
-    String DATE_PATTERN = "HH:mm:ss dd/MM/y[ G]";
-    DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH).withZone(ZoneOffset.UTC);
+    DateTimeFormatter DATE_FORMAT = DateTimeFormatter
+        .ofPattern("HH:mm:ss dd/MM/y[ G]", Locale.ENGLISH).withZone(ZoneOffset.UTC);
 }

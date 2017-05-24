@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -57,19 +57,19 @@ import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.DOCU
 @Service(DOCUMENTS_SERVICE_BEAN_NAME)
 class HodDocumentsServiceImpl implements HodDocumentsService {
     private static final ImmutableSet<String> PUBLIC_INDEX_NAMES = ImmutableSet.of(
-            ResourceName.WIKI_CHI.getName(),
-            ResourceName.WIKI_ENG.getName(),
-            ResourceName.WIKI_FRA.getName(),
-            ResourceName.WIKI_GER.getName(),
-            ResourceName.WIKI_ITA.getName(),
-            ResourceName.WIKI_SPA.getName(),
-            ResourceName.WORLD_FACTBOOK.getName(),
-            ResourceName.NEWS_ENG.getName(),
-            ResourceName.NEWS_FRA.getName(),
-            ResourceName.NEWS_GER.getName(),
-            ResourceName.NEWS_ITA.getName(),
-            ResourceName.ARXIV.getName(),
-            ResourceName.PATENTS.getName()
+        ResourceName.WIKI_CHI.getName(),
+        ResourceName.WIKI_ENG.getName(),
+        ResourceName.WIKI_FRA.getName(),
+        ResourceName.WIKI_GER.getName(),
+        ResourceName.WIKI_ITA.getName(),
+        ResourceName.WIKI_SPA.getName(),
+        ResourceName.WORLD_FACTBOOK.getName(),
+        ResourceName.NEWS_ENG.getName(),
+        ResourceName.NEWS_FRA.getName(),
+        ResourceName.NEWS_GER.getName(),
+        ResourceName.NEWS_ITA.getName(),
+        ResourceName.ARXIV.getName(),
+        ResourceName.PATENTS.getName()
     );
 
     private final FindSimilarService<HodSearchResult> findSimilarService;
@@ -82,12 +82,12 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
     @SuppressWarnings("ConstructorWithTooManyParameters")
     @Autowired
     HodDocumentsServiceImpl(
-            final FindSimilarService<HodSearchResult> findSimilarService,
-            final ConfigService<? extends HodSearchCapable> configService,
-            final QueryTextIndexService<HodSearchResult> queryTextIndexService,
-            final GetContentService<HodSearchResult> getContentService,
-            final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationRetriever,
-            final DocumentFieldsService documentFieldsService
+        final FindSimilarService<HodSearchResult> findSimilarService,
+        final ConfigService<? extends HodSearchCapable> configService,
+        final QueryTextIndexService<HodSearchResult> queryTextIndexService,
+        final GetContentService<HodSearchResult> getContentService,
+        final AuthenticationInformationRetriever<?, HodAuthenticationPrincipal> authenticationRetriever,
+        final DocumentFieldsService documentFieldsService
     ) {
         this.findSimilarService = findSimilarService;
         this.configService = configService;
@@ -101,11 +101,11 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
     public Documents<HodSearchResult> queryTextIndex(final HodQueryRequest queryRequest) throws HodErrorException {
         final QueryRequestBuilder params = setQueryParams(queryRequest, queryRequest.getQueryType() != QueryRequest.QueryType.RAW);
 
-        if (queryRequest.isAutoCorrect()) {
+        if(queryRequest.isAutoCorrect()) {
             params.setCheckSpelling(CheckSpelling.autocorrect);
         }
 
-        if (queryRequest.getQueryType() == QueryRequest.QueryType.PROMOTIONS) {
+        if(queryRequest.getQueryType() == QueryRequest.QueryType.PROMOTIONS) {
             params.setPromotions(true);
             //TODO remove this when IOD have fixed the the default value of the indexes parameter (IOD-6168)
             params.setIndexes(Collections.singletonList(ResourceName.WIKI_ENG));
@@ -138,8 +138,8 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
 
     private void checkForWarnings(final QueryResults<HodSearchResult> results) {
         final List<HodWarning> warnings = results.getHodWarnings();
-        if (!warnings.isEmpty()) {
-            for (final HodWarning warning : warnings) {
+        if(!warnings.isEmpty()) {
+            for(final HodWarning warning : warnings) {
                 log.warn("HoD returned a warning of type " + warning);
             }
         }
@@ -151,13 +151,13 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
     public List<HodSearchResult> getDocumentContent(final HodGetContentRequest request) throws HodErrorException {
         final List<HodSearchResult> contentResults = new ArrayList<>();
 
-        for (final GetContentRequestIndex<ResourceName> indexAndReferences : request.getIndexesAndReferences()) {
+        for(final GetContentRequestIndex<ResourceName> indexAndReferences : request.getIndexesAndReferences()) {
             final GetContentRequestBuilder builder = new GetContentRequestBuilder()
-                    .setPrint(request.getPrint())
-                    .setSummary(Summary.concept)
-                    .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
+                .setPrint(request.getPrint())
+                .setSummary(Summary.concept)
+                .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
 
-            if (request.getPrint() == Print.fields) {
+            if(request.getPrint() == Print.fields) {
                 builder.setPrintFields(documentFieldsService.getPrintFields(Collections.emptyList()));
             }
 
@@ -183,32 +183,32 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
 
         final Print print = Optional.ofNullable(searchRequest.getPrint()).map(Print::valueOf).orElse(null);
         final QueryRequestBuilder queryRequestBuilder = new QueryRequestBuilder()
-                .setAbsoluteMaxResults(Math.min(searchRequest.getMaxResults(), HOD_MAX_RESULTS))
-                .setSummary(Optional.ofNullable(searchRequest.getSummary()).map(Summary::valueOf).orElse(null))
-                .setStart(searchRequest.getStart())
-                .setMaxPageResults(searchRequest.getMaxResults() - searchRequest.getStart() + 1)
-                .setTotalResults(true)
-                .setIndexes(searchRequest.getQueryRestrictions().getDatabases())
-                .setFieldText(searchRequest.getQueryRestrictions().getFieldText())
-                .setSort(Optional.ofNullable(searchRequest.getSort()).map(Sort::valueOf).orElse(null))
-                .setMinDate(zonedDateTimeToJodaTime(searchRequest.getQueryRestrictions().getMinDate()))
-                .setMaxDate(zonedDateTimeToJodaTime(searchRequest.getQueryRestrictions().getMaxDate()))
-                .setPrint(print)
-                .setMinScore(searchRequest.getQueryRestrictions().getMinScore())
-                .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
+            .setAbsoluteMaxResults(Math.min(searchRequest.getMaxResults(), HOD_MAX_RESULTS))
+            .setSummary(Optional.ofNullable(searchRequest.getSummary()).map(Summary::valueOf).orElse(null))
+            .setStart(searchRequest.getStart())
+            .setMaxPageResults(searchRequest.getMaxResults() - searchRequest.getStart() + 1)
+            .setTotalResults(true)
+            .setIndexes(searchRequest.getQueryRestrictions().getDatabases())
+            .setFieldText(searchRequest.getQueryRestrictions().getFieldText())
+            .setSort(Optional.ofNullable(searchRequest.getSort()).map(Sort::valueOf).orElse(null))
+            .setMinDate(zonedDateTimeToJodaTime(searchRequest.getQueryRestrictions().getMinDate()))
+            .setMaxDate(zonedDateTimeToJodaTime(searchRequest.getQueryRestrictions().getMaxDate()))
+            .setPrint(print)
+            .setMinScore(searchRequest.getQueryRestrictions().getMinScore())
+            .setSecurityInfo(authenticationRetriever.getPrincipal().getSecurityInfo());
 
-        if (print == Print.fields) {
+        if(print == Print.fields) {
             queryRequestBuilder.setPrintFields(documentFieldsService.getPrintFields(searchRequest.getPrintFields()));
         }
 
-        if (searchRequest.isHighlight()) {
+        if(searchRequest.isHighlight()) {
             queryRequestBuilder
-                    .setHighlight(Highlight.terms)
-                    .setStartTag(HIGHLIGHT_START_TAG)
-                    .setEndTag(HIGHLIGHT_END_TAG);
+                .setHighlight(Highlight.terms)
+                .setStartTag(HIGHLIGHT_START_TAG)
+                .setEndTag(HIGHLIGHT_END_TAG);
         }
 
-        if (setQueryProfile) {
+        if(setQueryProfile) {
             queryRequestBuilder.setQueryProfile(new ResourceName(getDomain(), profileName));
         }
 
@@ -221,7 +221,7 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
     }
 
     private void addDomainToSearchResults(final Collection<HodSearchResult> documentList, final Iterable<ResourceName> indexIdentifiers, final Iterable<HodSearchResult> documents) {
-        for (final HodSearchResult hodSearchResult : documents) {
+        for(final HodSearchResult hodSearchResult : documents) {
             documentList.add(addDomain(indexIdentifiers, hodSearchResult));
         }
     }
@@ -234,21 +234,21 @@ class HodDocumentsServiceImpl implements HodDocumentsService {
 
         // It's most likely that the returned documents will be in one of the indexes we are querying (hopefully the
         // names are unique between the domains...)
-        for (final ResourceName indexIdentifier : indexIdentifiers) {
-            if (index.equals(indexIdentifier.getName())) {
+        for(final ResourceName indexIdentifier : indexIdentifiers) {
+            if(index.equals(indexIdentifier.getName())) {
                 domain = indexIdentifier.getDomain();
                 break;
             }
         }
 
-        if (domain == null) {
+        if(domain == null) {
             // If not, it might be a public index
             domain = PUBLIC_INDEX_NAMES.contains(index) ? ResourceName.PUBLIC_INDEXES_DOMAIN : getDomain();
         }
 
         return document.toBuilder()
-                .domain(domain)
-                .build();
+            .domain(domain)
+            .build();
     }
 
     private String getDomain() {

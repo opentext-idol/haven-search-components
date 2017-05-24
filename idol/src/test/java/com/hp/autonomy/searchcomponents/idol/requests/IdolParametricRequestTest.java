@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -49,23 +49,23 @@ public class IdolParametricRequestTest extends ParametricRequestTest<IdolQueryRe
     @Override
     protected IdolParametricRequest constructObject() {
         return IdolParametricRequestImpl.builder()
-                .fieldNames(Arrays.asList(tagNameFactory.getFieldPath("/DOCUMENT/FIELD1"), tagNameFactory.getFieldPath("/DOCUMENT/FIELD2")))
-                .maxValues(10)
-                .sort(SortParam.Alphabetical)
-                .queryRestrictions(IdolQueryRestrictionsImpl.builder()
-                        .queryText("*")
-                        .fieldText("NOT(EMPTY):{FIELD}")
-                        .database("Database1")
-                        .minDate(ZonedDateTime.parse("2016-11-15T16:07:00Z[UTC]"))
-                        .maxDate(ZonedDateTime.parse("2016-11-15T16:07:01Z[UTC]"))
-                        .minScore(5)
-                        .languageType("englishUtf8")
-                        .anyLanguage(false)
-                        .stateMatchId("0-ABC")
-                        .stateDontMatchId("0-ABD")
-                        .build())
-                .modified(true)
-                .build();
+            .fieldNames(Arrays.asList(tagNameFactory.getFieldPath("/DOCUMENT/FIELD1"), tagNameFactory.getFieldPath("/DOCUMENT/FIELD2")))
+            .maxValues(10)
+            .sort(SortParam.Alphabetical)
+            .queryRestrictions(IdolQueryRestrictionsImpl.builder()
+                                   .queryText("*")
+                                   .fieldText("NOT(EMPTY):{FIELD}")
+                                   .database("Database1")
+                                   .minDate(ZonedDateTime.parse("2016-11-15T16:07:00Z[UTC]"))
+                                   .maxDate(ZonedDateTime.parse("2016-11-15T16:07:01Z[UTC]"))
+                                   .minScore(5)
+                                   .languageType("englishUtf8")
+                                   .anyLanguage(false)
+                                   .stateMatchId("0-ABC")
+                                   .stateDontMatchId("0-ABD")
+                                   .build())
+            .modified(true)
+            .build();
     }
 
     @Override

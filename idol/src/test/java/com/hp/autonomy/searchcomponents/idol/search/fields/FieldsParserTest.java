@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -33,7 +33,9 @@ import java.util.Map;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,9 +43,9 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings({"unused", "SpringJavaAutowiredMembersInspection"})
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-        classes = {CoreTestContext.class, FieldsParserImpl.class, IdolDocumentFieldsServiceImpl.class},
-        properties = CORE_CLASSES_PROPERTY,
-        webEnvironment = SpringBootTest.WebEnvironment.NONE)
+    classes = {CoreTestContext.class, FieldsParserImpl.class, IdolDocumentFieldsServiceImpl.class},
+    properties = CORE_CLASSES_PROPERTY,
+    webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class FieldsParserTest {
     @MockBean
     private ConfigService<IdolSearchCapable> configService;
@@ -59,17 +61,17 @@ public class FieldsParserTest {
     @Before
     public void setUp() {
         final FieldsInfo fieldsInfo = FieldsInfo.builder()
-                .populateResponseMap("Custom Date", FieldInfo.<ZonedDateTime>builder()
-                        .id("Custom Date")
-                        .name(fieldPathNormaliser.normaliseFieldPath("DOCUMENT/CUSTOM_DATE"))
-                        .type(FieldType.DATE)
-                        .advanced(true)
-                        .build())
-                .populateResponseMap("author", FieldInfo.<String>builder()
-                        .id("author")
-                        .name(fieldPathNormaliser.normaliseFieldPath("DOCUMENT/CUSTOM_ARRAY"))
-                        .build())
-                .build();
+            .populateResponseMap("Custom Date", FieldInfo.<ZonedDateTime>builder()
+                .id("Custom Date")
+                .name(fieldPathNormaliser.normaliseFieldPath("DOCUMENT/CUSTOM_DATE"))
+                .type(FieldType.DATE)
+                .advanced(true)
+                .build())
+            .populateResponseMap("author", FieldInfo.<String>builder()
+                .id("author")
+                .name(fieldPathNormaliser.normaliseFieldPath("DOCUMENT/CUSTOM_ARRAY"))
+                .build())
+            .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);
     }

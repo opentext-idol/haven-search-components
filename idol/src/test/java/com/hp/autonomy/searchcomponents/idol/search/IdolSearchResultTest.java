@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -33,45 +33,45 @@ public class IdolSearchResultTest extends SearchResultTest {
     @Override
     protected void validateJson(final JsonContent<SearchResult> jsonContent) throws IOException {
         jsonContent.assertThat()
-                .hasJsonPathStringValue("$.reference", "ABC")
-                .hasJsonPathStringValue("$.index", "wiki_eng")
-                .hasJsonPathStringValue("$.title", "Fiji")
-                .hasJsonPathStringValue("$.summary", "Fiji is an island country")
-                .hasJsonPathNumberValue("$.weight", 11.7)
-                .hasJsonPathArrayValue("$.fieldMap.CUSTOM_FIELD.names", "CUSTOM_FIELD")
-                .hasJsonPathStringValue("$.fieldMap.CUSTOM_FIELD.type", "STRING")
-                .hasJsonPathBooleanValue("$.fieldMap.CUSTOM_FIELD.advanced", false)
-                .hasJsonPathArrayValue("$.fieldMap.CUSTOM_FIELD.names", "CUSTOM_VALUE")
-                .hasJsonPathArrayValue("$.fieldMap.DATE_FIELD.names", "DATE_FIELD")
-                .hasJsonPathStringValue("$.fieldMap.DATE_FIELD.type", "DATE")
-                .hasJsonPathBooleanValue("$.fieldMap.DATE_FIELD.advanced", false)
-                .hasJsonPathNumberValue("$.fieldMap.DATE_FIELD.values[0].value", 1479318360000L)
-                .hasJsonPathNumberValue("$.date", 1479318360000L)
-                .hasJsonPathStringValue("$.promotionCategory", "NONE")
-                .hasJsonPathStringValue("$.qmsId", "0")
-                .hasJsonPathStringValue("$.promotionName", "SomeName");
+            .hasJsonPathStringValue("$.reference", "ABC")
+            .hasJsonPathStringValue("$.index", "wiki_eng")
+            .hasJsonPathStringValue("$.title", "Fiji")
+            .hasJsonPathStringValue("$.summary", "Fiji is an island country")
+            .hasJsonPathNumberValue("$.weight", 11.7)
+            .hasJsonPathArrayValue("$.fieldMap.CUSTOM_FIELD.names", "CUSTOM_FIELD")
+            .hasJsonPathStringValue("$.fieldMap.CUSTOM_FIELD.type", "STRING")
+            .hasJsonPathBooleanValue("$.fieldMap.CUSTOM_FIELD.advanced", false)
+            .hasJsonPathArrayValue("$.fieldMap.CUSTOM_FIELD.names", "CUSTOM_VALUE")
+            .hasJsonPathArrayValue("$.fieldMap.DATE_FIELD.names", "DATE_FIELD")
+            .hasJsonPathStringValue("$.fieldMap.DATE_FIELD.type", "DATE")
+            .hasJsonPathBooleanValue("$.fieldMap.DATE_FIELD.advanced", false)
+            .hasJsonPathNumberValue("$.fieldMap.DATE_FIELD.values[0].value", 1479318360000L)
+            .hasJsonPathNumberValue("$.date", 1479318360000L)
+            .hasJsonPathStringValue("$.promotionCategory", "NONE")
+            .hasJsonPathStringValue("$.qmsId", "0")
+            .hasJsonPathStringValue("$.promotionName", "SomeName");
     }
 
     @Override
     protected SearchResult constructObject() {
         return IdolSearchResult.builder()
-                .reference("ABC")
-                .index("wiki_eng")
-                .title("Fiji")
-                .summary("Fiji is an island country")
-                .weight(11.7)
-                .fieldEntry("CUSTOM_FIELD", FieldInfo.builder()
-                        .name(fieldPathNormaliser.normaliseFieldPath("CUSTOM_FIELD"))
-                        .value(new FieldValue<>("CUSTOM_VALUE", "Custom Value")).build())
-                .fieldEntry("DATE_FIELD", FieldInfo.builder()
-                        .name(fieldPathNormaliser.normaliseFieldPath("DATE_FIELD"))
-                        .type(FieldType.DATE)
-                        .value(new FieldValue<>(ZonedDateTime.parse("2016-11-16T17:46:00Z[UTC]"), "2016-11-16T17:46:00Z"))
-                        .build())
-                .date(ZonedDateTime.parse("2016-11-16T17:46:00Z[UTC]"))
-                .promotionCategory(PromotionCategory.NONE)
-                .qmsId("0")
-                .promotionName("SomeName")
-                .build();
+            .reference("ABC")
+            .index("wiki_eng")
+            .title("Fiji")
+            .summary("Fiji is an island country")
+            .weight(11.7)
+            .fieldEntry("CUSTOM_FIELD", FieldInfo.builder()
+                .name(fieldPathNormaliser.normaliseFieldPath("CUSTOM_FIELD"))
+                .value(new FieldValue<>("CUSTOM_VALUE", "Custom Value")).build())
+            .fieldEntry("DATE_FIELD", FieldInfo.builder()
+                .name(fieldPathNormaliser.normaliseFieldPath("DATE_FIELD"))
+                .type(FieldType.DATE)
+                .value(new FieldValue<>(ZonedDateTime.parse("2016-11-16T17:46:00Z[UTC]"), "2016-11-16T17:46:00Z"))
+                .build())
+            .date(ZonedDateTime.parse("2016-11-16T17:46:00Z[UTC]"))
+            .promotionCategory(PromotionCategory.NONE)
+            .qmsId("0")
+            .promotionName("SomeName")
+            .build();
     }
 }

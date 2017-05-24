@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -16,17 +16,17 @@ import java.util.function.Function;
 public enum FieldType {
     STRING(String.class, value -> value),
     DATE(ZonedDateTime.class, value -> {
+        try {
+            final long epoch = Long.parseLong(value);
+            return ZonedDateTime.ofInstant(Instant.ofEpochSecond(epoch), ZoneOffset.UTC);
+        } catch(final NumberFormatException ignore) {
             try {
-                final long epoch = Long.parseLong(value);
-                return ZonedDateTime.ofInstant(Instant.ofEpochSecond(epoch), ZoneOffset.UTC);
-            } catch (final NumberFormatException ignore) {
-                try {
-                    // HOD handles date fields inconsistently; attempt to detect this here
-                    return ZonedDateTime.parse(value);
-                } catch (final IllegalArgumentException ignored) {
-                    return null;
-                }
+                // HOD handles date fields inconsistently; attempt to detect this here
+                return ZonedDateTime.parse(value);
+            } catch(final IllegalArgumentException ignored) {
+                return null;
             }
+        }
     }),
     NUMBER(Number.class, Double::parseDouble),
     BOOLEAN(Boolean.class, Boolean::parseBoolean);

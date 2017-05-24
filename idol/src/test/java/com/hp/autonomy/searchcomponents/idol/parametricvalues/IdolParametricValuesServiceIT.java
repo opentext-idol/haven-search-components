@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -36,22 +36,22 @@ public class IdolParametricValuesServiceIT extends AbstractParametricValuesServi
         final Map<FieldPath, NumericValueDetails> valueDetails = parametricValuesService.getNumericValueDetails(createParametricRequest());
 
         return valueDetails.entrySet().stream()
-                .filter(entry -> entry.getValue().getTotalValues() >= 2)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Pagination test requires a parametric field with more than 2 values"))
-                .getKey();
+            .filter(entry -> entry.getValue().getTotalValues() >= 2)
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Pagination test requires a parametric field with more than 2 values"))
+            .getKey();
     }
 
     @Override
     protected IdolParametricRequest noResultsParametricRequest(final Collection<FieldPath> fieldPaths) {
         final IdolQueryRestrictions queryRestrictions = queryRestrictionsBuilderFactory.getObject()
-                // No documents will match this text (probably)
-                .queryText("sfoiewsfoseinf")
-                .build();
+            // No documents will match this text (probably)
+            .queryText("sfoiewsfoseinf")
+            .build();
 
         return parametricRequestBuilderFactory.getObject()
-                .queryRestrictions(queryRestrictions)
-                .fieldNames(fieldPaths)
-                .build();
+            .queryRestrictions(queryRestrictions)
+            .fieldNames(fieldPaths)
+            .build();
     }
 }
