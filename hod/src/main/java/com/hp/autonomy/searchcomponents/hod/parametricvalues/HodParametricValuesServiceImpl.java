@@ -6,8 +6,8 @@
 package com.hp.autonomy.searchcomponents.hod.parametricvalues;
 
 import com.hp.autonomy.aci.content.ranges.NumericRange;
-import com.hp.autonomy.aci.content.ranges.Range;
-import com.hp.autonomy.aci.content.ranges.Ranges;
+import com.hp.autonomy.aci.content.ranges.ParametricFieldRange;
+import com.hp.autonomy.aci.content.ranges.ParametricFieldRanges;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.hod.caching.CachingConfiguration;
 import com.hp.autonomy.hod.client.api.resource.ResourceName;
@@ -156,10 +156,12 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
         return getParametricValuesInBuckets(parametricRequest, bucketingParamsPerField, bucketingParamsHelper::calculateNumericBoundaries, Function.identity());
     }
 
-    private <T extends Comparable<? super T> & Serializable> List<NumericRangeInfo> getParametricValuesInBuckets(final ParametricRequest<HodQueryRestrictions> parametricRequest,
-                                                                                                                 final Map<FieldPath, BucketingParams<T>> bucketingParamsPerField,
-                                                                                                                 final Function<BucketingParams<T>, List<T>> calculateBoundaries,
-                                                                                                                 final Function<List<T>, List<Double>> convertBoundaries) throws HodErrorException {
+    private <T extends Comparable<? super T> & Serializable> List<NumericRangeInfo> getParametricValuesInBuckets(
+        final ParametricRequest<HodQueryRestrictions> parametricRequest,
+        final Map<FieldPath, BucketingParams<T>> bucketingParamsPerField,
+        final Function<BucketingParams<T>, List<T>> calculateBoundaries,
+        final Function<List<T>, List<Double>> convertBoundaries
+    ) throws HodErrorException {
         if(parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyList();
         } else {
@@ -168,11 +170,11 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
             final Map<FieldPath, List<Double>> boundariesPerField = bucketingParamsPerField.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> convertBoundaries.apply(calculateBoundaries.apply(entry.getValue()))));
 
-            final List<Range> ranges = boundariesPerField.entrySet().stream()
+            final List<ParametricFieldRange> ranges = boundariesPerField.entrySet().stream()
                 .map(entry -> new NumericRange(entry.getKey().getNormalisedPath(), entry.getValue()))
                 .collect(Collectors.toList());
 
-            final List<FieldRanges> response = fetchParametricRanges(parametricRequest, null, new Ranges(ranges).toString());
+            final List<FieldRanges> response = fetchParametricRanges(parametricRequest, null, new ParametricFieldRanges(ranges).toString());
 
             return response.stream()
                 .map(fieldRanges -> {

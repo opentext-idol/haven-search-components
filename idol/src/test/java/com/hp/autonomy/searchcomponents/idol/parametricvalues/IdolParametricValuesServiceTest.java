@@ -320,13 +320,22 @@ public class IdolParametricValuesServiceTest {
         );
 
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        final List<DateRangeInfo> results = parametricValuesService.getDateParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(5, min, max)));
+        final List<DateRangeInfo> results = parametricValuesService
+            .getDateParametricValuesInBuckets(
+                idolParametricRequest,
+                ImmutableMap.of(
+                    tagNameFactory.getFieldPath("ParametricNumericDateField"),
+                    new BucketingParams<>(5, min, max)
+                )
+            );
         assertThat(results, is(not(empty())));
+
         final DateRangeInfo info = results.iterator().next();
         final List<DateRangeInfo.Value> countInfo = info.getValues();
         assertEquals(7, info.getCount());
         assertEquals(min, info.getMin());
         assertEquals(max, info.getMax());
+
         final Iterator<DateRangeInfo.Value> iterator = countInfo.iterator();
         assertEquals(new DateRangeInfo.Value(min, min.plusMinutes(1), 0), iterator.next());
         assertEquals(new DateRangeInfo.Value(min.plusMinutes(1), max.minusMinutes(1), 5), iterator.next());
@@ -386,7 +395,10 @@ public class IdolParametricValuesServiceTest {
     public void getDependentValuesFieldNamesFirst() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.emptyList());
 
-        final ImmutableMap<FieldTypeParam, Set<TagName>> fieldsResponse = ImmutableMap.of(FieldTypeParam.Parametric, Collections.singleton(tagNameFactory.buildTagName("CATEGORY")));
+        final ImmutableMap<FieldTypeParam, Set<TagName>> fieldsResponse = ImmutableMap.of(
+            FieldTypeParam.Parametric,
+            Collections.singleton(tagNameFactory.buildTagName("CATEGORY"))
+        );
         when(fieldsService.getFields(any())).thenReturn(fieldsResponse);
 
         final GetQueryTagValuesResponseData responseData = mockRecursiveResponse();
@@ -436,9 +448,10 @@ public class IdolParametricValuesServiceTest {
         return responseData;
     }
 
-    private <T extends Comparable<? super T>, V extends ValueDetails<T>> FlatField mockFlatField(final String name,
-                                                                                                 final V valueDetails,
-                                                                                                 final BiFunction<String, ? super T, JAXBElement<Serializable>> generateElement
+    private <T extends Comparable<? super T>, V extends ValueDetails<T>> FlatField mockFlatField(
+        final String name,
+        final V valueDetails,
+        final BiFunction<String, ? super T, JAXBElement<Serializable>> generateElement
     ) {
         final FlatField flatField = mock(FlatField.class);
         when(flatField.getName()).thenReturn(Collections.singletonList(name));
@@ -507,8 +520,13 @@ public class IdolParametricValuesServiceTest {
         when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(responseData);
     }
 
-    private TagValue mockTagValue(final ChronoZonedDateTime<?> min, final ChronoZonedDateTime<?> max, final int count) {
-        return mockTagValue(min.toEpochSecond() + "," + max.toEpochSecond(), min, max, count);
+    private TagValue mockTagValue(
+        final ChronoZonedDateTime<?> min,
+        final ChronoZonedDateTime<?> max,
+        final int count
+    ) {
+        final String value = min.toEpochSecond() * 1000 + "," + max.toEpochSecond() * 1000;
+        return mockTagValue(value, min, max, count);
     }
 
     private TagValue mockTagValue(final String value, final int count) {

@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.requests;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.hp.autonomy.aci.content.ranges.Range;
+import com.hp.autonomy.aci.content.ranges.ParametricFieldRange;
 import com.hp.autonomy.searchcomponents.idol.parametricvalues.IdolParametricRequest;
 import com.hp.autonomy.searchcomponents.idol.parametricvalues.IdolParametricRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
@@ -37,7 +37,7 @@ class IdolParametricRequestImpl implements IdolParametricRequest {
     private final Integer maxValues;
     private final SortParam sort;
     @Singular
-    private final List<Range> ranges;
+    private final List<ParametricFieldRange> ranges;
     @Singular
     private final List<String> valueRestrictions;
     private final IdolQueryRestrictions queryRestrictions;

@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
-import com.hp.autonomy.aci.content.ranges.Range;
+import com.hp.autonomy.aci.content.ranges.ParametricFieldRange;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObjectBuilder;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
@@ -21,7 +21,7 @@ import java.util.Collection;
  */
 @SuppressWarnings("unused")
 public interface ParametricRequestBuilder<P extends ParametricRequest<Q>, Q extends QueryRestrictions<?>, B extends ParametricRequestBuilder<P, Q, B>>
-        extends RequestObjectBuilder<ParametricRequest<Q>, ParametricRequestBuilder<?, Q, ?>> {
+    extends RequestObjectBuilder<ParametricRequest<Q>, ParametricRequestBuilder<?, Q, ?>> {
     /**
      * Sets a field for which to retrieve parametric values
      *
@@ -73,7 +73,7 @@ public interface ParametricRequestBuilder<P extends ParametricRequest<Q>, Q exte
      * @param range Range information for numeric bucketing for a single field
      * @return the builder (for chaining)
      */
-    B range(Range range);
+    B range(ParametricFieldRange range);
 
     /**
      * Sets range information for numeric bucketing per field
@@ -81,7 +81,7 @@ public interface ParametricRequestBuilder<P extends ParametricRequest<Q>, Q exte
      * @param ranges Range information for numeric bucketing per field
      * @return the builder (for chaining)
      */
-    B ranges(Collection<? extends Range> ranges);
+    B ranges(Collection<? extends ParametricFieldRange> ranges);
 
     /**
      * Clears collection of numeric range information

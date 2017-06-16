@@ -32,7 +32,6 @@ import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationR
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -50,7 +49,6 @@ import static com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParamet
 @Component(PARAMETER_HANDLER_BEAN_NAME)
 class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
     private static final String GET_CONTENT_QUERY_TEXT = "*";
-    private static final ZonedDateTime oneAD = ZonedDateTime.of(1, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
 
     private final ConfigService<? extends IdolSearchCapable> configService;
     private final DocumentFieldsService documentFieldsService;
@@ -174,9 +172,9 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
 
     @Override
     public void addSecurityInfo(final AciParameters aciParameters) {
-        final String securityInfo = authenticationInformationRetriever.getPrincipal() != null && authenticationInformationRetriever.getPrincipal().getSecurityInfo() != null
-            ? urlFragmentEscaper.escape(authenticationInformationRetriever.getPrincipal().getSecurityInfo())
-            : null;
+        final String securityInfo = authenticationInformationRetriever.getPrincipal() == null || authenticationInformationRetriever.getPrincipal().getSecurityInfo() == null
+            ? null
+            : urlFragmentEscaper.escape(authenticationInformationRetriever.getPrincipal().getSecurityInfo());
         aciParameters.add(QueryParams.SecurityInfo.name(), securityInfo);
     }
 
@@ -208,7 +206,8 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     private String formatDate(final ZonedDateTime date) {
-        // IDOL ISO date time does not have a year 0 whereas Java ISO date time does
-        return date == null ? null : DateTimeFormatter.ISO_INSTANT.format((date.isBefore(oneAD) ? date.minusYears(1) : date).truncatedTo(ChronoUnit.SECONDS));
+        return date == null
+            ? null
+            : DateTimeFormatter.ISO_INSTANT.format(date.truncatedTo(ChronoUnit.SECONDS));
     }
 }

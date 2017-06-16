@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
-import com.hp.autonomy.aci.content.ranges.Range;
+import com.hp.autonomy.aci.content.ranges.ParametricFieldRange;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
@@ -52,7 +52,7 @@ public interface ParametricRequest<Q extends QueryRestrictions<?>> extends Reque
      *
      * @return Range information for numeric bucketing per field
      */
-    List<Range> getRanges();
+    List<ParametricFieldRange> getRanges();
 
     /**
      * Wildcard restrictions for values
