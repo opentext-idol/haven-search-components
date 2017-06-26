@@ -15,7 +15,7 @@ For use in Haven on Demand, use:
     <dependency>
         <groupId>com.hp.autonomy.frontend</groupId>
         <artifactId>haven-search-components-hod</artifactId>
-        <version>0.48.0-SNAPSHOT</version>
+        <version>0.48.0</version>
     </dependency>
 
 For use on premise, use:
@@ -23,11 +23,11 @@ For use on premise, use:
     <dependency>
         <groupId>com.hp.autonomy.frontend</groupId>
         <artifactId>haven-search-components-idol</artifactId>
-        <version>0.48.0-SNAPSHOT</version>
+        <version>0.48.0</version>
     </dependency>
 
 ## License
 Copyright 2014-2016 Hewlett-Packard Development Company, L.P.
-Copyright 2015-2016 Hewlett Packard Enterprise Development LP.
+Copyright 2015-2017 Hewlett Packard Enterprise Development LP.
 
 Licensed under the MIT License (the "License"); you may not use this project except in compliance with the License.
