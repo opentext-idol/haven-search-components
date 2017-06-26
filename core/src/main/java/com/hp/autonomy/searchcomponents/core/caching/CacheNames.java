@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2016-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -10,11 +10,10 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
-import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
-import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 
 import java.util.Map;
 
@@ -35,7 +34,12 @@ public interface CacheNames {
     /**
      * Cache identifier for {@link ParametricValuesService#getNumericParametricValuesInBuckets(ParametricRequest, Map)}
      */
-    String PARAMETRIC_VALUES_IN_BUCKETS = "parametric-values-in-buckets";
+    String NUMERIC_PARAMETRIC_VALUES_IN_BUCKETS = "numeric-parametric-values-in-buckets";
+
+    /**
+     * Cache identifier for {@link ParametricValuesService#getDateParametricValuesInBuckets(ParametricRequest, Map)}
+     */
+    String DATE_PARAMETRIC_VALUES_IN_BUCKETS = "date-parametric-values-in-buckets";
 
     /**
      * Cache identifier for {@link DocumentsService#queryTextIndex(QueryRequest)}

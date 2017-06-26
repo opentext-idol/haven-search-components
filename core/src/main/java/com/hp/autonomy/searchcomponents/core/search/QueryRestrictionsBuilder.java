@@ -1,14 +1,14 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
 package com.hp.autonomy.searchcomponents.core.search;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObjectBuilder;
-import org.joda.time.DateTime;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 
 /**
@@ -16,7 +16,7 @@ import java.util.Collection;
  */
 @SuppressWarnings("unused")
 public interface QueryRestrictionsBuilder<Q extends QueryRestrictions<S>, S extends Serializable, B extends QueryRestrictionsBuilder<Q, S, B>>
-        extends RequestObjectBuilder<QueryRestrictions<S>, QueryRestrictionsBuilder<?, S, ?>> {
+    extends RequestObjectBuilder<QueryRestrictions<S>, QueryRestrictionsBuilder<?, S, ?>> {
     /**
      * Sets the query expression
      *
@@ -62,7 +62,7 @@ public interface QueryRestrictionsBuilder<Q extends QueryRestrictions<S>, S exte
      * @param minDate The minimum date of results (uses configured date field)
      * @return the builder (for chaining)
      */
-    B minDate(DateTime minDate);
+    B minDate(ZonedDateTime minDate);
 
     /**
      * Sets the maximum date of results (uses configured date field)
@@ -70,7 +70,7 @@ public interface QueryRestrictionsBuilder<Q extends QueryRestrictions<S>, S exte
      * @param maxDate The maximum date of results (uses configured date field)
      * @return the builder (for chaining)
      */
-    B maxDate(DateTime maxDate);
+    B maxDate(ZonedDateTime maxDate);
 
     /**
      * Sets the minimum score threshold to apply

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -18,13 +18,13 @@ import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.hamcrest.Matchers;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -74,7 +74,7 @@ public class HavenSearchAciParameterHandlerTest {
         when(queryRestrictions.getDatabases()).thenReturn(Collections.singletonList("Database1"));
         when(queryRestrictions.getStateMatchIds()).thenReturn(Collections.singletonList("stateID1"));
         when(queryRestrictions.getStateDontMatchIds()).thenReturn(Collections.singletonList("stateID2"));
-        when(queryRestrictions.getMaxDate()).thenReturn(DateTime.now());
+        when(queryRestrictions.getMaxDate()).thenReturn(ZonedDateTime.now());
         when(queryRestrictions.isAnyLanguage()).thenReturn(true);
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
         assertThat(aciParameters, hasSize(10));

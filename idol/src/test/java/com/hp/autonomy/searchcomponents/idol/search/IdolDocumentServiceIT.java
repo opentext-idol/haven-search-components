@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -11,15 +11,18 @@ import com.hp.autonomy.searchcomponents.core.search.AutoCorrectException;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
-import org.joda.time.DateTime;
 import org.junit.Test;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.ZonedDateTime;
 import java.util.Collections;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -43,20 +46,20 @@ public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<IdolQueryRe
     @Test(expected = AutoCorrectException.class)
     public void queryWithInvalidAutoCorrect() throws AciErrorException {
         final IdolQueryRequest queryRequest = queryRequestBuilderFactory.getObject()
-                .queryRestrictions(queryRestrictionsBuilder.getObject()
-                        .queryText("XORApple")
-                        .fieldText("")
-                        .databases(integrationTestUtils.buildQueryRestrictions().getDatabases())
-                        .minDate(null)
-                        .maxDate(DateTime.now())
-                        .minScore(0)
-                        .languageType(null)
-                        .anyLanguage(true)
-                        .stateMatchIds(Collections.emptyList())
-                        .stateDontMatchIds(Collections.emptyList())
-                        .build())
-                .autoCorrect(true)
-                .build();
+            .queryRestrictions(queryRestrictionsBuilder.getObject()
+                                   .queryText("XORApple")
+                                   .fieldText("")
+                                   .databases(integrationTestUtils.buildQueryRestrictions().getDatabases())
+                                   .minDate(null)
+                                   .maxDate(ZonedDateTime.now())
+                                   .minScore(0)
+                                   .languageType(null)
+                                   .anyLanguage(true)
+                                   .stateMatchIds(Collections.emptyList())
+                                   .stateDontMatchIds(Collections.emptyList())
+                                   .build())
+            .autoCorrect(true)
+            .build();
 
         documentsService.queryTextIndex(queryRequest);
     }

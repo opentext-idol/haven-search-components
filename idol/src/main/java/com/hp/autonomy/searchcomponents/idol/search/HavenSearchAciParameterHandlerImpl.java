@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -29,10 +29,12 @@ import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-import org.joda.time.ReadableInstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -56,9 +58,9 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
 
     @Autowired
     HavenSearchAciParameterHandlerImpl(
-            final ConfigService<? extends IdolSearchCapable> configService,
-            final DocumentFieldsService documentFieldsService,
-            final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever
+        final ConfigService<? extends IdolSearchCapable> configService,
+        final DocumentFieldsService documentFieldsService,
+        final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever
     ) {
         this.configService = configService;
         this.documentFieldsService = documentFieldsService;
@@ -68,13 +70,13 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     @Override
     public void addSearchRestrictions(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         aciParameters.add(QueryParams.Text.name(), queryRestrictions.getQueryText());
-        if (!queryRestrictions.getDatabases().isEmpty()) {
+        if(!queryRestrictions.getDatabases().isEmpty()) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(queryRestrictions.getDatabases()));
         }
-        if (!queryRestrictions.getStateMatchIds().isEmpty()) {
+        if(!queryRestrictions.getStateMatchIds().isEmpty()) {
             aciParameters.add(QueryParams.StateMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateMatchIds()));
         }
-        if (!queryRestrictions.getStateDontMatchIds().isEmpty()) {
+        if(!queryRestrictions.getStateDontMatchIds().isEmpty()) {
             aciParameters.add(QueryParams.StateDontMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateDontMatchIds()));
         }
 
@@ -101,7 +103,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         aciParameters.add(QueryParams.XMLMeta.name(), true);
         addPrintParameters(aciParameters, PrintParam.fromValue(searchRequest.getPrint(), null), searchRequest.getPrintFields());
 
-        if (searchRequest.isHighlight()) {
+        if(searchRequest.isHighlight()) {
             aciParameters.add(QueryParams.Highlight.name(), HighlightParam.SummaryTerms);
             aciParameters.add(QueryParams.StartTag.name(), DocumentsService.HIGHLIGHT_START_TAG);
             aciParameters.add(QueryParams.EndTag.name(), DocumentsService.HIGHLIGHT_END_TAG);
@@ -122,14 +124,14 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         aciParameters.add(QueryParams.XMLMeta.name(), true);
         addPrintParameters(aciParameters, print, Collections.emptyList());
 
-        if (indexAndReferences.getIndex() != null) {
+        if(indexAndReferences.getIndex() != null) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexAndReferences.getIndex()));
         }
     }
 
     private void addPrintParameters(final AciParameters aciParameters, final PrintParam print, final Collection<String> printFields) {
         aciParameters.add(QueryParams.Print.name(), print);
-        if (print == PrintParam.Fields) {
+        if(print == PrintParam.Fields) {
             final Collection<String> printFieldsToApply = documentFieldsService.getPrintFields(printFields);
             aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(printFieldsToApply));
         }
@@ -139,7 +141,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     public void addGetContentOutputParameters(final AciParameters parameters, final String database, final String documentReference, final String referenceField) {
         addSecurityInfo(parameters);
 
-        if (database != null) {
+        if(database != null) {
             parameters.add(GetContentParams.DatabaseMatch.name(), new Databases(database));
         }
 
@@ -150,14 +152,14 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     public void addLanguageRestriction(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         // If the AnyLanguage parameter is true, documents with any language can be returned, otherwise documents matching
         // the MatchLanguage parameter are returned.
-        if (queryRestrictions.isAnyLanguage()) {
+        if(queryRestrictions.isAnyLanguage()) {
             aciParameters.add(QueryParams.AnyLanguage.name(), true);
         }
 
         // The LanguageType parameter specifies the language and encoding of the query text. If no MatchLanguage or
         // AnyLanguage parameter is set, this acts as a MatchLanguage restriction for the specified language. If no
         // LanguageType is set, the query text is interpreted using the default language and encoding.
-        if (queryRestrictions.getLanguageType() != null) {
+        if(queryRestrictions.getLanguageType() != null) {
             aciParameters.add(QueryParams.LanguageType.name(), queryRestrictions.getLanguageType());
         }
     }
@@ -170,9 +172,9 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
 
     @Override
     public void addSecurityInfo(final AciParameters aciParameters) {
-        final String securityInfo = authenticationInformationRetriever.getPrincipal() != null && authenticationInformationRetriever.getPrincipal().getSecurityInfo() != null
-                ? urlFragmentEscaper.escape(authenticationInformationRetriever.getPrincipal().getSecurityInfo())
-                : null;
+        final String securityInfo = authenticationInformationRetriever.getPrincipal() == null || authenticationInformationRetriever.getPrincipal().getSecurityInfo() == null
+            ? null
+            : urlFragmentEscaper.escape(authenticationInformationRetriever.getPrincipal().getSecurityInfo());
         aciParameters.add(QueryParams.SecurityInfo.name(), securityInfo);
     }
 
@@ -190,7 +192,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         aciParameters.add(ViewParams.StripScript.name(), true);
         aciParameters.add(ViewParams.OriginalBaseURL.name(), true);
 
-        if (viewRequest.getHighlightExpression() != null) {
+        if(viewRequest.getHighlightExpression() != null) {
             aciParameters.add(ViewParams.Links.name(), viewRequest.getHighlightExpression());
             aciParameters.add(ViewParams.StartTag.name(), HIGHLIGHT_START_TAG);
             aciParameters.add(ViewParams.EndTag.name(), HIGHLIGHT_END_TAG);
@@ -203,7 +205,9 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         aciParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
     }
 
-    private String formatDate(final ReadableInstant date) {
-        return date == null ? null : date.getMillis() / 1000 + "e";
+    private String formatDate(final ZonedDateTime date) {
+        return date == null
+            ? null
+            : DateTimeFormatter.ISO_INSTANT.format(date.truncatedTo(ChronoUnit.SECONDS));
     }
 }

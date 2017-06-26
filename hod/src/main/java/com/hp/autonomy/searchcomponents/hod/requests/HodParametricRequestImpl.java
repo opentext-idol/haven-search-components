@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.hod.requests;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.hp.autonomy.aci.content.ranges.Range;
+import com.hp.autonomy.aci.content.ranges.ParametricFieldRange;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricRequest;
 import com.hp.autonomy.searchcomponents.hod.parametricvalues.HodParametricRequestBuilder;
@@ -37,7 +37,7 @@ class HodParametricRequestImpl implements HodParametricRequest {
     private final Integer maxValues;
     private final SortParam sort;
     @Singular
-    private final List<Range> ranges;
+    private final List<ParametricFieldRange> ranges;
     @Singular
     private final List<String> valueRestrictions;
     private final HodQueryRestrictions queryRestrictions;

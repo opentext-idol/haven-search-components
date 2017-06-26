@@ -1,15 +1,16 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
-import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfoValue;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -26,13 +27,12 @@ public interface BucketingParamsHelper {
     /**
      * Verify that the fields specified in the parametric request are matched by a valid entry in the bucketing params.
      *
-     * @param parametricRequest Query restrictions and field names
+     * @param parametricRequest       Query restrictions and field names
      * @param bucketingParamsPerField Map of fully qualified field name to min, max and number of buckets
-     * @param <R> The request type to use
-     * @param <Q> The type of the query restrictions object
+     * @param <T>                     The type of the data
      */
-    <R extends ParametricRequest<Q>, Q extends QueryRestrictions<?>> void validateBucketingParams(R parametricRequest,
-                                                                                                  Map<FieldPath, BucketingParams> bucketingParamsPerField);
+    <T extends Comparable<? super T> & Serializable> void validateBucketingParams(final ParametricRequest<?> parametricRequest,
+                                                                                  final Map<FieldPath, BucketingParams<T>> bucketingParamsPerField);
 
     /**
      * Calculate the boundary values (including both the min and the max) of the buckets specified in the BucketingParams.
@@ -40,14 +40,25 @@ public interface BucketingParamsHelper {
      * @param bucketingParams The min, max and target number of buckets
      * @return List of boundary values, including the min and the max value
      */
-    List<Double> calculateBoundaries(BucketingParams bucketingParams);
+    List<Double> calculateNumericBoundaries(BucketingParams<Double> bucketingParams);
+
+    /**
+     * Calculate the boundary values (including both the min and the max) of the buckets specified in the BucketingParams.
+     *
+     * @param bucketingParams The min, max and target number of buckets
+     * @return List of boundary values, including the min and the max value
+     */
+    List<ZonedDateTime> calculateDateBoundaries(BucketingParams<ZonedDateTime> bucketingParams);
 
     /**
      * Generate empty buckets for the given boundaries. This is useful because GetQueryTagValues returns no buckets if
      * no documents matched the query restrictions.
      *
-     * @param boundaries Bucket boundaries
+     * @param boundaries  Bucket boundaries
+     * @param constructor Bucket value constructor
+     * @param <T>         bucket data type
      * @return List of empty buckets
      */
-    List<RangeInfo.Value> emptyBuckets(List<Double> boundaries);
+    <T extends Comparable<? super T> & Serializable, D extends Comparable<D> & Serializable, V extends RangeInfoValue<T, D>>
+    List<V> emptyBuckets(List<T> boundaries, RangeInfoValue.Constructor<T, D, V> constructor);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -10,10 +10,10 @@ import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequestTest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolRelatedConceptsRequest;
 import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
 import org.junit.Before;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 public class IdolRelatedConceptsRequestTest extends RelatedConceptsRequestTest<IdolQueryRestrictions> {
     @Override
@@ -26,21 +26,21 @@ public class IdolRelatedConceptsRequestTest extends RelatedConceptsRequestTest<I
     @Override
     protected IdolRelatedConceptsRequest constructObject() {
         return IdolRelatedConceptsRequestImpl.<String>builder()
-                .queryRestrictions(IdolQueryRestrictionsImpl.builder()
-                        .queryText("*")
-                        .fieldText("NOT(EMPTY):{FIELD}")
-                        .database("Database1")
-                        .minDate(DateTime.parse("2016-11-15T16:07:00Z"))
-                        .maxDate(DateTime.parse("2016-11-15T16:07:01Z"))
-                        .minScore(5)
-                        .languageType("englishUtf8")
-                        .anyLanguage(false)
-                        .stateMatchId("0-ABC")
-                        .stateDontMatchId("0-ABD")
-                        .build())
-                .maxResults(10)
-                .querySummaryLength(50)
-                .build();
+            .queryRestrictions(IdolQueryRestrictionsImpl.builder()
+                                   .queryText("*")
+                                   .fieldText("NOT(EMPTY):{FIELD}")
+                                   .database("Database1")
+                                   .minDate(ZonedDateTime.parse("2016-11-15T16:07:00Z[UTC]"))
+                                   .maxDate(ZonedDateTime.parse("2016-11-15T16:07:01Z[UTC]"))
+                                   .minScore(5)
+                                   .languageType("englishUtf8")
+                                   .anyLanguage(false)
+                                   .stateMatchId("0-ABC")
+                                   .stateDontMatchId("0-ABD")
+                                   .build())
+            .maxResults(10)
+            .querySummaryLength(50)
+            .build();
     }
 
     @Override

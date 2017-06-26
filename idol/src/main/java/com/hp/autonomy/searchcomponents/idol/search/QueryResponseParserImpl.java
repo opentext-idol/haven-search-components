@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -19,8 +19,6 @@ import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.Spelling;
 import com.hp.autonomy.types.requests.Warnings;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -124,7 +122,7 @@ class QueryResponseParserImpl implements QueryResponseParser {
                     .index(hit.getDatabase())
                     .title(hit.getTitle())
                     .summary(hit.getSummary())
-                    .date(hit.getDate() != null ? new DateTime(hit.getDatestring().toInstant().toEpochMilli(), DateTimeZone.UTC) : null)
+                    .date(hit.getDatestring())
                     .weight(hit.getWeight())
                     .promotionName(hit.getPromotionname());
 

@@ -1,17 +1,20 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
+import com.hp.autonomy.types.requests.idol.actions.tags.DateRangeInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.DateValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericRangeInfo;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
 import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +54,7 @@ public interface ParametricValuesService<R extends ParametricRequest<Q>, Q exten
     Set<QueryTagInfo> getParametricValues(R parametricRequest) throws E;
 
     /**
-     * Get Numeric or NumericDate parametric values as ranges and counts. For each field in the parametricRequest, a
+     * Get Numeric parametric values as ranges and counts. For each field in the parametricRequest, a
      * BucketingParams must be specified in the bucketingParamsPerField map.
      *
      * @param parametricRequest       Query restrictions and field names
@@ -59,8 +62,18 @@ public interface ParametricValuesService<R extends ParametricRequest<Q>, Q exten
      * @return A list of ranges and counts for each field in the parametric request
      * @throws E The error thrown in the event of the platform returning an error response
      */
+    List<NumericRangeInfo> getNumericParametricValuesInBuckets(R parametricRequest, final Map<FieldPath, BucketingParams<Double>> bucketingParamsPerField) throws E;
 
-    List<RangeInfo> getNumericParametricValuesInBuckets(R parametricRequest, final Map<FieldPath, BucketingParams> bucketingParamsPerField) throws E;
+    /**
+     * Get NumericDate parametric values as ranges and counts. For each field in the parametricRequest, a
+     * BucketingParams must be specified in the bucketingParamsPerField map.
+     *
+     * @param parametricRequest       Query restrictions and field names
+     * @param bucketingParamsPerField Map of fully qualified field name to min, max and number of buckets
+     * @return A list of ranges and counts for each field in the parametric request
+     * @throws E The error thrown in the event of the platform returning an error response
+     */
+    List<DateRangeInfo> getDateParametricValuesInBuckets(R parametricRequest, final Map<FieldPath, BucketingParams<ZonedDateTime>> bucketingParamsPerField) throws E;
 
     /**
      * Returns parametric values in a hierarchy
@@ -72,11 +85,20 @@ public interface ParametricValuesService<R extends ParametricRequest<Q>, Q exten
     List<DependentParametricField> getDependentParametricValues(R parametricRequest) throws E;
 
     /**
-     * Get the value details for the fields and restrictions in the given parametric request.
+     * Get the value details for the numeric fields and restrictions in the given parametric request.
      *
      * @param parametricRequest Field names and query restrictions
      * @return A map of field name to value details
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    Map<FieldPath, ValueDetails> getValueDetails(R parametricRequest) throws E;
+    Map<FieldPath, NumericValueDetails> getNumericValueDetails(R parametricRequest) throws E;
+
+    /**
+     * Get the value details for the date fields and restrictions in the given parametric request.
+     *
+     * @param parametricRequest Field names and query restrictions
+     * @return A map of field name to value details
+     * @throws E The error thrown in the event of the platform returning an error response
+     */
+    Map<FieldPath, DateValueDetails> getDateValueDetails(R parametricRequest) throws E;
 }

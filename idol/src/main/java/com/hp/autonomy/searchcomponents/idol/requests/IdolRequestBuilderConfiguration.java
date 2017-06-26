@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -24,7 +24,9 @@ import org.springframework.context.annotation.Scope;
 import static com.hp.autonomy.searchcomponents.core.databases.DatabasesService.DATABASES_REQUEST_BUILDER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.core.fields.FieldsService.FIELDS_REQUEST_BUILDER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.PARAMETRIC_REQUEST_BUILDER_BEAN_NAME;
-import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.*;
+import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.GET_CONTENT_REQUEST_BUILDER_BEAN_NAME;
+import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.QUERY_REQUEST_BUILDER_BEAN_NAME;
+import static com.hp.autonomy.searchcomponents.core.search.DocumentsService.SUGGEST_REQUEST_BUILDER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndexBuilder.GET_CONTENT_REQUEST_INDEX_BUILDER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.core.search.QueryRestrictions.QUERY_RESTRICTIONS_BUILDER_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService.RELATED_CONCEPTS_REQUEST_BUILDER_BEAN_NAME;

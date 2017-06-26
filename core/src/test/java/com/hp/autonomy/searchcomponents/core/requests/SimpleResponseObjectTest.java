@@ -1,12 +1,12 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
 package com.hp.autonomy.searchcomponents.core.requests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.json.JacksonTester;
@@ -32,7 +32,7 @@ public abstract class SimpleResponseObjectTest<O extends Serializable> extends S
     }
 
     protected void setUpObjectMapper() {
-        objectMapper.registerModule(new JodaModule());
+        objectMapper.registerModule(new JavaTimeModule());
         json = new JacksonTester<>(getClass(), ResolvableType.forClass(object.getClass()), objectMapper);
     }
 

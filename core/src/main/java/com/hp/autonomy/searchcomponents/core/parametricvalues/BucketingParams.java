@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -10,10 +10,10 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class BucketingParams implements Serializable {
+public class BucketingParams<T extends Comparable<? super T> & Serializable> implements Serializable {
     private static final long serialVersionUID = 7148091304033066434L;
 
     private final int targetNumberOfBuckets;
-    private final double min;
-    private final double max;
+    private final T min;
+    private final T max;
 }

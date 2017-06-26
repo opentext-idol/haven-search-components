@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -7,7 +7,8 @@ package com.hp.autonomy.searchcomponents.core.search;
 
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObjectBuilder;
-import org.joda.time.DateTime;
+
+import java.time.ZonedDateTime;
 
 /**
  * Response object for Query actions in {@link DocumentsService}
@@ -54,7 +55,7 @@ public interface SearchResult extends RequestObject<SearchResult, SearchResult.S
      *
      * @return The document date (from configured date field)
      */
-    DateTime getDate();
+    ZonedDateTime getDate();
 
     /**
      * The type of promotion the document represents
@@ -113,7 +114,7 @@ public interface SearchResult extends RequestObject<SearchResult, SearchResult.S
          * @param date The document date
          * @return the builder (for chaining)
          */
-        SearchResultBuilder date(final DateTime date);
+        SearchResultBuilder date(final ZonedDateTime date);
 
         /**
          * Sets the type of promotion the document represents

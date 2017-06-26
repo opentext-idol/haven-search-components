@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -7,15 +7,14 @@ package com.hp.autonomy.searchcomponents.hod.requests;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.hp.autonomy.hod.client.api.resource.ResourceIdentifier;
 import com.hp.autonomy.hod.client.api.resource.ResourceName;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictionsBuilder;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-import org.joda.time.DateTime;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Data
@@ -28,8 +27,8 @@ class HodQueryRestrictionsImpl implements HodQueryRestrictions {
     private final String fieldText;
     @Singular
     private final List<ResourceName> databases;
-    private final DateTime minDate;
-    private final DateTime maxDate;
+    private final ZonedDateTime minDate;
+    private final ZonedDateTime maxDate;
     private final Integer minScore;
     private final String languageType;
     private final boolean anyLanguage;
