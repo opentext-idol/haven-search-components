@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -50,6 +50,8 @@ class IdolRelatedConceptsServiceImpl implements IdolRelatedConceptsService {
         parameters.add(QueryParams.QuerySummaryLength.name(), relatedConceptsRequest.getQuerySummaryLength());
 
         final QueryResponseData responseData = queryExecutor.executeQuery(parameters, QueryRequest.QueryType.RAW);
-        return responseData.getQs() != null ? responseData.getQs().getElement() : Collections.emptyList();
+        return responseData.getQs() == null
+            ? Collections.emptyList()
+            : responseData.getQs().getElement();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -7,18 +7,18 @@ package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.AbstractParametricValuesServiceIT;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictionsBuilder;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
-import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
+import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Collection;
 import java.util.Map;
 
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class)
@@ -33,25 +33,25 @@ public class IdolParametricValuesServiceIT extends AbstractParametricValuesServi
 
     @Override
     protected FieldPath determinePaginatableField() {
-        final Map<FieldPath, ValueDetails> valueDetails = parametricValuesService.getValueDetails(createParametricRequest());
+        final Map<FieldPath, NumericValueDetails> valueDetails = parametricValuesService.getNumericValueDetails(createParametricRequest());
 
         return valueDetails.entrySet().stream()
-                .filter(entry -> entry.getValue().getTotalValues() >= 2)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Pagination test requires a parametric field with more than 2 values"))
-                .getKey();
+            .filter(entry -> entry.getValue().getTotalValues() >= 2)
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Pagination test requires a parametric field with more than 2 values"))
+            .getKey();
     }
 
     @Override
-    protected IdolParametricRequest noResultsParametricRequest() {
+    protected IdolParametricRequest noResultsParametricRequest(final Collection<FieldPath> fieldPaths) {
         final IdolQueryRestrictions queryRestrictions = queryRestrictionsBuilderFactory.getObject()
-                // No documents will match this text (probably)
-                .queryText("sfoiewsfoseinf")
-                .build();
+            // No documents will match this text (probably)
+            .queryText("sfoiewsfoseinf")
+            .build();
 
         return parametricRequestBuilderFactory.getObject()
-                .queryRestrictions(queryRestrictions)
-                .fieldName(tagNameFactory.getFieldPath(ParametricValuesService.AUTN_DATE_FIELD))
-                .build();
+            .queryRestrictions(queryRestrictions)
+            .fieldNames(fieldPaths)
+            .build();
     }
 }

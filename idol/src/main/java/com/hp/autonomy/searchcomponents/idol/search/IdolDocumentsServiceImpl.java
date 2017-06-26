@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -46,9 +46,10 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
 
     @Autowired
     IdolDocumentsServiceImpl(
-            final HavenSearchAciParameterHandler parameterHandler,
-            final QueryExecutor queryExecutor,
-            final QueryResponseParser queryResponseParser) {
+        final HavenSearchAciParameterHandler parameterHandler,
+        final QueryExecutor queryExecutor,
+        final QueryResponseParser queryResponseParser
+    ) {
         this.parameterHandler = parameterHandler;
         this.queryExecutor = queryExecutor;
         this.queryResponseParser = queryResponseParser;
@@ -57,7 +58,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
     @Override
     public Documents<IdolSearchResult> queryTextIndex(final IdolQueryRequest queryRequest) throws AciErrorException {
         final QueryRequest.QueryType queryType = queryRequest.getQueryType();
-        if (!queryExecutor.performQuery(queryType)) {
+        if(!queryExecutor.performQuery(queryType)) {
             return new Documents<>(Collections.emptyList(), 0, null, null, null, null);
         }
 
@@ -65,20 +66,25 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
 
         parameterHandler.addSearchRestrictions(aciParameters, queryRequest.getQueryRestrictions());
         parameterHandler.addSearchOutputParameters(aciParameters, queryRequest);
-        if (queryType != QueryRequest.QueryType.RAW) {
+        if(queryType != QueryRequest.QueryType.RAW) {
             parameterHandler.addQmsParameters(aciParameters, queryRequest.getQueryRestrictions());
         }
 
-        if (queryRequest.isAutoCorrect()) {
+        if(queryRequest.isAutoCorrect()) {
             aciParameters.add(QueryParams.SpellCheck.name(), true);
         }
 
-        if (queryType == QueryRequest.QueryType.PROMOTIONS) {
+        if(queryType == QueryRequest.QueryType.PROMOTIONS) {
             aciParameters.add(QmsQueryParams.Promotions.name(), true);
         }
 
         final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, queryType);
-        return queryResponseParser.parseQueryResults(queryRequest, aciParameters, responseData, parameters -> queryExecutor.executeQuery(parameters, queryType));
+        return queryResponseParser.parseQueryResults(
+            queryRequest,
+            aciParameters,
+            responseData,
+            parameters -> queryExecutor.executeQuery(parameters, queryType)
+        );
     }
 
     @Override
@@ -98,8 +104,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
     public List<IdolSearchResult> getDocumentContent(final IdolGetContentRequest request) throws AciErrorException {
         final List<IdolSearchResult> results = new ArrayList<>(request.getIndexesAndReferences().size());
 
-        for (final IdolGetContentRequestIndex indexAndReferences : request.getIndexesAndReferences()) {
-
+        for(final IdolGetContentRequestIndex indexAndReferences : request.getIndexesAndReferences()) {
             // We use Query and not GetContent here so we can use Combine=simple to ensure returned references are unique
             final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
             parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, request.getPrint());
@@ -125,7 +130,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
         aciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         aciParameters.add(QueryParams.MaxResults.name(), maxResults);
 
-        if (promotions) {
+        if(promotions) {
             aciParameters.add(QmsQueryParams.Promotions.name(), true);
         }
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
@@ -134,8 +139,14 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
         aciParameters.remove(QueryParams.Combine.name());
 
         final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, QueryRequest.QueryType.RAW);
-        final String token = responseData.getState() != null ? responseData.getState() : EMPTY_RESULT_SET_TOKEN;
-        final TypedStateToken tokenData = new TypedStateToken(token, promotions ? TypedStateToken.StateTokenType.PROMOTIONS : TypedStateToken.StateTokenType.QUERY);
+        final String token = responseData.getState() == null
+            ? EMPTY_RESULT_SET_TOKEN
+            : responseData.getState();
+        final TypedStateToken tokenData = new TypedStateToken(
+            token,
+            promotions
+                ? TypedStateToken.StateTokenType.PROMOTIONS
+                : TypedStateToken.StateTokenType.QUERY);
 
         // Now fetch result count with combine=simple
         final AciParameters resultCountAciParameters = new AciParameters(QueryActions.Query.name());

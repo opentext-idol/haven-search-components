@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -12,8 +12,8 @@ import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-import org.joda.time.DateTime;
 
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -36,7 +36,7 @@ public class IdolSearchResult implements SearchResult {
     @Singular("fieldEntry")
     private final Map<String, FieldInfo<?>> fieldMap;
 
-    private final DateTime date;
+    private final ZonedDateTime date;
 
     private final String qmsId;
     private final String promotionName;
@@ -51,8 +51,8 @@ public class IdolSearchResult implements SearchResult {
 
         date = builder.date;
         fieldMap = new HashMap<>();
-        if (builder.fieldMap$key != null && builder.fieldMap$value != null) {
-            for (int i = 0; i < builder.fieldMap$key.size() & i < builder.fieldMap$value.size(); i++) {
+        if(builder.fieldMap$key != null && builder.fieldMap$value != null) {
+            for(int i = 0; i < builder.fieldMap$key.size() & i < builder.fieldMap$value.size(); i++) {
                 fieldMap.put(builder.fieldMap$key.get(i), builder.fieldMap$value.get(i));
             }
         }

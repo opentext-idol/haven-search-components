@@ -1,19 +1,20 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
 package com.hp.autonomy.searchcomponents.core.requests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.Serializable;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 /**
  * Simple abstract test class for any object intended to be passed to a HavenSearch controller endpoint
@@ -23,7 +24,7 @@ public abstract class SimpleRequestObjectTest<O extends Serializable> extends Se
 
     @Before
     public void setUpObjectMapper() {
-        objectMapper.registerModule(new JodaModule());
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     /**
@@ -36,7 +37,7 @@ public abstract class SimpleRequestObjectTest<O extends Serializable> extends Se
 
     @Test
     public void fromJson() throws IOException {
-        assertEquals(object, readJson());
+        assertThat(readJson(), equalTo(object));
     }
 
     protected Object readJson() throws IOException {

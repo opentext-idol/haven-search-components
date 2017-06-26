@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -14,13 +14,13 @@ import com.hp.autonomy.types.idol.responses.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -155,13 +155,13 @@ public class IdolDocumentsServiceTest {
 
         final StateTokenAndResultCount stateTokenAndResultCount = idolDocumentsService.getStateTokenAndResultCount(mockQueryParams(QueryRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
         assertThat(stateTokenAndResultCount.getTypedStateToken().getStateToken(), is(MOCK_STATE_TOKEN));
-        assertThat(stateTokenAndResultCount.getResultCount(), is((long) MOCK_TOTAL_HITS));
+        assertThat(stateTokenAndResultCount.getResultCount(), is((long)MOCK_TOTAL_HITS));
     }
 
     private IdolQueryRequest mockQueryParams(final QueryRequest.QueryType queryType) {
         when(queryRestrictions.getQueryText()).thenReturn("*");
         when(queryRestrictions.getDatabases()).thenReturn(Arrays.asList("Database1", "Database2"));
-        when(queryRestrictions.getMaxDate()).thenReturn(DateTime.now());
+        when(queryRestrictions.getMaxDate()).thenReturn(ZonedDateTime.now());
 
         when(queryRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
         when(queryRequest.getStart()).thenReturn(1);

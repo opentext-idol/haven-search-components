@@ -1,12 +1,13 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
 package com.hp.autonomy.searchcomponents.core.config;
 
-import org.joda.time.DateTime;
-
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.function.Function;
 
 /**
@@ -14,18 +15,18 @@ import java.util.function.Function;
  */
 public enum FieldType {
     STRING(String.class, value -> value),
-    DATE(DateTime.class, value -> {
+    DATE(ZonedDateTime.class, value -> {
+        try {
+            final long epoch = Long.parseLong(value);
+            return ZonedDateTime.ofInstant(Instant.ofEpochSecond(epoch), ZoneOffset.UTC);
+        } catch(final NumberFormatException ignore) {
             try {
-                final long epoch = Long.parseLong(value) * 1000;
-                return new DateTime(epoch);
-            } catch (final NumberFormatException ignore) {
-                try {
-                    // HOD handles date fields inconsistently; attempt to detect this here
-                    return new DateTime(value);
-                } catch (final IllegalArgumentException ignored) {
-                    return null;
-                }
+                // HOD handles date fields inconsistently; attempt to detect this here
+                return ZonedDateTime.parse(value);
+            } catch(final IllegalArgumentException ignored) {
+                return null;
             }
+        }
     }),
     NUMBER(Number.class, Double::parseDouble),
     BOOLEAN(Boolean.class, Boolean::parseBoolean);
