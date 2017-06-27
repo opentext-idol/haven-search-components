@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 
 import static org.mockito.Mockito.mock;
@@ -51,28 +52,29 @@ public class IdolTestConfiguration {
     }
 
     @Bean
+    @Primary
     public ConfigService<IdolSearchCapable> testConfigService(final IdolSearchCapable config) {
         final QueryManipulation queryManipulationConfig = QueryManipulation.builder()
-                .enabled(false)
-                .build();
+            .enabled(false)
+            .build();
 
         final ViewConfig viewConfig = ViewConfig.builder()
-                .referenceField(VIEW_SERVER_REFERENCE_FIELD)
-                .host(getProperty(VIEW_SERVER_HOST_PROPERTY, VIEW_SERVER_HOST))
-                .port(getIntProperty(VIEW_SERVER_PORT_PROPERTY, VIEW_SERVER_PORT))
-                .build();
+            .referenceField(VIEW_SERVER_REFERENCE_FIELD)
+            .host(getProperty(VIEW_SERVER_HOST_PROPERTY, VIEW_SERVER_HOST))
+            .port(getIntProperty(VIEW_SERVER_PORT_PROPERTY, VIEW_SERVER_PORT))
+            .build();
 
         final AnswerServerConfig answerServerConfig = AnswerServerConfig.builder()
-                .server(ServerConfig.builder()
+            .server(ServerConfig.builder()
                         .host(getProperty(ANSWER_SERVER_HOST_PROPERTY, ANSWER_SERVER_HOST))
                         .port(getIntProperty(ANSWER_SERVER_PORT_PROPERTY, ANSWER_SERVER_PORT))
                         .build())
-                .systemName(getProperty(ANSWER_SERVER_SYSTEM_PROPERTY, ANSWER_SERVER_SYSTEM_NAME))
-                .build();
+            .systemName(getProperty(ANSWER_SERVER_SYSTEM_PROPERTY, ANSWER_SERVER_SYSTEM_NAME))
+            .build();
 
         final AciServerDetails contentAciServerDetails = new AciServerDetails(
-                getProperty(CONTENT_HOST_PROPERTY, CONTENT_HOST),
-                getIntProperty(CONTENT_PORT_PROPERTY, CONTENT_PORT)
+            getProperty(CONTENT_HOST_PROPERTY, CONTENT_HOST),
+            getIntProperty(CONTENT_PORT_PROPERTY, CONTENT_PORT)
         );
 
         when(config.getContentAciServerDetails()).thenReturn(contentAciServerDetails);
