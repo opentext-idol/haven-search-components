@@ -50,6 +50,9 @@ public class FieldInfo<T extends Serializable> implements RequestObject<FieldInf
     @Singular
     private final List<FieldValue<T>> values;
 
+    // Array of potential <select> option values, or ['*'] for a edit box, or just [] for a non-editable field
+    private final List<String> editable;
+
     private FieldInfo(final FieldInfoBuilder<T> builder) {
         id = builder.id;
         type = builder.type;
@@ -57,6 +60,7 @@ public class FieldInfo<T extends Serializable> implements RequestObject<FieldInf
         names = builder.names;
         displayName = builder.displayName;
         values = builder.values;
+        editable = builder.editable;
     }
 
     public static <T extends Serializable> FieldInfoBuilder<T> builder() {
@@ -86,6 +90,10 @@ public class FieldInfo<T extends Serializable> implements RequestObject<FieldInf
         return Collections.unmodifiableList(values);
     }
 
+    public List<String> getEditable() {
+        return Collections.unmodifiableList(editable);
+    }
+
     @Override
     public FieldInfoBuilder<T> toBuilder() {
         return new FieldInfoBuilder<>(this);
@@ -103,6 +111,7 @@ public class FieldInfo<T extends Serializable> implements RequestObject<FieldInf
         private Set<FieldPath> names = new HashSet<>();
         private String displayName;
         private List<FieldValue<T>> values = new ArrayList<>();
+        private List<String> editable = new ArrayList<>();
 
         private FieldInfoBuilder(final FieldInfo<T> fieldInfo) {
             id = fieldInfo.id;
@@ -111,6 +120,7 @@ public class FieldInfo<T extends Serializable> implements RequestObject<FieldInf
             names = fieldInfo.names;
             displayName = fieldInfo.displayName;
             values = fieldInfo.values;
+            editable = fieldInfo.editable;
         }
 
         @JsonProperty("type")
@@ -141,6 +151,11 @@ public class FieldInfo<T extends Serializable> implements RequestObject<FieldInf
 
         public FieldInfoBuilder<T> values(final Collection<? extends FieldValue<T>> values) {
             this.values.addAll(values);
+            return this;
+        }
+
+        public FieldInfoBuilder<T> editable(final Collection<? extends String> editable) {
+            this.editable.addAll(editable);
             return this;
         }
 

@@ -13,6 +13,8 @@ import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,5 +38,22 @@ public abstract class AbstractDocumentFieldsService implements DocumentFieldsSer
                 .flatMap(field -> field.getNames().stream())
                 .map(FieldPath::getNormalisedPath)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Set<String> getEditableIdolFields(final String field) {
+        final FieldsInfo fieldsInfo = configService.getConfig().getFieldsInfo();
+
+        final FieldInfo<?> fieldInfo = fieldsInfo.getFieldConfig().get(field);
+
+        final Set<String> fieldNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+
+        if (fieldInfo != null && !fieldInfo.getEditable().isEmpty()) {
+            fieldNames.addAll(fieldInfo.getNames().stream()
+                .map(FieldPath::getNormalisedPath)
+                .collect(Collectors.toList()));
+        }
+
+        return fieldNames;
     }
 }

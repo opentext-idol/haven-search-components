@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.core.search.fields;
 
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Collection;
@@ -33,4 +34,6 @@ public interface DocumentFieldsService {
      * @return Additional fields toi read from the result, e.g. related to query manipulation.
      */
     Collection<FieldInfo<?>> getHardCodedFields();
+
+    Set<String> getEditableIdolFields(String field);
 }
