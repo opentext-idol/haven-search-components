@@ -61,4 +61,12 @@ public interface AskAnswerServerRequestBuilder extends RequestObjectBuilder<AskA
      * @return the builder (for chaining)
      */
     AskAnswerServerRequestBuilder maxResults(Integer maxResults);
+
+    /**
+     * Sets the customization data, if any
+     *
+     * @param customizationData The customization data
+     * @return the builder (for chaining)
+     */
+    AskAnswerServerRequestBuilder customizationData(String customizationData);
 }
