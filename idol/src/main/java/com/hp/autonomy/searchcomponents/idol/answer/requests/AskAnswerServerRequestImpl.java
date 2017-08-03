@@ -32,6 +32,7 @@ class AskAnswerServerRequestImpl implements AskAnswerServerRequest {
     private final Integer firstResult;
     private final Integer maxResults;
     private final Double minScore;
+    private final String customizationData;
 
     @JsonPOJOBuilder(withPrefix = "")
     static class AskAnswerServerRequestImplBuilder implements AskAnswerServerRequestBuilder {

@@ -56,4 +56,11 @@ public interface AskAnswerServerRequest extends RequestObject<AskAnswerServerReq
      * @return The score threshold for returned results
      */
     Double getMinScore();
+
+    /**
+     * The customization data, if any
+     *
+     * @return The customization data
+     */
+    String getCustomizationData();
 }

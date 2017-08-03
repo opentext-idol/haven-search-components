@@ -51,6 +51,7 @@ class AskAnswerServerServiceImpl implements AskAnswerServerService {
         aciParameters.add(AskParams.FirstResult.name(), request.getFirstResult());
         aciParameters.add(AskParams.MaxResults.name(), request.getMaxResults());
         aciParameters.add(AskParams.MinScore.name(), request.getMinScore());
+        aciParameters.add("customizationData", request.getCustomizationData());
 
         final AskAnswers answers = answerServerAciService.executeAction(aciParameters, processor).getAnswers();
         return Optional.ofNullable(answers).map(AskAnswers::getAnswer).orElse(Collections.emptyList());
