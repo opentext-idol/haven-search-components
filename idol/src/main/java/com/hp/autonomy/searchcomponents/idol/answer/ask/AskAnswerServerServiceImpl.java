@@ -16,13 +16,12 @@ import com.hp.autonomy.types.idol.responses.answer.AskResponsedata;
 import com.hp.autonomy.types.requests.idol.actions.answer.AnswerServerActions;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.AskParams;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.AskSortParam;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import static com.hp.autonomy.searchcomponents.idol.answer.ask.AskAnswerServerService.ASK_SERVICE_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.exceptions.codes.IdolErrorCodes.ANSWER_SERVER;
