@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObjectBuilder;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Builder for {@link AskAnswerServerRequest}
@@ -69,4 +70,13 @@ public interface AskAnswerServerRequestBuilder extends RequestObjectBuilder<AskA
      * @return the builder (for chaining)
      */
     AskAnswerServerRequestBuilder customizationData(String customizationData);
+
+    /**
+     * Sets any proxied parameters, if any.
+     * (you have to configure [Server] AllowedQueryParameters in Answer Server to pass them through).
+     *
+     * @param proxiedParams Map of proxied parameters
+     * @return the builder (for chaining)
+     */
+    AskAnswerServerRequestBuilder proxiedParams(Map<? extends String, ? extends String> proxiedParams);
 }

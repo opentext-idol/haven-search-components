@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 import com.hp.autonomy.searchcomponents.core.requests.RequestObject;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.AskSortParam;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -63,4 +64,11 @@ public interface AskAnswerServerRequest extends RequestObject<AskAnswerServerReq
      * @return The customization data
      */
     String getCustomizationData();
+
+    /**
+     * The proxied parameters, if any.
+     * (you have to configure [Server] AllowedQueryParameters in Answer Server to pass them through).
+     * @return
+     */
+    Map<String, String> getProxiedParams();
 }
