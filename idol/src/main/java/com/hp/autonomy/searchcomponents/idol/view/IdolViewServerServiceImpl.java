@@ -149,6 +149,13 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
         final ViewConfig viewConfig = configService.getConfig().getViewConfig();
         final ViewingMode viewingMode = viewConfig.getViewingMode();
 
+        final String referenceField = viewConfig.getReferenceField();
+        final Optional<String> fieldOptional = parseFieldValue(document, referenceField);
+
+        if (fieldOptional.isPresent()) {
+            return fieldOptional;
+        }
+
         if (viewingMode == ViewingMode.CONNECTOR) {
             final Optional<String> maybeIdentifier = parseFieldValue(document, AUTN_IDENTIFIER);
             final Optional<String> maybeGroup = parseFieldValue(document, AUTN_GROUP);
@@ -176,10 +183,9 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
             } else {
                 return Optional.empty();
             }
-        } else {
-            final String referenceField = viewConfig.getReferenceField();
-            return parseFieldValue(document, referenceField);
         }
+
+        return Optional.empty();
     }
 
     private Optional<String> parseFieldValue(final Hit document, final String fieldName) {
