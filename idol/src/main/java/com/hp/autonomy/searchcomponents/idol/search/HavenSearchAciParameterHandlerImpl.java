@@ -50,6 +50,8 @@ import static com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParamet
 class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandler {
     private static final String GET_CONTENT_QUERY_TEXT = "*";
 
+    private static final String SIMPLE_AND_FIELDCHECK = CombineParam.Simple + "+" + CombineParam.FieldCheck;
+
     private final ConfigService<? extends IdolSearchCapable> configService;
     private final DocumentFieldsService documentFieldsService;
     private final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever;
@@ -80,7 +82,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
             aciParameters.add(QueryParams.StateDontMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateDontMatchIds()));
         }
 
-        aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
+        aciParameters.add(QueryParams.Combine.name(), SIMPLE_AND_FIELDCHECK);
         aciParameters.add(QueryParams.MinDate.name(), formatDate(queryRestrictions.getMinDate()));
         aciParameters.add(QueryParams.MaxDate.name(), formatDate(queryRestrictions.getMaxDate()));
         aciParameters.add(QueryParams.FieldText.name(), queryRestrictions.getFieldText());
@@ -117,7 +119,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         final Set<String> references = indexAndReferences.getReferences();
         aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(references));
         aciParameters.add(QueryParams.Summary.name(), SummaryParam.Concept);
-        aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
+        aciParameters.add(QueryParams.Combine.name(), SIMPLE_AND_FIELDCHECK);
         aciParameters.add(QueryParams.Text.name(), GET_CONTENT_QUERY_TEXT);
         aciParameters.add(QueryParams.MaxResults.name(), references.size());
         aciParameters.add(QueryParams.AnyLanguage.name(), true);
