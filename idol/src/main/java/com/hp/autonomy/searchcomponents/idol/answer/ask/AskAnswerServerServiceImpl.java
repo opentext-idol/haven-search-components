@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.hp.autonomy.searchcomponents.idol.answer.ask.AskAnswerServerService.ASK_SERVICE_BEAN_NAME;
@@ -52,6 +53,13 @@ class AskAnswerServerServiceImpl implements AskAnswerServerService {
         aciParameters.add(AskParams.MaxResults.name(), request.getMaxResults());
         aciParameters.add(AskParams.MinScore.name(), request.getMinScore());
         aciParameters.add("customizationData", request.getCustomizationData());
+
+        final Map<String, String> proxiedParams = request.getProxiedParams();
+        if (proxiedParams != null) {
+            for(Map.Entry<String, String> entry : proxiedParams.entrySet()) {
+                aciParameters.put(entry.getKey(), entry.getValue());
+            }
+        }
 
         final AskAnswers answers = answerServerAciService.executeAction(aciParameters, processor).getAnswers();
         return Optional.ofNullable(answers).map(AskAnswers::getAnswer).orElse(Collections.emptyList());
