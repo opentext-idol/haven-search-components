@@ -390,10 +390,15 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
     private int flatFieldTotalValues(final FlatField flatField, final Integer values) {
         // If no values are returned for a field, IDOL does not return a <total_values> element
-        // For (non-parametric) numeric fields we should use values as total_values won't be populated
-        return Optional.ofNullable(flatField.getTotalValues())
-            .orElse(Optional.ofNullable(values)
-                        .orElse(0));
+        // For (non-parametric) numeric fields we should use values. <autn:total_values> is missing on a DAH in combine
+        //   mode, or is always <autn:total_values>0</autn:total_values> if you're using content or a DAH in mirror mode.
+        // That's why we use the Math.max below.
+        final Integer totalValues = flatField.getTotalValues();
+        if (totalValues != null) {
+            return values != null ? Math.max(totalValues, values) : totalValues;
+        }
+
+        return values != null ? values : 0;
     }
 
     private Collection<FlatField> getFlatFields(final IdolParametricRequest parametricRequest, final Collection<FieldPath> fieldNames) {

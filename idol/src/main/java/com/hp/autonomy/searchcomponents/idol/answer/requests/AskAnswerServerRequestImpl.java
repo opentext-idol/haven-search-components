@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.idol.answer.ask.AskAnswerServerRequest;
 import com.hp.autonomy.searchcomponents.idol.answer.ask.AskAnswerServerRequestBuilder;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.AskSortParam;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
@@ -32,6 +33,9 @@ class AskAnswerServerRequestImpl implements AskAnswerServerRequest {
     private final Integer firstResult;
     private final Integer maxResults;
     private final Double minScore;
+    private final String customizationData;
+    @Singular
+    private final Map<String,String> proxiedParams;
 
     @JsonPOJOBuilder(withPrefix = "")
     static class AskAnswerServerRequestImplBuilder implements AskAnswerServerRequestBuilder {
