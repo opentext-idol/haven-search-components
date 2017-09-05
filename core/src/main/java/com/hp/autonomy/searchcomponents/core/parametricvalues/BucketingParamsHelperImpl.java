@@ -85,6 +85,13 @@ class BucketingParamsHelperImpl implements BucketingParamsHelper {
             boundary = boundary.plus(bucketDuration);
         } while(boundaries.size() <= targetNumberOfBuckets);
 
+        if(boundaries.size() == 1) {
+            // IDOL uses ranges which are lower bound inclusive and upper bound exclusive; so if there's one data point
+            //   it throws an 'Invalid parametric range specification.' error.
+            // Workaround by creating a 1-second range, since 1 second is the minimum time that IDOL will resolve.
+            boundaries.add(boundaries.get(0).plusSeconds(1));
+        }
+
         return boundaries;
     }
 

@@ -114,6 +114,15 @@ public class BucketingParamsHelperTest {
     }
 
     @Test
+    public void calculateSingleTimePointDateBoundaries() {
+        // Test for https://jira.autonomy.com/browse/FIND-1459 : ensuring we don't send a single point as a date range.
+        final ZonedDateTime time = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS);
+        final ZonedDateTime adjustedTime = time.truncatedTo(ChronoUnit.SECONDS);
+        final List<ZonedDateTime> expectedBoundaries = Arrays.asList(adjustedTime, adjustedTime.plusSeconds(1));
+        assertEquals(expectedBoundaries, bucketingParamsHelper.calculateDateBoundaries(new BucketingParams<>(2, time, time)));
+    }
+
+    @Test
     public void calculateDateBoundariesRequiringFewerBucketsThanRequested() {
         final ZonedDateTime max = ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS);
         final ZonedDateTime min = max.minusSeconds(1);
