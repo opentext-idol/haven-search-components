@@ -41,6 +41,7 @@ import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
+import java.util.Optional;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -228,12 +229,13 @@ class HodParametricValuesServiceImpl implements HodParametricValuesService {
     }
 
     private Collection<FieldPath> lookupFields(final Collection<ResourceName> databases) throws HodErrorException {
-        return fieldsService.getFields(fieldsRequestBuilderFactory.getObject()
+        return Optional.ofNullable(
+                fieldsService.getFields(fieldsRequestBuilderFactory.getObject()
                                            .fieldType(FieldTypeParam.Parametric)
                                            .databases(databases)
                                            .build())
             .get(FieldTypeParam.Parametric)
-            .stream()
+            ).orElse(Collections.emptySet()).stream()
             .map(TagName::getId)
             .collect(Collectors.toList());
     }
