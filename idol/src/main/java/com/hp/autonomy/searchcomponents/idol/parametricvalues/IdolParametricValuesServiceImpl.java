@@ -300,8 +300,9 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     }
 
     private Collection<FieldPath> lookupFields() {
-        return fieldsService.getFields(fieldsRequestBuilderFactory.getObject().fieldType(FieldTypeParam.Parametric).build()).get(FieldTypeParam.Parametric)
-            .stream()
+        return Optional.ofNullable(
+            fieldsService.getFields(fieldsRequestBuilderFactory.getObject().fieldType(FieldTypeParam.Parametric).build()).get(FieldTypeParam.Parametric)
+            ).orElse(Collections.emptySet()).stream()
             .map(TagName::getId)
             .collect(Collectors.toList());
     }
