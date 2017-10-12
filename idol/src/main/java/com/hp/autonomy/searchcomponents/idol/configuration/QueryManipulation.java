@@ -27,6 +27,7 @@ import org.apache.commons.lang3.BooleanUtils;
 public class QueryManipulation extends SimpleComponent<QueryManipulation> implements OptionalConfigurationComponent<QueryManipulation> {
     private final ServerConfig server;
     private final Boolean expandQuery;
+    private final Boolean synonymDatabaseMatch;
     private final String blacklist;
     private final ModeParam typeAheadMode;
     private final Boolean enabled;

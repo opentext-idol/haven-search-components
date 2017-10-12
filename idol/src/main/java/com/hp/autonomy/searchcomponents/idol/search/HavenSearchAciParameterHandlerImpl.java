@@ -168,6 +168,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     public void addQmsParameters(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         aciParameters.add(QmsQueryParams.Blacklist.name(), configService.getConfig().getQueryManipulation().getBlacklist());
         aciParameters.add(QmsQueryParams.ExpandQuery.name(), configService.getConfig().getQueryManipulation().getExpandQuery());
+        aciParameters.add(QmsQueryParams.SynonymDatabaseMatch.name(), configService.getConfig().getQueryManipulation().getSynonymDatabaseMatch());
     }
 
     @Override
