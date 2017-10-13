@@ -130,10 +130,10 @@ public class HavenSearchAciParameterHandlerTest {
     @Test
     public void addQmsParameters() {
         final IdolSearchCapable config = mock(IdolSearchCapable.class);
-        when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().blacklist("ISO_BLACKLIST").expandQuery(true).build());
+        when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().blacklist("ISO_BLACKLIST").expandQuery(true).synonymDatabaseMatch(true).build());
         when(configService.getConfig()).thenReturn(config);
         parameterHandler.addQmsParameters(aciParameters, null);
-        assertThat(aciParameters, hasSize(2));
+        assertThat(aciParameters, hasSize(3));
     }
 
     @Test
