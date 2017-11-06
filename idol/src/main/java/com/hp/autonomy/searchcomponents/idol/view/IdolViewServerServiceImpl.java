@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.view;
 
 import com.autonomy.aci.client.services.*;
 import com.autonomy.aci.client.util.AciParameters;
+import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.server.ServerConfig;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
@@ -25,10 +26,12 @@ import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.requests.idol.actions.connector.ConnectorActions;
 import com.hp.autonomy.types.requests.idol.actions.connector.params.ConnectorViewParams;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
+import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
 import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,7 +91,16 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
      */
     @Override
     public void viewDocument(final IdolViewRequest request, final OutputStream outputStream) throws ViewDocumentNotFoundException, IOException {
-        final Hit document = loadDocument(request.getDocumentReference(), request.getDatabase());
+        // Only fetch the minimum necessary information to know if we should use View, Connector, or DRECONTENT rendering.
+        final PrintFields printFields = new PrintFields(AUTN_IDENTIFIER, AUTN_GROUP);
+        final ViewConfig viewConfig = configService.getConfig().getViewConfig();
+
+        final String refField = viewConfig.getReferenceField();
+        if(StringUtils.isNotBlank(refField)) {
+            printFields.append(refField);
+        }
+
+        final Hit document = loadDocument(request.getDocumentReference(), request.getDatabase(), printFields);
         final Optional<String> maybeUrl = readViewUrl(document);
 
         if (maybeUrl.isPresent()) {
@@ -101,7 +113,10 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
                 throw new ViewServerErrorException(request.getDocumentReference(), e);
             }
         } else {
-            final String content = parseFieldValue(document, CONTENT_FIELD).orElse("");
+            // We need to fetch the DRECONTENT if we have to use the DRECONTENT rendering fallback.
+            final Hit docContent = loadDocument(request.getDocumentReference(), request.getDatabase(), new PrintFields(CONTENT_FIELD));
+
+            final String content = parseFieldValue(docContent, CONTENT_FIELD).orElse("");
 
             final RawDocument rawDocument = RawDocument.builder()
                     .reference(document.getReference())
@@ -120,12 +135,14 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
         throw new NotImplementedException("Viewing static content promotions on premise is not yet possible");
     }
 
-    private Hit loadDocument(final String documentReference, final String database) {
+    private Hit loadDocument(final String documentReference, final String database, final PrintFields printFields) {
         final ViewConfig viewConfig = configService.getConfig().getViewConfig();
         final String referenceField = viewConfig.getReferenceField();
 
         // do a GetContent to check for document visibility and to read out required fields
         final AciParameters parameters = new AciParameters(QueryActions.GetContent.name());
+        parameters.add(GetContentParams.Print.name(), "Fields");
+        parameters.add(GetContentParams.PrintFields.name(), printFields);
         parameterHandler.addGetContentOutputParameters(parameters, database, documentReference, referenceField);
 
         final GetContentResponseData queryResponse;
