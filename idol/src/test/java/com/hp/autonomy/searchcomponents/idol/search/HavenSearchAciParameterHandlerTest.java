@@ -146,6 +146,6 @@ public class HavenSearchAciParameterHandlerTest {
     public void addViewParameters() {
         when(viewRequest.getHighlightExpression()).thenReturn("SomeText");
         parameterHandler.addViewParameters(aciParameters, "123456", viewRequest);
-        assertThat(aciParameters, hasSize(10));
+        assertThat(aciParameters, hasSize(11));
     }
 }

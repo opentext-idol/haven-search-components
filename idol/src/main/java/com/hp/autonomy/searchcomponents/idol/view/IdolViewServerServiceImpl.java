@@ -91,10 +91,22 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
      */
     @Override
     public void viewDocument(final IdolViewRequest request, final OutputStream outputStream) throws ViewDocumentNotFoundException, IOException {
-        // Only fetch the minimum necessary information to know if we should use View, Connector, or DRECONTENT rendering.
-        final PrintFields printFields = new PrintFields(AUTN_IDENTIFIER, AUTN_GROUP);
         final ViewConfig viewConfig = configService.getConfig().getViewConfig();
 
+        if (viewConfig.getViewingMode() == ViewingMode.UNIVERSAL) {
+            final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
+            parameterHandler.addViewParameters(viewParameters, request.getDocumentReference(), request);
+
+            try {
+                viewAciService.executeAction(viewParameters, new CopyResponseProcessor(outputStream));
+                return;
+            } catch (final AciServiceException e) {
+                throw new ViewServerErrorException(request.getDocumentReference(), e);
+            }
+        }
+
+        // Only fetch the minimum necessary information to know if we should use View, Connector, or DRECONTENT rendering.
+        final PrintFields printFields = new PrintFields(AUTN_IDENTIFIER, AUTN_GROUP);
         final String refField = viewConfig.getReferenceField();
         if(StringUtils.isNotBlank(refField)) {
             printFields.append(refField);
