@@ -192,6 +192,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         aciParameters.add(ViewParams.EmbedImages.name(), true);
         aciParameters.add(ViewParams.StripScript.name(), true);
         aciParameters.add(ViewParams.OriginalBaseURL.name(), true);
+        addSecurityInfo(aciParameters);
 
         if(viewRequest.getHighlightExpression() != null) {
             aciParameters.add(ViewParams.Links.name(), viewRequest.getHighlightExpression());

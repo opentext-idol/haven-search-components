@@ -6,5 +6,5 @@
 package com.hp.autonomy.searchcomponents.idol.view.configuration;
 
 public enum ViewingMode {
-    FIELD, CONNECTOR;
+    FIELD, CONNECTOR, UNIVERSAL;
 }
