@@ -44,6 +44,9 @@ public class ViewConfigValidator implements Validator<ViewConfig> {
                 case FIELD:
                     returnValue = StringUtils.isBlank(config.getReferenceField()) ? new ValidationResult<>(false, Validation.REFERENCE_FIELD_BLANK) : validationResult;
                     break;
+                case UNIVERSAL:
+                    returnValue = new ValidationResult<>(true);
+                    break;
             }
         } else {
             returnValue = validationResult;
