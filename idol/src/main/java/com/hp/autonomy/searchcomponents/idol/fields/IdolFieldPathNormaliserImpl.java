@@ -9,7 +9,10 @@ import com.hp.autonomy.searchcomponents.core.fields.AbstractFieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Matcher;
@@ -23,10 +26,21 @@ import static com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser.F
 @Component(FIELD_PATH_NORMALISER_BEAN_NAME)
 class IdolFieldPathNormaliserImpl extends AbstractFieldPathNormaliser {
     private static final String IDX_PREFIX = "DOCUMENT/";
-    private static final String XML_PREFIX = "DOCUMENTS/";
     private static final Pattern FIELD_NAME_PATTERN = Pattern.compile("(/?[^/]+)+");
     private static final Pattern IDX_PATH_PATTERN = Pattern.compile("^/?(?:" + IDX_PREFIX + ")?(?<fieldPath>[^/]+)$");
-    private static final Pattern XML_PATH_PATTERN = Pattern.compile("^/?(?:" + XML_PREFIX + ")?(?:" + IDX_PREFIX + ")?(?<fieldPath>[^/]+(?:/[^/]+)*)$");
+    private final Pattern XML_PATH_PATTERN;
+
+    @SuppressWarnings("WeakerAccess")
+    public IdolFieldPathNormaliserImpl(
+        @Value("${idol.field.path.normalizer.xml.prefixes:DOCUMENTS}")
+        final String[] prefixes
+    ) {
+        final String XML_PREFIX = Arrays.stream(prefixes)
+                .map(s -> Pattern.quote(s + "/"))
+                .collect(Collectors.joining("|"));
+
+        XML_PATH_PATTERN = Pattern.compile("^/?(?:" + XML_PREFIX + ")?(?:" + IDX_PREFIX + ")?(?<fieldPath>[^/]+(?:/[^/]+)*)$");
+    }
 
     @Override
     public FieldPath normaliseFieldPath(final String fieldPath) {
