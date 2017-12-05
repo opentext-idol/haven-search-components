@@ -27,6 +27,7 @@ import com.hp.autonomy.types.requests.idol.actions.connector.ConnectorActions;
 import com.hp.autonomy.types.requests.idol.actions.connector.params.ConnectorViewParams;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
+import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
 import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -112,7 +113,7 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
             printFields.append(refField);
         }
 
-        final Hit document = loadDocument(request.getDocumentReference(), request.getDatabase(), printFields);
+        final Hit document = loadDocument(request.getDocumentReference(), request.getDatabase(), printFields, null);
         final Optional<String> maybeUrl = readViewUrl(document);
 
         if (maybeUrl.isPresent()) {
@@ -126,7 +127,7 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
             }
         } else {
             // We need to fetch the DRECONTENT if we have to use the DRECONTENT rendering fallback.
-            final Hit docContent = loadDocument(request.getDocumentReference(), request.getDatabase(), new PrintFields(CONTENT_FIELD));
+            final Hit docContent = loadDocument(request.getDocumentReference(), request.getDatabase(), new PrintFields(CONTENT_FIELD), request.getHighlightExpression());
 
             final String content = parseFieldValue(docContent, CONTENT_FIELD).orElse("");
 
@@ -147,7 +148,7 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
         throw new NotImplementedException("Viewing static content promotions on premise is not yet possible");
     }
 
-    private Hit loadDocument(final String documentReference, final String database, final PrintFields printFields) {
+    private Hit loadDocument(final String documentReference, final String database, final PrintFields printFields, final String highlightExpression) {
         final ViewConfig viewConfig = configService.getConfig().getViewConfig();
         final String referenceField = viewConfig.getReferenceField();
 
@@ -156,6 +157,14 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
         parameters.add(GetContentParams.Print.name(), "Fields");
         parameters.add(GetContentParams.PrintFields.name(), printFields);
         parameterHandler.addGetContentOutputParameters(parameters, database, documentReference, referenceField);
+
+        if (StringUtils.isNotBlank(highlightExpression)) {
+            parameters.add(GetContentParams.Highlight.name(), HighlightParam.Terms);
+            parameters.add(GetContentParams.Links.name(), highlightExpression);
+            parameters.add(GetContentParams.Boolean.name(), true);
+            parameters.add(GetContentParams.StartTag.name(), HIGHLIGHT_START_TAG);
+            parameters.add(GetContentParams.EndTag.name(), HIGHLIGHT_END_TAG);
+        }
 
         final GetContentResponseData queryResponse;
 
