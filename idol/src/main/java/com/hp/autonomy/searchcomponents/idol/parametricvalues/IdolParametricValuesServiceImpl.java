@@ -430,6 +430,8 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         return fieldNames.isEmpty()
             ? Collections.emptyList()
             : recursiveFields.stream()
+            // We want to ignore fields where the count is missing, e.g. https://jira.autonomy.com/browse/FIND-1496
+            .filter(a -> a.getCount() != null)
             .map(recursiveField -> DependentParametricField.builder()
                 .value(recursiveField.getValue())
                 .displayValue(tagNameFactory.getTagDisplayValue(fieldNames.get(0), recursiveField.getValue()))
