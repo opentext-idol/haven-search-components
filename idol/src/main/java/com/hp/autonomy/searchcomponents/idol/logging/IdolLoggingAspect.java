@@ -3,6 +3,7 @@ package com.hp.autonomy.searchcomponents.idol.logging;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.transport.AciResponseInputStream;
 import com.autonomy.aci.client.transport.AciServerDetails;
+import com.autonomy.aci.client.transport.ActionParameter;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
@@ -61,7 +62,7 @@ public class IdolLoggingAspect {
     public Object logIdolRequests(
             final ProceedingJoinPoint joinPoint,
             final AciServerDetails serverDetails,
-            final Collection<? extends AciParameter> parameters) throws Throwable {
+            final Collection<? extends ActionParameter> parameters) throws Throwable {
 
         final String host = serverDetails.getHost();
         final int port = serverDetails.getPort();
@@ -96,13 +97,13 @@ public class IdolLoggingAspect {
      * @return A custom message
      */
     @SuppressWarnings({"unused", "WeakerAccess"})
-    protected String generateMessage(final AciServerDetails serverDetails, final Collection<? extends AciParameter> parameters) {
+    protected String generateMessage(final AciServerDetails serverDetails, final Collection<? extends ActionParameter> parameters) {
         return "";
     }
 
-    private String getParameterValue(final AciParameter parameter) {
+    private String getParameterValue(final ActionParameter parameter) {
         return parameter.getName().equalsIgnoreCase(QueryParams.SecurityInfo.name()) || parameter.getName().equalsIgnoreCase(SecurityParams.Password.name())
                 ? HIDDEN_VALUE
-                : parameter.getValue();
+                : parameter.getValue().toString();
     }
 }

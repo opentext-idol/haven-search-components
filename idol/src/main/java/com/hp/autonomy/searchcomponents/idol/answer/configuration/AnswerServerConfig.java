@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2018 Micro Focus International plc.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -34,6 +34,8 @@ public class AnswerServerConfig extends SimpleComponent<AnswerServerConfig> impl
     @Singular
     private final Collection<String> systemNames;
     private final Boolean enabled;
+
+    private final String conversationSystemName;
 
     @Override
     public void basicValidate(final String configSection) throws ConfigException {
