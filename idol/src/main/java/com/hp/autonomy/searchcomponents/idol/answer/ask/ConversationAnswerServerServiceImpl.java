@@ -7,7 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
-import com.autonomy.aci.client.transport.InputStreamActionParameter;
+import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.util.ActionParameters;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,7 +24,7 @@ import com.hp.autonomy.types.idol.responses.conversation.ManagementResult;
 import com.hp.autonomy.types.requests.idol.actions.answer.AnswerServerActions;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.ConverseParams;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.ManageResourcesParams;
-import java.io.ByteArrayInputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +32,9 @@ import java.util.Optional;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.StringBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -73,8 +76,7 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
         params.add(ManageResourcesParams.SystemName.name(), conversationSystemName);
 
         try {
-            params.add(new InputStreamActionParameter(ManageResourcesParams.Data.name(),
-                new ByteArrayInputStream(objectMapper.writeValueAsBytes(op))));
+            params.add(new JsonMultipartString(ManageResourcesParams.Data.name(), objectMapper.writeValueAsString(op)));
         }
         catch(JsonProcessingException e) {
             throw new Error("Unexpected JSON processing error", e);
@@ -111,8 +113,7 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
         params.add(ManageResourcesParams.SystemName.name(), conversationSystemName);
 
         try {
-            params.add(new InputStreamActionParameter(ManageResourcesParams.Data.name(),
-                    new ByteArrayInputStream(objectMapper.writeValueAsBytes(op))));
+            params.add(new JsonMultipartString(ManageResourcesParams.Data.name(), objectMapper.writeValueAsString(op)));
         }
         catch(JsonProcessingException e) {
             throw new Error("Unexpected JSON processing error", e);
@@ -151,5 +152,22 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
         final String operation;
         final String type;
         final List<String> ids;
+    }
+
+    public static class JsonMultipartString extends AciParameter {
+
+        public JsonMultipartString(final String name, final Object value) {
+            super(name, value);
+        }
+
+        @Override
+        public void addToEntity(final MultipartEntityBuilder builder, final Charset charset) {
+            builder.addPart(getName(), new StringBody(getValue(), ContentType.create("application/json", charset)));
+        }
+
+        @Override
+        public boolean requiresPostRequest() {
+            return true;
+        }
     }
 }
