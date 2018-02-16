@@ -104,6 +104,7 @@ public class IdolLoggingAspect {
     private String getParameterValue(final ActionParameter parameter) {
         return parameter.getName().equalsIgnoreCase(QueryParams.SecurityInfo.name()) || parameter.getName().equalsIgnoreCase(SecurityParams.Password.name())
                 ? HIDDEN_VALUE
+                : parameter.getValue() == null ? null
                 : parameter.getValue().toString();
     }
 }
