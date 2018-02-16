@@ -28,7 +28,9 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -37,6 +39,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.StringBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import static com.hp.autonomy.searchcomponents.idol.answer.ask.ConversationAnswerServerService.CONVERSATION_SERVICE_BEAN_NAME;
 import static com.hp.autonomy.searchcomponents.idol.exceptions.codes.IdolErrorCodes.ANSWER_SERVER;
@@ -67,10 +70,10 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
     }
 
     @Override
-    public String conversationStart() {
+    public String conversationStart(final Map<String, String> sessionAttributes) {
         final String conversationSystemName = getSystemName();
 
-        final ManagementOperation op = new ManagementOperation("add", "conversation_session", null);
+        final ConversationStart op = new ConversationStart(sessionAttributes);
 
         final ActionParameters params = new ActionParameters(AnswerServerActions.ManageResources.name());
         params.add(ManageResourcesParams.SystemName.name(), conversationSystemName);
@@ -107,7 +110,7 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
             return;
         }
 
-        final ManagementOperation op = new ManagementOperation("delete", "conversation_session", Arrays.asList(sessionIds));
+        final ConversationEnd op = new ConversationEnd(Arrays.asList(sessionIds));
 
         final ActionParameters params = new ActionParameters(AnswerServerActions.ManageResources.name());
         params.add(ManageResourcesParams.SystemName.name(), conversationSystemName);
@@ -148,9 +151,35 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private static class ManagementOperation {
-        final String operation;
-        final String type;
+    private static class ConversationStart {
+        final String operation = "add";
+        final String type = "conversation_session";
+        final List<SessionVariable> session_variables;
+
+        ConversationStart(final Map<String, String> sessionAttributes) {
+
+            if (CollectionUtils.isEmpty(sessionAttributes)) {
+                session_variables = null;
+            }
+            else {
+                session_variables = sessionAttributes.entrySet().stream()
+                    .map(entry -> new SessionVariable(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
+            }
+        }
+    }
+
+    @Data
+    private static class SessionVariable {
+        final String name;
+        final String value;
+    }
+
+    @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private static class ConversationEnd {
+        final String operation = "delete";
+        final String type = "conversation_session";
         final List<String> ids;
     }
 

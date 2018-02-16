@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
 import com.hp.autonomy.types.idol.responses.conversation.ConversePrompt;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
@@ -27,9 +28,10 @@ public interface ConversationAnswerServerService {
 
     /**
      * Starts a new conversation
+     * @param sessionAttributes optional map of session attributes to pre-initialize in the conversation.
      * @return the session ID if available, or null if we couldn't create one
      */
-    String conversationStart();
+    String conversationStart(Map<String, String> sessionAttributes);
 
     /**
      * Terminates sessions
