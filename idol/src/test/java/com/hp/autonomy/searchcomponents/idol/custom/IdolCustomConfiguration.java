@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.custom;
 
 import com.autonomy.aci.client.annotations.IdolAnnotationsProcessorFactory;
 import com.autonomy.aci.client.services.AciService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
@@ -77,5 +78,10 @@ class IdolCustomConfiguration {
     @Bean
     public HttpClient validatorHttpClient() {
         return mock(HttpClient.class);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return mock(ObjectMapper.class);
     }
 }
