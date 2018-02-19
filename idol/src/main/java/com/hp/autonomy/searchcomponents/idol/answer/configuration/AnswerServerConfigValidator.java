@@ -5,10 +5,16 @@
 package com.hp.autonomy.searchcomponents.idol.answer.configuration;
 
 import com.autonomy.aci.client.services.AciService;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.frontend.configuration.server.ServerConfig;
 import com.hp.autonomy.frontend.configuration.validation.ValidationResult;
 import com.hp.autonomy.frontend.configuration.validation.Validator;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.hp.autonomy.types.idol.responses.answer.GetStatusResponsedata;
+import com.hp.autonomy.types.requests.idol.actions.answer.AnswerServerActions;
+import org.apache.commons.lang.StringUtils;
+
+import static com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfigValidator.Validation.INVALID_CONVERSATION_SYSTEM_NAME;
 
 public class AnswerServerConfigValidator implements Validator<AnswerServerConfig> {
     private final AciService aciService;
@@ -23,11 +29,32 @@ public class AnswerServerConfigValidator implements Validator<AnswerServerConfig
     @Override
     public ValidationResult<?> validate(final AnswerServerConfig config) {
         final ServerConfig server = config.getServer();
-        return server.validate(aciService, null, processorFactory);
+        final ValidationResult<?> validate = server.validate(aciService, null, processorFactory);
+
+        final String conversationSystemName = config.getConversationSystemName();
+        if (StringUtils.isNotBlank(conversationSystemName) && validate.isValid()) {
+            final GetStatusResponsedata systems = aciService.executeAction(
+                    server.toAciServerDetails(),
+                    new ActionParameters(AnswerServerActions.GetStatus.name()),
+                    processorFactory.getResponseDataProcessor(GetStatusResponsedata.class));
+
+            if (systems.getSystems().getSystem().stream().noneMatch(
+                    s -> conversationSystemName.equals(s.getName())
+                    && "conversation".equals(s.getType())
+            )) {
+                return new ValidationResult<>(false, INVALID_CONVERSATION_SYSTEM_NAME);
+            }
+        }
+
+        return validate;
     }
 
     @Override
     public Class<AnswerServerConfig> getSupportedClass() {
         return AnswerServerConfig.class;
+    }
+
+    public enum Validation {
+        INVALID_CONVERSATION_SYSTEM_NAME
     }
 }
