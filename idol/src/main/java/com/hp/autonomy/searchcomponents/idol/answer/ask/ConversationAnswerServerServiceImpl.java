@@ -7,12 +7,15 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
-import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.transport.ActionParameter;
 import com.autonomy.aci.client.util.ActionParameters;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
@@ -25,6 +28,7 @@ import com.hp.autonomy.types.idol.responses.conversation.ManagementResult;
 import com.hp.autonomy.types.requests.idol.actions.answer.AnswerServerActions;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.ConverseParams;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.ManageResourcesParams;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,6 +61,7 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
     private final Processor<ManageResourcesResponsedata> manageProcessor;
     private final ConfigService<? extends IdolSearchCapable> configService;
     private final ObjectMapper objectMapper;
+    private final ObjectMapper logMapper;
 
     @Autowired
     ConversationAnswerServerServiceImpl(final AciService answerServerAciService,
@@ -68,6 +73,11 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
         manageProcessor = processorFactory.getResponseDataProcessor(ManageResourcesResponsedata.class);
         this.configService = configService;
         this.objectMapper = objectMapper;
+        // Custom log mapper to censor out the SECURITY_INFO property when written to idol-access.log.
+        logMapper = new ObjectMapper();
+        final SimpleModule module = new SimpleModule();
+        module.addSerializer(SessionVariable.class, new CensoredJsonSessionSerializer());
+        logMapper.registerModule(module);
     }
 
     @Override
@@ -80,7 +90,7 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
         params.add(ManageResourcesParams.SystemName.name(), conversationSystemName);
 
         try {
-            params.add(new JsonMultipartString(ManageResourcesParams.Data.name(), objectMapper, op));
+            params.add(new JsonMultipartString(ManageResourcesParams.Data.name(), op));
         }
         catch(JsonProcessingException e) {
             throw new Error("Unexpected JSON processing error", e);
@@ -117,7 +127,7 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
         params.add(ManageResourcesParams.SystemName.name(), conversationSystemName);
 
         try {
-            params.add(new JsonMultipartString(ManageResourcesParams.Data.name(), objectMapper, op));
+            params.add(new JsonMultipartString(ManageResourcesParams.Data.name(), op));
         }
         catch(JsonProcessingException e) {
             throw new Error("Unexpected JSON processing error", e);
@@ -174,10 +184,15 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
     private static class SessionVariable {
         final String name;
         final String value;
+    }
 
+    private static class CensoredJsonSessionSerializer extends JsonSerializer<SessionVariable> {
         @Override
-        public String toString() {
-            return name + "=" + ("SECURITY_INFO".equalsIgnoreCase(name) ? "*******" : value);
+        public void serialize(final SessionVariable value, final JsonGenerator gen, final SerializerProvider serializers) throws IOException {
+            gen.writeStartObject();
+            gen.writeStringField("name", value.getName());
+            gen.writeStringField("value", "SECURITY_INFO".equalsIgnoreCase(value.getName()) ? "*******" : value.getValue());
+            gen.writeEndObject();
         }
     }
 
@@ -189,16 +204,18 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
         final List<String> ids;
     }
 
-    public static class JsonMultipartString implements ActionParameter<Object> {
+    public class JsonMultipartString implements ActionParameter<Object> {
 
         private final String name;
         private final Object value;
         private final String json;
+        private final String censoredJson;
 
-        public JsonMultipartString(final String name, final ObjectMapper objectMapper, final Object value) throws JsonProcessingException {
+        public JsonMultipartString(final String name, final Object value) throws JsonProcessingException {
             this.name = name;
             this.value = value;
             this.json = objectMapper.writeValueAsString(value);
+            this.censoredJson = logMapper.writeValueAsString(value);
         }
 
         @Override
@@ -208,11 +225,13 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
 
         @Override
         public String getValue() {
-            return value == null ? null : value.toString();
+            // Use censored version for logging.
+            return value == null ? null : censoredJson;
         }
 
         @Override
         public void addToEntity(final MultipartEntityBuilder builder, final Charset charset) {
+            // Use the real value when sending to answer server.
             builder.addPart(getName(), new StringBody(json, ContentType.create("application/json", charset)));
         }
 
