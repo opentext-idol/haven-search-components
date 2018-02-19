@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciParameter;
+import com.autonomy.aci.client.transport.ActionParameter;
 import com.autonomy.aci.client.util.ActionParameters;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -79,7 +80,7 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
         params.add(ManageResourcesParams.SystemName.name(), conversationSystemName);
 
         try {
-            params.add(new JsonMultipartString(ManageResourcesParams.Data.name(), objectMapper.writeValueAsString(op)));
+            params.add(new JsonMultipartString(ManageResourcesParams.Data.name(), objectMapper, op));
         }
         catch(JsonProcessingException e) {
             throw new Error("Unexpected JSON processing error", e);
@@ -116,7 +117,7 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
         params.add(ManageResourcesParams.SystemName.name(), conversationSystemName);
 
         try {
-            params.add(new JsonMultipartString(ManageResourcesParams.Data.name(), objectMapper.writeValueAsString(op)));
+            params.add(new JsonMultipartString(ManageResourcesParams.Data.name(), objectMapper, op));
         }
         catch(JsonProcessingException e) {
             throw new Error("Unexpected JSON processing error", e);
@@ -173,6 +174,11 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
     private static class SessionVariable {
         final String name;
         final String value;
+
+        @Override
+        public String toString() {
+            return name + "=" + ("SECURITY_INFO".equalsIgnoreCase(name) ? "*******" : value);
+        }
     }
 
     @Data
@@ -183,15 +189,31 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
         final List<String> ids;
     }
 
-    public static class JsonMultipartString extends AciParameter {
+    public static class JsonMultipartString implements ActionParameter<Object> {
 
-        public JsonMultipartString(final String name, final Object value) {
-            super(name, value);
+        private final String name;
+        private final Object value;
+        private final String json;
+
+        public JsonMultipartString(final String name, final ObjectMapper objectMapper, final Object value) throws JsonProcessingException {
+            this.name = name;
+            this.value = value;
+            this.json = objectMapper.writeValueAsString(value);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getValue() {
+            return value == null ? null : value.toString();
         }
 
         @Override
         public void addToEntity(final MultipartEntityBuilder builder, final Charset charset) {
-            builder.addPart(getName(), new StringBody(getValue(), ContentType.create("application/json", charset)));
+            builder.addPart(getName(), new StringBody(json, ContentType.create("application/json", charset)));
         }
 
         @Override
