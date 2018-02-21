@@ -200,6 +200,7 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
                             // need to set the path because of ACI's weird format
                             .setPath("/")
                             .addParameter(AciConstants.PARAM_ACTION, ConnectorActions.View.name())
+                            .addParameter("AnyLanguage", "true")
                             .addParameter(ConnectorViewParams.Identifier.name(), maybeIdentifier.get())
                             .addParameter(ConnectorViewParams.Autn_Group.name(), maybeGroup.get())
                             .build();
