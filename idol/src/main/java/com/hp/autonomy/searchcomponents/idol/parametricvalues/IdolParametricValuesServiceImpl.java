@@ -287,6 +287,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     private AciParameters createAciParameters(final IdolParametricRequest parametricRequest, final Collection<FieldPath> fieldNames) {
         final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
         parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
+        parameterHandler.addUserIdentifiers(aciParameters);
         if(parametricRequest.isModified()) {
             parameterHandler.addQmsParameters(aciParameters, parametricRequest.getQueryRestrictions());
         }

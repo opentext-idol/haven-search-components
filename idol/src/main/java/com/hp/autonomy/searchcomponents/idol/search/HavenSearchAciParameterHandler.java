@@ -78,6 +78,8 @@ public interface HavenSearchAciParameterHandler {
      */
     void addSecurityInfo(AciParameters aciParameters);
 
+    void addUserIdentifiers(AciParameters aciParameters);
+
     /**
      * Adds parameters used when retrieving state tokens for a query
      *

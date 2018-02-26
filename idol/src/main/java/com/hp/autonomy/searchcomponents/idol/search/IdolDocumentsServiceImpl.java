@@ -65,6 +65,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
         final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
 
         parameterHandler.addSearchRestrictions(aciParameters, queryRequest.getQueryRestrictions());
+        parameterHandler.addUserIdentifiers(aciParameters);
         parameterHandler.addSearchOutputParameters(aciParameters, queryRequest);
         if(queryType != QueryRequest.QueryType.RAW) {
             parameterHandler.addQmsParameters(aciParameters, queryRequest.getQueryRestrictions());
@@ -93,6 +94,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
         aciParameters.add(SuggestParams.Reference.name(), new Reference(suggestRequest.getReference()));
 
         parameterHandler.addSearchRestrictions(aciParameters, suggestRequest.getQueryRestrictions());
+        parameterHandler.addUserIdentifiers(aciParameters);
         parameterHandler.addSearchOutputParameters(aciParameters, suggestRequest);
 
         final SuggestResponseData responseData = queryExecutor.executeSuggest(aciParameters, QueryRequest.QueryType.RAW);
@@ -134,6 +136,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
             aciParameters.add(QmsQueryParams.Promotions.name(), true);
         }
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
+        parameterHandler.addUserIdentifiers(aciParameters);
 
         // Unset combine=simple for state token generation
         aciParameters.remove(QueryParams.Combine.name());
@@ -155,6 +158,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
         resultCountAciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         resultCountAciParameters.add(QueryParams.Predict.name(), false);
         parameterHandler.addSearchRestrictions(resultCountAciParameters, queryRestrictions);
+        parameterHandler.addUserIdentifiers(resultCountAciParameters);
         final QueryResponseData resultCountResponseData = queryExecutor.executeQuery(resultCountAciParameters, QueryRequest.QueryType.RAW);
 
         return new StateTokenAndResultCount(tokenData, resultCountResponseData.getTotalhits());

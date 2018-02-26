@@ -44,6 +44,7 @@ class IdolRelatedConceptsServiceImpl implements IdolRelatedConceptsService {
         final AciParameters parameters = new AciParameters(QueryActions.Query.name());
         parameterHandler.addSecurityInfo(parameters);
         parameterHandler.addSearchRestrictions(parameters, relatedConceptsRequest.getQueryRestrictions());
+        parameterHandler.addUserIdentifiers(parameters);
         parameters.add(QueryParams.MaxResults.name(), relatedConceptsRequest.getMaxResults());
         parameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         parameters.add(QueryParams.QuerySummary.name(), true);

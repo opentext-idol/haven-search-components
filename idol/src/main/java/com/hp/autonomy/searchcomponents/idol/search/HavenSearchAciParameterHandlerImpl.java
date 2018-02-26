@@ -29,6 +29,7 @@ import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -179,6 +180,19 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
             ? null
             : urlFragmentEscaper.escape(authenticationInformationRetriever.getPrincipal().getSecurityInfo());
         aciParameters.add(QueryParams.SecurityInfo.name(), securityInfo);
+    }
+
+    @Override
+    public void addUserIdentifiers(final AciParameters aciParameters) {
+        final CommunityPrincipal principal = authenticationInformationRetriever.getPrincipal();
+
+        if (principal != null) {
+            aciParameters.add("AppUser", principal.getName());
+
+            Optional.ofNullable(principal.getFields()).map(f -> f.get("department")).ifPresent(department -> {
+                aciParameters.add("AppDepartment", department);
+            });
+        }
     }
 
     @Override
