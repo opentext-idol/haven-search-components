@@ -79,6 +79,12 @@ public interface HavenSearchAciParameterHandler {
     void addSecurityInfo(AciParameters aciParameters);
 
     /**
+     * Adds parameters to the request which can be used to identify the user
+     * @param aciParameters
+     */
+    void addUserIdentifiers(AciParameters aciParameters);
+
+    /**
      * Adds parameters used when retrieving state tokens for a query
      *
      * @param aciParameters The set of parameters to add to

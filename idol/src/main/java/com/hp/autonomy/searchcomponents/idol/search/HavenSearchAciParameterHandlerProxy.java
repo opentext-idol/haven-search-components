@@ -56,6 +56,11 @@ public abstract class HavenSearchAciParameterHandlerProxy implements HavenSearch
     }
 
     @Override
+    public void addUserIdentifiers(final AciParameters aciParameters) {
+        parameterHandler.addUserIdentifiers(aciParameters);
+    }
+
+    @Override
     public void addStoreStateParameters(final AciParameters aciParameters) {
         parameterHandler.addStoreStateParameters(aciParameters);
     }

@@ -64,7 +64,7 @@ public class HavenSearchAciParameterHandlerTest {
     @Before
     public void setUp() {
         aciParameters = new AciParameters();
-        parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, documentFieldsService, authenticationInformationRetriever);
+        parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, documentFieldsService, authenticationInformationRetriever, null, null);
     }
 
     @Test
