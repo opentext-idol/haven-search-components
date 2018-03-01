@@ -204,7 +204,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
             final CommunityPrincipal principal = authenticationInformationRetriever.getPrincipal();
 
             if (principal != null) {
-                aciParameters.add(userRequestPrefix + "user", principal.getName());
+                aciParameters.add(userRequestPrefix + "User", principal.getName());
 
                 Optional.ofNullable(principal.getFields()).ifPresent(f -> {
                     for(String property : userRequestFields) {
