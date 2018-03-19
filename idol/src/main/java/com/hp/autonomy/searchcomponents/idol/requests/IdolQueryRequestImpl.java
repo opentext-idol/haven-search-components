@@ -35,6 +35,7 @@ class IdolQueryRequestImpl implements IdolQueryRequest {
     private final Integer summaryCharacters;
     private final String sort;
     private final boolean highlight;
+    private final boolean intentBasedRanking;
     private final String print;
     @Singular
     private final Collection<String> printFields;
@@ -47,5 +48,6 @@ class IdolQueryRequestImpl implements IdolQueryRequest {
         private int maxResults = DEFAULT_MAX_RESULTS;
         private String print = DEFAULT_PRINT.name();
         private QueryRequest.QueryType queryType = QueryRequest.QueryType.MODIFIED;
+        private boolean intentBasedRanking = false;
     }
 }

@@ -71,6 +71,10 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
             parameterHandler.addQmsParameters(aciParameters, queryRequest.getQueryRestrictions());
         }
 
+        if (queryRequest.isIntentBasedRanking()) {
+            parameterHandler.addIntentBasedRankingParameters(aciParameters);
+        }
+
         if(queryRequest.isAutoCorrect()) {
             aciParameters.add(QueryParams.SpellCheck.name(), true);
         }

@@ -191,6 +191,17 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
+    public void addIntentBasedRankingParameters(final AciParameters aciParameters) {
+        CommunityPrincipal principal = authenticationInformationRetriever.getPrincipal();
+        if (principal != null) {
+            aciParameters.add("Username", principal.getName());
+            aciParameters.add("IntentRankedQuery","True");
+            aciParameters.add("SoftCacheMaxSize","10240");
+            aciParameters.add("DefaultIRQCorpusSize","100");
+        }
+    }
+
+    @Override
     public void addSecurityInfo(final AciParameters aciParameters) {
         final String securityInfo = authenticationInformationRetriever.getPrincipal() == null || authenticationInformationRetriever.getPrincipal().getSecurityInfo() == null
             ? null

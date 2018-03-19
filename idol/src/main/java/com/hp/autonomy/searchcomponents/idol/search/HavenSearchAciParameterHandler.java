@@ -71,6 +71,8 @@ public interface HavenSearchAciParameterHandler {
      */
     void addQmsParameters(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions);
 
+    void addIntentBasedRankingParameters(AciParameters aciParameters);
+
     /**
      * Adds security info String which may allow restricted documents to be accessed
      *
