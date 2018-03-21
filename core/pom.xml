@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-authentication</artifactId>
-            <version>0.12.0-SNAPSHOT</version>
+            <version>0.12.0</version>
         </dependency>
         <dependency>
             <groupId>com.hp.bigdata.frontend</groupId>
