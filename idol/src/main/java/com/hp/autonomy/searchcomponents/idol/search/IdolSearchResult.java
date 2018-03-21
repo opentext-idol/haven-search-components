@@ -42,6 +42,8 @@ public class IdolSearchResult implements SearchResult {
     private final String promotionName;
     private final PromotionCategory promotionCategory;
 
+    private final Boolean intentRankedHit;
+
     private IdolSearchResult(final IdolSearchResultBuilder builder) {
         reference = builder.reference;
         index = builder.index;
@@ -60,6 +62,8 @@ public class IdolSearchResult implements SearchResult {
         qmsId = builder.qmsId;
         promotionName = builder.promotionName;
         promotionCategory = builder.promotionCategory == null ? PromotionCategory.NONE : builder.promotionCategory;
+
+        intentRankedHit = builder.intentRankedHit;
 
         title = DocumentTitleResolver.resolveTitle(builder.title, builder.reference);
     }

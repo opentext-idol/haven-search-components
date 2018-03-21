@@ -124,6 +124,7 @@ class QueryResponseParserImpl implements QueryResponseParser {
                     .summary(hit.getSummary())
                     .date(hit.getDatestring())
                     .weight(hit.getWeight())
+                    .intentRankedHit(hit.getIntentrankedhit())
                     .promotionName(hit.getPromotionname());
 
             fieldsParser.parseDocumentFields(hit, searchResultBuilder);
