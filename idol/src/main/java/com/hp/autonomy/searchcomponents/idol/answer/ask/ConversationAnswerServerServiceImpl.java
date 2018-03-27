@@ -63,16 +63,17 @@ class ConversationAnswerServerServiceImpl implements ConversationAnswerServerSer
     private final ObjectMapper objectMapper;
     private final ObjectMapper logMapper;
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @Autowired
     ConversationAnswerServerServiceImpl(final AciService answerServerAciService,
                                         final ProcessorFactory processorFactory,
                                         final ConfigService<? extends IdolSearchCapable> configService,
-                                        final ObjectMapper objectMapper) {
+                                        final Optional<ObjectMapper> existingMapper) {
         this.answerServerAciService = answerServerAciService;
         processor = processorFactory.getResponseDataProcessor(ConverseResponsedata.class);
         manageProcessor = processorFactory.getResponseDataProcessor(ManageResourcesResponsedata.class);
         this.configService = configService;
-        this.objectMapper = objectMapper;
+        this.objectMapper = existingMapper.orElse(new ObjectMapper());
         // Custom log mapper to censor out the SECURITY_INFO property when written to idol-access.log.
         logMapper = new ObjectMapper();
         final SimpleModule module = new SimpleModule();
