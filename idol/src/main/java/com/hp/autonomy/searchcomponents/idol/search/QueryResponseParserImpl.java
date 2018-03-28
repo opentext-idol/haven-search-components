@@ -16,21 +16,23 @@ import com.hp.autonomy.types.idol.responses.Database;
 import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.Documents;
+import com.hp.autonomy.types.requests.ExpansionRule;
 import com.hp.autonomy.types.requests.Spelling;
 import com.hp.autonomy.types.requests.Warnings;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static com.hp.autonomy.searchcomponents.idol.search.QueryResponseParser.QUERY_RESPONSE_PARSER_BEAN_NAME;
 
@@ -69,7 +71,15 @@ class QueryResponseParserImpl implements QueryResponseParser {
             documents = rerunQueryWithAdjustedSpelling(aciParameters, responseData, spellingQuery, warnings, queryExecutor);
         } else {
             final List<IdolSearchResult> results = parseQueryHits(hits);
-            documents = new Documents<>(results, responseData.getTotalhits(), responseData.getExpandedQuery(), null, null, warnings);
+
+            final List<ExpansionRule> expansions = Optional.ofNullable(responseData.getExpansionOrder()).map(order ->
+                order.getRule().stream()
+                    .filter(rule -> "synonym".equals(rule.getRuleType()))
+                    .map(rule -> new ExpansionRule(rule.getReference(), rule.getRuleType())
+                ).collect(Collectors.toList())
+            ).orElse(null);
+
+            documents = new Documents<>(results, responseData.getTotalhits(), responseData.getExpandedQuery(), null, null, warnings, expansions);
         }
 
         return documents;
@@ -124,6 +134,7 @@ class QueryResponseParserImpl implements QueryResponseParser {
                     .summary(hit.getSummary())
                     .date(hit.getDatestring())
                     .weight(hit.getWeight())
+                    .intentRankedHit(hit.getIntentrankedhit())
                     .promotionName(hit.getPromotionname());
 
             fieldsParser.parseDocumentFields(hit, searchResultBuilder);

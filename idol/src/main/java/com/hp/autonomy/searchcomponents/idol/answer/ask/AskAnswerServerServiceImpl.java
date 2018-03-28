@@ -52,7 +52,7 @@ class AskAnswerServerServiceImpl implements AskAnswerServerService {
         aciParameters.add(AskParams.FirstResult.name(), request.getFirstResult());
         aciParameters.add(AskParams.MaxResults.name(), request.getMaxResults());
         aciParameters.add(AskParams.MinScore.name(), request.getMinScore());
-        aciParameters.add("customizationData", request.getCustomizationData());
+        aciParameters.add(AskParams.CustomizationData.name(), request.getCustomizationData());
 
         final Map<String, String> proxiedParams = request.getProxiedParams();
         if (proxiedParams != null) {

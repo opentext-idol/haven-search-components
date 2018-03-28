@@ -24,6 +24,14 @@ public interface QueryRequestBuilder<R extends QueryRequest<Q>, Q extends QueryR
     B autoCorrect(boolean autoCorrect);
 
     /**
+     * Sets whether to apply intent-based-ranking on results
+     *
+     * @param intentBasedRanking Whether to apply intent-based-ranking on results
+     * @return the builder (for chaining)
+     */
+    B intentBasedRanking(boolean intentBasedRanking);
+
+    /**
      * Sets whether to query with QMS rules, without QMS rules, or for promotions
      *
      * @param queryType Whether to query with QMS rules, without QMS rules, or for promotions

@@ -47,6 +47,8 @@ class HodQueryRequestImpl implements HodQueryRequest {
     @Singular
     private final List<String> stateDontMatchIds;
 
+    private final boolean intentBasedRanking;
+
     @SuppressWarnings({"FieldMayBeFinal", "unused"})
     @JsonPOJOBuilder(withPrefix = "")
     static class HodQueryRequestImplBuilder implements HodQueryRequestBuilder {
@@ -54,5 +56,6 @@ class HodQueryRequestImpl implements HodQueryRequest {
         private int maxResults = DEFAULT_MAX_RESULTS;
         private String print = DEFAULT_PRINT.name();
         private QueryType queryType = QueryType.MODIFIED;
+        private boolean intentBasedRanking = false;
     }
 }

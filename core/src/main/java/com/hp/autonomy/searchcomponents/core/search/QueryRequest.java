@@ -22,6 +22,12 @@ public interface QueryRequest<Q extends QueryRestrictions<?>>
     boolean isAutoCorrect();
 
     /**
+     * Whether to apply intent-based ranking on results
+     * @return whether we're using intent-based ranking
+     */
+    boolean isIntentBasedRanking();
+
+    /**
      * Whether to query with QMS rules, without QMS rules, or for promotions
      *
      * @return Whether to query with QMS rules, without QMS rules, or for promotions

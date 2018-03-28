@@ -29,7 +29,12 @@ import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
@@ -56,15 +61,29 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
 
     private final Escaper urlFragmentEscaper = UrlEscapers.urlFragmentEscaper();
 
+    public static final String IDOL_USER_REQUEST_PREFIX_PROPERTY_KEY = "idol.user.request.prefix";
+    public static final String IDOL_USER_REQUEST_FIELDS_PROPERTY_KEY = "idol.user.request.fields";
+
+    private final String userRequestPrefix;
+    private final Set<String> userRequestFields;
+
     @Autowired
     HavenSearchAciParameterHandlerImpl(
         final ConfigService<? extends IdolSearchCapable> configService,
         final DocumentFieldsService documentFieldsService,
-        final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever
+        final AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever,
+        @Value("${"+IDOL_USER_REQUEST_PREFIX_PROPERTY_KEY+":}") final String userRequestPrefix,
+        @Value("${"+ IDOL_USER_REQUEST_FIELDS_PROPERTY_KEY +":}") final List<String> userRequestFields
     ) {
         this.configService = configService;
         this.documentFieldsService = documentFieldsService;
         this.authenticationInformationRetriever = authenticationInformationRetriever;
+        this.userRequestPrefix = StringUtils.defaultIfEmpty(userRequestPrefix, null);
+        this.userRequestFields = new HashSet<>();
+
+        if (userRequestFields != null) {
+            this.userRequestFields.addAll(userRequestFields);
+        }
     }
 
     @Override
@@ -172,11 +191,43 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
+    public void addIntentBasedRankingParameters(final AciParameters aciParameters) {
+        CommunityPrincipal principal = authenticationInformationRetriever.getPrincipal();
+        if (principal != null) {
+            aciParameters.add("Username", principal.getName());
+            aciParameters.add("IntentRankedQuery","True");
+            aciParameters.add("SoftCacheMaxSize","10240");
+            aciParameters.add("DefaultIRQCorpusSize","100");
+        }
+    }
+
+    @Override
     public void addSecurityInfo(final AciParameters aciParameters) {
         final String securityInfo = authenticationInformationRetriever.getPrincipal() == null || authenticationInformationRetriever.getPrincipal().getSecurityInfo() == null
             ? null
             : urlFragmentEscaper.escape(authenticationInformationRetriever.getPrincipal().getSecurityInfo());
         aciParameters.add(QueryParams.SecurityInfo.name(), securityInfo);
+    }
+
+    @Override
+    public void addUserIdentifiers(final AciParameters aciParameters) {
+        if (this.userRequestPrefix != null) {
+            final CommunityPrincipal principal = authenticationInformationRetriever.getPrincipal();
+
+            if (principal != null) {
+                aciParameters.add(userRequestPrefix + "User", principal.getName());
+
+                Optional.ofNullable(principal.getFields()).ifPresent(f -> {
+                    for(String property : userRequestFields) {
+                        final String value = f.get(property);
+
+                        if(value != null) {
+                            aciParameters.add(userRequestPrefix + property, value);
+                        }
+                    }
+                });
+            }
+        }
     }
 
     @Override
