@@ -23,6 +23,7 @@ import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +75,10 @@ class QueryResponseParserImpl implements QueryResponseParser {
 
             final List<ExpansionRule> expansions = Optional.ofNullable(responseData.getExpansionOrder()).map(order ->
                 order.getRule().stream()
-                    .filter(rule -> "synonym".equals(rule.getRuleType()))
+                    .filter(rule -> {
+                        final String ruleType = rule.getRuleType();
+                        return "synonym".equals(ruleType) || "blacklist".equals(ruleType);
+                    })
                     .map(rule -> new ExpansionRule(rule.getReference(), rule.getRuleType())
                 ).collect(Collectors.toList())
             ).orElse(null);
