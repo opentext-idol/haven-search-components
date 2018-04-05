@@ -29,7 +29,8 @@ public enum FieldType {
         }
     }),
     NUMBER(Number.class, Double::parseDouble),
-    BOOLEAN(Boolean.class, Boolean::parseBoolean);
+    BOOLEAN(Boolean.class, Boolean::parseBoolean),
+    GEOINDEX(String.class, value -> value);
 
     private final Class<?> type;
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
