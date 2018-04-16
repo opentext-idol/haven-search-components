@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2018 Micro Focus International plc.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -55,6 +55,8 @@ public class FieldInfo<T extends Serializable> implements RequestObject<FieldInf
 
     private final Boolean csvExport;
 
+    private final MapType childMapping;
+
     private FieldInfo(final FieldInfoBuilder<T> builder) {
         id = builder.id;
         type = builder.type;
@@ -64,6 +66,7 @@ public class FieldInfo<T extends Serializable> implements RequestObject<FieldInf
         values = builder.values;
         csvExport = builder.csvExport;
         editable = builder.editable;
+        childMapping = builder.childMapping;
     }
 
     public static <T extends Serializable> FieldInfoBuilder<T> builder() {
@@ -117,6 +120,7 @@ public class FieldInfo<T extends Serializable> implements RequestObject<FieldInf
         private List<FieldValue<T>> values = new ArrayList<>();
         private List<String> editable = new ArrayList<>();
         private Boolean csvExport;
+        private MapType childMapping;
 
         private FieldInfoBuilder(final FieldInfo<T> fieldInfo) {
             id = fieldInfo.id;
@@ -127,6 +131,7 @@ public class FieldInfo<T extends Serializable> implements RequestObject<FieldInf
             values = fieldInfo.values;
             editable = fieldInfo.editable;
             csvExport = fieldInfo.csvExport;
+            childMapping = fieldInfo.childMapping;
         }
 
         @JsonProperty("type")
