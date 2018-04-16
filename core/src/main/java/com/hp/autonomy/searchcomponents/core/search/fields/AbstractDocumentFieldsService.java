@@ -9,6 +9,7 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
+import com.hp.autonomy.searchcomponents.core.config.MapType;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 
 import java.util.Collection;
@@ -35,8 +36,23 @@ public abstract class AbstractDocumentFieldsService implements DocumentFieldsSer
         final Collection<FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfig().values();
         return Stream.concat(getHardCodedFields().stream(), fieldConfig.stream())
                 .filter(field -> selectedFields.isEmpty() || selectedFields.contains(field.getId()))
-                .flatMap(field -> field.getNames().stream())
-                .map(FieldPath::getNormalisedPath)
+                .flatMap(field -> {
+                    final MapType childMapping = field.getChildMapping();
+
+                    if (childMapping != null) {
+                        switch(childMapping) {
+                            case ATTRIBUTE:
+                                //  We need both the field name and '/_ATTR_*' to print all attributes.
+                                return field.getNames().stream().flatMap(name -> Stream.of(
+                                        name.getNormalisedPath(),
+                                        name.getNormalisedPath() + "/_ATTR_*"));
+                            case ELEMENTNAME:
+                                return field.getNames().stream().map(name -> name.getNormalisedPath() + "/*");
+                        }
+                    }
+
+                    return field.getNames().stream().map(FieldPath::getNormalisedPath);
+                })
                 .collect(Collectors.toList());
     }
 
