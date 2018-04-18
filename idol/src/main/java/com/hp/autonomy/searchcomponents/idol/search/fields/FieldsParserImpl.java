@@ -157,7 +157,9 @@ class FieldsParserImpl implements FieldsParser {
                         fieldMap.put(id, fieldInfoWithValue);
                     }
                 }
-                else if (node.getChildNodes().getLength() > 0) {
+
+                if (node.getChildNodes().getLength() > 0) {
+                    // We still want to process the children, e.g. LAT is used for both Places and Location
                     parseAllFields(fieldConfig, node.getChildNodes(), fieldMap, name + '/' + node.getNodeName());
                 }
             }
