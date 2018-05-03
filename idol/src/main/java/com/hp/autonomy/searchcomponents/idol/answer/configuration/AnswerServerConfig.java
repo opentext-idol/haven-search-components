@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.answer.configuration;
 
 import com.autonomy.aci.client.transport.AciServerDetails;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.frontend.configuration.ConfigException;
@@ -36,6 +37,9 @@ public class AnswerServerConfig extends SimpleComponent<AnswerServerConfig> impl
     private final Boolean enabled;
 
     private final String conversationSystemName;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Double conceptualMinScore;
 
     @Override
     public void basicValidate(final String configSection) throws ConfigException {

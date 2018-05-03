@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2018 Micro Focus International plc.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -18,6 +18,7 @@ import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import com.hp.autonomy.types.idol.responses.DocContent;
 import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
+import java.util.LinkedHashMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,8 +120,48 @@ class FieldsParserImpl implements FieldsParser {
                         fieldMap.put(id, fieldInfoWithValue);
                     }
                 }
-            } else if (node.getChildNodes().getLength() > 0) {
-                parseAllFields(fieldConfig, node.getChildNodes(), fieldMap, name + '/' + node.getNodeName());
+            } else {
+                final FieldPath childPath = fieldPathNormaliser.normaliseFieldPath(name + '/' + node.getNodeName());
+                if (fieldConfig.containsKey(childPath) && fieldConfig.get(childPath).getChildMapping() != null) {
+                    final FieldInfo<?> fieldInfo = fieldConfig.get(childPath);
+                    final String id = fieldInfo.getId();
+                    final String displayName = fieldDisplayNameGenerator.generateDisplayNameFromId(id);
+                    final FieldType fieldType = fieldInfo.getType();
+
+                    final LinkedHashMap<String, Serializable> value = fieldInfo.getChildMapping().parseMapType(fieldType, node);
+
+                    String displayValue = null;
+                    if(!value.isEmpty()) {
+                        displayValue = fieldDisplayNameGenerator.generateDisplayValueFromId(id, value.values().iterator().next(), fieldType);
+                    }
+
+                    if(fieldMap.containsKey(id)) {
+                        @SuppressWarnings({"unchecked", "CastToConcreteClass"}) final FieldInfo<?> updatedFieldInfo = ((FieldInfo<LinkedHashMap<String, Serializable>>) fieldMap.get(id)).toBuilder()
+                                .name(childPath)
+                                .value(new FieldValue<>(value, displayValue))
+                                .build();
+                        fieldMap.put(id, updatedFieldInfo);
+                    }
+                    else {
+                        final Collection<FieldPath> names = new ArrayList<>(fieldInfo.getNames().size());
+                        names.add(childPath);
+                        final FieldInfo<LinkedHashMap<String, Serializable>> fieldInfoWithValue = FieldInfo.<LinkedHashMap<String, Serializable>>builder()
+                                .id(id)
+                                .names(names)
+                                .displayName(displayName)
+                                .type(fieldInfo.getType())
+                                .advanced(fieldInfo.isAdvanced())
+                                .value(new FieldValue<>(value, displayValue))
+                                .childMapping(fieldInfo.getChildMapping())
+                                .build();
+                        fieldMap.put(id, fieldInfoWithValue);
+                    }
+                }
+
+                if (node.getChildNodes().getLength() > 0) {
+                    // We still want to process the children, e.g. LAT is used for both Places and Location
+                    parseAllFields(fieldConfig, node.getChildNodes(), fieldMap, name + '/' + node.getNodeName());
+                }
             }
         }
     }

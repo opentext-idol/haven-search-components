@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Hewlett Packard Enterprise Development Company, L.P.
+ * Copyright 2015-2018 Micro Focus International plc.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -86,6 +86,9 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     static final String VALUE_MAX_NODE_NAME = "valuemax";
     static final String VALUE_AVERAGE_NODE_NAME = "valueaverage";
     static final String VALUE_SUM_NODE_NAME = "valuesum";
+
+    static final String AFTER_END_OF_RANGE = "after upper end of range";
+    static final String BEFORE_END_OF_RANGE = "before lower end of range";
 
     private final HavenSearchAciParameterHandler parameterHandler;
     private final IdolFieldsService fieldsService;
@@ -455,6 +458,8 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         final String date = ((DateOrNumber)element.getValue()).getDate();
         return date == null
             ? null
+            : AFTER_END_OF_RANGE.equals(date) ? null
+            : BEFORE_END_OF_RANGE.equals(date) ? null
             : ZonedDateTime.parse(date, DATE_FORMAT);
     }
 }

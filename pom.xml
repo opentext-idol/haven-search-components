@@ -23,10 +23,10 @@
 
     <groupId>com.hp.autonomy.frontend</groupId>
     <artifactId>haven-search-components</artifactId>
-    <version>0.57.0</version>
+    <version>0.58.0</version>
 
-    <name>HP Haven Search Components</name>
-    <description>Reusable components for HP Haven Search.</description>
+    <name>Micro Focus Haven Search Components</name>
+    <description>Reusable components for Micro Focus Haven Search.</description>
     <url>https://github.com/hpe-idol/haven-search-components</url>
     <inceptionYear>2015</inceptionYear>
 
