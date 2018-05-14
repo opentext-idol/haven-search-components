@@ -5,8 +5,7 @@
 
 package com.hp.autonomy.searchcomponents.idol.beanconfiguration;
 
-import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.configuration.IdolComponentLabelLookup;
 import com.hp.autonomy.searchcomponents.idol.logging.IdolActionIdAspect;
 import com.hp.autonomy.searchcomponents.idol.logging.IdolLoggingAspect;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,8 +37,8 @@ public class HavenSearchIdolAspectConfiguration {
     @Bean(name = IDOL_LOGGING_ASPECT_BEAN_NAME)
     @ConditionalOnProperty(IDOL_LOG_PROPERTY_KEY)
     @ConditionalOnMissingBean(name = IDOL_LOGGING_ASPECT_BEAN_NAME)
-    public IdolLoggingAspect IdolLoggingAspect(final ConfigService<? extends IdolSearchCapable> configService,
+    public IdolLoggingAspect IdolLoggingAspect(final IdolComponentLabelLookup lookup,
                                                @Value(IDOL_LOG_TIMING_PROPERTY) final boolean timingEnabled) {
-        return new IdolLoggingAspect(configService, timingEnabled);
+        return new IdolLoggingAspect(lookup, timingEnabled);
     }
 }

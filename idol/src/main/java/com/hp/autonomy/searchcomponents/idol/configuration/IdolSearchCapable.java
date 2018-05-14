@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2018 Micro Focus International plc.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 /**
  * Configuration required for any application performing Haven Search
  */
-public interface IdolSearchCapable extends HavenSearchCapable, ViewCapable {
+public interface IdolSearchCapable extends HavenSearchCapable, ViewCapable, IdolComponentLabelLookup {
     /**
      * The bean name of the default implementation.
      * Use this in an {@link Qualifier} tag to access this implementation via autowiring.

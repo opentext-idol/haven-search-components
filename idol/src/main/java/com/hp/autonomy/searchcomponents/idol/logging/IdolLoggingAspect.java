@@ -3,8 +3,7 @@ package com.hp.autonomy.searchcomponents.idol.logging;
 import com.autonomy.aci.client.transport.AciResponseInputStream;
 import com.autonomy.aci.client.transport.AciServerDetails;
 import com.autonomy.aci.client.transport.ActionParameter;
-import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.configuration.IdolComponentLabelLookup;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.user.params.SecurityParams;
 import java.text.DecimalFormat;
@@ -39,12 +38,12 @@ public class IdolLoggingAspect {
     private static final char NAME_VALUE_SEPARATOR = '=';
     private static final String HIDDEN_VALUE = "*******";
 
-    private final ConfigService<? extends IdolSearchCapable> configService;
+    private final IdolComponentLabelLookup lookup;
     private final boolean timingEnabled;
 
-    public IdolLoggingAspect(final ConfigService<? extends IdolSearchCapable> configService,
+    public IdolLoggingAspect(final IdolComponentLabelLookup lookup,
                              final boolean timingEnabled) {
-        this.configService = configService;
+        this.lookup = lookup;
         this.timingEnabled = timingEnabled;
     }
 
@@ -79,7 +78,7 @@ public class IdolLoggingAspect {
                 .collect(Collectors.joining(PARAMETER_SEPARATOR));
 
         final StringBuilder messageBuilder = new StringBuilder()
-                .append(configService.getConfig().lookupComponentNameByHostAndPort(host, port)).append('\t')
+                .append(lookup.lookupComponentNameByHostAndPort(host, port)).append('\t')
                 .append(host).append('\t')
                 .append(port).append('\t')
                 .append(query).append('\t');
