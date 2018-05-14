@@ -13,10 +13,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.core.annotation.Order;
+
+import static com.hp.autonomy.searchcomponents.idol.logging.IdolLoggingAspect.LOGGING_PRECEDENCE;
 
 @SuppressWarnings("ProhibitedExceptionDeclared")
 @Slf4j
 @Aspect
+// This has to come before the logger, so that the ActionId is logged.
+@Order(LOGGING_PRECEDENCE - 1)
 public class IdolActionIdAspect {
 
     private final String ACTION_ID_PARAM = "ActionId";
