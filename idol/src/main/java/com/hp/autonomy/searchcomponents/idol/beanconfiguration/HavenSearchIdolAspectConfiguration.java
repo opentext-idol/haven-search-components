@@ -27,7 +27,13 @@ public class HavenSearchIdolAspectConfiguration {
     public static final String IDOL_LOG_TIMING_PROPERTY = "${" + IDOL_LOG_TIMING_PROPERTY_KEY + ":true}";
 
     public static final String IDOL_ACTION_ID_ASPECT_BEAN_NAME = "idolActionIdAspect";
-    public static final String IDOL_ACTION_ID_PROPERTY_KEY = "idol.actionid.enabled";
+    public static final String IDOL_ACTION_ID_PROPERTY_KEY = "idol.log.actionid.enabled";
+
+    @Bean(name = IDOL_ACTION_ID_ASPECT_BEAN_NAME)
+    @ConditionalOnProperty(IDOL_ACTION_ID_PROPERTY_KEY)
+    public IdolActionIdAspect createIdolActionIdAspect() {
+        return new IdolActionIdAspect();
+    }
 
     @Bean(name = IDOL_LOGGING_ASPECT_BEAN_NAME)
     @ConditionalOnProperty(IDOL_LOG_PROPERTY_KEY)
@@ -35,11 +41,5 @@ public class HavenSearchIdolAspectConfiguration {
     public IdolLoggingAspect IdolLoggingAspect(final ConfigService<? extends IdolSearchCapable> configService,
                                                @Value(IDOL_LOG_TIMING_PROPERTY) final boolean timingEnabled) {
         return new IdolLoggingAspect(configService, timingEnabled);
-    }
-
-    @Bean(name = IDOL_ACTION_ID_ASPECT_BEAN_NAME)
-    @ConditionalOnProperty(IDOL_ACTION_ID_PROPERTY_KEY)
-    public IdolActionIdAspect createIdolActionIdAspect() {
-        return new IdolActionIdAspect();
     }
 }
