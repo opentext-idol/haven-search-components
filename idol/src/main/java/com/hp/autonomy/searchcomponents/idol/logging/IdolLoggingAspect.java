@@ -1,24 +1,25 @@
 package com.hp.autonomy.searchcomponents.idol.logging;
 
-import com.autonomy.aci.client.transport.AciParameter;
 import com.autonomy.aci.client.transport.AciResponseInputStream;
 import com.autonomy.aci.client.transport.AciServerDetails;
 import com.autonomy.aci.client.transport.ActionParameter;
-import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
+import com.hp.autonomy.searchcomponents.idol.configuration.IdolComponentLabelLookup;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.user.params.SecurityParams;
+import java.text.DecimalFormat;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.util.StopWatch;
 
-import java.text.DecimalFormat;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import static com.hp.autonomy.searchcomponents.idol.logging.IdolLoggingAspect.LOGGING_PRECEDENCE;
+import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 
 /**
  * Intercepts and logs all calls to Idol.
@@ -26,19 +27,23 @@ import java.util.stream.Collectors;
 @SuppressWarnings("ProhibitedExceptionDeclared")
 @Slf4j
 @Aspect
+// We need this to be lower-priority than the ActionId generation, so that the generated ActionId gets logged.
+@Order(LOGGING_PRECEDENCE)
 public class IdolLoggingAspect {
+    public static final int LOGGING_PRECEDENCE = LOWEST_PRECEDENCE;
+
     private static final Marker IDOL = MarkerFactory.getMarker("IDOL");
 
     private static final String PARAMETER_SEPARATOR = "&";
     private static final char NAME_VALUE_SEPARATOR = '=';
     private static final String HIDDEN_VALUE = "*******";
 
-    private final ConfigService<? extends IdolSearchCapable> configService;
+    private final IdolComponentLabelLookup lookup;
     private final boolean timingEnabled;
 
-    public IdolLoggingAspect(final ConfigService<? extends IdolSearchCapable> configService,
+    public IdolLoggingAspect(final IdolComponentLabelLookup lookup,
                              final boolean timingEnabled) {
-        this.configService = configService;
+        this.lookup = lookup;
         this.timingEnabled = timingEnabled;
     }
 
@@ -73,7 +78,7 @@ public class IdolLoggingAspect {
                 .collect(Collectors.joining(PARAMETER_SEPARATOR));
 
         final StringBuilder messageBuilder = new StringBuilder()
-                .append(configService.getConfig().lookupComponentNameByHostAndPort(host, port)).append('\t')
+                .append(lookup.lookupComponentNameByHostAndPort(host, port)).append('\t')
                 .append(host).append('\t')
                 .append(port).append('\t')
                 .append(query).append('\t');
