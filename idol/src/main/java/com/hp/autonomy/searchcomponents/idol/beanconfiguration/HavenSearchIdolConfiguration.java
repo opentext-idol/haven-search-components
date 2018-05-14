@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Hewlett-Packard Development Company, L.P.
+ * Copyright 2015-2018 Micro Focus International plc.
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
@@ -16,6 +16,7 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.aci.AbstractConfigurableAciService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfig;
+import com.hp.autonomy.searchcomponents.idol.configuration.IdolComponentLabelLookup;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.types.idol.marshalling.Jaxb2ParsingConfiguration;
@@ -227,5 +228,13 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
                 .setMaxConnTotal(maxConnectionsTotal)
                 .setDefaultSocketConfig(socketConfig)
                 .build();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(IdolComponentLabelLookup.class)
+    public IdolComponentLabelLookup createIdolComponentLabelLookup (
+            final ConfigService<? extends IdolSearchCapable> configService
+    ) {
+        return (host, port) -> configService.getConfig().lookupComponentNameByHostAndPort(host, port);
     }
 }
