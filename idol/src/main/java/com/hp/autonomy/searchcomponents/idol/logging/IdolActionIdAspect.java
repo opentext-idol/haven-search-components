@@ -24,7 +24,13 @@ import static com.hp.autonomy.searchcomponents.idol.logging.IdolLoggingAspect.LO
 @Order(LOGGING_PRECEDENCE - 1)
 public class IdolActionIdAspect {
 
-    private final String ACTION_ID_PARAM = "ActionId";
+    private static final String ACTION_ID_PARAM = "ActionId";
+
+    private final String prefix;
+
+    public IdolActionIdAspect(final String prefix) {
+        this.prefix = prefix;
+    }
 
     @Around(value = "execution(* com.autonomy.aci.client.transport.AciHttpClient.executeAction(..)) && args(serverDetails, parameters)",
             argNames = "joinPoint,serverDetails,parameters")
@@ -34,7 +40,7 @@ public class IdolActionIdAspect {
             final Collection<? extends ActionParameter<?>> parameters) throws Throwable {
         if (parameters.stream().noneMatch(param -> ACTION_ID_PARAM.equalsIgnoreCase(param.getName()))) {
             final ActionParameters newParams = new ActionParameters(parameters);
-            newParams.add(ACTION_ID_PARAM, UUID.randomUUID().toString());
+            newParams.add(ACTION_ID_PARAM, prefix + UUID.randomUUID().toString());
             return joinPoint.proceed(new Object[]{serverDetails, newParams});
         }
         else {
