@@ -27,11 +27,14 @@ public class HavenSearchIdolAspectConfiguration {
 
     public static final String IDOL_ACTION_ID_ASPECT_BEAN_NAME = "idolActionIdAspect";
     public static final String IDOL_ACTION_ID_PROPERTY_KEY = "idol.log.actionid.enabled";
+    public static final String IDOL_ACTION_ID_PREFIX_PROPERTY_KEY = "idol.log.actionid.prefix";
+    public static final String IDOL_ACTION_ID_PREFIX_PROPERTY = "${" + IDOL_ACTION_ID_PREFIX_PROPERTY_KEY + ":}";
 
     @Bean(name = IDOL_ACTION_ID_ASPECT_BEAN_NAME)
     @ConditionalOnProperty(IDOL_ACTION_ID_PROPERTY_KEY)
-    public IdolActionIdAspect createIdolActionIdAspect() {
-        return new IdolActionIdAspect();
+    public IdolActionIdAspect createIdolActionIdAspect(
+            @Value(IDOL_ACTION_ID_PREFIX_PROPERTY) final String prefix) {
+        return new IdolActionIdAspect(prefix);
     }
 
     @Bean(name = IDOL_LOGGING_ASPECT_BEAN_NAME)
