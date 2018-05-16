@@ -89,7 +89,7 @@ public class IdolLoggingAspect {
             return aciResponseInputStream;
         } finally {
             if (aciResponseInputStream != null) {
-                messageBuilder.append(aciResponseInputStream.getStatusCode() + '\t');
+                messageBuilder.append(aciResponseInputStream.getStatusCode()).append('\t');
                 messageBuilder.append(generateMessage(serverDetails, parameters));
                 log.info(IDOL, messageBuilder.toString());
             }
