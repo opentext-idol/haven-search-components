@@ -146,6 +146,11 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         if(indexAndReferences.getIndex() != null) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexAndReferences.getIndex()));
         }
+
+        final String referenceField = configService.getConfig().getReferenceField();
+        if(StringUtils.isNotEmpty(referenceField)) {
+            aciParameters.add(QueryParams.ReferenceField.name(), referenceField);
+        }
     }
 
     private void addPrintParameters(final AciParameters aciParameters, final PrintParam print, final Collection<String> printFields) {

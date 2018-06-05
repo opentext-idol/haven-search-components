@@ -56,4 +56,11 @@ public interface IdolSearchCapable extends HavenSearchCapable, ViewCapable, Idol
      * @return AnswerServer configuration
      */
     AnswerServerConfig getAnswerServer();
+
+    /**
+     * Returns the primary reference field which should be used for getContent, in case there's multiple references;
+     * can be null.
+     * @return String reference field, or null if not set.
+     */
+    String getReferenceField();
 }
