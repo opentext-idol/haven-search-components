@@ -51,7 +51,7 @@ public interface HavenSearchAciParameterHandler {
      * @param aciParameters     The set of parameters to add to
      * @param database          Database in which the document is located
      * @param documentReference Reference of the document
-     * @param referenceField    Document field which represents the reference
+     * @param referenceField    Document field which represents the reference (a field name in content, not a view URL).
      */
     void addGetContentOutputParameters(final AciParameters aciParameters, final String database, final String documentReference, final String referenceField);
 

@@ -106,7 +106,7 @@ public class HavenSearchAciParameterHandlerTest {
     public void addGetContentOutputParameters() {
         when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
         parameterHandler.addGetContentOutputParameters(aciParameters, "Database1", "ref", "field");
-        assertThat(aciParameters, hasSize(3));
+        assertThat(aciParameters, hasSize(4));
     }
 
     @Test
