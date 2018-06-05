@@ -95,6 +95,7 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addGetDocumentOutputParameters() {
+        when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
         when(indexAndReferences.getIndex()).thenReturn("Database1");
         when(indexAndReferences.getReferences()).thenReturn(Collections.singleton("SomeReference"));
         parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, PrintParam.Fields);
@@ -103,6 +104,7 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addGetContentOutputParameters() {
+        when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
         parameterHandler.addGetContentOutputParameters(aciParameters, "Database1", "ref", "field");
         assertThat(aciParameters, hasSize(3));
     }
