@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.hod.requests;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.hod.search.HodQueryRestrictions;
 import com.hp.autonomy.searchcomponents.hod.search.HodRelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.hod.search.HodRelatedConceptsRequestBuilder;
@@ -25,11 +26,13 @@ class HodRelatedConceptsRequestImpl implements HodRelatedConceptsRequest {
     private final int querySummaryLength;
     private final Integer maxResults;
     private final HodQueryRestrictions queryRestrictions;
+    private final QueryRequest.QueryType queryType;
 
     @SuppressWarnings("unused")
     @JsonPOJOBuilder(withPrefix = "")
     static class HodRelatedConceptsRequestImplBuilder implements HodRelatedConceptsRequestBuilder {
         private int querySummaryLength = 0;
         private Integer maxResults = MAX_RESULTS_DEFAULT;
+        private QueryRequest.QueryType queryType = QueryRequest.QueryType.MODIFIED;
     }
 }

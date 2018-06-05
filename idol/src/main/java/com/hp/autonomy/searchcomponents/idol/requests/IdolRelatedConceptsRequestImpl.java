@@ -7,6 +7,7 @@ package com.hp.autonomy.searchcomponents.idol.requests;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolRelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolRelatedConceptsRequestBuilder;
@@ -25,11 +26,13 @@ class IdolRelatedConceptsRequestImpl implements IdolRelatedConceptsRequest {
     private final int querySummaryLength;
     private final Integer maxResults;
     private final IdolQueryRestrictions queryRestrictions;
+    private final QueryRequest.QueryType queryType;
 
     @SuppressWarnings("unused")
     @JsonPOJOBuilder(withPrefix = "")
     static class IdolRelatedConceptsRequestImplBuilder implements IdolRelatedConceptsRequestBuilder {
         private int querySummaryLength = 0;
         private Integer maxResults = MAX_RESULTS_DEFAULT;
+        private QueryRequest.QueryType queryType = QueryRequest.QueryType.MODIFIED;
     }
 }

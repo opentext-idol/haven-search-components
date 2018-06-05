@@ -39,6 +39,8 @@ public interface RelatedConceptsRequestBuilder<R extends RelatedConceptsRequest<
      */
     B queryRestrictions(Q queryRestrictions);
 
+    B queryType(QueryRequest.QueryType queryType);
+
     /**
      * {@inheritDoc}
      */

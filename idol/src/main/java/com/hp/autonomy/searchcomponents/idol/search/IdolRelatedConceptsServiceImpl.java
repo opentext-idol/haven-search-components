@@ -49,7 +49,7 @@ class IdolRelatedConceptsServiceImpl implements IdolRelatedConceptsService {
         parameters.add(QueryParams.QuerySummary.name(), true);
         parameters.add(QueryParams.QuerySummaryLength.name(), relatedConceptsRequest.getQuerySummaryLength());
 
-        final QueryResponseData responseData = queryExecutor.executeQuery(parameters, QueryRequest.QueryType.RAW);
+        final QueryResponseData responseData = queryExecutor.executeQuery(parameters, relatedConceptsRequest.getQueryType());
         return responseData.getQs() == null
             ? Collections.emptyList()
             : responseData.getQs().getElement();
