@@ -34,4 +34,6 @@ public interface RelatedConceptsRequest<Q extends QueryRestrictions<?>>
      * @return The query restrictions to apply
      */
     Q getQueryRestrictions();
+
+    QueryRequest.QueryType getQueryType();
 }
