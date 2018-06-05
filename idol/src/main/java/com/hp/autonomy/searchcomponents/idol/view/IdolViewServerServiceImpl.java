@@ -149,14 +149,11 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
     }
 
     private Hit loadDocument(final String documentReference, final String database, final PrintFields printFields, final String highlightExpression) {
-        final ViewConfig viewConfig = configService.getConfig().getViewConfig();
-        final String referenceField = viewConfig.getReferenceField();
-
         // do a GetContent to check for document visibility and to read out required fields
         final AciParameters parameters = new AciParameters(QueryActions.GetContent.name());
         parameters.add(GetContentParams.Print.name(), "Fields");
         parameters.add(GetContentParams.PrintFields.name(), printFields);
-        parameterHandler.addGetContentOutputParameters(parameters, database, documentReference, referenceField);
+        parameterHandler.addGetContentOutputParameters(parameters, database, documentReference, null);
 
         if (StringUtils.isNotBlank(highlightExpression)) {
             parameters.add(GetContentParams.Highlight.name(), HighlightParam.Terms);

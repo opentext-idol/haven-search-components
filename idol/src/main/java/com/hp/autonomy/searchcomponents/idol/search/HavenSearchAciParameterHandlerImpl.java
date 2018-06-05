@@ -147,6 +147,10 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexAndReferences.getIndex()));
         }
 
+        addDefaultReferenceField(aciParameters);
+    }
+
+    private void addDefaultReferenceField(final AciParameters aciParameters) {
         final String referenceField = configService.getConfig().getReferenceField();
         if(StringUtils.isNotEmpty(referenceField)) {
             aciParameters.add(QueryParams.ReferenceField.name(), referenceField);
@@ -170,6 +174,13 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         }
 
         parameters.add(GetContentParams.Reference.name(), new Reference(documentReference));
+
+        if (referenceField != null) {
+            parameters.add(QueryParams.ReferenceField.name(), referenceField);
+        }
+        else {
+            addDefaultReferenceField(parameters);
+        }
     }
 
     @Override
