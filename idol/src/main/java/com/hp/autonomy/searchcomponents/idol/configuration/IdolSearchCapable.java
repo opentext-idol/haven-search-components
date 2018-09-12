@@ -9,6 +9,7 @@ import com.autonomy.aci.client.transport.AciServerDetails;
 import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfig;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
+import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
@@ -63,4 +64,12 @@ public interface IdolSearchCapable extends HavenSearchCapable, ViewCapable, Idol
      * @return String reference field, or null if not set.
      */
     String getReferenceField();
+
+    /**
+     * Returns the combine method for combining results when doing queries.
+     * @return String the combine method
+     */
+    default String getCombineMethod() {
+        return CombineParam.Simple.name();
+    };
 }
