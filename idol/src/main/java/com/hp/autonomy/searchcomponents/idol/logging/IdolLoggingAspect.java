@@ -37,6 +37,7 @@ public class IdolLoggingAspect {
     private static final String PARAMETER_SEPARATOR = "&";
     private static final char NAME_VALUE_SEPARATOR = '=';
     private static final String HIDDEN_VALUE = "*******";
+    private static final String SERVER_UNREACHABLE = "(server unreachable)";
 
     private final IdolComponentLabelLookup lookup;
     private final boolean timingEnabled;
@@ -88,11 +89,9 @@ public class IdolLoggingAspect {
             aciResponseInputStream = (AciResponseInputStream) timeIdolRequests(joinPoint, messageBuilder);
             return aciResponseInputStream;
         } finally {
-            if (aciResponseInputStream != null) {
-                messageBuilder.append(aciResponseInputStream.getStatusCode()).append('\t');
-                messageBuilder.append(generateMessage(serverDetails, parameters));
-                log.info(IDOL, messageBuilder.toString());
-            }
+            messageBuilder.append(aciResponseInputStream == null ? SERVER_UNREACHABLE : aciResponseInputStream.getStatusCode()).append('\t');
+            messageBuilder.append(generateMessage(serverDetails, parameters));
+            log.info(IDOL, messageBuilder.toString());
         }
     }
 

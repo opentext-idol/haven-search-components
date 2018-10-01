@@ -23,11 +23,11 @@
 
     <groupId>com.hp.autonomy.frontend</groupId>
     <artifactId>haven-search-components</artifactId>
-    <version>0.60.1</version>
+    <version>0.61.0</version>
 
     <name>Micro Focus Haven Search Components</name>
     <description>Reusable components for Micro Focus Haven Search.</description>
-    <url>https://github.com/hpe-idol/haven-search-components</url>
+    <url>https://github.com/microfocus-idol/haven-search-components</url>
     <inceptionYear>2015</inceptionYear>
 
     <licenses>
@@ -38,14 +38,14 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:hpe-idol/haven-search-components.git</connection>
-        <developerConnection>scm:git:git@github.com:hpe-idol/haven-search-components.git</developerConnection>
-        <url>git@github.com:hpe-idol/haven-search-components.git</url>
+        <connection>scm:git:git@github.com:microfocus-idol/haven-search-components.git</connection>
+        <developerConnection>scm:git:git@github.com:microfocus-idol/haven-search-components.git</developerConnection>
+        <url>git@github.com:microfocus-idol/haven-search-components.git</url>
     </scm>
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/hpe-idol/haven-search-components/issues</url>
+        <url>https://github.com/microfocus-idol/haven-search-components/issues</url>
     </issueManagement>
 
     <developers>

@@ -69,6 +69,7 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addSearchRestrictions() {
+        when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
         when(queryRestrictions.getQueryText()).thenReturn("Some Text");
         when(queryRestrictions.getFieldText()).thenReturn("Some field text");
         when(queryRestrictions.getDatabases()).thenReturn(Collections.singletonList("Database1"));

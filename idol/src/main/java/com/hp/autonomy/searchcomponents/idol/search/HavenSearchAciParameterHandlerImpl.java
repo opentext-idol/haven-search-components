@@ -99,7 +99,9 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
             aciParameters.add(QueryParams.StateDontMatchID.name(), new StateIdsBuilder(queryRestrictions.getStateDontMatchIds()));
         }
 
-        aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
+        final IdolSearchCapable config = configService.getConfig();
+
+        aciParameters.add(QueryParams.Combine.name(), config.getCombineMethod());
         aciParameters.add(QueryParams.MinDate.name(), formatDate(queryRestrictions.getMinDate()));
         aciParameters.add(QueryParams.MaxDate.name(), formatDate(queryRestrictions.getMaxDate()));
         aciParameters.add(QueryParams.FieldText.name(), queryRestrictions.getFieldText());
@@ -133,10 +135,12 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     public void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex indexAndReferences, final PrintParam print) {
         addSecurityInfo(aciParameters);
 
+        final IdolSearchCapable config = configService.getConfig();
+
         final Set<String> references = indexAndReferences.getReferences();
         aciParameters.add(QueryParams.MatchReference.name(), new ReferencesBuilder(references));
         aciParameters.add(QueryParams.Summary.name(), SummaryParam.Concept);
-        aciParameters.add(QueryParams.Combine.name(), CombineParam.Simple);
+        aciParameters.add(QueryParams.Combine.name(), config.getCombineMethod());
         aciParameters.add(QueryParams.Text.name(), GET_CONTENT_QUERY_TEXT);
         aciParameters.add(QueryParams.MaxResults.name(), references.size());
         aciParameters.add(QueryParams.AnyLanguage.name(), true);
