@@ -15,6 +15,7 @@ import com.hp.autonomy.types.requests.idol.actions.answer.AnswerServerActions;
 import org.apache.commons.lang.StringUtils;
 
 import static com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfigValidator.Validation.INVALID_CONVERSATION_SYSTEM_NAME;
+import static com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfigValidator.Validation.INVALID_SYSTEM_NAME;
 
 public class AnswerServerConfigValidator implements Validator<AnswerServerConfig> {
     private final AciService aciService;
@@ -46,6 +47,21 @@ public class AnswerServerConfigValidator implements Validator<AnswerServerConfig
             }
         }
 
+        if (config.getSystemNames() != null && !config.getSystemNames().isEmpty() && validate.isValid()) {
+            final GetStatusResponsedata systems = aciService.executeAction(
+                    server.toAciServerDetails(),
+                    new ActionParameters(AnswerServerActions.GetStatus.name()),
+                    processorFactory.getResponseDataProcessor(GetStatusResponsedata.class));
+
+            for(String systemName : config.getSystemNames()) {
+                if (systems.getSystems().getSystem().stream().noneMatch(
+                        s -> systemName.equals(s.getName())
+                )) {
+                    return new ValidationResult<>(false, INVALID_SYSTEM_NAME);
+                }
+            }
+        }
+
         return validate;
     }
 
@@ -55,6 +71,7 @@ public class AnswerServerConfigValidator implements Validator<AnswerServerConfig
     }
 
     public enum Validation {
-        INVALID_CONVERSATION_SYSTEM_NAME
+        INVALID_CONVERSATION_SYSTEM_NAME,
+        INVALID_SYSTEM_NAME
     }
 }
