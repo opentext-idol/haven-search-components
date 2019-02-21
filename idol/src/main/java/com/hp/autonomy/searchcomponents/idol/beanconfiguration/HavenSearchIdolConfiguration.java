@@ -104,7 +104,7 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
      */
     public static final String VALIDATOR_HTTP_CLIENT_BEAN_NAME = "validatorHttpClient";
 
-    private static final int HTTP_SOCKET_TIMEOUT = 90000;
+    private static final int HTTP_SOCKET_TIMEOUT = 180000;
     private static final int HTTP_MAX_CONNECTIONS_PER_ROUTE = 20;
     private static final int HTTP_MAX_CONNECTIONS_TOTAL = 120;
     private static final int VALIDATOR_HTTP_SOCKET_TIMEOUT = 2000;
