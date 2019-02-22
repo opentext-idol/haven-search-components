@@ -6,6 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
 import com.hp.autonomy.types.idol.responses.answer.AskAnswer;
+import com.hp.autonomy.types.idol.responses.answer.GetStatusResponsedata;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
@@ -13,7 +14,6 @@ import java.util.List;
 /**
  * Service for sending queries to answer server
  */
-@FunctionalInterface
 public interface AskAnswerServerService {
     /**
      * The bean name of the default ask request builder implementation.
@@ -34,4 +34,6 @@ public interface AskAnswerServerService {
      * @return answers returned by AnswerServer (may be empty)
      */
     List<AskAnswer> ask(AskAnswerServerRequest request);
+
+    GetStatusResponsedata getStatus();
 }

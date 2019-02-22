@@ -8,11 +8,13 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
 import com.hp.autonomy.types.idol.responses.answer.AskAnswer;
 import com.hp.autonomy.types.idol.responses.answer.AskAnswers;
 import com.hp.autonomy.types.idol.responses.answer.AskResponsedata;
+import com.hp.autonomy.types.idol.responses.answer.GetStatusResponsedata;
 import com.hp.autonomy.types.requests.idol.actions.answer.AnswerServerActions;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.AskParams;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.AskSortParam;
@@ -35,12 +37,14 @@ import static com.hp.autonomy.searchcomponents.idol.exceptions.codes.IdolErrorCo
 class AskAnswerServerServiceImpl implements AskAnswerServerService {
     private final AciService answerServerAciService;
     private final Processor<AskResponsedata> processor;
+    private final Processor<GetStatusResponsedata> getStatusResponsedataProcessor;
 
     @Autowired
     AskAnswerServerServiceImpl(final AciService answerServerAciService,
                                final ProcessorFactory processorFactory) {
         this.answerServerAciService = answerServerAciService;
         processor = processorFactory.getResponseDataProcessor(AskResponsedata.class);
+        getStatusResponsedataProcessor = processorFactory.getResponseDataProcessor(GetStatusResponsedata.class);
     }
 
     @Override
@@ -63,5 +67,14 @@ class AskAnswerServerServiceImpl implements AskAnswerServerService {
 
         final AskAnswers answers = answerServerAciService.executeAction(aciParameters, processor).getAnswers();
         return Optional.ofNullable(answers).map(AskAnswers::getAnswer).orElse(Collections.emptyList());
+    }
+
+    @Override
+    public GetStatusResponsedata getStatus() {
+        final GetStatusResponsedata systems = answerServerAciService.executeAction(
+                new ActionParameters(AnswerServerActions.GetStatus.name()),
+                getStatusResponsedataProcessor);
+
+        return systems;
     }
 }
