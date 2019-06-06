@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.hp.autonomy.aci.client</groupId>
             <artifactId>aci-annotations-processor</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-authentication</artifactId>
-            <version>0.15.1</version>
+            <version>0.15.2</version>
         </dependency>
         <dependency>
             <groupId>com.hp.bigdata.frontend</groupId>
