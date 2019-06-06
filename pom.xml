@@ -23,7 +23,7 @@
 
     <groupId>com.hp.autonomy.frontend</groupId>
     <artifactId>haven-search-components</artifactId>
-    <version>0.64.0-SNAPSHOT</version>
+    <version>0.63.3</version>
 
     <name>Micro Focus Haven Search Components</name>
     <description>Reusable components for Micro Focus Haven Search.</description>
