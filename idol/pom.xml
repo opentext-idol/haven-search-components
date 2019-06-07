@@ -12,8 +12,8 @@
     <artifactId>haven-search-components-idol</artifactId>
 
     <properties>
-        <gpg.publicKeyring>${project.parent.basedir}/public.gpg</gpg.publicKeyring>
-        <gpg.secretKeyring>${project.parent.basedir}/secret.gpg</gpg.secretKeyring>
+        <gpg.publicKeyring>${project.basedir}/../public.gpg</gpg.publicKeyring>
+        <gpg.secretKeyring>${project.basedir}/../secret.gpg</gpg.secretKeyring>
     </properties>
 
     <build>
