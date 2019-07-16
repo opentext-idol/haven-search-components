@@ -72,4 +72,7 @@ public interface IdolSearchCapable extends HavenSearchCapable, ViewCapable, Idol
     default String getCombineMethod() {
         return CombineParam.Simple.name();
     };
+
+    String getStoredStateField();
+
 }

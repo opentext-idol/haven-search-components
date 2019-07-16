@@ -31,6 +31,7 @@ import java.util.Collections;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -141,8 +142,20 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addStoreStateParameters() {
+        when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
         parameterHandler.addStoreStateParameters(aciParameters);
         assertThat(aciParameters, hasSize(2));
+    }
+
+    @Test
+    public void addStoreStateParameters_withStoredStateField() {
+        final IdolSearchCapable config = mock(IdolSearchCapable.class);
+        when(config.getStoredStateField()).thenReturn("the-field");
+        when(configService.getConfig()).thenReturn(config);
+        parameterHandler.addStoreStateParameters(aciParameters);
+        assertThat(aciParameters, hasSize(3));
+        assertThat(aciParameters,
+            hasItem(new AciParameter(QueryParams.StoredStateField.name(), "the-field")));
     }
 
     @Test

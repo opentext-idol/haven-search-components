@@ -254,6 +254,10 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     public void addStoreStateParameters(final AciParameters aciParameters) {
         aciParameters.add(QueryParams.StoreState.name(), true);
         aciParameters.add(QueryParams.StoredStateTokenLifetime.name(), -1);  // negative value means no expiry (DAH)
+        final String storedStateField = configService.getConfig().getStoredStateField();
+        if(StringUtils.isNotEmpty(storedStateField)) {
+            aciParameters.add(QueryParams.StoredStateField.name(), storedStateField);
+        }
     }
 
     @Override
