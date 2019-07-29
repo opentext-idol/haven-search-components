@@ -44,17 +44,17 @@
         <dependency>
             <groupId>com.hp.autonomy.hod</groupId>
             <artifactId>hod-spring-caching</artifactId>
-            <version>0.6.1</version>
+            <version>0.6.2</version>
         </dependency>
         <dependency>
             <groupId>com.hp.autonomy.hod</groupId>
             <artifactId>hod-sso-spring-security</artifactId>
-            <version>0.9.1</version>
+            <version>0.9.2</version>
         </dependency>
         <dependency>
             <groupId>com.hp.autonomy.hod</groupId>
             <artifactId>java-hod-client</artifactId>
-            <version>0.25.2</version>
+            <version>0.25.3</version>
         </dependency>
 
         <dependency>

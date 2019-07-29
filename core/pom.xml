@@ -48,7 +48,7 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-impl</artifactId>
-            <version>2.1.4</version>
+            <version>2.1.5</version>
         </dependency>
         <dependency>
             <groupId>com.hp.autonomy.aci.content</groupId>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-authentication</artifactId>
-            <version>0.15.2</version>
+            <version>0.15.3</version>
         </dependency>
         <dependency>
             <groupId>com.hp.bigdata.frontend</groupId>
