@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.core.config;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.function.Function;
 
 /**
@@ -23,7 +24,7 @@ public enum FieldType {
             try {
                 // HOD handles date fields inconsistently; attempt to detect this here
                 return ZonedDateTime.parse(value);
-            } catch(final IllegalArgumentException ignored) {
+            } catch(final DateTimeParseException ignored) {
                 return null;
             }
         }
