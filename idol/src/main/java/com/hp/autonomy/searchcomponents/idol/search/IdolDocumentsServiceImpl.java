@@ -157,7 +157,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
 
         // Now fetch result count with combine=simple
         final AciParameters resultCountAciParameters = new AciParameters(QueryActions.Query.name());
-        parameterHandler.addSecurityInfo(aciParameters);
+        parameterHandler.addSecurityInfo(resultCountAciParameters);
         resultCountAciParameters.add(QueryParams.TotalResults.name(), true);
         resultCountAciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         resultCountAciParameters.add(QueryParams.Predict.name(), false);
