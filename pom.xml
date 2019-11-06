@@ -120,7 +120,7 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-impl</artifactId>
-            <version>2.1.7</version>
+            <version>2.1.8</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
