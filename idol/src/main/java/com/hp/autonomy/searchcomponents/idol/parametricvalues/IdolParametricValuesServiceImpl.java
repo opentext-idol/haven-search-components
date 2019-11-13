@@ -126,7 +126,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
 
         return fieldNames.isEmpty()
             ? Collections.emptySet()
-            : getFlatFields(parametricRequest, fieldNames)
+            : getFlatFields(parametricRequest, fieldNames, false)
             .stream()
             .map(this::flatFieldToTagInfo)
             .filter(queryTagInfo -> !queryTagInfo.getValues().isEmpty())
@@ -160,7 +160,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                 .build();
 
             @SuppressWarnings("RedundantTypeArguments") // presumably Java bug
-            final List<NumericRangeInfo> results = getFlatFields(bucketingRequest, parametricRequest.getFieldNames()).stream()
+            final List<NumericRangeInfo> results = getFlatFields(bucketingRequest, parametricRequest.getFieldNames(), true).stream()
                 .map(this.<Double, Double, NumericRangeInfo.Value, NumericRangeInfo, NumericRangeInfo.NumericRangeInfoBuilder>flatFieldToRangeInfo(boundariesPerField, this::parseNumericRange, NumericRangeInfo::builder, NumericRangeInfo.Value::new))
                 .collect(Collectors.toList());
             return results;
@@ -194,7 +194,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
                 .build();
 
             @SuppressWarnings("RedundantTypeArguments") // presumably Java bug
-            final List<DateRangeInfo> results = getFlatFields(bucketingRequest, parametricRequest.getFieldNames())
+            final List<DateRangeInfo> results = getFlatFields(bucketingRequest, parametricRequest.getFieldNames(), true)
                 .stream()
                 .map(this.<ZonedDateTime, Duration, DateRangeInfo.Value, DateRangeInfo, DateRangeInfo.DateRangeInfoBuilder>flatFieldToRangeInfo(boundariesPerField, this::parseDateRange, DateRangeInfo::builder, DateRangeInfo.Value::new))
                 .collect(Collectors.toList());
@@ -406,14 +406,14 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         return values != null ? values : 0;
     }
 
-    private Collection<FlatField> getFlatFields(final IdolParametricRequest parametricRequest, final Collection<FieldPath> fieldNames) {
+    private Collection<FlatField> getFlatFields(final IdolParametricRequest parametricRequest, final Collection<FieldPath> fieldNames, final boolean includeValueDetails) {
         final AciParameters aciParameters = createAciParameters(parametricRequest, fieldNames);
 
         aciParameters.add(GetQueryTagValuesParams.Start.name(), parametricRequest.getStart());
         aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), parametricRequest.getMaxValues());
         aciParameters.add(GetQueryTagValuesParams.Sort.name(), parametricRequest.getSort());
         aciParameters.add(GetQueryTagValuesParams.Ranges.name(), new ParametricFieldRanges(parametricRequest.getRanges()));
-        aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
+        aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), includeValueDetails);
         aciParameters.add(GetQueryTagValuesParams.TotalValues.name(), true);
         aciParameters.add(GetQueryTagValuesParams.ValueRestriction.name(), String.join(",", parametricRequest.getValueRestrictions()));
 
