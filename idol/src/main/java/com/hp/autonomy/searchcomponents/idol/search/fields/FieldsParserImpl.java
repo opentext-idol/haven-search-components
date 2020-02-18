@@ -6,10 +6,7 @@
 package com.hp.autonomy.searchcomponents.idol.search.fields;
 
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
-import com.hp.autonomy.searchcomponents.core.config.FieldType;
-import com.hp.autonomy.searchcomponents.core.config.FieldValue;
-import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
+import com.hp.autonomy.searchcomponents.core.config.*;
 import com.hp.autonomy.searchcomponents.core.fields.FieldDisplayNameGenerator;
 import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
@@ -18,7 +15,6 @@ import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import com.hp.autonomy.types.idol.responses.DocContent;
 import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
-import java.util.LinkedHashMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +25,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser.FIELDS_PARSER_BEAN_NAME;
 
@@ -71,10 +62,8 @@ class FieldsParserImpl implements FieldsParser {
         if (content != null) {
             final Element docContent = (Element) content.getContent().get(0);
             if (docContent.hasChildNodes()) {
-                final NodeList childNodes = docContent.getChildNodes();
-                fieldMap = new HashMap<>(childNodes.getLength());
-
-                parseAllFields(fieldConfig, childNodes, fieldMap, docContent.getNodeName());
+                fieldMap = new HashMap<>();
+                parseAllFields(fieldConfig, docContent, fieldMap, docContent.getNodeName());
                 qmsId = parseField(docContent, documentFieldsService.getQmsIdFieldInfo(), String.class);
                 promotionCategory = determinePromotionCategory(docContent, hit.getPromotionname(), hit.getDatabase());
             }
@@ -86,88 +75,88 @@ class FieldsParserImpl implements FieldsParser {
                 .promotionCategory(promotionCategory);
     }
 
-    private void parseAllFields(final Map<FieldPath, FieldInfo<?>> fieldConfig, final NodeList childNodes, final Map<String, FieldInfo<?>> fieldMap, final String name) {
+    /**
+     * Add a parsed field to the result.
+     *
+     * @param fieldMap Result fields
+     * @param fieldInfo Field definition, configured or computed
+     * @param fieldPath Full path to the field from the document root
+     * @param value Parsed field value
+     * @param <T> Parsed field value type
+     */
+    private <T extends Serializable> void addToFieldMap(final Map<String, FieldInfo<?>> fieldMap, final FieldInfo<T> fieldInfo, final FieldPath fieldPath, final FieldValue<T> value) {
+        final String id = fieldInfo.getId();
+        final String displayName = fieldDisplayNameGenerator.generateDisplayNameFromId(id);
+        if (fieldMap.containsKey(id)) {
+            @SuppressWarnings({"unchecked", "CastToConcreteClass"})
+            final FieldInfo<T> updatedFieldInfo = ((FieldInfo<T>) fieldMap.get(id)).toBuilder()
+                .name(fieldPath)
+                .value(value)
+                .build();
+            fieldMap.put(id, updatedFieldInfo);
+        } else {
+            final Collection<FieldPath> names = new ArrayList<>(fieldInfo.getNames().size());
+            names.add(fieldPath);
+            final FieldInfo<T> fieldInfoWithValue = FieldInfo.<T>builder()
+                .id(id)
+                .names(names)
+                .displayName(displayName)
+                .type(fieldInfo.getType())
+                .advanced(fieldInfo.isAdvanced())
+                .value(value)
+                .build();
+            fieldMap.put(id, fieldInfoWithValue);
+        }
+    }
+
+    private void parseAllFields(final Map<FieldPath, FieldInfo<?>> fieldConfig, final Node node, final Map<String, FieldInfo<?>> fieldMap, final String name) {
         final FieldPath fieldPath = fieldPathNormaliser.normaliseFieldPath(name);
+        final FieldInfo<Serializable> fieldInfo = getFieldInfo(fieldConfig, fieldPath);
+
+        // fields configured as records have separate handling for nested fields, so don't fall
+        // through to the recursive call below
+        if (fieldInfo.getType().equals(FieldType.RECORD)) {
+            final Serializable value = RecordType.parseValue(node);
+            addToFieldMap(fieldMap, fieldInfo, fieldPath, new FieldValue<>(value, null));
+            return;
+        }
+
+        final NodeList childNodes = node.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
-            final Node node = childNodes.item(i);
-            if (node instanceof Text) {
-                final String stringValue = node.getNodeValue();
+            final Node childNode = childNodes.item(i);
+            if (childNode instanceof Text) {
+                final String stringValue = childNode.getNodeValue();
                 if (StringUtils.isNotBlank(stringValue)) {
-                    final FieldInfo<?> fieldInfo = getFieldInfo(fieldConfig, fieldPath);
                     final String id = fieldInfo.getId();
-                    final String displayName = fieldDisplayNameGenerator.generateDisplayNameFromId(id);
                     final FieldType fieldType = fieldInfo.getType();
                     final Serializable value = (Serializable) fieldType.parseValue(fieldType.getType(), stringValue);
                     final String displayValue = fieldDisplayNameGenerator.generateDisplayValueFromId(id, value, fieldType);
-                    if (fieldMap.containsKey(id)) {
-                        @SuppressWarnings({"unchecked", "CastToConcreteClass"})
-                        final FieldInfo<?> updatedFieldInfo = ((FieldInfo<Serializable>) fieldMap.get(id)).toBuilder()
-                                .name(fieldPath)
-                                .value(new FieldValue<>(value, displayValue))
-                                .build();
-                        fieldMap.put(id, updatedFieldInfo);
-                    } else {
-                        final Collection<FieldPath> names = new ArrayList<>(fieldInfo.getNames().size());
-                        names.add(fieldPath);
-                        final FieldInfo<Serializable> fieldInfoWithValue = FieldInfo.builder()
-                                .id(id)
-                                .names(names)
-                                .displayName(displayName)
-                                .type(fieldInfo.getType())
-                                .advanced(fieldInfo.isAdvanced())
-                                .value(new FieldValue<>(value, displayValue))
-                                .build();
-                        fieldMap.put(id, fieldInfoWithValue);
-                    }
+                    addToFieldMap(fieldMap, fieldInfo, fieldPath, new FieldValue<>(value, displayValue));
                 }
+
             } else {
-                final FieldPath childPath = fieldPathNormaliser.normaliseFieldPath(name + '/' + node.getNodeName());
+                final FieldPath childPath = fieldPathNormaliser.normaliseFieldPath(name + '/' + childNode.getNodeName());
+                final FieldInfo<Serializable> childFieldInfo = getFieldInfo(fieldConfig, childPath);
+
                 if (fieldConfig.containsKey(childPath) && fieldConfig.get(childPath).getChildMapping() != null) {
-                    final FieldInfo<?> fieldInfo = fieldConfig.get(childPath);
-                    final String id = fieldInfo.getId();
-                    final String displayName = fieldDisplayNameGenerator.generateDisplayNameFromId(id);
-                    final FieldType fieldType = fieldInfo.getType();
-
-                    final LinkedHashMap<String, Serializable> value = fieldInfo.getChildMapping().parseMapType(fieldType, node);
-
+                    final String id = childFieldInfo.getId();
+                    final FieldType fieldType = childFieldInfo.getType();
+                    final LinkedHashMap<String, Serializable> value = childFieldInfo.getChildMapping().parseMapType(fieldType, childNode);
                     String displayValue = null;
                     if(!value.isEmpty()) {
                         displayValue = fieldDisplayNameGenerator.generateDisplayValueFromId(id, value.values().iterator().next(), fieldType);
                     }
-
-                    if(fieldMap.containsKey(id)) {
-                        @SuppressWarnings({"unchecked", "CastToConcreteClass"}) final FieldInfo<?> updatedFieldInfo = ((FieldInfo<LinkedHashMap<String, Serializable>>) fieldMap.get(id)).toBuilder()
-                                .name(childPath)
-                                .value(new FieldValue<>(value, displayValue))
-                                .build();
-                        fieldMap.put(id, updatedFieldInfo);
-                    }
-                    else {
-                        final Collection<FieldPath> names = new ArrayList<>(fieldInfo.getNames().size());
-                        names.add(childPath);
-                        final FieldInfo<LinkedHashMap<String, Serializable>> fieldInfoWithValue = FieldInfo.<LinkedHashMap<String, Serializable>>builder()
-                                .id(id)
-                                .names(names)
-                                .displayName(displayName)
-                                .type(fieldInfo.getType())
-                                .advanced(fieldInfo.isAdvanced())
-                                .value(new FieldValue<>(value, displayValue))
-                                .childMapping(fieldInfo.getChildMapping())
-                                .build();
-                        fieldMap.put(id, fieldInfoWithValue);
-                    }
+                    addToFieldMap(fieldMap, childFieldInfo, childPath, new FieldValue<Serializable>(value, displayValue));
                 }
 
-                if (node.getChildNodes().getLength() > 0) {
-                    // We still want to process the children, e.g. LAT is used for both Places and Location
-                    parseAllFields(fieldConfig, node.getChildNodes(), fieldMap, name + '/' + node.getNodeName());
-                }
+                // We still want to process the children, e.g. LAT is used for both Places and Location
+                parseAllFields(fieldConfig, childNode, fieldMap, name + '/' + childNode.getNodeName());
             }
         }
     }
 
-    private FieldInfo<?> getFieldInfo(final Map<FieldPath, FieldInfo<?>> fieldConfig, final FieldPath fieldPath) {
-        return fieldConfig.containsKey(fieldPath) ? fieldConfig.get(fieldPath) : FieldInfo.builder()
+    private <T extends Serializable> FieldInfo<T> getFieldInfo(final Map<FieldPath, FieldInfo<?>> fieldConfig, final FieldPath fieldPath) {
+        return fieldConfig.containsKey(fieldPath) ? (FieldInfo<T>) fieldConfig.get(fieldPath) : FieldInfo.<T>builder()
                 .id(fieldPath.getNormalisedPath())
                 .name(fieldPath)
                 .advanced(true)

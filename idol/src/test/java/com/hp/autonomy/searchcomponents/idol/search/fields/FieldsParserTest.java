@@ -8,6 +8,7 @@ package com.hp.autonomy.searchcomponents.idol.search.fields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldType;
+import com.hp.autonomy.searchcomponents.core.config.FieldValue;
 import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.core.fields.FieldDisplayNameGenerator;
 import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
@@ -28,8 +29,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.Map;
+import java.util.*;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 import static org.hamcrest.Matchers.hasSize;
@@ -71,6 +73,11 @@ public class FieldsParserTest {
                 .id("author")
                 .name(fieldPathNormaliser.normaliseFieldPath("DOCUMENT/CUSTOM_ARRAY"))
                 .build())
+            .populateResponseMap("complex", FieldInfo.<Serializable>builder()
+                .id("complex")
+                .name(fieldPathNormaliser.normaliseFieldPath("DOCUMENT/CUSTOM_RECORD"))
+                .type(FieldType.RECORD)
+                .build())
             .build();
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);
         when(configService.getConfig()).thenReturn(config);
@@ -82,8 +89,19 @@ public class FieldsParserTest {
         fieldsParser.parseDocumentFields(mockHit(), builder);
         final IdolSearchResult idolSearchResult = builder.build();
         final Map<String, FieldInfo<?>> fieldMap = idolSearchResult.getFieldMap();
+
         assertNotNull(fieldMap.get("Custom Date"));
-        assertThat(fieldMap.get("author").getValues(), hasSize(2));
+
+        assertEquals(
+            Arrays.asList(new FieldValue<>("a", null), new FieldValue<>("b", null)),
+            fieldMap.get("author").getValues());
+
+        final HashMap<String, List<String>> recordValue = new HashMap<>();
+        recordValue.put("first", Collections.singletonList("val 1"));
+        recordValue.put("second", Collections.singletonList("val 2"));
+        assertEquals(
+            Collections.singletonList(new FieldValue<>(recordValue, null)),
+            fieldMap.get("complex").getValues());
     }
 
     @Test
@@ -116,11 +134,22 @@ public class FieldsParserTest {
         when(element.getNodeName()).thenReturn("DOCUMENT");
         when(element.hasChildNodes()).thenReturn(true);
         final NodeList childNodes = mock(NodeList.class);
-        when(childNodes.getLength()).thenReturn(4);
+        when(childNodes.getLength()).thenReturn(5);
         mockNodeListEntry(childNodes, 0, "CUSTOM_DATE", "2016-02-03T11:42:00Z");
         mockNodeListEntry(childNodes, 1, "CUSTOM_ARRAY", "a");
         mockNodeListEntry(childNodes, 2, "CUSTOM_ARRAY", "b");
         mockNodeListEntry(childNodes, 3, "UNKNOWN", "c");
+
+        final Element recordElement = mock(Element.class);
+        when(recordElement.getNodeName()).thenReturn("CUSTOM_RECORD");
+        when(recordElement.hasChildNodes()).thenReturn(true);
+        final NodeList recordChildNodes = mock(NodeList.class);
+        when(recordChildNodes.getLength()).thenReturn(2);
+        mockNodeListEntry(recordChildNodes, 0, "FIRST", "val 1");
+        mockNodeListEntry(recordChildNodes, 1, "SECOND", "val 2");
+        when(recordElement.getChildNodes()).thenReturn(recordChildNodes);
+
+        when(childNodes.item(4)).thenReturn(recordElement);
         when(element.getChildNodes()).thenReturn(childNodes);
 
         mockHardCodedField(element, IdolDocumentFieldsServiceImpl.QMS_ID_FIELD, "123");

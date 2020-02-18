@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -31,7 +32,9 @@ public enum FieldType {
     }),
     NUMBER(Number.class, Double::parseDouble),
     BOOLEAN(Boolean.class, Boolean::parseBoolean),
-    GEOINDEX(String.class, value -> value);
+    GEOINDEX(String.class, value -> value),
+    // the parser won't be called - bypassed in `FieldsParserImpl` to use `RecordType`
+    RECORD(Map.class, value -> value);
 
     private final Class<?> type;
     @SuppressWarnings("NonSerializableFieldInSerializableClass")
