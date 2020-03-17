@@ -26,8 +26,12 @@ import static com.hp.autonomy.searchcomponents.core.search.fields.DocumentFields
 class IdolDocumentFieldsServiceImpl extends AbstractDocumentFieldsService implements IdolDocumentFieldsService {
     static final String QMS_ID_FIELD = "QMSID";
     static final String INJECTED_PROMOTION_FIELD = "INJECTEDPROMOTION";
+    static final String FACT_ID_FIELD = "FACTS/FACT_EXTRACT_/ID";
+    static final String FACT_SENTENCE_FIELD = "FACTS/FACT_EXTRACT_/SENTENCE";
     private final FieldInfo<String> qmsIdFieldInfo;
     private final FieldInfo<Boolean> injectedPromotionFieldInfo;
+    private final FieldInfo<String> factIdFieldInfo;
+    private final FieldInfo<String> factSentenceFieldInfo;
 
     @SuppressWarnings("TypeMayBeWeakened")
     @Autowired
@@ -45,10 +49,23 @@ class IdolDocumentFieldsServiceImpl extends AbstractDocumentFieldsService implem
                 .type(FieldType.BOOLEAN)
                 .advanced(true)
                 .build();
+
+        factIdFieldInfo = FieldInfo.<String>builder()
+            .id(FACT_ID_FIELD)
+            .name(fieldPathNormaliser.normaliseFieldPath(FACT_ID_FIELD))
+            .advanced(true)
+            .build();
+
+        factSentenceFieldInfo = FieldInfo.<String>builder()
+            .id(FACT_SENTENCE_FIELD)
+            .name(fieldPathNormaliser.normaliseFieldPath(FACT_SENTENCE_FIELD))
+            .advanced(true)
+            .build();
     }
 
     @Override
     public Collection<FieldInfo<?>> getHardCodedFields() {
-        return Arrays.asList(qmsIdFieldInfo, injectedPromotionFieldInfo);
+        return Arrays.asList(
+            qmsIdFieldInfo, injectedPromotionFieldInfo, factIdFieldInfo, factSentenceFieldInfo);
     }
 }
