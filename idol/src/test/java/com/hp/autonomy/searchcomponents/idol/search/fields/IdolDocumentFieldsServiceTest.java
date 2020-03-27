@@ -16,6 +16,6 @@ import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CL
 public class IdolDocumentFieldsServiceTest extends AbstractDocumentFieldsServiceTest {
     @Before
     public void setUp() {
-        numberOfHardCodedFields = 2;
+        numberOfHardCodedFields = 4;
     }
 }
