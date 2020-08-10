@@ -10,8 +10,9 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
-import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
+import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,12 +21,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,6 +40,8 @@ public class HavenSearchAciParameterHandlerImplTest {
     private AuthenticationInformationRetriever<?, CommunityPrincipal> authenticationInformationRetriever;
     @Mock
     private IdolQueryRestrictions queryRestrictions;
+    @Mock
+    private IdolViewRequest viewRequest;
 
     private AciParameters aciParameters;
 
@@ -61,10 +63,8 @@ public class HavenSearchAciParameterHandlerImplTest {
 
         handler.addSearchRestrictions(aciParameters, queryRestrictions);
 
-        assertThat("2010-11-11T02:02:02Z",
-                   is(DateTimeFormatter.ISO_INSTANT.format(minDate.truncatedTo(ChronoUnit.SECONDS))));
-        assertThat("2017-11-11T02:02:02Z",
-                   is(DateTimeFormatter.ISO_INSTANT.format(maxDate.truncatedTo(ChronoUnit.SECONDS))));
+        assertThat(aciParameters.get("mindate"), is("2010-11-11T02:02:02Z"));
+        assertThat(aciParameters.get("maxdate"), is("2017-11-11T02:02:02Z"));
     }
 
     @Test
@@ -76,10 +76,8 @@ public class HavenSearchAciParameterHandlerImplTest {
 
         handler.addSearchRestrictions(aciParameters, queryRestrictions);
 
-        assertThat("-0001-11-11T02:02:02Z",
-                   is(DateTimeFormatter.ISO_INSTANT.format(minDate.truncatedTo(ChronoUnit.SECONDS))));
-        assertThat("0000-11-11T02:02:02Z",
-                   is(DateTimeFormatter.ISO_INSTANT.format(maxDate.truncatedTo(ChronoUnit.SECONDS))));
+        assertThat(aciParameters.get("mindate"), is("-0001-11-11T02:02:02Z"));
+        assertThat(aciParameters.get("maxdate"), is("0000-11-11T02:02:02Z"));
     }
 
     @Test
@@ -91,10 +89,8 @@ public class HavenSearchAciParameterHandlerImplTest {
 
         handler.addSearchRestrictions(aciParameters, queryRestrictions);
 
-        assertThat("-0043-11-11T02:02:02Z",
-                   is(DateTimeFormatter.ISO_INSTANT.format(minDate.truncatedTo(ChronoUnit.SECONDS))));
-        assertThat("-0011-11-11T02:02:02Z",
-                   is(DateTimeFormatter.ISO_INSTANT.format(maxDate.truncatedTo(ChronoUnit.SECONDS))));
+        assertThat(aciParameters.get("mindate"), is("-0043-11-11T02:02:02Z"));
+        assertThat(aciParameters.get("maxdate"), is("-0011-11-11T02:02:02Z"));
     }
 
     private void setUpQueryRestrictions(final ZonedDateTime minDate, final ZonedDateTime maxDate) {
@@ -106,4 +102,28 @@ public class HavenSearchAciParameterHandlerImplTest {
         when(queryRestrictions.getMinDate()).thenReturn(minDate);
         when(queryRestrictions.getMaxDate()).thenReturn(maxDate);
     }
+
+    @Test
+    public void testAddViewParameters() {
+        handler.addViewParameters(aciParameters, "the doc ref", viewRequest);
+        assertThat(aciParameters.get("noaci"), is("true"));
+        assertThat(aciParameters.get("reference"), is("the doc ref"));
+        assertThat(aciParameters.get("embedimages"), is("true"));
+        assertThat(aciParameters.get("stripscript"), is("true"));
+        assertThat(aciParameters.get("originalbaseurl"), is("true"));
+        assertThat(aciParameters.get("outputtype"), is("HTML"));
+    }
+
+    @Test
+    public void testAddViewParameters_original() {
+        when(viewRequest.isOriginal()).thenReturn(true);
+        handler.addViewParameters(aciParameters, "the doc ref", viewRequest);
+        assertThat(aciParameters.get("noaci"), is("true"));
+        assertThat(aciParameters.get("reference"), is("the doc ref"));
+        Assert.assertNull(aciParameters.get("embedimages"));
+        Assert.assertNull(aciParameters.get("stripscript"));
+        Assert.assertNull(aciParameters.get("originalbaseurl"));
+        assertThat(aciParameters.get("outputtype"), is("Raw"));
+    }
+
 }

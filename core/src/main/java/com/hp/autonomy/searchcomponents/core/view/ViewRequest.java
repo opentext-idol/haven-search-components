@@ -35,4 +35,10 @@ public interface ViewRequest<S extends Serializable> extends RequestObject<ViewR
      * @return Text to highlight in the document
      */
     String getHighlightExpression();
+
+    /**
+     * @return Whether to retrieve the original file, without converting to HTML.
+     */
+    boolean isOriginal();
+
 }

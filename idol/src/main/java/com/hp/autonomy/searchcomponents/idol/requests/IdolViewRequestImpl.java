@@ -26,6 +26,7 @@ class IdolViewRequestImpl implements IdolViewRequest {
     private final String documentReference;
     private final String database;
     private final String highlightExpression;
+    private final boolean original;
 
     @JsonPOJOBuilder(withPrefix = "")
     static class IdolViewRequestImplBuilder implements IdolViewRequestBuilder {

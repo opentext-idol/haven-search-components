@@ -25,6 +25,7 @@ class HodViewRequestImpl implements HodViewRequest {
     private final String documentReference;
     private final ResourceName database;
     private final String highlightExpression;
+    private final boolean original;
 
     @JsonPOJOBuilder(withPrefix = "")
     static class HodViewRequestImplBuilder implements HodViewRequestBuilder {

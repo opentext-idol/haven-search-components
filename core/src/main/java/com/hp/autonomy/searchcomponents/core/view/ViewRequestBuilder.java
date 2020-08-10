@@ -42,6 +42,12 @@ public interface ViewRequestBuilder<R extends ViewRequest<S>, S extends Serializ
     B highlightExpression(String highlightExpression);
 
     /**
+     * @param original Whether to retrieve the original file, without converting to HTML.
+     * @return the builder (for chaining)
+     */
+    B original(boolean original);
+
+    /**
      * {@inheritDoc}
      */
     @Override

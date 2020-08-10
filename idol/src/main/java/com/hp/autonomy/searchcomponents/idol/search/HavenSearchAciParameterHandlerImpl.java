@@ -19,7 +19,6 @@ import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
-import com.hp.autonomy.types.requests.idol.actions.query.params.CombineParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
@@ -264,22 +263,25 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     public void addViewParameters(final AciParameters aciParameters, final String reference, final IdolViewRequest viewRequest) {
         aciParameters.add(ViewParams.NoACI.name(), true);
         aciParameters.add(ViewParams.Reference.name(), reference);
-        aciParameters.add(ViewParams.EmbedImages.name(), true);
-        aciParameters.add(ViewParams.StripScript.name(), true);
-        aciParameters.add(ViewParams.OriginalBaseURL.name(), true);
         addSecurityInfo(aciParameters);
 
-        if(viewRequest.getHighlightExpression() != null) {
-            aciParameters.add(ViewParams.Links.name(), viewRequest.getHighlightExpression());
-            aciParameters.add(ViewParams.StartTag.name(), HIGHLIGHT_START_TAG);
-            aciParameters.add(ViewParams.EndTag.name(), HIGHLIGHT_END_TAG);
+        if (!viewRequest.isOriginal()) {
+            aciParameters.add(ViewParams.EmbedImages.name(), true);
+            aciParameters.add(ViewParams.StripScript.name(), true);
+            aciParameters.add(ViewParams.OriginalBaseURL.name(), true);
 
-            // we need this because we're sending query text, not a csv of stemmed terms
-            aciParameters.add(ViewParams.Boolean.name(), true);
+            if(viewRequest.getHighlightExpression() != null) {
+                aciParameters.add(ViewParams.Links.name(), viewRequest.getHighlightExpression());
+                aciParameters.add(ViewParams.StartTag.name(), HIGHLIGHT_START_TAG);
+                aciParameters.add(ViewParams.EndTag.name(), HIGHLIGHT_END_TAG);
+
+                // we need this because we're sending query text, not a csv of stemmed terms
+                aciParameters.add(ViewParams.Boolean.name(), true);
+            }
         }
 
-        // this prevents ViewServer from returning the raw file
-        aciParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
+        aciParameters.add(ViewParams.OutputType.name(),
+            viewRequest.isOriginal() ? OutputTypeParam.Raw : OutputTypeParam.HTML);
     }
 
     private String formatDate(final ZonedDateTime date) {
