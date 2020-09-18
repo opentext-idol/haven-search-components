@@ -129,7 +129,7 @@ public class HodSearchResultDeserializerTest {
 
         final FieldInfo<?> authors = fieldMap.get("authors");
         assertThat(authors, not(nullValue()));
-        assertThat(authors.getDisplayName(), is("Chief Creative"));
+        assertThat(authors.getDisplayName(), is("Authors"));
         assertThat(authors.isAdvanced(), is(false));
         assertThat(authors.getValues(), hasSize(3));
 
