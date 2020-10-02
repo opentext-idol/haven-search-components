@@ -8,22 +8,13 @@ It is designed primarily for use in
 [![Build Status](https://travis-ci.org/microfocus-idol/haven-search-components.svg?branch=master)](https://travis-ci.org/microfocus-idol/haven-search-components)
 
 ## Usage
-The haven search components library is available from maven.
 
-For use in Haven on Demand, use:
-
-    <dependency>
-        <groupId>com.hp.autonomy.frontend</groupId>
-        <artifactId>haven-search-components-hod</artifactId>
-        <version>0.67.0-SNAPSHOT</version>
-    </dependency>
-
-For use on premise, use:
+The haven search components library is available from maven:
 
     <dependency>
         <groupId>com.hp.autonomy.frontend</groupId>
         <artifactId>haven-search-components-idol</artifactId>
-        <version>0.67.0-SNAPSHOT</version>
+        <version>0.67.0</version>
     </dependency>
 
 ## License
