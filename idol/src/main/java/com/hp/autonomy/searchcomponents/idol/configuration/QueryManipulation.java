@@ -37,6 +37,7 @@ public class QueryManipulation extends SimpleComponent<QueryManipulation> implem
     private final ServerConfig server;
     private final Boolean expandQuery;
     private final Boolean synonymDatabaseMatch;
+    private final Boolean explicitProfiling;
     private final String blacklist;
     private final ModeParam typeAheadMode;
     private final Boolean enabled;

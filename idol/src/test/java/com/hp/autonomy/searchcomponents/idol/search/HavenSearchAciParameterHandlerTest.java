@@ -67,12 +67,23 @@ public class HavenSearchAciParameterHandlerTest {
     @Mock
     private IdolViewRequest viewRequest;
 
+    @Mock
+    private CommunityPrincipal mockPrincipal;
+
+    private final QueryManipulation mockQueryManipulation = QueryManipulation.builder()
+        .blacklist("ISO_BLACKLIST")
+        .expandQuery(true)
+        .synonymDatabaseMatch(true)
+        .explicitProfiling(true)
+        .build();
+
     private HavenSearchAciParameterHandler parameterHandler;
 
     private AciParameters aciParameters;
 
     @Before
     public void setUp() {
+        when(mockPrincipal.getName()).thenReturn("the user");
         aciParameters = new AciParameters();
         parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, documentFieldsService, authenticationInformationRetriever, null, null);
     }
@@ -143,10 +154,20 @@ public class HavenSearchAciParameterHandlerTest {
     @Test
     public void addQmsParameters() {
         final IdolSearchCapable config = mock(IdolSearchCapable.class);
-        when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().blacklist("ISO_BLACKLIST").expandQuery(true).synonymDatabaseMatch(true).build());
+        when(config.getQueryManipulation()).thenReturn(mockQueryManipulation);
         when(configService.getConfig()).thenReturn(config);
         parameterHandler.addQmsParameters(aciParameters, null);
         assertThat(aciParameters, hasSize(3));
+    }
+
+    public void addQmsParameters_authenticated() {
+        final IdolSearchCapable config = mock(IdolSearchCapable.class);
+        when(config.getQueryManipulation()).thenReturn(mockQueryManipulation);
+        when(configService.getConfig()).thenReturn(config);
+        when(authenticationInformationRetriever.getPrincipal()).thenReturn(mockPrincipal);
+
+        parameterHandler.addQmsParameters(aciParameters, null);
+        assertThat(aciParameters, hasSize(5));
     }
 
     @Test

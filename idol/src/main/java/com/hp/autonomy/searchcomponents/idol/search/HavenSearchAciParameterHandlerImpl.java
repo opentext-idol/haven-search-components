@@ -216,6 +216,13 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         aciParameters.add(QmsQueryParams.Blacklist.name(), configService.getConfig().getQueryManipulation().getBlacklist());
         aciParameters.add(QmsQueryParams.ExpandQuery.name(), configService.getConfig().getQueryManipulation().getExpandQuery());
         aciParameters.add(QmsQueryParams.SynonymDatabaseMatch.name(), configService.getConfig().getQueryManipulation().getSynonymDatabaseMatch());
+
+        final CommunityPrincipal principal = authenticationInformationRetriever.getPrincipal();
+        if (principal != null) {
+            aciParameters.add(QmsQueryParams.ExplicitProfiling.name(),
+                configService.getConfig().getQueryManipulation().getExplicitProfiling());
+            aciParameters.add(QmsQueryParams.Username.name(), principal.getName());
+        }
     }
 
     @Override

@@ -58,6 +58,8 @@ public class QueryManipulationTest extends ConfigurationComponentTest<QueryManip
         return QueryManipulation.builder()
                 .server(serverConfig)
                 .expandQuery(true)
+                .synonymDatabaseMatch(false)
+                .explicitProfiling(true)
                 .blacklist("ISO_Blacklist")
                 .enabled(true)
                 .build();
@@ -73,6 +75,8 @@ public class QueryManipulationTest extends ConfigurationComponentTest<QueryManip
         jsonContent.assertThat().hasJsonPathStringValue("@.server.host", "find-idol");
         jsonContent.assertThat().hasJsonPathNumberValue("@.server.port", 16000);
         jsonContent.assertThat().hasJsonPathBooleanValue("@.expandQuery", true);
+        jsonContent.assertThat().hasJsonPathBooleanValue("@.synonymDatabaseMatch", false);
+        jsonContent.assertThat().hasJsonPathBooleanValue("@.explicitProfiling", true);
         jsonContent.assertThat().hasJsonPathStringValue("@.blacklist", "ISO_Blacklist");
         jsonContent.assertThat().hasJsonPathBooleanValue("@.enabled", true);
     }
@@ -82,6 +86,8 @@ public class QueryManipulationTest extends ConfigurationComponentTest<QueryManip
         assertThat(objectContent.getObject().getServer().getProductType(), hasSize(3));
         objectContent.assertThat().hasFieldOrPropertyWithValue("typeAheadMode", ModeParam.Index);
         objectContent.assertThat().hasFieldOrPropertyWithValue("expandQuery", true);
+        objectContent.assertThat().hasFieldOrPropertyWithValue("synonymDatabaseMatch", true);
+        objectContent.assertThat().hasFieldOrPropertyWithValue("explicitProfiling", false);
         objectContent.assertThat().hasFieldOrPropertyWithValue("blacklist", "ISO_BLACKLIST");
         objectContent.assertThat().hasFieldOrPropertyWithValue("enabled", false);
     }
@@ -91,6 +97,8 @@ public class QueryManipulationTest extends ConfigurationComponentTest<QueryManip
         assertThat(objectContent.getObject().getServer().getProductType(), hasSize(3));
         objectContent.assertThat().hasFieldOrPropertyWithValue("typeAheadMode", ModeParam.Index);
         objectContent.assertThat().hasFieldOrPropertyWithValue("expandQuery", true);
+        objectContent.assertThat().hasFieldOrPropertyWithValue("synonymDatabaseMatch", false);
+        objectContent.assertThat().hasFieldOrPropertyWithValue("explicitProfiling", true);
         objectContent.assertThat().hasFieldOrPropertyWithValue("blacklist", "ISO_Blacklist");
         objectContent.assertThat().hasFieldOrPropertyWithValue("enabled", true);
     }

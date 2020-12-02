@@ -11,6 +11,8 @@
   },
   "typeAheadMode": "Index",
   "expandQuery": true,
+  "synonymDatabaseMatch": true,
+  "explicitProfiling": false,
   "blacklist": "ISO_BLACKLIST",
   "enabled": false
 }
