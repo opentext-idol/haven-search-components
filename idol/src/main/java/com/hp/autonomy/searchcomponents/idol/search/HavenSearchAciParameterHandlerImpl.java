@@ -237,11 +237,15 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addSecurityInfo(final AciParameters aciParameters) {
-        final String securityInfo = authenticationInformationRetriever.getPrincipal() == null || authenticationInformationRetriever.getPrincipal().getSecurityInfo() == null
+    public String getSecurityInfo() {
+        return authenticationInformationRetriever.getPrincipal() == null || authenticationInformationRetriever.getPrincipal().getSecurityInfo() == null
             ? null
             : urlFragmentEscaper.escape(authenticationInformationRetriever.getPrincipal().getSecurityInfo());
-        aciParameters.add(QueryParams.SecurityInfo.name(), securityInfo);
+    }
+
+    @Override
+    public void addSecurityInfo(final AciParameters aciParameters) {
+        aciParameters.add(QueryParams.SecurityInfo.name(), getSecurityInfo());
     }
 
     @Override

@@ -17,10 +17,12 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -96,6 +98,12 @@ public class HavenSearchAciParameterHandlerProxyTest {
         final AciParameters aciParameters = new AciParameters();
         proxy.addQmsParameters(aciParameters, queryRestrictions);
         verify(parameterHandler).addQmsParameters(aciParameters, queryRestrictions);
+    }
+
+    @Test
+    public void getSecurityInfo() {
+        Mockito.doReturn("secInfo").when(parameterHandler).getSecurityInfo();
+        Assert.assertEquals("secInfo", proxy.getSecurityInfo());
     }
 
     @Test

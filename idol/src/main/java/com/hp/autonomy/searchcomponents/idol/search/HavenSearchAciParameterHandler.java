@@ -83,6 +83,11 @@ public interface HavenSearchAciParameterHandler {
     void addIntentBasedRankingParameters(AciParameters aciParameters);
 
     /**
+     * @return Security info for the current user
+     */
+    String getSecurityInfo();
+
+    /**
      * Adds security info String which may allow restricted documents to be accessed
      *
      * @param aciParameters The set of parameters to add to

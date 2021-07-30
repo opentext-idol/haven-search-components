@@ -65,6 +65,11 @@ public abstract class HavenSearchAciParameterHandlerProxy implements HavenSearch
     }
 
     @Override
+    public String getSecurityInfo() {
+        return parameterHandler.getSecurityInfo();
+    }
+
+    @Override
     public void addSecurityInfo(final AciParameters aciParameters) {
         parameterHandler.addSecurityInfo(aciParameters);
     }
