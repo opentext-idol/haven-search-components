@@ -96,20 +96,26 @@ public interface DocumentsService<RQ extends QueryRequest<Q>, RS extends Suggest
      *
      * @param queryRestrictions The query restrictions
      * @param maxResults        The number of query results
+     * @param queryType         How to perform the query
      * @param promotions        Whether to query for promotions
      * @return The state token
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    String getStateToken(Q queryRestrictions, int maxResults, boolean promotions) throws E;
+    String getStateToken(
+        Q queryRestrictions, int maxResults, QueryRequest.QueryType queryType, boolean promotions
+    ) throws E;
 
     /**
      * Retrieves a state token and result count for a given query
      *
      * @param queryRestrictions The query restrictions
      * @param maxResults        The number of query results
+     * @param queryType         How to perform the query
      * @param promotions        Whether to query for promotions
      * @return The state token
      * @throws E The error thrown in the event of the platform returning an error response
      */
-    StateTokenAndResultCount getStateTokenAndResultCount(Q queryRestrictions, int maxResults, boolean promotions) throws E;
+    StateTokenAndResultCount getStateTokenAndResultCount(
+        Q queryRestrictions, int maxResults, QueryRequest.QueryType queryType, boolean promotions
+    ) throws E;
 }

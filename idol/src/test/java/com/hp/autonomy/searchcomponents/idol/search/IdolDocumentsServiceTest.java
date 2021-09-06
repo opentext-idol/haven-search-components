@@ -16,6 +16,7 @@ package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
+import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
@@ -27,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.time.ZonedDateTime;
@@ -154,15 +156,35 @@ public class IdolDocumentsServiceTest {
     public void getStateToken() {
         when(queryExecutor.executeQuery(any(), any())).thenReturn(mockStateTokenResponse());
 
-        final String stateToken = idolDocumentsService.getStateToken(mockQueryParams(QueryRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
+        final String stateToken = idolDocumentsService.getStateToken(mockQueryParams(QueryRequest.QueryType.RAW).getQueryRestrictions(), 3, QueryRequest.QueryType.RAW, false);
         assertThat(stateToken, is(MOCK_STATE_TOKEN));
     }
 
     @Test
     public void getStateTokenAndResultCount() {
-        when(queryExecutor.executeQuery(any(), any())).thenReturn(mockStateTokenResponse());
+        when(queryExecutor.executeQuery(any(), eq(QueryRequest.QueryType.RAW)))
+            .thenReturn(mockStateTokenResponse());
+        final StateTokenAndResultCount stateTokenAndResultCount =
+            idolDocumentsService.getStateTokenAndResultCount(
+                mockQueryParams(QueryRequest.QueryType.RAW).getQueryRestrictions(),
+                3, QueryRequest.QueryType.RAW, false);
 
-        final StateTokenAndResultCount stateTokenAndResultCount = idolDocumentsService.getStateTokenAndResultCount(mockQueryParams(QueryRequest.QueryType.RAW).getQueryRestrictions(), 3, false);
+        verify(parameterHandler, Mockito.never()).addQmsParameters(any(), any());
+        assertThat(stateTokenAndResultCount.getTypedStateToken().getStateToken(), is(MOCK_STATE_TOKEN));
+        assertThat(stateTokenAndResultCount.getResultCount(), is((long)MOCK_TOTAL_HITS));
+    }
+
+    @Test
+    public void getStateTokenAndResultCount_modified() {
+        when(queryExecutor.executeQuery(any(), eq(QueryRequest.QueryType.MODIFIED)))
+            .thenReturn(mockStateTokenResponse());
+        final IdolQueryRestrictions queryRestrictions =
+            mockQueryParams(QueryRequest.QueryType.MODIFIED).getQueryRestrictions();
+        final StateTokenAndResultCount stateTokenAndResultCount =
+            idolDocumentsService.getStateTokenAndResultCount(
+                queryRestrictions, 3, QueryRequest.QueryType.MODIFIED, false);
+
+        verify(parameterHandler, Mockito.times(2)).addQmsParameters(any(), eq(queryRestrictions));
         assertThat(stateTokenAndResultCount.getTypedStateToken().getStateToken(), is(MOCK_STATE_TOKEN));
         assertThat(stateTokenAndResultCount.getResultCount(), is((long)MOCK_TOTAL_HITS));
     }

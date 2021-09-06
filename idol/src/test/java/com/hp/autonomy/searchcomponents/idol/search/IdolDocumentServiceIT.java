@@ -15,10 +15,7 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciErrorException;
-import com.hp.autonomy.searchcomponents.core.search.AbstractDocumentServiceIT;
-import com.hp.autonomy.searchcomponents.core.search.AutoCorrectException;
-import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
-import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
+import com.hp.autonomy.searchcomponents.core.search.*;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
 import org.junit.Test;
 import org.springframework.beans.factory.ObjectFactory;
@@ -43,7 +40,7 @@ public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<IdolQueryRe
 
     @Test
     public void getStateTokenAndResultCount() {
-        final StateTokenAndResultCount stateTokenAndResultCount = documentsService.getStateTokenAndResultCount(integrationTestUtils.buildQueryRestrictions(), 3, false);
+        final StateTokenAndResultCount stateTokenAndResultCount = documentsService.getStateTokenAndResultCount(integrationTestUtils.buildQueryRestrictions(), 3, QueryRequest.QueryType.RAW, false);
         assertThat(stateTokenAndResultCount.getResultCount(), is(greaterThan(0L)));
 
         final TypedStateToken typedStateToken = stateTokenAndResultCount.getTypedStateToken();

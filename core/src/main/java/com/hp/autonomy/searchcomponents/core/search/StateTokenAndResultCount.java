@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * Response returned by {@link DocumentsService#getStateTokenAndResultCount(QueryRestrictions, int, boolean)}
+ * Response returned by {@link DocumentsService#getStateTokenAndResultCount}
  */
 @Data
 public class StateTokenAndResultCount implements Serializable {

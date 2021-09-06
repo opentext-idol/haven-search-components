@@ -11,7 +11,8 @@ import javax.persistence.Enumerated;
 import java.io.Serializable;
 
 /**
- * State token information returned as part of response of {@link DocumentsService#getStateTokenAndResultCount(QueryRestrictions, int, boolean)}
+ * State token information returned as part of response of
+ * {@link DocumentsService#getStateTokenAndResultCount}
  */
 @Embeddable
 @Data

@@ -133,18 +133,32 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
     }
 
     @Override
-    public String getStateToken(final IdolQueryRestrictions queryRestrictions, final int maxResults, final boolean promotions) throws AciErrorException {
-        return getStateTokenAndResultCount(queryRestrictions, maxResults, promotions).getTypedStateToken().getStateToken();
+    public String getStateToken(
+        final IdolQueryRestrictions queryRestrictions,
+        final int maxResults,
+        final QueryRequest.QueryType queryType,
+        final boolean promotions
+    ) throws AciErrorException {
+        return getStateTokenAndResultCount(queryRestrictions, maxResults, queryType, promotions)
+            .getTypedStateToken().getStateToken();
     }
 
     @Override
-    public StateTokenAndResultCount getStateTokenAndResultCount(final IdolQueryRestrictions queryRestrictions, final int maxResults, final boolean promotions) throws AciErrorException {
+    public StateTokenAndResultCount getStateTokenAndResultCount(
+        final IdolQueryRestrictions queryRestrictions,
+        final int maxResults,
+        final QueryRequest.QueryType queryType,
+        final boolean promotions
+    ) throws AciErrorException {
         final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
         parameterHandler.addSecurityInfo(aciParameters);
         parameterHandler.addStoreStateParameters(aciParameters);
         aciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         aciParameters.add(QueryParams.MaxResults.name(), maxResults);
 
+        if(queryType != QueryRequest.QueryType.RAW) {
+            parameterHandler.addQmsParameters(aciParameters, queryRestrictions);
+        }
         if(promotions) {
             aciParameters.add(QmsQueryParams.Promotions.name(), true);
         }
@@ -154,7 +168,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
         // Unset combine=simple for state token generation
         aciParameters.remove(QueryParams.Combine.name());
 
-        final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, QueryRequest.QueryType.RAW);
+        final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, queryType);
         final String token = responseData.getState() == null
             ? EMPTY_RESULT_SET_TOKEN
             : responseData.getState();
@@ -170,9 +184,13 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
         resultCountAciParameters.add(QueryParams.TotalResults.name(), true);
         resultCountAciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
         resultCountAciParameters.add(QueryParams.Predict.name(), false);
+        if(queryType != QueryRequest.QueryType.RAW) {
+            parameterHandler.addQmsParameters(resultCountAciParameters, queryRestrictions);
+        }
         parameterHandler.addSearchRestrictions(resultCountAciParameters, queryRestrictions);
         parameterHandler.addUserIdentifiers(resultCountAciParameters);
-        final QueryResponseData resultCountResponseData = queryExecutor.executeQuery(resultCountAciParameters, QueryRequest.QueryType.RAW);
+        final QueryResponseData resultCountResponseData =
+            queryExecutor.executeQuery(resultCountAciParameters, queryType);
 
         return new StateTokenAndResultCount(tokenData, resultCountResponseData.getTotalhits());
     }
