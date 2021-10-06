@@ -6,7 +6,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
-        <module>hod</module>
         <module>idol</module>
     </modules>
 

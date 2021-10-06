@@ -1,8 +1,0 @@
-{
-  "documentReference": "dede952d-8a4d-4f54-ac1f-5187bf10a744",
-  "database": {
-    "domain": "PUBLIC_INDEXES",
-    "name": "wiki_eng"
-  },
-  "highlightExpression": "SomeExpression"
-}
