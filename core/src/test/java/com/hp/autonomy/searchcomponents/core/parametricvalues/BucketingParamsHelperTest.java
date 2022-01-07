@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -137,6 +138,24 @@ public class BucketingParamsHelperTest {
         final ZonedDateTime min = max.minusSeconds(1);
         final List<ZonedDateTime> expectedBoundaries = Arrays.asList(min, max);
         assertEquals(expectedBoundaries, bucketingParamsHelper.calculateDateBoundaries(new BucketingParams<>(3, min, max)));
+    }
+
+    @Test
+    public void calculateDateBoundariesBeforeEpoch() {
+        final ZonedDateTime min = ZonedDateTime.ofInstant(Instant.ofEpochSecond(-50), ZoneOffset.UTC);
+        final ZonedDateTime max = min.plusSeconds(100);
+        assertEquals(
+            Arrays.asList(min.minusSeconds(10), min.plusSeconds(60 - 10), min.plusSeconds(2 * 60 - 10)),
+            bucketingParamsHelper.calculateDateBoundaries(new BucketingParams<>(5, min, max)));
+    }
+
+    @Test
+    public void calculateDateBoundariesAfterEpoch() {
+        final ZonedDateTime min = ZonedDateTime.ofInstant(Instant.ofEpochSecond(2_147_483_647 - 50), ZoneOffset.UTC);
+        final ZonedDateTime max = min.plusSeconds(100);
+        assertEquals(
+            Arrays.asList(min.minusSeconds(10), min.plusSeconds(60 - 10), min.plusSeconds(2 * 60 - 10)),
+            bucketingParamsHelper.calculateDateBoundaries(new BucketingParams<>(5, min, max)));
     }
 
     @Test

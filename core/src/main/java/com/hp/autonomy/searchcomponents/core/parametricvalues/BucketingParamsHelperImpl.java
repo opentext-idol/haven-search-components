@@ -75,9 +75,13 @@ class BucketingParamsHelperImpl implements BucketingParamsHelper {
 
         int targetNumberOfBuckets = bucketingParams.getTargetNumberOfBuckets();
         double bucketSize = (double)(max.toEpochSecond() - min.toEpochSecond()) / targetNumberOfBuckets;
-        if((long)bucketSize == 0) {
-            bucketSize = 1;
-            targetNumberOfBuckets = (int)(max.toEpochSecond() - min.toEpochSecond());
+        // IDOL's stored date resolution is 1s inside the epoch range, 1m outside
+        final double minBucketSize =
+            (min.toEpochSecond() < 0 || max.toEpochSecond() > 2_147_483_647) ? 60 : 1;
+        if(bucketSize < minBucketSize) {
+            bucketSize = minBucketSize;
+            targetNumberOfBuckets =
+                (int) Math.ceil((max.toEpochSecond() - min.toEpochSecond()) / bucketSize);
         }
 
         final Duration bucketDuration = Duration.ofSeconds((long)Math.ceil(bucketSize));
