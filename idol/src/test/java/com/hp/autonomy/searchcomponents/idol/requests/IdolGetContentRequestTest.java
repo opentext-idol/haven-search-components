@@ -35,11 +35,16 @@ public class IdolGetContentRequestTest extends GetContentRequestTest<IdolGetCont
     protected IdolGetContentRequest constructObject() {
         return IdolGetContentRequestImpl.builder()
                 .indexAndReferences(new IdolGetContentRequestIndexImpl("Database1", Collections.singleton("Reference1")))
+                .referenceField("ref")
                 .build();
     }
 
     @Override
     protected String json() throws IOException {
-        return "{\"indexesAndReferences\": [{\"index\": \"Database1\", \"references\": [\"Reference1\"]}]}";
+        return "" +
+            "{" +
+            "    \"indexesAndReferences\": [{\"index\": \"Database1\", \"references\": [\"Reference1\"]}]," +
+            "    \"referenceField\": \"ref\"" +
+            "}";
     }
 }

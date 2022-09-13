@@ -32,15 +32,16 @@ import java.util.Set;
 @Data
 @Builder(toBuilder = true)
 @JsonDeserialize(builder = IdolGetContentRequestImpl.IdolGetContentRequestImplBuilder.class)
-class IdolGetContentRequestImpl implements IdolGetContentRequest {
+public class IdolGetContentRequestImpl implements IdolGetContentRequest {
     private static final long serialVersionUID = -6655229692839205599L;
 
     @Singular("indexAndReferences")
     private final Set<IdolGetContentRequestIndex> indexesAndReferences;
+    private final String referenceField;
     private final PrintParam print;
 
     @SuppressWarnings({"FieldMayBeFinal", "unused"})
     @JsonPOJOBuilder(withPrefix = "")
-    static class IdolGetContentRequestImplBuilder implements IdolGetContentRequestBuilder {
+    public static class IdolGetContentRequestImplBuilder implements IdolGetContentRequestBuilder {
     }
 }

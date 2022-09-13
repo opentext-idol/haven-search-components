@@ -50,9 +50,9 @@ public interface HavenSearchAciParameterHandler {
      *
      * @param aciParameters      The set of parameters to add to
      * @param indexAndReferences The databases and references of documents to be retrieved
-     * @param print              the print setting, determining Idol output
+     * @param request            The request options
      */
-    void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex indexAndReferences, final PrintParam print);
+    void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex indexAndReferences, final IdolGetContentRequest request);
 
     /**
      * Adds Idol parameters for retrieving document content (during View document process)

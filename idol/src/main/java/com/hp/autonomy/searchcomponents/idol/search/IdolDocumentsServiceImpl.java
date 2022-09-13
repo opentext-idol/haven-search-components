@@ -112,7 +112,9 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
 
         final SuggestResponseData responseData = queryExecutor.executeSuggest(aciParameters, QueryRequest.QueryType.RAW);
         final List<Hit> hits = responseData.getHits();
-        return new Documents<>(queryResponseParser.parseQueryHits(hits), responseData.getTotalhits(), null, null, null, null);
+        return new Documents<>(
+            queryResponseParser.parseQueryHits(hits, suggestRequest.getReferenceField()),
+            responseData.getTotalhits(), null, null, null, null);
     }
 
     @Override
@@ -122,11 +124,11 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
         for(final IdolGetContentRequestIndex indexAndReferences : request.getIndexesAndReferences()) {
             // We use Query and not GetContent here so we can use Combine=simple to ensure returned references are unique
             final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
-            parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, request.getPrint());
+            parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, request);
 
             final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, QueryRequest.QueryType.RAW);
             final List<Hit> hits = responseData.getHits();
-            results.addAll(queryResponseParser.parseQueryHits(hits));
+            results.addAll(queryResponseParser.parseQueryHits(hits, request.getReferenceField()));
         }
 
         return results;

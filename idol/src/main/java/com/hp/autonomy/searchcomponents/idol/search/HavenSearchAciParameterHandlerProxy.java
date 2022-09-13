@@ -40,8 +40,8 @@ public abstract class HavenSearchAciParameterHandlerProxy implements HavenSearch
     }
 
     @Override
-    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex getContentRequestIndex, final PrintParam printParam) {
-        parameterHandler.addGetDocumentOutputParameters(aciParameters, getContentRequestIndex, printParam);
+    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex getContentRequestIndex, final IdolGetContentRequest request) {
+        parameterHandler.addGetDocumentOutputParameters(aciParameters, getContentRequestIndex, request);
     }
 
     @Override

@@ -6,7 +6,10 @@
 package com.hp.autonomy.searchcomponents.idol.search.fields;
 
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.core.config.*;
+import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
+import com.hp.autonomy.searchcomponents.core.config.FieldType;
+import com.hp.autonomy.searchcomponents.core.config.FieldValue;
+import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
 import com.hp.autonomy.searchcomponents.core.fields.FieldDisplayNameGenerator;
 import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
@@ -16,6 +19,7 @@ import com.hp.autonomy.types.idol.responses.DocContent;
 import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -56,13 +60,12 @@ class FieldsParserImpl implements FieldsParser {
         final Map<FieldPath, FieldInfo<?>> fieldConfig = fieldsInfo.getFieldConfigByName();
 
         final DocContent content = hit.getContent();
-        Map<String, FieldInfo<?>> fieldMap = Collections.emptyMap();
+        final CaseInsensitiveMap<String, FieldInfo<?>> fieldMap = new CaseInsensitiveMap<>();
         String qmsId = null;
         PromotionCategory promotionCategory = PromotionCategory.NONE;
         if (content != null) {
             final Element docContent = (Element) content.getContent().get(0);
             if (docContent.hasChildNodes()) {
-                fieldMap = new HashMap<>();
                 parseAllFields(fieldConfig, docContent, fieldMap, docContent.getNodeName());
                 qmsId = parseField(docContent, documentFieldsService.getQmsIdFieldInfo(), String.class);
                 promotionCategory = determinePromotionCategory(docContent, hit.getPromotionname(), hit.getDatabase());

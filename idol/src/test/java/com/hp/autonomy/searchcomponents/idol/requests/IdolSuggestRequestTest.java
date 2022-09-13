@@ -59,6 +59,7 @@ public class IdolSuggestRequestTest extends SuggestRequestTest<IdolQueryRestrict
             .highlight(true)
             .print(PrintParam.Fields.name())
             .printField("CATEGORY")
+            .referenceField("ref")
             .build();
     }
 

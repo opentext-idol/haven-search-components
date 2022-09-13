@@ -22,6 +22,7 @@ import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.core.search.SearchResultTest;
 import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,14 +48,14 @@ public class IdolSearchResultTest extends SearchResultTest {
             .hasJsonPathStringValue("$.title", "Fiji")
             .hasJsonPathStringValue("$.summary", "Fiji is an island country")
             .hasJsonPathNumberValue("$.weight", 11.7)
-            .hasJsonPathArrayValue("$.fieldMap.CUSTOM_FIELD.names", "CUSTOM_FIELD")
-            .hasJsonPathStringValue("$.fieldMap.CUSTOM_FIELD.type", "STRING")
-            .hasJsonPathBooleanValue("$.fieldMap.CUSTOM_FIELD.advanced", false)
-            .hasJsonPathArrayValue("$.fieldMap.CUSTOM_FIELD.names", "CUSTOM_VALUE")
-            .hasJsonPathArrayValue("$.fieldMap.DATE_FIELD.names", "DATE_FIELD")
-            .hasJsonPathStringValue("$.fieldMap.DATE_FIELD.type", "DATE")
-            .hasJsonPathBooleanValue("$.fieldMap.DATE_FIELD.advanced", false)
-            .hasJsonPathNumberValue("$.fieldMap.DATE_FIELD.values[0].value", 1479318360000L)
+            .hasJsonPathArrayValue("$.fieldMap.custom_field.names", "CUSTOM_FIELD")
+            .hasJsonPathStringValue("$.fieldMap.custom_field.type", "STRING")
+            .hasJsonPathBooleanValue("$.fieldMap.custom_field.advanced", false)
+            .hasJsonPathArrayValue("$.fieldMap.custom_field.names", "CUSTOM_VALUE")
+            .hasJsonPathArrayValue("$.fieldMap.date_field.names", "DATE_FIELD")
+            .hasJsonPathStringValue("$.fieldMap.date_field.type", "DATE")
+            .hasJsonPathBooleanValue("$.fieldMap.date_field.advanced", false)
+            .hasJsonPathNumberValue("$.fieldMap.date_field.values[0].value", 1479318360000L)
             .hasJsonPathNumberValue("$.date", 1479318360000L)
             .hasJsonPathStringValue("$.promotionCategory", "NONE")
             .hasJsonPathStringValue("$.qmsId", "0")
@@ -63,20 +64,23 @@ public class IdolSearchResultTest extends SearchResultTest {
 
     @Override
     protected SearchResult constructObject() {
+        final CaseInsensitiveMap<String, FieldInfo<?>> fieldMap = new CaseInsensitiveMap<>();
+        fieldMap.put("CUSTOM_FIELD", FieldInfo.builder()
+            .name(fieldPathNormaliser.normaliseFieldPath("CUSTOM_FIELD"))
+            .value(new FieldValue<>("CUSTOM_VALUE", "Custom Value")).build());
+        fieldMap.put("DATE_FIELD", FieldInfo.builder()
+            .name(fieldPathNormaliser.normaliseFieldPath("DATE_FIELD"))
+            .type(FieldType.DATE)
+            .value(new FieldValue<>(ZonedDateTime.parse("2016-11-16T17:46:00Z[UTC]"), "2016-11-16T17:46:00Z"))
+            .build());
+
         return IdolSearchResult.builder()
             .reference("ABC")
             .index("wiki_eng")
             .title("Fiji")
             .summary("Fiji is an island country")
             .weight(11.7)
-            .fieldEntry("CUSTOM_FIELD", FieldInfo.builder()
-                .name(fieldPathNormaliser.normaliseFieldPath("CUSTOM_FIELD"))
-                .value(new FieldValue<>("CUSTOM_VALUE", "Custom Value")).build())
-            .fieldEntry("DATE_FIELD", FieldInfo.builder()
-                .name(fieldPathNormaliser.normaliseFieldPath("DATE_FIELD"))
-                .type(FieldType.DATE)
-                .value(new FieldValue<>(ZonedDateTime.parse("2016-11-16T17:46:00Z[UTC]"), "2016-11-16T17:46:00Z"))
-                .build())
+            .fieldMap(fieldMap)
             .date(ZonedDateTime.parse("2016-11-16T17:46:00Z[UTC]"))
             .promotionCategory(PromotionCategory.NONE)
             .qmsId("0")

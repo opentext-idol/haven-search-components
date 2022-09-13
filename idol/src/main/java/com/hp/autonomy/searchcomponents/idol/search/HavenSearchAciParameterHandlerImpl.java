@@ -37,9 +37,9 @@ import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,9 +48,6 @@ import org.springframework.stereotype.Component;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
 
 import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_END_TAG;
 import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_START_TAG;
@@ -130,7 +127,11 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         aciParameters.add(QueryParams.Sort.name(), searchRequest.getSort());
         aciParameters.add(QueryParams.TotalResults.name(), true);
         aciParameters.add(QueryParams.XMLMeta.name(), true);
-        addPrintParameters(aciParameters, PrintParam.fromValue(searchRequest.getPrint(), null), searchRequest.getPrintFields());
+        addPrintParameters(
+            aciParameters,
+            PrintParam.fromValue(searchRequest.getPrint(), null),
+            searchRequest.getPrintFields(),
+            searchRequest.getReferenceField());
 
         if(searchRequest.isHighlight()) {
             aciParameters.add(QueryParams.Highlight.name(), HighlightParam.SummaryTerms);
@@ -140,7 +141,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex indexAndReferences, final PrintParam print) {
+    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex indexAndReferences, final IdolGetContentRequest request) {
         addSecurityInfo(aciParameters);
 
         final IdolSearchCapable config = configService.getConfig();
@@ -153,7 +154,11 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         aciParameters.add(QueryParams.MaxResults.name(), references.size());
         aciParameters.add(QueryParams.AnyLanguage.name(), true);
         aciParameters.add(QueryParams.XMLMeta.name(), true);
-        addPrintParameters(aciParameters, print, Collections.emptyList());
+        addPrintParameters(
+            aciParameters,
+            request.getPrint(),
+            Collections.emptyList(),
+            request.getReferenceField());
 
         if(indexAndReferences.getIndex() != null) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(indexAndReferences.getIndex()));
@@ -169,11 +174,34 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         }
     }
 
-    private void addPrintParameters(final AciParameters aciParameters, final PrintParam print, final Collection<String> printFields) {
+    private void addPrintParameters(
+        final AciParameters aciParameters,
+        final PrintParam print,
+        final Collection<String> printFields,
+        final String referenceField
+    ) {
+        final List<String> rawPrintFields = new ArrayList<>(documentFieldsService.getPrintFields(
+            printFields == null ? Collections.emptyList() : printFields));
+        if (referenceField != null &&
+            (print == PrintParam.Fields || print == PrintParam.Reference)
+        ) {
+            rawPrintFields.add(referenceField);
+            addPrintParameters(aciParameters, PrintParam.Fields, rawPrintFields);
+        } else {
+            addPrintParameters(aciParameters, print, rawPrintFields);
+        }
+    }
+
+    private void addPrintParameters(
+        final AciParameters aciParameters,
+        final PrintParam print,
+        final Collection<String> rawPrintFields
+    ) {
         aciParameters.add(QueryParams.Print.name(), print);
-        if(print == PrintParam.Fields) {
-            final Collection<String> printFieldsToApply = documentFieldsService.getPrintFields(printFields);
-            aciParameters.add(QueryParams.PrintFields.name(), new PrintFields(printFieldsToApply));
+        if (print == PrintParam.Fields) {
+            aciParameters.add(
+                QueryParams.PrintFields.name(),
+                new PrintFields(rawPrintFields));
         }
     }
 

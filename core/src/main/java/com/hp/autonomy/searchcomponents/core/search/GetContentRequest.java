@@ -31,4 +31,9 @@ public interface GetContentRequest<T extends GetContentRequestIndex<?>>
      * @return The references (per database) for which to retrieve content
      */
     Set<T> getIndexesAndReferences();
+
+    /**
+     * @return The field used to store document references (must be a reference type field)
+     */
+    String getReferenceField();
 }

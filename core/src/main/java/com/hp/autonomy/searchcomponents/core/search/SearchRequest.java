@@ -87,4 +87,9 @@ public interface SearchRequest<Q extends QueryRestrictions<?>> {
      * @return The fields to display in the document result output if print is set to the 'PrintFields' option
      */
     Collection<String> getPrintFields();
+
+    /**
+     * @return The field used to store document references (must be a reference type field)
+     */
+    String getReferenceField();
 }

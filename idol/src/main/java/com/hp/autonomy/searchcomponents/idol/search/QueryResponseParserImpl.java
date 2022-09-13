@@ -78,9 +78,12 @@ class QueryResponseParserImpl implements QueryResponseParser {
         // If IDOL has a spelling suggestion, retry query for auto correct
         final Documents<IdolSearchResult> documents;
         if (spellingQuery != null) {
-            documents = rerunQueryWithAdjustedSpelling(aciParameters, responseData, spellingQuery, warnings, queryExecutor);
+            documents = rerunQueryWithAdjustedSpelling(
+                aciParameters, responseData, spellingQuery, warnings, queryExecutor,
+                searchRequest.getReferenceField());
         } else {
-            final List<IdolSearchResult> results = parseQueryHits(hits);
+            final List<IdolSearchResult> results =
+                parseQueryHits(hits, searchRequest.getReferenceField());
 
             final List<ExpansionRule> expansions = Optional.ofNullable(responseData.getExpansionOrder()).map(order ->
                 order.getRule().stream()
@@ -120,7 +123,14 @@ class QueryResponseParserImpl implements QueryResponseParser {
         return warnings;
     }
 
-    protected Documents<IdolSearchResult> rerunQueryWithAdjustedSpelling(final AciParameters aciParameters, final QueryResponseData responseData, final String spellingQuery, final Warnings warnings, final Function<AciParameters, QueryResponseData> queryExecutor) {
+    protected Documents<IdolSearchResult> rerunQueryWithAdjustedSpelling(
+        final AciParameters aciParameters,
+        final QueryResponseData responseData,
+        final String spellingQuery,
+        final Warnings warnings,
+        final Function<AciParameters, QueryResponseData> queryExecutor,
+        final String referenceField
+    ) {
         final String originalQuery = aciParameters.get(QueryParams.Text.name());
         aciParameters.put(QueryParams.Text.name(), spellingQuery);
 
@@ -128,7 +138,8 @@ class QueryResponseParserImpl implements QueryResponseParser {
 
         try {
             final QueryResponseData correctedResponseData = queryExecutor.apply(aciParameters);
-            final List<IdolSearchResult> correctedResults = parseQueryHits(correctedResponseData.getHits());
+            final List<IdolSearchResult> correctedResults =
+                parseQueryHits(correctedResponseData.getHits(), referenceField);
 
             return new Documents<>(correctedResults, correctedResponseData.getTotalhits(), null, null, spelling, warnings);
         } catch (final AciErrorException e) {
@@ -137,7 +148,9 @@ class QueryResponseParserImpl implements QueryResponseParser {
     }
 
     @Override
-    public List<IdolSearchResult> parseQueryHits(final Collection<Hit> hits) {
+    public List<IdolSearchResult> parseQueryHits(
+        final Collection<Hit> hits, final String referenceField
+    ) {
         final List<IdolSearchResult> results = new ArrayList<>(hits.size());
         for (final Hit hit : hits) {
             final IdolSearchResult.IdolSearchResultBuilder searchResultBuilder = new IdolSearchResult.IdolSearchResultBuilder()
@@ -151,7 +164,17 @@ class QueryResponseParserImpl implements QueryResponseParser {
                     .promotionName(hit.getPromotionname());
 
             fieldsParser.parseDocumentFields(hit, searchResultBuilder);
-            results.add(searchResultBuilder.build());
+            final IdolSearchResult searchResult = searchResultBuilder.build();
+
+            if (referenceField != null && searchResult.getFieldMap().containsKey(referenceField)) {
+                results.add(searchResult.toBuilder()
+                    .reference((String) searchResult.getFieldMap()
+                        .get(referenceField).getValues().get(0).getValue())
+                    .build()
+                );
+            } else {
+                results.add(searchResult);
+            }
         }
         return results;
     }

@@ -20,5 +20,6 @@
   "autoCorrect": true,
   "print": "Fields",
   "printField": "CATEGORY",
-  "queryType": "MODIFIED"
+  "queryType": "MODIFIED",
+  "referenceField":  "ref"
 }

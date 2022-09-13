@@ -15,6 +15,8 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
+import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
+import com.hp.autonomy.searchcomponents.core.config.FieldValue;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesService;
 import com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser;
@@ -22,16 +24,19 @@ import com.hp.autonomy.types.idol.responses.Database;
 import com.hp.autonomy.types.idol.responses.Hit;
 import com.hp.autonomy.types.idol.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.Documents;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.factory.ObjectFactory;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.io.Serializable;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -41,6 +46,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("WeakerAccess")
@@ -115,6 +121,21 @@ public class QueryResponseParserTest {
         assertEquals("Database1", results.getWarnings().getInvalidDatabases().iterator().next());
     }
 
+    @Test
+    public void parseQueryHits_referenceField() {
+        final Map<String, List<Serializable>> fieldValues1 = new HashMap<>();
+        fieldValues1.put("customRef", Collections.singletonList("customid1"));
+
+        final List<IdolSearchResult> results = queryResponseParser.parseQueryHits(Arrays.asList(
+            mockHit("defaultid1", fieldValues1),
+            mockHit("defaultid2", Collections.emptyMap())
+        ), "CUSTOMREF");
+
+        assertThat(results, hasSize(2));
+        assertThat(results.get(0).getReference(), is("customid1"));
+        assertThat(results.get(1).getReference(), is("defaultid2"));
+    }
+
     protected QueryResponseData mockQueryResponse() {
         final QueryResponseData responseData = new QueryResponseData();
         responseData.setTotalhits(1);
@@ -127,6 +148,26 @@ public class QueryResponseParserTest {
     private Hit mockHit() {
         final Hit hit = new Hit();
         hit.setTitle("Some Title");
+        return hit;
+    }
+
+    private Hit mockHit(final String reference, final Map<String, List<Serializable>> fieldValues) {
+        final Hit hit = new Hit();
+        hit.setTitle("Some Title");
+        hit.setReference(reference);
+
+        final CaseInsensitiveMap<String, FieldInfo<?>> fieldMap = new CaseInsensitiveMap<>();
+        for (final String name : fieldValues.keySet()) {
+            final List<FieldValue<Serializable>> values = fieldValues.get(name).stream()
+                .map(val -> new FieldValue<>(val, null))
+                .collect(Collectors.toList());
+            fieldMap.put(name, FieldInfo.builder().values(values).build());
+        }
+        Mockito.doAnswer(inv -> {
+            ((IdolSearchResult.IdolSearchResultBuilder) inv.getArguments()[1]).fieldMap(fieldMap);
+            return null;
+        }).when(documentFieldsService).parseDocumentFields(eq(hit), any());
+
         return hit;
     }
 }

@@ -19,5 +19,6 @@
   "sort": "Alphabetical",
   "highlight": true,
   "print": "Fields",
-  "printField": "CATEGORY"
+  "printField": "CATEGORY",
+  "referenceField":  "ref"
 }

@@ -20,11 +20,9 @@ import com.hp.autonomy.searchcomponents.core.search.PromotionCategory;
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 @SuppressWarnings({"InstanceVariableOfConcreteClass", "MismatchedQueryAndUpdateOfCollection"})
@@ -42,8 +40,7 @@ public class IdolSearchResult implements SearchResult {
     private final String summary;
     private final Double weight;
 
-    @Singular("fieldEntry")
-    private final Map<String, FieldInfo<?>> fieldMap;
+    private final CaseInsensitiveMap<String, FieldInfo<?>> fieldMap;
 
     private final ZonedDateTime date;
 
@@ -61,12 +58,7 @@ public class IdolSearchResult implements SearchResult {
         weight = builder.weight;
 
         date = builder.date;
-        fieldMap = new HashMap<>();
-        if(builder.fieldMap$key != null && builder.fieldMap$value != null) {
-            for(int i = 0; i < builder.fieldMap$key.size() & i < builder.fieldMap$value.size(); i++) {
-                fieldMap.put(builder.fieldMap$key.get(i), builder.fieldMap$value.get(i));
-            }
-        }
+        fieldMap = builder.fieldMap == null ? new CaseInsensitiveMap<>() : builder.fieldMap;
 
         qmsId = builder.qmsId;
         promotionName = builder.promotionName;

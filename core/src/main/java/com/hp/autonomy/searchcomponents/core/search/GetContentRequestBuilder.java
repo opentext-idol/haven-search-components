@@ -45,6 +45,13 @@ public interface GetContentRequestBuilder<R extends GetContentRequest<T>, T exte
     B clearIndexesAndReferences();
 
     /**
+     * @param referenceField The field used to store document references (must be a reference type
+     *                       field)
+     * @return the builder (for chaining)
+     */
+    B referenceField(String referenceField);
+
+    /**
      * {@inheritDoc}
      */
     @Override

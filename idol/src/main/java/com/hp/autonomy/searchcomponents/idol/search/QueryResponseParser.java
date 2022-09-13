@@ -49,7 +49,9 @@ public interface QueryResponseParser {
      * Parses the "hits" section of the Idol query response
      *
      * @param hits The "hits" section of the Idol query response
+     * @param referenceField The field used to store document references (must be a reference type
+     *                       field)
      * @return The parsed query results
      */
-    List<IdolSearchResult> parseQueryHits(Collection<Hit> hits);
+    List<IdolSearchResult> parseQueryHits(Collection<Hit> hits, String referenceField);
 }

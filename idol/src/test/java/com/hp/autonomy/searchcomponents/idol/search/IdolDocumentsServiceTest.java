@@ -130,8 +130,9 @@ public class IdolDocumentsServiceTest {
 
         when(suggestRequest.getReference()).thenReturn("Some reference");
         when(suggestRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
+        when(suggestRequest.getReferenceField()).thenReturn("refField");
         idolDocumentsService.findSimilar(suggestRequest);
-        verify(queryResponseParser).parseQueryHits(responseData.getHits());
+        verify(queryResponseParser).parseQueryHits(responseData.getHits(), "refField");
     }
 
     @Test
@@ -147,9 +148,10 @@ public class IdolDocumentsServiceTest {
         when(getContentRequestIndex.getReferences()).thenReturn(Collections.singleton("Some reference"));
         when(getContentRequest.getIndexesAndReferences()).thenReturn(Collections.singleton(getContentRequestIndex));
         when(getContentRequest.getPrint()).thenReturn(PrintParam.Fields);
+        when(getContentRequest.getReferenceField()).thenReturn("refField");
 
         idolDocumentsService.getDocumentContent(getContentRequest);
-        verify(queryResponseParser).parseQueryHits(responseData.getHits());
+        verify(queryResponseParser).parseQueryHits(responseData.getHits(), "refField");
     }
 
     @Test

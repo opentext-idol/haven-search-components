@@ -15,6 +15,7 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
+import com.hp.autonomy.searchcomponents.idol.requests.IdolGetContentRequestImpl;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import org.junit.Assert;
@@ -71,9 +72,10 @@ public class HavenSearchAciParameterHandlerProxyTest {
     @Test
     public void addGetDocumentOutputParameters() {
         final AciParameters aciParameters = new AciParameters();
-        final PrintParam print = PrintParam.All;
-        proxy.addGetDocumentOutputParameters(aciParameters, getContentRequestIndex, print);
-        verify(parameterHandler).addGetDocumentOutputParameters(aciParameters, getContentRequestIndex, print);
+        final IdolGetContentRequest request =
+            IdolGetContentRequestImpl.builder().print(PrintParam.All).build();
+        proxy.addGetDocumentOutputParameters(aciParameters, getContentRequestIndex, request);
+        verify(parameterHandler).addGetDocumentOutputParameters(aciParameters, getContentRequestIndex, request);
     }
 
     @Test

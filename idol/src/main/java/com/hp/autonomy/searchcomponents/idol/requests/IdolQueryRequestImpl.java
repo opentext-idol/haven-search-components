@@ -33,7 +33,7 @@ import java.util.Collection;
 @Data
 @Builder(toBuilder = true)
 @JsonDeserialize(builder = IdolQueryRequestImpl.IdolQueryRequestImplBuilder.class)
-class IdolQueryRequestImpl implements IdolQueryRequest {
+public class IdolQueryRequestImpl implements IdolQueryRequest {
     private static final long serialVersionUID = -6338199353489914631L;
 
     private final boolean autoCorrect;
@@ -48,11 +48,12 @@ class IdolQueryRequestImpl implements IdolQueryRequest {
     private final String print;
     @Singular
     private final Collection<String> printFields;
+    private final String referenceField;
     private final QueryRequest.QueryType queryType;
 
     @SuppressWarnings({"FieldMayBeFinal", "unused"})
     @JsonPOJOBuilder(withPrefix = "")
-    static class IdolQueryRequestImplBuilder implements IdolQueryRequestBuilder {
+    public static class IdolQueryRequestImplBuilder implements IdolQueryRequestBuilder {
         private int start = DEFAULT_START;
         private int maxResults = DEFAULT_MAX_RESULTS;
         private String print = DEFAULT_PRINT.name();

@@ -112,6 +112,13 @@ public interface SearchRequestBuilder<R extends SearchRequest<Q>, Q extends Quer
     B clearPrintFields();
 
     /**
+     * @param referenceField The field used to store document references (must be a reference type
+     *                       field)
+     * @return the builder (for chaining)
+     */
+    B referenceField(String referenceField);
+
+    /**
      * Generates a new request object
      *
      * @return the new request object

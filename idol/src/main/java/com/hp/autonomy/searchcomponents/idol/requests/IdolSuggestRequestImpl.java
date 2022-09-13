@@ -31,7 +31,7 @@ import java.util.Collection;
 @Data
 @Builder(toBuilder = true)
 @JsonDeserialize(builder = IdolSuggestRequestImpl.IdolSuggestRequestImplBuilder.class)
-class IdolSuggestRequestImpl implements IdolSuggestRequest {
+public class IdolSuggestRequestImpl implements IdolSuggestRequest {
     private static final long serialVersionUID = -6338199353489914631L;
 
     private final String reference;
@@ -46,10 +46,11 @@ class IdolSuggestRequestImpl implements IdolSuggestRequest {
     private final String print;
     @Singular
     private final Collection<String> printFields;
+    private final String referenceField;
 
     @SuppressWarnings({"FieldMayBeFinal", "unused"})
     @JsonPOJOBuilder(withPrefix = "")
-    static class IdolSuggestRequestImplBuilder implements IdolSuggestRequestBuilder {
+    public static class IdolSuggestRequestImplBuilder implements IdolSuggestRequestBuilder {
         private int start = DEFAULT_START;
         private int maxResults = DEFAULT_MAX_RESULTS;
         private String print = DEFAULT_PRINT.name();

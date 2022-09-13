@@ -61,6 +61,7 @@ public class IdolQueryRequestTest extends SearchRequestTest<IdolQueryRestriction
             .print(PrintParam.Fields.name())
             .printField("CATEGORY")
             .queryType(QueryRequest.QueryType.MODIFIED)
+            .referenceField("ref")
             .build();
     }
 

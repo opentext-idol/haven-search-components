@@ -21,6 +21,7 @@ import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
+import com.hp.autonomy.searchcomponents.idol.requests.IdolGetContentRequestImpl;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
@@ -36,11 +37,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -109,10 +109,43 @@ public class HavenSearchAciParameterHandlerTest {
         when(searchRequest.getSummary()).thenReturn(SummaryParam.Concept.name());
         when(searchRequest.getSummaryCharacters()).thenReturn(250);
         when(searchRequest.isHighlight()).thenReturn(true);
+        when(searchRequest.getPrint()).thenReturn(PrintParam.All.name());
+        parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
+        assertThat(aciParameters, hasSize(13));
+    }
+
+    @Test
+    public void addSearchOutputParameters_printFields() {
+        when(searchRequest.getStart()).thenReturn(1);
+        when(searchRequest.getMaxResults()).thenReturn(50);
+        when(searchRequest.getSummary()).thenReturn(SummaryParam.Concept.name());
+        when(searchRequest.getSummaryCharacters()).thenReturn(250);
+        when(searchRequest.isHighlight()).thenReturn(true);
         when(searchRequest.getPrint()).thenReturn(PrintParam.Fields.name());
         when(searchRequest.getPrintFields()).thenReturn(Arrays.asList("CATEGORY", "REFERENCE"));
         parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
+
         assertThat(aciParameters, hasSize(14));
+        assertThat(aciParameters, hasItem(new AciParameter("Print", "Fields")));
+        assertThat(aciParameters, hasItem(new AciParameter("PrintFields", "CATEGORY,REFERENCE")));
+    }
+
+    @Test
+    public void addSearchOutputParameters_printFields_referenceField() {
+        when(searchRequest.getStart()).thenReturn(1);
+        when(searchRequest.getMaxResults()).thenReturn(50);
+        when(searchRequest.getSummary()).thenReturn(SummaryParam.Concept.name());
+        when(searchRequest.getSummaryCharacters()).thenReturn(250);
+        when(searchRequest.isHighlight()).thenReturn(true);
+        when(searchRequest.getPrint()).thenReturn(PrintParam.Fields.name());
+        when(searchRequest.getPrintFields()).thenReturn(Arrays.asList("CATEGORY", "REFERENCE"));
+        when(searchRequest.getReferenceField()).thenReturn("CUSTOMREF");
+        parameterHandler.addSearchOutputParameters(aciParameters, searchRequest);
+
+        assertThat(aciParameters, hasSize(14));
+        assertThat(aciParameters, hasItem(new AciParameter("Print", "Fields")));
+        assertThat(aciParameters,
+            hasItem(new AciParameter("PrintFields", "CATEGORY,REFERENCE,CUSTOMREF")));
     }
 
     @Test
@@ -120,8 +153,39 @@ public class HavenSearchAciParameterHandlerTest {
         when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
         when(indexAndReferences.getIndex()).thenReturn("Database1");
         when(indexAndReferences.getReferences()).thenReturn(Collections.singleton("SomeReference"));
-        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, PrintParam.Fields);
+        final IdolGetContentRequest request =
+            IdolGetContentRequestImpl.builder().print(PrintParam.All).build();
+        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, request);
+        assertThat(aciParameters, hasSize(10));
+    }
+
+    @Test
+    public void addGetDocumentOutputParameters_printFields() {
+        when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
+        when(indexAndReferences.getIndex()).thenReturn("Database1");
+        when(indexAndReferences.getReferences()).thenReturn(Collections.singleton("SomeReference"));
+        final IdolGetContentRequest request =
+            IdolGetContentRequestImpl.builder().print(PrintParam.Fields).build();
+        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, request);
+
         assertThat(aciParameters, hasSize(11));
+        assertThat(aciParameters, hasItem(new AciParameter("Print", "Fields")));
+        assertThat(aciParameters, hasItem(new AciParameter("PrintFields", "CATEGORY,REFERENCE")));
+    }
+
+    @Test
+    public void addGetDocumentOutputParameters_printFields_referenceField() {
+        when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
+        when(indexAndReferences.getIndex()).thenReturn("Database1");
+        when(indexAndReferences.getReferences()).thenReturn(Collections.singleton("SomeReference"));
+        final IdolGetContentRequest request = IdolGetContentRequestImpl.builder()
+            .print(PrintParam.Fields).referenceField("CUSTOMREF").build();
+        parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, request);
+
+        assertThat(aciParameters, hasSize(11));
+        assertThat(aciParameters, hasItem(new AciParameter("Print", "Fields")));
+        assertThat(aciParameters,
+            hasItem(new AciParameter("PrintFields", "CATEGORY,REFERENCE,CUSTOMREF")));
     }
 
     @Test
