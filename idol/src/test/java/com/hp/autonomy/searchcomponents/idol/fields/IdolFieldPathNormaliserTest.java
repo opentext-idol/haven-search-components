@@ -18,6 +18,7 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.AUTN_DATABASE_FIELD;
 import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.AUTN_DATE_FIELD;
 import static org.junit.Assert.assertEquals;
 
@@ -49,8 +50,18 @@ public class IdolFieldPathNormaliserTest {
     }
 
     @Test
+    public void autnDatabase() {
+        assertEquals(AUTN_DATABASE_FIELD, fieldPathNormaliser.normaliseFieldPath(AUTN_DATABASE_FIELD).getNormalisedPath());
+    }
+
+    @Test
     public void lowerCaseAutnDate() {
         assertEquals(AUTN_DATE_FIELD, fieldPathNormaliser.normaliseFieldPath(AUTN_DATE_FIELD.toLowerCase()).getNormalisedPath());
+    }
+
+    @Test
+    public void lowerCaseAutnDatabase() {
+        assertEquals(AUTN_DATABASE_FIELD, fieldPathNormaliser.normaliseFieldPath(AUTN_DATABASE_FIELD.toLowerCase()).getNormalisedPath());
     }
 
     @Test

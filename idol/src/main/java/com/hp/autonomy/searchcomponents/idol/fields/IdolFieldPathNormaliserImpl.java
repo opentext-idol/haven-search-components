@@ -54,7 +54,7 @@ public class IdolFieldPathNormaliserImpl extends AbstractFieldPathNormaliser {
         }
 
         String normalisedFieldName = fieldPath.toUpperCase();
-        if (!ParametricValuesService.AUTN_DATE_FIELD.equals(normalisedFieldName)) {
+        if (!ParametricValuesService.IDOL_METADATA_FIELDS.contains(normalisedFieldName)) {
             final Matcher idxMatcher = IDX_PATH_PATTERN.matcher(normalisedFieldName);
             if (idxMatcher.find()) {
                 normalisedFieldName = idxMatcher.group("fieldPath");

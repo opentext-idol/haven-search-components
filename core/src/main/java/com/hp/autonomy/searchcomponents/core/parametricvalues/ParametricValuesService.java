@@ -24,9 +24,7 @@ import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Service for retrieving parametric values
@@ -52,6 +50,16 @@ public interface ParametricValuesService<R extends ParametricRequest<Q>, Q exten
      * Special Idol parametric values field which matches the configured default date field
      */
     String AUTN_DATE_FIELD = "AUTN_DATE";
+
+    /**
+     * Special IDOL parametric field containing the database name
+     */
+    String AUTN_DATABASE_FIELD = "AUTN_DATABASE";
+
+    /**
+     * Special IDOL fields
+     */
+    Set<String> IDOL_METADATA_FIELDS = new HashSet<>(Arrays.asList(AUTN_DATE_FIELD, AUTN_DATABASE_FIELD));
 
     /**
      * Returns parametric values which match the request restrictions for the requested parametric fields specified.
