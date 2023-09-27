@@ -14,8 +14,8 @@
 
 package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
-import com.hp.autonomy.types.idol.responses.answer.AskAnswer;
-import com.hp.autonomy.types.idol.responses.answer.GetStatusResponsedata;
+import com.opentext.idol.types.responses.answer.AskAnswer;
+import com.opentext.idol.types.responses.answer.GetStatusResponsedata;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;

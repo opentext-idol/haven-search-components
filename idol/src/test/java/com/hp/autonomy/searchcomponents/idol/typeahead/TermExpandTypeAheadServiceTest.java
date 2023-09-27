@@ -16,19 +16,19 @@ package com.hp.autonomy.searchcomponents.idol.typeahead;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.transport.AciParameter;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.TermExpandResponseData;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.TermExpandResponseData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -48,7 +48,7 @@ public class TermExpandTypeAheadServiceTest {
 
     @Test
     public void getSuggestions() {
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockResponse());
+        when(contentAciService.executeAction(Mockito.<AciParameter>anySet(), any())).thenReturn(mockResponse());
         final List<String> suggestions = termExpandTypeAheadService.getSuggestions("A");
         assertEquals("ab", suggestions.get(0));
     }

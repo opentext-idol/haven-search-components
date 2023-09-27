@@ -22,6 +22,7 @@ import com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerCo
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -60,7 +61,7 @@ public class IdolTestConfiguration {
     }
 
     @Bean
-    public ConfigService<IdolSearchCapable> testConfigService(final IdolSearchCapable config) {
+    public ConfigService testConfigService(final IdolSearchCapable config) {
         final QueryManipulation queryManipulationConfig = QueryManipulation.builder()
                 .enabled(false)
                 .build();
@@ -84,16 +85,16 @@ public class IdolTestConfiguration {
                 getIntProperty(CONTENT_PORT_PROPERTY, CONTENT_PORT)
         );
 
-        when(config.getContentAciServerDetails()).thenReturn(contentAciServerDetails);
-        when(config.getQueryManipulation()).thenReturn(queryManipulationConfig);
-        when(config.getViewConfig()).thenReturn(viewConfig);
-        when(config.getAnswerServer()).thenReturn(answerServerConfig);
-        when(config.getFieldsInfo()).thenReturn(FieldsInfo.builder().build());
+        Mockito.lenient().when(config.getContentAciServerDetails()).thenReturn(contentAciServerDetails);
+        Mockito.lenient().when(config.getQueryManipulation()).thenReturn(queryManipulationConfig);
+        Mockito.lenient().when(config.getViewConfig()).thenReturn(viewConfig);
+        Mockito.lenient().when(config.getAnswerServer()).thenReturn(answerServerConfig);
+        Mockito.lenient().when(config.getFieldsInfo()).thenReturn(FieldsInfo.builder().build());
 
         @SuppressWarnings("unchecked")
         final ConfigService<IdolSearchCapable> configService = mock(ConfigService.class);
 
-        when(configService.getConfig()).thenReturn(config);
+        Mockito.lenient().when(configService.getConfig()).thenReturn(config);
 
         return configService;
     }

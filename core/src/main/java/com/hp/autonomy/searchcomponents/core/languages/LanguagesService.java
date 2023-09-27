@@ -14,7 +14,7 @@
 
 package com.hp.autonomy.searchcomponents.core.languages;
 
-import com.hp.autonomy.types.idol.responses.LanguageType;
+import com.opentext.idol.types.responses.LanguageType;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Map;

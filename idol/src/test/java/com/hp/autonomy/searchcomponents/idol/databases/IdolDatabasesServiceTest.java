@@ -16,24 +16,23 @@ package com.hp.autonomy.searchcomponents.idol.databases;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.transport.AciParameter;
-import com.hp.autonomy.searchcomponents.core.databases.DatabasesRequest;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.Database;
-import com.hp.autonomy.types.idol.responses.Databases;
-import com.hp.autonomy.types.idol.responses.GetStatusResponseData;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.Database;
+import com.opentext.idol.types.responses.Databases;
+import com.opentext.idol.types.responses.GetStatusResponseData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,7 +59,7 @@ public class IdolDatabasesServiceTest {
         databaseList.add(mockDatabaseInfo("APublicDatabase", 123, false));
         databaseList.add(mockDatabaseInfo("AnInternalDatabase", 456, true));
         responseData.setDatabases(databases);
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(responseData);
+        when(contentAciService.executeAction(Mockito.<AciParameter>anySet(), any())).thenReturn(responseData);
 
         final Set<Database> results = idolDatabasesService.getDatabases(mock(IdolDatabasesRequest.class));
         assertThat(results, hasSize(1));

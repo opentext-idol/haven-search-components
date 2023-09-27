@@ -16,7 +16,7 @@ package com.hp.autonomy.searchcomponents.core.view;
 
 import org.apache.commons.lang.StringUtils;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 
 /**

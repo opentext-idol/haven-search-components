@@ -28,7 +28,7 @@ import com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerCo
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolComponentLabelLookup;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
-import com.hp.autonomy.types.idol.marshalling.Jaxb2ParsingConfiguration;
+import com.opentext.idol.types.marshalling.Jaxb2ParsingConfiguration;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hpe.bigdata.frontend.spring.authentication.SpringSecurityAuthenticationInformationRetriever;
 import org.apache.commons.lang.BooleanUtils;
@@ -237,13 +237,5 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
                 .setMaxConnTotal(maxConnectionsTotal)
                 .setDefaultSocketConfig(socketConfig)
                 .build();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(IdolComponentLabelLookup.class)
-    public IdolComponentLabelLookup createIdolComponentLabelLookup (
-            final ConfigService<? extends IdolSearchCapable> configService
-    ) {
-        return (host, port) -> configService.getConfig().lookupComponentNameByHostAndPort(host, port);
     }
 }

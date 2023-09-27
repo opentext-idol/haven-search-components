@@ -17,12 +17,12 @@
     <parent>
         <groupId>com.hp.autonomy</groupId>
         <artifactId>foss-spring-boot-master-pom</artifactId>
-        <version>0.7.0</version>
+        <version>3.1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.hp.autonomy.frontend</groupId>
     <artifactId>haven-search-components</artifactId>
-    <version>0.73.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <name>OpenText Haven Search Components</name>
     <description>Reusable components for OpenText Haven Search.</description>
@@ -88,69 +88,99 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>1.2.6</version>
+                <groupId>com.hp.autonomy.aci.client</groupId>
+                <artifactId>aci-annotations-processor</artifactId>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-core</artifactId>
-                <version>1.2.6</version>
+                <groupId>com.hp.autonomy.frontend.configuration</groupId>
+                <artifactId>configuration-api</artifactId>
+                <version>1.0.1</version>
             </dependency>
             <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>2.2.11</version>
+                <groupId>com.hp.autonomy.frontend.configuration</groupId>
+                <artifactId>configuration-authentication</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>2.13.0</version>
+                <groupId>com.hp.autonomy.frontend.configuration</groupId>
+                <artifactId>configuration-impl</artifactId>
+                <version>3.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>2.13.0</version>
+                <groupId>com.hp.autonomy.aci.content</groupId>
+                <artifactId>content-parameter-api</artifactId>
+                <version>4.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>2.13.4</version>
+                <groupId>com.hp.autonomy.frontend</groupId>
+                <artifactId>idol-types</artifactId>
+                <version>2.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.datatype</groupId>
-                <artifactId>jackson-datatype-joda</artifactId>
-                <version>2.13.0</version>
+                <groupId>com.hp.autonomy.idol</groupId>
+                <artifactId>indexing-api</artifactId>
+                <version>3.1.1</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.datatype</groupId>
-                <artifactId>jackson-datatype-jsr310</artifactId>
-                <version>2.13.0</version>
+                <groupId>com.hp.bigdata.frontend</groupId>
+                <artifactId>spring-authentication-utils</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>32.1.2-jre</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-core</artifactId>
-                <version>2.2.11</version>
+                <version>4.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
-                <version>2.2.11</version>
+                <version>4.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.11.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
-                <version>4.1</version>
+                <version>4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.13.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.4.16</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.5.13</version>
+                <version>4.5.14</version>
             </dependency>
             <dependency>
-                <groupId>org.yaml</groupId>
-                <artifactId>snakeyaml</artifactId>
-                <version>1.33</version>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>4.5.14</version>
+            </dependency>
+            <dependency>
+                <groupId>stax</groupId>
+                <artifactId>stax-api</artifactId>
+                <version>1.0.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -159,14 +189,13 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.10</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-impl</artifactId>
-            <version>2.1.11</version>
+            <version>3.0.0-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -176,18 +205,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

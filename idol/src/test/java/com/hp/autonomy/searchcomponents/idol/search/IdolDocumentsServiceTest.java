@@ -18,9 +18,9 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
-import com.hp.autonomy.types.idol.responses.Hit;
-import com.hp.autonomy.types.idol.responses.QueryResponseData;
-import com.hp.autonomy.types.idol.responses.SuggestResponseData;
+import com.opentext.idol.types.responses.Hit;
+import com.opentext.idol.types.responses.QueryResponseData;
+import com.opentext.idol.types.responses.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -38,8 +38,8 @@ import java.util.Collections;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -144,10 +144,10 @@ public class IdolDocumentsServiceTest {
 
         when(queryExecutor.executeQuery(any(), any())).thenReturn(responseData);
 
-        when(getContentRequestIndex.getIndex()).thenReturn("Database1");
-        when(getContentRequestIndex.getReferences()).thenReturn(Collections.singleton("Some reference"));
+        Mockito.lenient().when(getContentRequestIndex.getIndex()).thenReturn("Database1");
+        Mockito.lenient().when(getContentRequestIndex.getReferences()).thenReturn(Collections.singleton("Some reference"));
         when(getContentRequest.getIndexesAndReferences()).thenReturn(Collections.singleton(getContentRequestIndex));
-        when(getContentRequest.getPrint()).thenReturn(PrintParam.Fields);
+        Mockito.lenient().when(getContentRequest.getPrint()).thenReturn(PrintParam.Fields);
         when(getContentRequest.getReferenceField()).thenReturn("refField");
 
         idolDocumentsService.getDocumentContent(getContentRequest);
@@ -192,19 +192,19 @@ public class IdolDocumentsServiceTest {
     }
 
     private IdolQueryRequest mockQueryParams(final QueryRequest.QueryType queryType) {
-        when(queryRestrictions.getQueryText()).thenReturn("*");
-        when(queryRestrictions.getDatabases()).thenReturn(Arrays.asList("Database1", "Database2"));
-        when(queryRestrictions.getMaxDate()).thenReturn(ZonedDateTime.now());
+        Mockito.lenient().when(queryRestrictions.getQueryText()).thenReturn("*");
+        Mockito.lenient().when(queryRestrictions.getDatabases()).thenReturn(Arrays.asList("Database1", "Database2"));
+        Mockito.lenient().when(queryRestrictions.getMaxDate()).thenReturn(ZonedDateTime.now());
 
-        when(queryRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
-        when(queryRequest.getStart()).thenReturn(1);
-        when(queryRequest.getMaxResults()).thenReturn(50);
-        when(queryRequest.getSummary()).thenReturn(SummaryParam.Concept.name());
-        when(queryRequest.getSummaryCharacters()).thenReturn(250);
-        when(queryRequest.isHighlight()).thenReturn(true);
-        when(queryRequest.isAutoCorrect()).thenReturn(true);
-        when(queryRequest.getPrint()).thenReturn(PrintParam.Fields.name());
-        when(queryRequest.getQueryType()).thenReturn(queryType);
+        Mockito.lenient().when(queryRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
+        Mockito.lenient().when(queryRequest.getStart()).thenReturn(1);
+        Mockito.lenient().when(queryRequest.getMaxResults()).thenReturn(50);
+        Mockito.lenient().when(queryRequest.getSummary()).thenReturn(SummaryParam.Concept.name());
+        Mockito.lenient().when(queryRequest.getSummaryCharacters()).thenReturn(250);
+        Mockito.lenient().when(queryRequest.isHighlight()).thenReturn(true);
+        Mockito.lenient().when(queryRequest.isAutoCorrect()).thenReturn(true);
+        Mockito.lenient().when(queryRequest.getPrint()).thenReturn(PrintParam.Fields.name());
+        Mockito.lenient().when(queryRequest.getQueryType()).thenReturn(queryType);
 
         return queryRequest;
     }

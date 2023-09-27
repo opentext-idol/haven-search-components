@@ -25,8 +25,8 @@ import java.time.ZonedDateTime;
 public class DateBucketingParamsTest extends SimpleRequestObjectTest<BucketingParams<ZonedDateTime>> {
     @Override
     protected BucketingParams<ZonedDateTime> constructObject() {
-        final ZonedDateTime min = ZonedDateTime.of(2017, 5, 10, 15, 0, 0, 0, ZoneId.ofOffset("UTC", ZoneOffset.UTC));
-        final ZonedDateTime max = ZonedDateTime.of(2017, 5, 10, 15, 40, 0, 0, ZoneId.ofOffset("UTC", ZoneOffset.UTC));
+        final ZonedDateTime min = ZonedDateTime.of(2017, 5, 10, 15, 0, 0, 0, ZoneOffset.ofTotalSeconds(0));
+        final ZonedDateTime max = ZonedDateTime.of(2017, 5, 10, 15, 40, 0, 0, ZoneOffset.ofTotalSeconds(0));
         return new BucketingParams<>(12, min, max);
     }
 

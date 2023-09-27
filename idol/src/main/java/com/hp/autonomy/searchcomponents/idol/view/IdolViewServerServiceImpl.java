@@ -27,11 +27,11 @@ import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandl
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewingMode;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.marshalling.processors.CopyResponseProcessor;
-import com.hp.autonomy.types.idol.responses.DocContent;
-import com.hp.autonomy.types.idol.responses.GetContentResponseData;
-import com.hp.autonomy.types.idol.responses.Hit;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.marshalling.processors.CopyResponseProcessor;
+import com.opentext.idol.types.responses.DocContent;
+import com.opentext.idol.types.responses.GetContentResponseData;
+import com.opentext.idol.types.responses.Hit;
 import com.hp.autonomy.types.requests.idol.actions.connector.ConnectorActions;
 import com.hp.autonomy.types.requests.idol.actions.connector.params.ConnectorViewParams;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;

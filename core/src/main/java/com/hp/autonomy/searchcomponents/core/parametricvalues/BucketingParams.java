@@ -14,11 +14,17 @@
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
 import java.io.Serializable;
 
 @Data
+@Jacksonized
+@Builder
+@AllArgsConstructor
 public class BucketingParams<T extends Comparable<? super T> & Serializable> implements Serializable {
     private static final long serialVersionUID = 7148091304033066434L;
 

@@ -26,8 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
-import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -39,8 +38,7 @@ import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CL
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-@JsonTest
-@AutoConfigureJsonTesters(enabled = false)
+@AutoConfigureJson
 @SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY)
 public class IdolParametricRequestTest extends ParametricRequestTest<IdolQueryRestrictions> {
     @Autowired
@@ -65,8 +63,8 @@ public class IdolParametricRequestTest extends ParametricRequestTest<IdolQueryRe
                                    .queryText("*")
                                    .fieldText("NOT(EMPTY):{FIELD}")
                                    .database("Database1")
-                                   .minDate(ZonedDateTime.parse("2016-11-15T16:07:00Z[UTC]"))
-                                   .maxDate(ZonedDateTime.parse("2016-11-15T16:07:01Z[UTC]"))
+                                   .minDate(ZonedDateTime.parse("2016-11-15T16:07:00Z"))
+                                   .maxDate(ZonedDateTime.parse("2016-11-15T16:07:01Z"))
                                    .minScore(5)
                                    .languageType("englishUtf8")
                                    .anyLanguage(false)

@@ -16,7 +16,7 @@ package com.hp.autonomy.searchcomponents.idol.search.fields;
 
 import com.hp.autonomy.searchcomponents.core.search.SearchResult;
 import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
-import com.hp.autonomy.types.idol.responses.Hit;
+import com.opentext.idol.types.responses.Hit;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**

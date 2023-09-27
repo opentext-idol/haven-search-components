@@ -24,18 +24,18 @@ import com.hp.autonomy.searchcomponents.core.view.raw.RawDocument;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.DocContent;
-import com.hp.autonomy.types.idol.responses.GetContentResponseData;
-import com.hp.autonomy.types.idol.responses.Hit;
-import com.hp.autonomy.types.idol.responses.QueryResponse;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.DocContent;
+import com.opentext.idol.types.responses.GetContentResponseData;
+import com.opentext.idol.types.responses.Hit;
+import com.opentext.idol.types.responses.QueryResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -43,11 +43,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)

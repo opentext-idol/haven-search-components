@@ -3,12 +3,8 @@ package com.hp.autonomy.searchcomponents.idol.logging;
 import com.autonomy.aci.client.transport.AciResponseInputStream;
 import com.autonomy.aci.client.transport.AciServerDetails;
 import com.autonomy.aci.client.transport.ActionParameter;
-import com.hp.autonomy.searchcomponents.idol.configuration.IdolComponentLabelLookup;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.user.params.SecurityParams;
-import java.text.DecimalFormat;
-import java.util.Collection;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -17,6 +13,10 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.util.StopWatch;
+
+import java.text.DecimalFormat;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.idol.logging.IdolLoggingAspect.LOGGING_PRECEDENCE;
 import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
@@ -39,12 +39,9 @@ public class IdolLoggingAspect {
     private static final String HIDDEN_VALUE = "*******";
     private static final String SERVER_UNREACHABLE = "(server unreachable)";
 
-    private final IdolComponentLabelLookup lookup;
     private final boolean timingEnabled;
 
-    public IdolLoggingAspect(final IdolComponentLabelLookup lookup,
-                             final boolean timingEnabled) {
-        this.lookup = lookup;
+    public IdolLoggingAspect(final boolean timingEnabled) {
         this.timingEnabled = timingEnabled;
     }
 
@@ -79,7 +76,6 @@ public class IdolLoggingAspect {
                 .collect(Collectors.joining(PARAMETER_SEPARATOR));
 
         final StringBuilder messageBuilder = new StringBuilder()
-                .append(lookup.lookupComponentNameByHostAndPort(host, port)).append('\t')
                 .append(host).append('\t')
                 .append(port).append('\t')
                 .append(query).append('\t');

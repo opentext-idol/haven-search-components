@@ -17,7 +17,7 @@ package com.hp.autonomy.searchcomponents.idol.databases;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.databases.AbstractDatabasesServiceIT;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
-import com.hp.autonomy.types.idol.responses.Database;
+import com.opentext.idol.types.responses.Database;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class)

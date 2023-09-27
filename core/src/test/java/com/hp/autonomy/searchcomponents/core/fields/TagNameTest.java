@@ -21,8 +21,7 @@ import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import org.apache.commons.io.IOUtils;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
-import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
@@ -36,8 +35,7 @@ import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CL
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-@JsonTest
-@AutoConfigureJsonTesters(enabled = false)
+@AutoConfigureJson
 @SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class TagNameTest extends SimpleRequestResponseObjectTest<TagName> {
     @Autowired

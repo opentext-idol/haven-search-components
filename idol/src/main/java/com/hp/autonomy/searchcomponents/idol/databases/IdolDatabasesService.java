@@ -16,7 +16,7 @@ package com.hp.autonomy.searchcomponents.idol.databases;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
-import com.hp.autonomy.types.idol.responses.Database;
+import com.opentext.idol.types.responses.Database;
 
 /**
  * Idol extension to {@link DatabasesService}

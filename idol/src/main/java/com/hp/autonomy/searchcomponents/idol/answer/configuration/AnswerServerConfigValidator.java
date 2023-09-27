@@ -18,8 +18,8 @@ import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.frontend.configuration.server.ServerConfig;
 import com.hp.autonomy.frontend.configuration.validation.ValidationResult;
 import com.hp.autonomy.frontend.configuration.validation.Validator;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.answer.GetStatusResponsedata;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.answer.GetStatusResponsedata;
 import com.hp.autonomy.types.requests.idol.actions.answer.AnswerServerActions;
 import org.apache.commons.lang.StringUtils;
 

@@ -17,17 +17,17 @@ package com.hp.autonomy.searchcomponents.idol.languages;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.GetStatusResponseData;
-import com.hp.autonomy.types.idol.responses.LanguageSettingsResponseData;
-import com.hp.autonomy.types.idol.responses.LanguageType;
-import com.hp.autonomy.types.idol.responses.LanguageTypeSettings;
-import com.hp.autonomy.types.idol.responses.Languages;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.GetStatusResponseData;
+import com.opentext.idol.types.responses.LanguageSettingsResponseData;
+import com.opentext.idol.types.responses.LanguageType;
+import com.opentext.idol.types.responses.LanguageTypeSettings;
+import com.opentext.idol.types.responses.Languages;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Map;
@@ -40,8 +40,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)

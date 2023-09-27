@@ -21,8 +21,7 @@ import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import org.apache.commons.io.IOUtils;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
-import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
@@ -40,9 +39,8 @@ import static org.junit.Assert.*;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-@JsonTest
-@AutoConfigureJsonTesters(enabled = false)
 @SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@AutoConfigureJson
 public class FieldsInfoTest extends ConfigurationComponentTest<FieldsInfo> {
     @Autowired
     private FieldPathNormaliser fieldPathNormaliser;

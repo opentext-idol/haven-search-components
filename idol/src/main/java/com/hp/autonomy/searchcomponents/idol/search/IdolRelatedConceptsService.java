@@ -16,7 +16,7 @@ package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
-import com.hp.autonomy.types.idol.responses.QsElement;
+import com.opentext.idol.types.responses.QsElement;
 
 /**
  * Idol extension to {@link RelatedConceptsService}

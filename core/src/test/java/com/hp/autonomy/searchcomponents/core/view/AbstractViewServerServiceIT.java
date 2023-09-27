@@ -21,8 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
-import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.ByteArrayOutputStream;
@@ -33,8 +32,7 @@ import static org.junit.Assert.assertNotNull;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
-@JsonTest
-@AutoConfigureJsonTesters(enabled = false)
+@AutoConfigureJson
 public abstract class AbstractViewServerServiceIT<R extends ViewRequest<S>, Q extends QueryRestrictions<S>, S extends Serializable, D extends SearchResult, E extends Exception> {
     @Autowired
     protected ViewServerService<R, S, E> viewServerService;

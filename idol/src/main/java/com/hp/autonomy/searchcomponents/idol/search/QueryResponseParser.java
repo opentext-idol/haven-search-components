@@ -15,8 +15,8 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.types.idol.responses.Hit;
-import com.hp.autonomy.types.idol.responses.QueryResponseData;
+import com.opentext.idol.types.responses.Hit;
+import com.opentext.idol.types.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import org.springframework.beans.factory.annotation.Qualifier;
 

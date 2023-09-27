@@ -20,9 +20,9 @@ import com.hp.autonomy.searchcomponents.core.config.FieldValue;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesService;
 import com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser;
-import com.hp.autonomy.types.idol.responses.Database;
-import com.hp.autonomy.types.idol.responses.Hit;
-import com.hp.autonomy.types.idol.responses.QueryResponseData;
+import com.opentext.idol.types.responses.Database;
+import com.opentext.idol.types.responses.Hit;
+import com.opentext.idol.types.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.junit.Before;
@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.ObjectFactory;
 
 import java.io.Serializable;
@@ -45,8 +45,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("WeakerAccess")

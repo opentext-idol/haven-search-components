@@ -58,7 +58,6 @@ public class FieldsInfo extends SimpleComponent<FieldsInfo> implements Serializa
     @JsonPOJOBuilder(withPrefix = "")
     public static class FieldsInfoBuilder {
         private LinkedHashMap<String, FieldInfo<?>> fieldConfig = new LinkedHashMap<>();
-        @JsonIgnore
         private LinkedHashMap<FieldPath, FieldInfo<?>> fieldConfigByName = new LinkedHashMap<>();
 
         @JsonAnySetter

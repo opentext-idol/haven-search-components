@@ -17,20 +17,20 @@ package com.hp.autonomy.searchcomponents.idol.answer.system;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciServerDetails;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.answer.GetStatusResponsedata;
-import com.hp.autonomy.types.idol.responses.answer.System;
-import com.hp.autonomy.types.idol.responses.answer.Systems;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.answer.GetStatusResponsedata;
+import com.opentext.idol.types.responses.answer.System;
+import com.opentext.idol.types.responses.answer.Systems;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)

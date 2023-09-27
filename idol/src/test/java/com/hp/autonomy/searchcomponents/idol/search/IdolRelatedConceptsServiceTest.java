@@ -14,14 +14,14 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.hp.autonomy.types.idol.responses.Qs;
-import com.hp.autonomy.types.idol.responses.QsElement;
-import com.hp.autonomy.types.idol.responses.QueryResponseData;
+import com.opentext.idol.types.responses.Qs;
+import com.opentext.idol.types.responses.QsElement;
+import com.opentext.idol.types.responses.QueryResponseData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)

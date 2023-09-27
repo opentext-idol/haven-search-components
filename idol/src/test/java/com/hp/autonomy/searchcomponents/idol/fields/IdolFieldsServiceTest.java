@@ -17,22 +17,22 @@ package com.hp.autonomy.searchcomponents.idol.fields;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.GetTagNamesResponseData;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.GetTagNamesResponseData;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +56,7 @@ public class IdolFieldsServiceTest {
 
     @Test
     public void getFields() {
-        when(contentAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockTagNamesResponse());
+        when(contentAciService.executeAction(Mockito.<AciParameter>anySet(), any())).thenReturn(mockTagNamesResponse());
         assertThat(idolFieldsService.getFields(mock(IdolFieldsRequest.class)), hasEntry(is(FieldTypeParam.Numeric), not(empty())));
     }
 

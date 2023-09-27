@@ -49,8 +49,7 @@ public class HavenSearchIdolAspectConfiguration {
     @Bean(name = IDOL_LOGGING_ASPECT_BEAN_NAME)
     @ConditionalOnProperty(IDOL_LOG_PROPERTY_KEY)
     @ConditionalOnMissingBean(name = IDOL_LOGGING_ASPECT_BEAN_NAME)
-    public IdolLoggingAspect IdolLoggingAspect(final IdolComponentLabelLookup lookup,
-                                               @Value(IDOL_LOG_TIMING_PROPERTY) final boolean timingEnabled) {
-        return new IdolLoggingAspect(lookup, timingEnabled);
+    public IdolLoggingAspect IdolLoggingAspect(@Value(IDOL_LOG_TIMING_PROPERTY) final boolean timingEnabled) {
+        return new IdolLoggingAspect(timingEnabled);
     }
 }

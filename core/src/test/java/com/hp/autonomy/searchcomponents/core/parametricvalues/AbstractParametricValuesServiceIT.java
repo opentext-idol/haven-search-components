@@ -21,48 +21,28 @@ import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.test.TestUtils;
-import com.hp.autonomy.types.requests.idol.actions.tags.DateRangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.DateValueDetails;
-import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
-import com.hp.autonomy.types.requests.idol.actions.tags.NumericRangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
-import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
-import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
+import com.hp.autonomy.types.requests.idol.actions.tags.*;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
-import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 @SuppressWarnings({"SpringJavaAutowiredMembersInspection", "SpringJavaAutowiringInspection"})
 @RunWith(SpringRunner.class)
-@JsonTest
-@AutoConfigureJsonTesters(enabled = false)
+@AutoConfigureJson
 public abstract class AbstractParametricValuesServiceIT<
     R extends ParametricRequest<Q>,
     F extends FieldsRequest,

@@ -14,7 +14,7 @@
 
 package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
-import com.hp.autonomy.types.idol.responses.conversation.ConversePrompt;
+import com.opentext.idol.types.responses.conversation.ConversePrompt;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -15,22 +15,22 @@
 package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
 import com.autonomy.aci.client.services.AciService;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.answer.AskAnswer;
-import com.hp.autonomy.types.idol.responses.answer.AskAnswers;
-import com.hp.autonomy.types.idol.responses.answer.AskResponsedata;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.answer.AskAnswer;
+import com.opentext.idol.types.responses.answer.AskAnswers;
+import com.opentext.idol.types.responses.answer.AskResponsedata;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)

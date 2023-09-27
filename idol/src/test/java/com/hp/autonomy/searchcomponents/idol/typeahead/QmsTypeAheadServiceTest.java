@@ -20,20 +20,20 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
-import com.hp.autonomy.types.idol.responses.TypeAheadResponseData;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.TypeAheadResponseData;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.params.ModeParam;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -64,7 +64,7 @@ public class QmsTypeAheadServiceTest {
     @Test
     public void getSuggestionsInDictionaryMode() {
         when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().typeAheadMode(ModeParam.Dictionary).build());
-        when(qmsAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockResponse());
+        when(qmsAciService.executeAction(Mockito.<AciParameter>anySet(), any())).thenReturn(mockResponse());
         final List<String> suggestions = qmsTypeAheadService.getSuggestions("A");
         assertEquals("Ab", suggestions.get(0));
     }
@@ -72,7 +72,7 @@ public class QmsTypeAheadServiceTest {
     @Test
     public void getSuggestionsInIndexMode() {
         when(config.getQueryManipulation()).thenReturn(QueryManipulation.builder().typeAheadMode(ModeParam.Index).build());
-        when(qmsAciService.executeAction(anySetOf(AciParameter.class), any())).thenReturn(mockResponse());
+        when(qmsAciService.executeAction(Mockito.<AciParameter>anySet(), any())).thenReturn(mockResponse());
         final List<String> suggestions = qmsTypeAheadService.getSuggestions("A");
         assertEquals("ab", suggestions.get(0));
     }

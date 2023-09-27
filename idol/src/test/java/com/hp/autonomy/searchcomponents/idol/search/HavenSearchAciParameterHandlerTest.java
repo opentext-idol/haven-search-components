@@ -32,15 +32,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -83,7 +84,7 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Before
     public void setUp() {
-        when(mockPrincipal.getName()).thenReturn("the user");
+        Mockito.lenient().when(mockPrincipal.getName()).thenReturn("the user");
         aciParameters = new AciParameters();
         parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, documentFieldsService, authenticationInformationRetriever, null, null);
     }
@@ -190,7 +191,6 @@ public class HavenSearchAciParameterHandlerTest {
 
     @Test
     public void addGetContentOutputParameters() {
-        when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
         parameterHandler.addGetContentOutputParameters(aciParameters, "Database1", "ref", "field");
         assertThat(aciParameters, hasSize(4));
     }

@@ -22,7 +22,7 @@ import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulationValidator;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfigValidator;
-import com.hp.autonomy.types.idol.marshalling.ProcessorFactory;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
