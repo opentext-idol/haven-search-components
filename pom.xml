@@ -82,6 +82,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <doclint>none</doclint>
+                    <isOffline>true</isOffline>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
