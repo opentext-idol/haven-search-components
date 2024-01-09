@@ -18,6 +18,7 @@ import com.autonomy.aci.client.util.AciParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.core.view.ViewingPart;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
@@ -26,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.ZoneOffset;
@@ -112,7 +114,9 @@ public class HavenSearchAciParameterHandlerImplTest {
     }
 
     @Test
-    public void testAddViewParameters() {
+    public void testAddViewParameters_document() {
+        when(viewRequest.getPart()).thenReturn(ViewingPart.DOCUMENT);
+        Mockito.lenient().when(viewRequest.getSubDocRef()).thenReturn("thesubdoc");
         handler.addViewParameters(aciParameters, "the doc ref", viewRequest);
         assertThat(aciParameters.get("noaci"), is("true"));
         assertThat(aciParameters.get("reference"), is("the doc ref"));
@@ -120,11 +124,21 @@ public class HavenSearchAciParameterHandlerImplTest {
         assertThat(aciParameters.get("stripscript"), is("true"));
         assertThat(aciParameters.get("originalbaseurl"), is("true"));
         assertThat(aciParameters.get("outputtype"), is("HTML"));
+        Assert.assertNull(aciParameters.get("urlprefix"));
+        Assert.assertNull(aciParameters.get("linkspec"));
+    }
+
+    @Test
+    public void testAddViewParameters_document_urlPrefix() {
+        when(viewRequest.getPart()).thenReturn(ViewingPart.DOCUMENT);
+        when(viewRequest.getUrlPrefix()).thenReturn("http://www.example.com/subdoc?subref=");
+        handler.addViewParameters(aciParameters, "the doc ref", viewRequest);
+        Assert.assertThat(aciParameters.get("urlprefix"), is("http://www.example.com/subdoc?subref="));
     }
 
     @Test
     public void testAddViewParameters_original() {
-        when(viewRequest.isOriginal()).thenReturn(true);
+        when(viewRequest.getPart()).thenReturn(ViewingPart.ORIGINAL);
         handler.addViewParameters(aciParameters, "the doc ref", viewRequest);
         assertThat(aciParameters.get("noaci"), is("true"));
         assertThat(aciParameters.get("reference"), is("the doc ref"));
@@ -132,6 +146,31 @@ public class HavenSearchAciParameterHandlerImplTest {
         Assert.assertNull(aciParameters.get("stripscript"));
         Assert.assertNull(aciParameters.get("originalbaseurl"));
         assertThat(aciParameters.get("outputtype"), is("Raw"));
+        Assert.assertNull(aciParameters.get("urlprefix"));
+        Assert.assertNull(aciParameters.get("linkspec"));
+    }
+
+    @Test
+    public void testAddViewParameters_subdocument() {
+        when(viewRequest.getPart()).thenReturn(ViewingPart.SUBDOCUMENT);
+        when(viewRequest.getSubDocRef()).thenReturn("thesubdoc");
+        handler.addViewParameters(aciParameters, "the doc ref", viewRequest);
+        assertThat(aciParameters.get("noaci"), is("true"));
+        assertThat(aciParameters.get("reference"), is("the doc ref"));
+        assertThat(aciParameters.get("embedimages"), is("true"));
+        assertThat(aciParameters.get("stripscript"), is("true"));
+        assertThat(aciParameters.get("originalbaseurl"), is("true"));
+        assertThat(aciParameters.get("outputtype"), is("HTML"));
+        Assert.assertNull(aciParameters.get("urlprefix"));
+        assertThat(aciParameters.get("linkspec"), is("thesubdoc"));
+    }
+
+    @Test
+    public void testAddViewParameters_subdocument_urlPrefix() {
+        when(viewRequest.getPart()).thenReturn(ViewingPart.SUBDOCUMENT);
+        when(viewRequest.getUrlPrefix()).thenReturn("http://www.example.com/subdoc?subref=");
+        handler.addViewParameters(aciParameters, "the doc ref", viewRequest);
+        Assert.assertThat(aciParameters.get("urlprefix"), is("http://www.example.com/subdoc?subref="));
     }
 
 }

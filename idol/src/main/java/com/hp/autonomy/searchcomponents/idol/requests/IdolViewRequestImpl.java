@@ -17,6 +17,7 @@ package com.hp.autonomy.searchcomponents.idol.requests;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
+import com.hp.autonomy.searchcomponents.core.view.ViewingPart;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequestBuilder;
 import lombok.Builder;
@@ -35,7 +36,10 @@ class IdolViewRequestImpl implements IdolViewRequest {
     private final String documentReference;
     private final String database;
     private final String highlightExpression;
-    private final boolean original;
+    @Builder.Default
+    private final ViewingPart part = ViewingPart.DOCUMENT;
+    private final String urlPrefix;
+    private final String subDocRef;
 
     @JsonPOJOBuilder(withPrefix = "")
     static class IdolViewRequestImplBuilder implements IdolViewRequestBuilder {

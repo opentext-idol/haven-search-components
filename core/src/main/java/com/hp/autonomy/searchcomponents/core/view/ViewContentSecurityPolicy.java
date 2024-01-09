@@ -34,10 +34,15 @@ public class ViewContentSecurityPolicy {
             "img-src * 'unsafe-inline' data:",
             "style-src * 'unsafe-inline'",
             "media-src * 'unsafe-inline'",
+            // Allow frames for subdocuments
+            "frame-src 'self'",
+            // We need viewserver's scripts to run, which are all inline with no support for nonce or hash.  We must
+            // trust viewserver to stripscript properly for now.
+            "script-src 'unsafe-inline'",
 
             // Behaves like the iframe sandbox attribute, disabling potentially dangerous features such as form submission
             // Allow same origin so CSS etc can be loaded
-            "sandbox allow-same-origin"
+            "sandbox allow-same-origin allow-scripts"
     ), "; ");
 
     private ViewContentSecurityPolicy() {}

@@ -46,8 +46,18 @@ public interface ViewRequest<S extends Serializable> extends RequestObject<ViewR
     String getHighlightExpression();
 
     /**
-     * @return Whether to retrieve the original file, without converting to HTML.
+     * @return How to view the document
      */
-    boolean isOriginal();
+    ViewingPart getPart();
+
+    /**
+     * @return Links in the rendered document should be prefixed by this string
+     */
+    String getUrlPrefix();
+
+    /**
+     * @return Reference to the subdocument to view
+     */
+    String getSubDocRef();
 
 }

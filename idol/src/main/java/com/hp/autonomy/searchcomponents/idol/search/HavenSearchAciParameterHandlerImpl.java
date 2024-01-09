@@ -26,6 +26,7 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
+import com.hp.autonomy.searchcomponents.core.view.ViewingPart;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
@@ -313,10 +314,15 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         aciParameters.add(ViewParams.Reference.name(), reference);
         addSecurityInfo(aciParameters);
 
-        if (!viewRequest.isOriginal()) {
+        if (viewRequest.getPart() == ViewingPart.ORIGINAL) {
+            aciParameters.add(ViewParams.OutputType.name(), OutputTypeParam.Raw);
+
+        } else {
             aciParameters.add(ViewParams.EmbedImages.name(), true);
             aciParameters.add(ViewParams.StripScript.name(), true);
             aciParameters.add(ViewParams.OriginalBaseURL.name(), true);
+            aciParameters.add(ViewParams.OutputType.name(), OutputTypeParam.HTML);
+            aciParameters.add(ViewParams.UrlPrefix.name(), viewRequest.getUrlPrefix());
 
             if(viewRequest.getHighlightExpression() != null) {
                 aciParameters.add(ViewParams.Links.name(), viewRequest.getHighlightExpression());
@@ -326,10 +332,11 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
                 // we need this because we're sending query text, not a csv of stemmed terms
                 aciParameters.add(ViewParams.Boolean.name(), true);
             }
-        }
 
-        aciParameters.add(ViewParams.OutputType.name(),
-            viewRequest.isOriginal() ? OutputTypeParam.Raw : OutputTypeParam.HTML);
+            if (viewRequest.getPart() == ViewingPart.SUBDOCUMENT) {
+                aciParameters.add("LinkSpec", viewRequest.getSubDocRef());
+            }
+        }
     }
 
     private String formatDate(final ZonedDateTime date) {

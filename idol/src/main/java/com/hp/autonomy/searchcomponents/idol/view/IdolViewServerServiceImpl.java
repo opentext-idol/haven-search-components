@@ -20,6 +20,7 @@ import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.server.ServerConfig;
 import com.hp.autonomy.searchcomponents.core.view.ViewServerService;
+import com.hp.autonomy.searchcomponents.core.view.ViewingPart;
 import com.hp.autonomy.searchcomponents.core.view.raw.RawContentViewer;
 import com.hp.autonomy.searchcomponents.core.view.raw.RawDocument;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
@@ -103,8 +104,9 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
     public void viewDocument(final IdolViewRequest request, final OutputStream outputStream) throws ViewDocumentNotFoundException, IOException {
         final ViewConfig viewConfig = configService.getConfig().getViewConfig();
 
-        if (viewConfig.getViewingMode() == ViewingMode.UNIVERSAL) {
-            final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
+        if (request.getPart() == ViewingPart.SUBDOCUMENT || viewConfig.getViewingMode() == ViewingMode.UNIVERSAL) {
+            final AciParameters viewParameters = new AciParameters(
+                    request.getPart() == ViewingPart.SUBDOCUMENT ? ViewActions.GetLink.name() : ViewActions.View.name());
             parameterHandler.addViewParameters(viewParameters, request.getDocumentReference(), request);
 
             try {

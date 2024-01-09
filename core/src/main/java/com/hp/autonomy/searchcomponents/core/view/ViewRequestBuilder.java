@@ -51,10 +51,19 @@ public interface ViewRequestBuilder<R extends ViewRequest<S>, S extends Serializ
     B highlightExpression(String highlightExpression);
 
     /**
-     * @param original Whether to retrieve the original file, without converting to HTML.
-     * @return the builder (for chaining)
+     * @param part How to view the document
      */
-    B original(boolean original);
+    B part(ViewingPart part);
+
+    /**
+     * @param urlPrefix Links in the rendered document should be prefixed by this string
+     */
+    B urlPrefix(String urlPrefix);
+
+    /**
+     * @param subDocRef Reference to the subdocument to view
+     */
+    B subDocRef(String subDocRef);
 
     /**
      * {@inheritDoc}
