@@ -14,9 +14,8 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
-import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
@@ -35,7 +34,7 @@ public interface HavenSearchAciParameterHandler {
      * @param aciParameters     The set of parameters to add to
      * @param queryRestrictions The restrictions to add
      */
-    void addSearchRestrictions(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions);
+    void addSearchRestrictions(final ActionParameters aciParameters, final IdolQueryRestrictions queryRestrictions);
 
     /**
      * Adds Idol parameters relating to the format/content of the response objects returned by Idol
@@ -43,7 +42,7 @@ public interface HavenSearchAciParameterHandler {
      * @param aciParameters The set of parameters to add to
      * @param searchRequest The request options
      */
-    void addSearchOutputParameters(final AciParameters aciParameters, final IdolSearchRequest searchRequest);
+    void addSearchOutputParameters(final ActionParameters aciParameters, final IdolSearchRequest searchRequest);
 
     /**
      * Adds Idol parameters relating to requests for retrieving document content
@@ -52,7 +51,7 @@ public interface HavenSearchAciParameterHandler {
      * @param indexAndReferences The databases and references of documents to be retrieved
      * @param request            The request options
      */
-    void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex indexAndReferences, final IdolGetContentRequest request);
+    void addGetDocumentOutputParameters(final ActionParameters aciParameters, final IdolGetContentRequestIndex indexAndReferences, final IdolGetContentRequest request);
 
     /**
      * Adds Idol parameters for retrieving document content (during View document process)
@@ -62,7 +61,7 @@ public interface HavenSearchAciParameterHandler {
      * @param documentReference Reference of the document
      * @param referenceField    Document field which represents the reference (a field name in content, not a view URL).
      */
-    void addGetContentOutputParameters(final AciParameters aciParameters, final String database, final String documentReference, final String referenceField);
+    void addGetContentOutputParameters(final ActionParameters aciParameters, final String database, final String documentReference, final String referenceField);
 
     /**
      * Adds parameters for restrictions (or absence of restrictions) relating to language
@@ -70,7 +69,7 @@ public interface HavenSearchAciParameterHandler {
      * @param aciParameters     The set of parameters to add to
      * @param queryRestrictions The restrictions to add (includes language restrictions)
      */
-    void addLanguageRestriction(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions);
+    void addLanguageRestriction(final ActionParameters aciParameters, final IdolQueryRestrictions queryRestrictions);
 
     /**
      * Adds parameters which only apply when query QMS (and should not be added when querying Content)
@@ -78,9 +77,9 @@ public interface HavenSearchAciParameterHandler {
      * @param aciParameters     The set of parameters to add to
      * @param queryRestrictions The restrictions to add
      */
-    void addQmsParameters(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions);
+    void addQmsParameters(final ActionParameters aciParameters, final IdolQueryRestrictions queryRestrictions);
 
-    void addIntentBasedRankingParameters(AciParameters aciParameters);
+    void addIntentBasedRankingParameters(ActionParameters aciParameters);
 
     /**
      * @return Security info for the current user
@@ -92,20 +91,20 @@ public interface HavenSearchAciParameterHandler {
      *
      * @param aciParameters The set of parameters to add to
      */
-    void addSecurityInfo(AciParameters aciParameters);
+    void addSecurityInfo(ActionParameters aciParameters);
 
     /**
      * Adds parameters to the request which can be used to identify the user
      * @param aciParameters
      */
-    void addUserIdentifiers(AciParameters aciParameters);
+    void addUserIdentifiers(ActionParameters aciParameters);
 
     /**
      * Adds parameters used when retrieving state tokens for a query
      *
      * @param aciParameters The set of parameters to add to
      */
-    void addStoreStateParameters(AciParameters aciParameters);
+    void addStoreStateParameters(ActionParameters aciParameters);
 
     /**
      * Adds parameters for performing a view action against ViewServer
@@ -114,5 +113,5 @@ public interface HavenSearchAciParameterHandler {
      * @param reference     The document reference to view
      * @param viewRequest   View request options
      */
-    void addViewParameters(AciParameters aciParameters, String reference, IdolViewRequest viewRequest);
+    void addViewParameters(ActionParameters aciParameters, String reference, IdolViewRequest viewRequest);
 }

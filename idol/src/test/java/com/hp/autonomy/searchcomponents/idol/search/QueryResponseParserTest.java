@@ -14,16 +14,16 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
 import com.hp.autonomy.searchcomponents.core.config.FieldValue;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesService;
 import com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser;
+import com.hp.autonomy.types.requests.Documents;
 import com.opentext.idol.types.responses.Database;
 import com.opentext.idol.types.responses.Hit;
 import com.opentext.idol.types.responses.QueryResponseData;
-import com.hp.autonomy.types.requests.Documents;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public class QueryResponseParserTest {
     private IdolDatabasesRequestBuilder databasesRequestBuilder;
 
     @Mock
-    private Function<AciParameters, QueryResponseData> queryExecutor;
+    private Function<ActionParameters, QueryResponseData> queryExecutor;
 
     @Mock
     private IdolQueryRestrictions queryRestrictions;
@@ -89,7 +89,7 @@ public class QueryResponseParserTest {
     public void parseResults() {
         final QueryResponseData responseData = mockQueryResponse();
 
-        final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new AciParameters(), responseData, queryExecutor);
+        final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new ActionParameters(), responseData, queryExecutor);
         assertThat(results.getDocuments(), is(not(empty())));
     }
 
@@ -99,9 +99,9 @@ public class QueryResponseParserTest {
         responseData.setSpellingquery("spelling");
         responseData.setSpelling("mm, mmh");
 
-        when(queryExecutor.apply(any(AciParameters.class))).thenReturn(mockQueryResponse());
+        when(queryExecutor.apply(any(ActionParameters.class))).thenReturn(mockQueryResponse());
 
-        final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new AciParameters(), responseData, queryExecutor);
+        final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new ActionParameters(), responseData, queryExecutor);
         assertThat(results.getDocuments(), is(not(empty())));
     }
 
@@ -114,7 +114,7 @@ public class QueryResponseParserTest {
         goodDatabase.setName("Database2");
         when(databasesService.getDatabases(any())).thenReturn(Collections.singleton(goodDatabase));
 
-        final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new AciParameters(), responseData, queryExecutor);
+        final Documents<IdolSearchResult> results = queryResponseParser.parseQueryResults(searchRequest, new ActionParameters(), responseData, queryExecutor);
         assertThat(results.getDocuments(), is(not(empty())));
         assertNotNull(results.getWarnings());
         assertThat(results.getWarnings().getInvalidDatabases(), hasSize(1));

@@ -15,18 +15,14 @@
 package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
 import com.autonomy.aci.client.services.AciErrorException;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.aci.content.ranges.DateRange;
 import com.hp.autonomy.aci.content.ranges.NumericRange;
 import com.hp.autonomy.aci.content.ranges.ParametricFieldRange;
 import com.hp.autonomy.aci.content.ranges.ParametricFieldRanges;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParamsHelper;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.DependentParametricField;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequest;
-import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService;
+import com.hp.autonomy.searchcomponents.core.parametricvalues.*;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
@@ -34,49 +30,23 @@ import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsService;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.QueryExecutor;
-import com.opentext.idol.types.responses.DateOrNumber;
-import com.opentext.idol.types.responses.FlatField;
-import com.opentext.idol.types.responses.GetQueryTagValuesResponseData;
-import com.opentext.idol.types.responses.RecursiveField;
-import com.opentext.idol.types.responses.TagValue;
-import com.hp.autonomy.types.requests.idol.actions.tags.DateRangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.DateValueDetails;
-import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
-import com.hp.autonomy.types.requests.idol.actions.tags.NumericRangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
-import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagCountInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfoBuilder;
-import com.hp.autonomy.types.requests.idol.actions.tags.RangeInfoValue;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
-import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetailsBuilder;
+import com.hp.autonomy.types.requests.idol.actions.tags.*;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetQueryTagValuesParams;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
+import com.opentext.idol.types.responses.*;
+import jakarta.xml.bind.JAXBElement;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import jakarta.xml.bind.JAXBElement;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -223,7 +193,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         if(fieldNames.isEmpty()) {
             results = Collections.emptyList();
         } else {
-            final AciParameters aciParameters = createAciParameters(parametricRequest, fieldNames);
+            final ActionParameters aciParameters = createAciParameters(parametricRequest, fieldNames);
             aciParameters.add(GetQueryTagValuesParams.FieldDependence.name(), true);
             aciParameters.add(GetQueryTagValuesParams.FieldDependenceMultiLevel.name(), true);
 
@@ -255,7 +225,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         if(parametricRequest.getFieldNames().isEmpty()) {
             return Collections.emptyMap();
         } else {
-            final AciParameters aciParameters = createAciParameters(parametricRequest, parametricRequest.getFieldNames());
+            final ActionParameters aciParameters = createAciParameters(parametricRequest, parametricRequest.getFieldNames());
 
             aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), 1);
             aciParameters.add(GetQueryTagValuesParams.ValueDetails.name(), true);
@@ -296,8 +266,8 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         }
     }
 
-    private AciParameters createAciParameters(final IdolParametricRequest parametricRequest, final Collection<FieldPath> fieldNames) {
-        final AciParameters aciParameters = new AciParameters(TagActions.GetQueryTagValues.name());
+    private ActionParameters createAciParameters(final IdolParametricRequest parametricRequest, final Collection<FieldPath> fieldNames) {
+        final ActionParameters aciParameters = new ActionParameters(TagActions.GetQueryTagValues.name());
         parameterHandler.addSearchRestrictions(aciParameters, parametricRequest.getQueryRestrictions());
         parameterHandler.addUserIdentifiers(aciParameters);
         if(parametricRequest.isModified()) {
@@ -416,7 +386,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
     }
 
     private Collection<FlatField> getFlatFields(final IdolParametricRequest parametricRequest, final Collection<FieldPath> fieldNames, final boolean includeValueDetails) {
-        final AciParameters aciParameters = createAciParameters(parametricRequest, fieldNames);
+        final ActionParameters aciParameters = createAciParameters(parametricRequest, fieldNames);
 
         aciParameters.add(GetQueryTagValuesParams.Start.name(), parametricRequest.getStart());
         aciParameters.add(GetQueryTagValuesParams.MaxValues.name(), parametricRequest.getMaxValues());
@@ -430,7 +400,7 @@ class IdolParametricValuesServiceImpl implements IdolParametricValuesService {
         return responseData.getField();
     }
 
-    private GetQueryTagValuesResponseData executeAction(final ParametricRequest<IdolQueryRestrictions> idolParametricRequest, final AciParameters aciParameters) {
+    private GetQueryTagValuesResponseData executeAction(final ParametricRequest<IdolQueryRestrictions> idolParametricRequest, final ActionParameters aciParameters) {
         return queryExecutor.executeGetQueryTagValues(
             aciParameters,
             idolParametricRequest.isModified()

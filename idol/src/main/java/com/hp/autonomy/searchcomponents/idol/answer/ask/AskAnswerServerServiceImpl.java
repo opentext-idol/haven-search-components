@@ -16,17 +16,16 @@ package com.hp.autonomy.searchcomponents.idol.answer.ask;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
-import com.autonomy.aci.client.util.AciParameters;
 import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
+import com.hp.autonomy.types.requests.idol.actions.answer.AnswerServerActions;
+import com.hp.autonomy.types.requests.idol.actions.answer.params.AskParams;
+import com.hp.autonomy.types.requests.idol.actions.answer.params.AskSortParam;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
 import com.opentext.idol.types.responses.answer.AskAnswer;
 import com.opentext.idol.types.responses.answer.AskAnswers;
 import com.opentext.idol.types.responses.answer.AskResponsedata;
 import com.opentext.idol.types.responses.answer.GetStatusResponsedata;
-import com.hp.autonomy.types.requests.idol.actions.answer.AnswerServerActions;
-import com.hp.autonomy.types.requests.idol.actions.answer.params.AskParams;
-import com.hp.autonomy.types.requests.idol.actions.answer.params.AskSortParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +57,7 @@ class AskAnswerServerServiceImpl implements AskAnswerServerService {
 
     @Override
     public List<AskAnswer> ask(final AskAnswerServerRequest request) {
-        final AciParameters aciParameters = new AciParameters(AnswerServerActions.Ask.name());
+        final ActionParameters aciParameters = new ActionParameters(AnswerServerActions.Ask.name());
         aciParameters.add(AskParams.Text.name(), request.getText());
         aciParameters.add(AskParams.Sort.name(), Optional.ofNullable(request.getSort()).map(AskSortParam::value).orElse(null));
         aciParameters.add(AskParams.SystemNames.name(), String.join(",", request.getSystemNames()));

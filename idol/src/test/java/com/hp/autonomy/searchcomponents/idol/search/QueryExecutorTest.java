@@ -15,7 +15,7 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciService;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
@@ -72,13 +72,13 @@ public class QueryExecutorTest {
 
     @Test
     public void executeQuery() {
-        queryExecutor.executeQuery(new AciParameters(), QueryRequest.QueryType.MODIFIED);
+        queryExecutor.executeQuery(new ActionParameters(), QueryRequest.QueryType.MODIFIED);
         verify(aciService).executeAction(any(), any());
     }
 
     @Test
     public void executeSuggest() {
-        queryExecutor.executeSuggest(new AciParameters(), QueryRequest.QueryType.RAW);
+        queryExecutor.executeSuggest(new ActionParameters(), QueryRequest.QueryType.RAW);
         verify(aciService).executeAction(any(), any());
     }
 }

@@ -17,17 +17,17 @@ package com.hp.autonomy.searchcomponents.idol.fields;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.core.caching.CacheNames;
 import com.hp.autonomy.searchcomponents.core.fields.FieldsService;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
-import com.opentext.idol.types.marshalling.ProcessorFactory;
-import com.opentext.idol.types.responses.GetTagNamesResponseData;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagActions;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.GetTagNamesParams;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.GetTagNamesResponseData;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -64,7 +64,7 @@ class IdolFieldsServiceImpl implements IdolFieldsService {
     @Override
     @Cacheable(CacheNames.FIELDS)
     public Map<FieldTypeParam, Set<TagName>> getFields(final IdolFieldsRequest request) throws AciErrorException {
-        final AciParameters aciParameters = new AciParameters(TagActions.GetTagNames.name());
+        final ActionParameters aciParameters = new ActionParameters(TagActions.GetTagNames.name());
         Optional.ofNullable(request.getFieldTypes()).ifPresent(fieldTypes ->
                 aciParameters.add(GetTagNamesParams.FieldType.name(), String.join(",", fieldTypes.stream().map(FieldTypeParam::name).collect(Collectors.toList()))));
         aciParameters.add(GetTagNamesParams.MaxValues.name(), request.getMaxValues());

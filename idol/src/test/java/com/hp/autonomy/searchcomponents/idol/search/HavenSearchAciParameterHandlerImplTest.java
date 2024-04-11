@@ -14,7 +14,7 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
@@ -53,7 +53,7 @@ public class HavenSearchAciParameterHandlerImplTest {
     @Mock
     private IdolViewRequest viewRequest;
 
-    private AciParameters aciParameters;
+    private ActionParameters aciParameters;
 
     @Before
     public void setUp() {
@@ -61,7 +61,7 @@ public class HavenSearchAciParameterHandlerImplTest {
 
         when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
 
-        aciParameters = new AciParameters();
+        aciParameters = new ActionParameters();
     }
 
     @Test

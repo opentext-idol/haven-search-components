@@ -15,7 +15,7 @@
 package com.hp.autonomy.searchcomponents.idol.view;
 
 import com.autonomy.aci.client.services.*;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.aci.content.printfields.PrintFields;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.server.ServerConfig;
@@ -28,22 +28,22 @@ import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandl
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewCapable;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewConfig;
 import com.hp.autonomy.searchcomponents.idol.view.configuration.ViewingMode;
-import com.opentext.idol.types.marshalling.ProcessorFactory;
-import com.opentext.idol.types.marshalling.processors.CopyResponseProcessor;
-import com.opentext.idol.types.responses.DocContent;
-import com.opentext.idol.types.responses.GetContentResponseData;
-import com.opentext.idol.types.responses.Hit;
 import com.hp.autonomy.types.requests.idol.actions.connector.ConnectorActions;
 import com.hp.autonomy.types.requests.idol.actions.connector.params.ConnectorViewParams;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
 import com.hp.autonomy.types.requests.idol.actions.view.ViewActions;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.marshalling.processors.CopyResponseProcessor;
+import com.opentext.idol.types.responses.DocContent;
+import com.opentext.idol.types.responses.GetContentResponseData;
+import com.opentext.idol.types.responses.Hit;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
@@ -105,7 +105,7 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
         final ViewConfig viewConfig = configService.getConfig().getViewConfig();
 
         if (request.getPart() == ViewingPart.SUBDOCUMENT || viewConfig.getViewingMode() == ViewingMode.UNIVERSAL) {
-            final AciParameters viewParameters = new AciParameters(
+            final ActionParameters viewParameters = new ActionParameters(
                     request.getPart() == ViewingPart.SUBDOCUMENT ? ViewActions.GetLink.name() : ViewActions.View.name());
             parameterHandler.addViewParameters(viewParameters, request.getDocumentReference(), request);
 
@@ -128,7 +128,7 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
         final Optional<String> maybeUrl = readViewUrl(document);
 
         if (maybeUrl.isPresent()) {
-            final AciParameters viewParameters = new AciParameters(ViewActions.View.name());
+            final ActionParameters viewParameters = new ActionParameters(ViewActions.View.name());
             parameterHandler.addViewParameters(viewParameters, maybeUrl.get(), request);
 
             try {
@@ -161,7 +161,7 @@ class IdolViewServerServiceImpl implements IdolViewServerService {
 
     private Hit loadDocument(final String documentReference, final String database, final PrintFields printFields, final String highlightExpression) {
         // do a GetContent to check for document visibility and to read out required fields
-        final AciParameters parameters = new AciParameters(QueryActions.GetContent.name());
+        final ActionParameters parameters = new ActionParameters(QueryActions.GetContent.name());
         parameters.add(GetContentParams.Print.name(), "Fields");
         parameters.add(GetContentParams.PrintFields.name(), printFields);
         parameterHandler.addGetContentOutputParameters(parameters, database, documentReference, null);

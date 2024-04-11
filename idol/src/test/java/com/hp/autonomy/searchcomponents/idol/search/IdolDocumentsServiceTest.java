@@ -14,16 +14,15 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
-import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
-import com.opentext.idol.types.responses.Hit;
-import com.opentext.idol.types.responses.QueryResponseData;
-import com.opentext.idol.types.responses.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
+import com.opentext.idol.types.responses.Hit;
+import com.opentext.idol.types.responses.QueryResponseData;
+import com.opentext.idol.types.responses.SuggestResponseData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,7 +87,7 @@ public class IdolDocumentsServiceTest {
         when(queryExecutor.executeQuery(any(), any())).thenReturn(responseData);
 
         idolDocumentsService.queryTextIndex(mockQueryParams(QueryRequest.QueryType.RAW));
-        verify(queryResponseParser).parseQueryResults(any(), any(AciParameters.class), eq(responseData), any());
+        verify(queryResponseParser).parseQueryResults(any(), any(ActionParameters.class), eq(responseData), any());
     }
 
     @Test
@@ -99,7 +98,7 @@ public class IdolDocumentsServiceTest {
         when(queryExecutor.executeQuery(any(), any())).thenReturn(responseData);
 
         idolDocumentsService.queryTextIndex(mockQueryParams(QueryRequest.QueryType.MODIFIED));
-        verify(queryResponseParser).parseQueryResults(any(), any(AciParameters.class), eq(responseData), any());
+        verify(queryResponseParser).parseQueryResults(any(), any(ActionParameters.class), eq(responseData), any());
     }
 
     @Test
@@ -116,7 +115,7 @@ public class IdolDocumentsServiceTest {
         when(queryExecutor.executeQuery(any(), any())).thenReturn(responseData);
 
         idolDocumentsService.queryTextIndex(mockQueryParams(QueryRequest.QueryType.PROMOTIONS));
-        verify(queryResponseParser).parseQueryResults(any(), any(AciParameters.class), eq(responseData), any());
+        verify(queryResponseParser).parseQueryResults(any(), any(ActionParameters.class), eq(responseData), any());
     }
 
     @Test

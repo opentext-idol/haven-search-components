@@ -25,16 +25,17 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.aci.AbstractConfigurableAciService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfig;
-import com.hp.autonomy.searchcomponents.idol.configuration.IdolComponentLabelLookup;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.configuration.QueryManipulation;
-import com.opentext.idol.types.marshalling.Jaxb2ParsingConfiguration;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import com.hpe.bigdata.frontend.spring.authentication.SpringSecurityAuthenticationInformationRetriever;
+import com.opentext.idol.types.marshalling.Jaxb2ParsingConfiguration;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.http.client.HttpClient;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.util.Timeout;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -228,14 +229,14 @@ public class HavenSearchIdolConfiguration<C extends IdolSearchCapable> {
     }
 
     private HttpClient createHttpClient(final int httpSocketTimeout, final int maxConnectionsPerRoute, final int maxConnectionsTotal) {
-        final SocketConfig socketConfig = SocketConfig.custom()
-                .setSoTimeout(httpSocketTimeout)
-                .build();
+        final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(maxConnectionsTotal);
+        connectionManager.setDefaultMaxPerRoute(maxConnectionsPerRoute);
 
-        return HttpClientBuilder.create()
-                .setMaxConnPerRoute(maxConnectionsPerRoute)
-                .setMaxConnTotal(maxConnectionsTotal)
-                .setDefaultSocketConfig(socketConfig)
-                .build();
+        connectionManager.setDefaultSocketConfig(SocketConfig.custom()
+                .setSoTimeout(Timeout.ofMilliseconds(httpSocketTimeout))
+                .build());
+
+        return HttpClients.custom().setConnectionManager(connectionManager).build();
     }
 }

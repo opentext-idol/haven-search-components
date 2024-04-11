@@ -17,7 +17,7 @@ package com.hp.autonomy.searchcomponents.idol.view;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.AciServiceException;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.view.raw.RawContentViewer;
 import com.hp.autonomy.searchcomponents.core.view.raw.RawDocument;
@@ -97,7 +97,7 @@ public class IdolViewServerServiceTest {
     @Test
     public void viewDocument() throws ViewDocumentNotFoundException, IOException {
         final GetContentResponseData responseData = mockResponseData();
-        when(contentAciService.executeAction(any(AciParameters.class), any())).thenReturn(responseData);
+        when(contentAciService.executeAction(any(ActionParameters.class), any())).thenReturn(responseData);
         idolViewServerService.viewDocument(request, mock(OutputStream.class));
 
         verify(parameterHandler).addViewParameters(any(), eq("http://en.wikipedia.org/wiki/Car"), any());
@@ -112,7 +112,7 @@ public class IdolViewServerServiceTest {
     @Test
     public void noReferenceFieldConfigured() throws IOException {
         final GetContentResponseData responseData = mockResponseData();
-        when(contentAciService.executeAction(any(AciParameters.class), any())).thenReturn(responseData);
+        when(contentAciService.executeAction(any(ActionParameters.class), any())).thenReturn(responseData);
         when(viewCapableConfig.getViewConfig()).thenReturn(ViewConfig.builder().build());
 
         idolViewServerService.viewDocument(mock(IdolViewRequest.class), mock(OutputStream.class));
@@ -120,13 +120,13 @@ public class IdolViewServerServiceTest {
 
     @Test(expected = ViewDocumentNotFoundException.class)
     public void errorGettingContent() throws IOException {
-        when(contentAciService.executeAction(any(AciParameters.class), any())).thenThrow(new AciErrorException());
+        when(contentAciService.executeAction(any(ActionParameters.class), any())).thenThrow(new AciErrorException());
         idolViewServerService.viewDocument(request, mock(OutputStream.class));
     }
 
     @Test(expected = ViewDocumentNotFoundException.class)
     public void noDocumentFound() throws IOException {
-        when(contentAciService.executeAction(any(AciParameters.class), any())).thenReturn(new GetContentResponseData());
+        when(contentAciService.executeAction(any(ActionParameters.class), any())).thenReturn(new GetContentResponseData());
         idolViewServerService.viewDocument(request, mock(OutputStream.class));
     }
 
@@ -163,7 +163,7 @@ public class IdolViewServerServiceTest {
         when(childNodes.item(eq(0))).thenReturn(contentNode);
         when(node.getChildNodes()).thenReturn(childNodes);
 
-        when(contentAciService.executeAction(any(AciParameters.class), any())).thenReturn(responseData);
+        when(contentAciService.executeAction(any(ActionParameters.class), any())).thenReturn(responseData);
 
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         idolViewServerService.viewDocument(request, outputStream);
@@ -183,8 +183,8 @@ public class IdolViewServerServiceTest {
     @Test(expected = ViewServerErrorException.class)
     public void viewServer404() throws IOException {
         final GetContentResponseData responseData = mockResponseData();
-        when(contentAciService.executeAction(any(AciParameters.class), any())).thenReturn(responseData);
-        when(viewAciService.executeAction(any(AciParameters.class), any())).thenThrow(new AciServiceException());
+        when(contentAciService.executeAction(any(ActionParameters.class), any())).thenReturn(responseData);
+        when(viewAciService.executeAction(any(ActionParameters.class), any())).thenThrow(new AciServiceException());
 
         idolViewServerService.viewDocument(request, mock(OutputStream.class));
     }

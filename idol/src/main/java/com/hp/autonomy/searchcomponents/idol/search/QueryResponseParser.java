@@ -14,10 +14,10 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
+import com.hp.autonomy.types.requests.Documents;
 import com.opentext.idol.types.responses.Hit;
 import com.opentext.idol.types.responses.QueryResponseData;
-import com.hp.autonomy.types.requests.Documents;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Collection;
@@ -43,7 +43,7 @@ public interface QueryResponseParser {
      * @param queryExecutor The function used for executing the query (in case it needs to be rerun)
      * @return The parsed query results
      */
-    Documents<IdolSearchResult> parseQueryResults(IdolSearchRequest searchRequest, AciParameters aciParameters, QueryResponseData responseData, Function<AciParameters, QueryResponseData> queryExecutor);
+    Documents<IdolSearchResult> parseQueryResults(IdolSearchRequest searchRequest, ActionParameters aciParameters, QueryResponseData responseData, Function<ActionParameters, QueryResponseData> queryExecutor);
 
     /**
      * Parses the "hits" section of the Idol query response

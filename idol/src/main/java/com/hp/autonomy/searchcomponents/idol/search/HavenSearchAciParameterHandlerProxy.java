@@ -14,9 +14,8 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
-import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -30,37 +29,37 @@ public abstract class HavenSearchAciParameterHandlerProxy implements HavenSearch
     protected HavenSearchAciParameterHandler parameterHandler;
 
     @Override
-    public void addSearchRestrictions(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
+    public void addSearchRestrictions(final ActionParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         parameterHandler.addSearchRestrictions(aciParameters, queryRestrictions);
     }
 
     @Override
-    public void addSearchOutputParameters(final AciParameters aciParameters, final IdolSearchRequest aciSearchRequest) {
+    public void addSearchOutputParameters(final ActionParameters aciParameters, final IdolSearchRequest aciSearchRequest) {
         parameterHandler.addSearchOutputParameters(aciParameters, aciSearchRequest);
     }
 
     @Override
-    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex getContentRequestIndex, final IdolGetContentRequest request) {
+    public void addGetDocumentOutputParameters(final ActionParameters aciParameters, final IdolGetContentRequestIndex getContentRequestIndex, final IdolGetContentRequest request) {
         parameterHandler.addGetDocumentOutputParameters(aciParameters, getContentRequestIndex, request);
     }
 
     @Override
-    public void addGetContentOutputParameters(final AciParameters aciParameters, final String database, final String documentReference, final String referenceField) {
+    public void addGetContentOutputParameters(final ActionParameters aciParameters, final String database, final String documentReference, final String referenceField) {
         parameterHandler.addGetContentOutputParameters(aciParameters, database, documentReference, referenceField);
     }
 
     @Override
-    public void addLanguageRestriction(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
+    public void addLanguageRestriction(final ActionParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         parameterHandler.addLanguageRestriction(aciParameters, queryRestrictions);
     }
 
     @Override
-    public void addQmsParameters(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
+    public void addQmsParameters(final ActionParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         parameterHandler.addQmsParameters(aciParameters, queryRestrictions);
     }
 
     @Override
-    public void addIntentBasedRankingParameters(final AciParameters aciParameters) {
+    public void addIntentBasedRankingParameters(final ActionParameters aciParameters) {
         parameterHandler.addIntentBasedRankingParameters(aciParameters);
     }
 
@@ -70,22 +69,22 @@ public abstract class HavenSearchAciParameterHandlerProxy implements HavenSearch
     }
 
     @Override
-    public void addSecurityInfo(final AciParameters aciParameters) {
+    public void addSecurityInfo(final ActionParameters aciParameters) {
         parameterHandler.addSecurityInfo(aciParameters);
     }
 
     @Override
-    public void addUserIdentifiers(final AciParameters aciParameters) {
+    public void addUserIdentifiers(final ActionParameters aciParameters) {
         parameterHandler.addUserIdentifiers(aciParameters);
     }
 
     @Override
-    public void addStoreStateParameters(final AciParameters aciParameters) {
+    public void addStoreStateParameters(final ActionParameters aciParameters) {
         parameterHandler.addStoreStateParameters(aciParameters);
     }
 
     @Override
-    public void addViewParameters(final AciParameters aciParameters, final String reference, final IdolViewRequest viewRequest) {
+    public void addViewParameters(final ActionParameters aciParameters, final String reference, final IdolViewRequest viewRequest) {
         parameterHandler.addViewParameters(aciParameters, reference, viewRequest);
     }
 }

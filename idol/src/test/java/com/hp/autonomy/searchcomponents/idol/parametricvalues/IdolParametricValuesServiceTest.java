@@ -14,7 +14,7 @@
 
 package com.hp.autonomy.searchcomponents.idol.parametricvalues;
 
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.BucketingParams;
@@ -25,21 +25,11 @@ import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsService;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
 import com.hp.autonomy.searchcomponents.idol.search.QueryExecutor;
-import com.opentext.idol.types.responses.DateOrNumber;
-import com.opentext.idol.types.responses.FlatField;
-import com.opentext.idol.types.responses.GetQueryTagValuesResponseData;
-import com.opentext.idol.types.responses.RecursiveField;
-import com.opentext.idol.types.responses.TagValue;
-import com.opentext.idol.types.responses.Values;
-import com.hp.autonomy.types.requests.idol.actions.tags.DateRangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.DateValueDetails;
-import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
-import com.hp.autonomy.types.requests.idol.actions.tags.NumericRangeInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.NumericValueDetails;
-import com.hp.autonomy.types.requests.idol.actions.tags.QueryTagInfo;
-import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import com.hp.autonomy.types.requests.idol.actions.tags.ValueDetails;
+import com.hp.autonomy.types.requests.idol.actions.tags.*;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
+import com.opentext.idol.types.responses.*;
+import jakarta.xml.bind.JAXBElement;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -54,7 +44,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
-import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.io.Serializable;
 import java.time.ZoneOffset;
@@ -62,14 +51,7 @@ import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -141,7 +123,7 @@ public class IdolParametricValuesServiceTest {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("Some field"));
 
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
-        when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(responseData);
+        when(queryExecutor.executeGetQueryTagValues(any(ActionParameters.class), any())).thenReturn(responseData);
         final Set<QueryTagInfo> results = parametricValuesService.getParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
     }
@@ -154,7 +136,7 @@ public class IdolParametricValuesServiceTest {
         when(fieldsService.getFields(any())).thenReturn(fieldsResponse);
 
         final GetQueryTagValuesResponseData responseData = mockQueryResponse();
-        when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(responseData);
+        when(queryExecutor.executeGetQueryTagValues(any(ActionParameters.class), any())).thenReturn(responseData);
 
         final Set<QueryTagInfo> results = parametricValuesService.getParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
@@ -220,7 +202,7 @@ public class IdolParametricValuesServiceTest {
         final GetQueryTagValuesResponseData response = mock(GetQueryTagValuesResponseData.class);
         when(response.getField()).thenReturn(responseFields);
 
-        when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(response);
+        when(queryExecutor.executeGetQueryTagValues(any(ActionParameters.class), any())).thenReturn(response);
 
         final Map<FieldPath, NumericValueDetails> valueDetails = parametricValuesService.getNumericValueDetails(parametricRequest);
         assertThat(valueDetails.size(), is(3));
@@ -248,7 +230,7 @@ public class IdolParametricValuesServiceTest {
         final GetQueryTagValuesResponseData response = mock(GetQueryTagValuesResponseData.class);
         when(response.getField()).thenReturn(responseFields);
 
-        when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(response);
+        when(queryExecutor.executeGetQueryTagValues(any(ActionParameters.class), any())).thenReturn(response);
 
         final Map<FieldPath, DateValueDetails> valueDetails = parametricValuesService.getDateValueDetails(parametricRequest);
         assertThat(valueDetails.size(), is(1));
@@ -395,7 +377,7 @@ public class IdolParametricValuesServiceTest {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("Some field"));
 
         final GetQueryTagValuesResponseData responseData = mockRecursiveResponse();
-        when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(responseData);
+        when(queryExecutor.executeGetQueryTagValues(any(ActionParameters.class), any())).thenReturn(responseData);
         final Collection<DependentParametricField> results = parametricValuesService.getDependentParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
     }
@@ -411,7 +393,7 @@ public class IdolParametricValuesServiceTest {
         when(fieldsService.getFields(any())).thenReturn(fieldsResponse);
 
         final GetQueryTagValuesResponseData responseData = mockRecursiveResponse();
-        when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(responseData);
+        when(queryExecutor.executeGetQueryTagValues(any(ActionParameters.class), any())).thenReturn(responseData);
 
         final Collection<DependentParametricField> results = parametricValuesService.getDependentParametricValues(idolParametricRequest);
         assertThat(results, is(not(empty())));
@@ -526,7 +508,7 @@ public class IdolParametricValuesServiceTest {
         }
         responseData.getField().add(field2);
 
-        when(queryExecutor.executeGetQueryTagValues(any(AciParameters.class), any())).thenReturn(responseData);
+        when(queryExecutor.executeGetQueryTagValues(any(ActionParameters.class), any())).thenReturn(responseData);
     }
 
     private TagValue mockTagValue(

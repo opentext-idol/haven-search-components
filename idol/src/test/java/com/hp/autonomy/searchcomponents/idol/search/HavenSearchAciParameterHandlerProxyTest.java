@@ -14,7 +14,7 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.idol.requests.IdolGetContentRequestImpl;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
@@ -57,21 +57,21 @@ public class HavenSearchAciParameterHandlerProxyTest {
 
     @Test
     public void addSearchRestrictions() {
-        final AciParameters aciParameters = new AciParameters();
+        final ActionParameters aciParameters = new ActionParameters();
         proxy.addSearchRestrictions(aciParameters, queryRestrictions);
         verify(parameterHandler).addSearchRestrictions(aciParameters, queryRestrictions);
     }
 
     @Test
     public void addSearchOutputParameters() {
-        final AciParameters aciParameters = new AciParameters();
+        final ActionParameters aciParameters = new ActionParameters();
         proxy.addSearchOutputParameters(aciParameters, searchRequest);
         verify(parameterHandler).addSearchOutputParameters(aciParameters, searchRequest);
     }
 
     @Test
     public void addGetDocumentOutputParameters() {
-        final AciParameters aciParameters = new AciParameters();
+        final ActionParameters aciParameters = new ActionParameters();
         final IdolGetContentRequest request =
             IdolGetContentRequestImpl.builder().print(PrintParam.All).build();
         proxy.addGetDocumentOutputParameters(aciParameters, getContentRequestIndex, request);
@@ -80,7 +80,7 @@ public class HavenSearchAciParameterHandlerProxyTest {
 
     @Test
     public void addGetContentOutputParameters() {
-        final AciParameters aciParameters = new AciParameters();
+        final ActionParameters aciParameters = new ActionParameters();
         final String database = "SomeDatabase";
         final String reference = "SomeReference";
         final String referenceField = "SomeField";
@@ -90,14 +90,14 @@ public class HavenSearchAciParameterHandlerProxyTest {
 
     @Test
     public void addLanguageRestriction() {
-        final AciParameters aciParameters = new AciParameters();
+        final ActionParameters aciParameters = new ActionParameters();
         proxy.addLanguageRestriction(aciParameters, queryRestrictions);
         verify(parameterHandler).addLanguageRestriction(aciParameters, queryRestrictions);
     }
 
     @Test
     public void addQmsParameters() {
-        final AciParameters aciParameters = new AciParameters();
+        final ActionParameters aciParameters = new ActionParameters();
         proxy.addQmsParameters(aciParameters, queryRestrictions);
         verify(parameterHandler).addQmsParameters(aciParameters, queryRestrictions);
     }
@@ -110,21 +110,21 @@ public class HavenSearchAciParameterHandlerProxyTest {
 
     @Test
     public void addSecurityInfo() {
-        final AciParameters aciParameters = new AciParameters();
+        final ActionParameters aciParameters = new ActionParameters();
         proxy.addSecurityInfo(aciParameters);
         verify(parameterHandler).addSecurityInfo(aciParameters);
     }
 
     @Test
     public void addStoreStateParameters() {
-        final AciParameters aciParameters = new AciParameters();
+        final ActionParameters aciParameters = new ActionParameters();
         proxy.addStoreStateParameters(aciParameters);
         verify(parameterHandler).addStoreStateParameters(aciParameters);
     }
 
     @Test
     public void addViewParameters() {
-        final AciParameters aciParameters = new AciParameters();
+        final ActionParameters aciParameters = new ActionParameters();
         final String reference = "SomeReference";
         proxy.addViewParameters(aciParameters, reference, viewRequest);
         verify(parameterHandler).addViewParameters(aciParameters, reference, viewRequest);

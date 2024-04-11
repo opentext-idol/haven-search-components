@@ -16,25 +16,25 @@ package com.hp.autonomy.searchcomponents.idol.languages;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.core.languages.LanguagesService;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
+import com.hp.autonomy.types.requests.idol.actions.general.GeneralActions;
+import com.hp.autonomy.types.requests.idol.actions.status.StatusActions;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
 import com.opentext.idol.types.responses.GetStatusResponseData;
 import com.opentext.idol.types.responses.LanguageSettingsResponseData;
 import com.opentext.idol.types.responses.LanguageType;
 import com.opentext.idol.types.responses.Languages;
-import com.hp.autonomy.types.requests.idol.actions.general.GeneralActions;
-import com.hp.autonomy.types.requests.idol.actions.status.StatusActions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.hp.autonomy.searchcomponents.core.languages.LanguagesService.LANGUAGES_SERVICE_BEAN_NAME;
 
@@ -63,7 +63,7 @@ class IdolLanguagesServiceImpl implements IdolLanguagesService {
     @Override
     @Cacheable(value = "IdolLanguagesService.getLanguages", key = "#root.methodName")
     public Map<String, LanguageType> getLanguages() {
-        final GetStatusResponseData getStatusResponseData = contentAciService.executeAction(new AciParameters(StatusActions.GetStatus.name()), getStatusProcessor);
+        final GetStatusResponseData getStatusResponseData = contentAciService.executeAction(new ActionParameters(StatusActions.GetStatus.name()), getStatusProcessor);
 
         final List<LanguageType> languageTypes = getStatusResponseData.getLanguageTypeSettings().getLanguageType();
         final Map<String, LanguageType> languages = new LinkedHashMap<>(languageTypes.size());
@@ -91,7 +91,7 @@ class IdolLanguagesServiceImpl implements IdolLanguagesService {
     @Cacheable(value = "IdolLanguagesService.getDefaultLanguageId", key = "#root.methodName")
     public String getDefaultLanguageId() {
         try {
-            final Languages languages = contentAciService.executeAction(new AciParameters(GeneralActions.LanguageSettings.name()), languageSettingsProcessor).getLanguages();
+            final Languages languages = contentAciService.executeAction(new ActionParameters(GeneralActions.LanguageSettings.name()), languageSettingsProcessor).getLanguages();
             return languages.getDefaultLanguageType();
         }
         catch(Exception e) {

@@ -15,15 +15,14 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciErrorException;
-import com.autonomy.aci.client.util.AciParameters;
-import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsService;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
-import com.opentext.idol.types.responses.QsElement;
-import com.opentext.idol.types.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
+import com.opentext.idol.types.responses.QsElement;
+import com.opentext.idol.types.responses.QueryResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +49,7 @@ class IdolRelatedConceptsServiceImpl implements IdolRelatedConceptsService {
 
     @Override
     public List<QsElement> findRelatedConcepts(final IdolRelatedConceptsRequest relatedConceptsRequest) throws AciErrorException {
-        final AciParameters parameters = new AciParameters(QueryActions.Query.name());
+        final ActionParameters parameters = new ActionParameters(QueryActions.Query.name());
         parameterHandler.addSecurityInfo(parameters);
         parameterHandler.addSearchRestrictions(parameters, relatedConceptsRequest.getQueryRestrictions());
         parameterHandler.addUserIdentifiers(parameters);

@@ -15,34 +15,28 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciErrorException;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.aci.content.database.Databases;
 import com.hp.autonomy.searchcomponents.core.search.AutoCorrectException;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.databases.IdolDatabasesService;
 import com.hp.autonomy.searchcomponents.idol.search.fields.FieldsParser;
-import com.opentext.idol.types.responses.Database;
-import com.opentext.idol.types.responses.Hit;
-import com.opentext.idol.types.responses.QueryResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.ExpansionRule;
 import com.hp.autonomy.types.requests.Spelling;
 import com.hp.autonomy.types.requests.Warnings;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import com.opentext.idol.types.responses.Database;
+import com.opentext.idol.types.responses.Hit;
+import com.opentext.idol.types.responses.QueryResponseData;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.hp.autonomy.searchcomponents.idol.search.QueryResponseParser.QUERY_RESPONSE_PARSER_BEAN_NAME;
 
@@ -68,7 +62,7 @@ class QueryResponseParserImpl implements QueryResponseParser {
     }
 
     @Override
-    public Documents<IdolSearchResult> parseQueryResults(final IdolSearchRequest searchRequest, final AciParameters aciParameters, final QueryResponseData responseData, final Function<AciParameters, QueryResponseData> queryExecutor) {
+    public Documents<IdolSearchResult> parseQueryResults(final IdolSearchRequest searchRequest, final ActionParameters aciParameters, final QueryResponseData responseData, final Function<ActionParameters, QueryResponseData> queryExecutor) {
         final List<Hit> hits = responseData.getHits();
 
         final Warnings warnings = parseWarnings(searchRequest, aciParameters, responseData);
@@ -101,7 +95,7 @@ class QueryResponseParserImpl implements QueryResponseParser {
         return documents;
     }
 
-    protected Warnings parseWarnings(final IdolSearchRequest searchRequest, final AciParameters aciParameters, final QueryResponseData responseData) {
+    protected Warnings parseWarnings(final IdolSearchRequest searchRequest, final ActionParameters aciParameters, final QueryResponseData responseData) {
         Warnings warnings = null;
         for (final String warning : responseData.getWarning()) {
             if (MISSING_DATABASE_WARNING.equals(warning.trim())) {
@@ -124,14 +118,14 @@ class QueryResponseParserImpl implements QueryResponseParser {
     }
 
     protected Documents<IdolSearchResult> rerunQueryWithAdjustedSpelling(
-        final AciParameters aciParameters,
+        final ActionParameters aciParameters,
         final QueryResponseData responseData,
         final String spellingQuery,
         final Warnings warnings,
-        final Function<AciParameters, QueryResponseData> queryExecutor,
+        final Function<ActionParameters, QueryResponseData> queryExecutor,
         final String referenceField
     ) {
-        final String originalQuery = aciParameters.get(QueryParams.Text.name());
+        final String originalQuery = (String) aciParameters.get(QueryParams.Text.name());
         aciParameters.put(QueryParams.Text.name(), spellingQuery);
 
         final Spelling spelling = new Spelling(Arrays.asList(SPELLING_SEPARATOR_PATTERN.split(responseData.getSpelling())), spellingQuery, originalQuery);

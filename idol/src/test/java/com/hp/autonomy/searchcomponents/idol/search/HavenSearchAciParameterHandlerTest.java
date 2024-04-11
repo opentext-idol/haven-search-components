@@ -15,7 +15,7 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.transport.AciParameter;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.authentication.CommunityPrincipal;
 import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService;
@@ -80,12 +80,12 @@ public class HavenSearchAciParameterHandlerTest {
 
     private HavenSearchAciParameterHandler parameterHandler;
 
-    private AciParameters aciParameters;
+    private ActionParameters aciParameters;
 
     @Before
     public void setUp() {
         Mockito.lenient().when(mockPrincipal.getName()).thenReturn("the user");
-        aciParameters = new AciParameters();
+        aciParameters = new ActionParameters();
         parameterHandler = new HavenSearchAciParameterHandlerImpl(configService, documentFieldsService, authenticationInformationRetriever, null, null);
     }
 

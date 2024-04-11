@@ -17,11 +17,11 @@ package com.hp.autonomy.searchcomponents.idol.answer.system;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.transport.AciServerDetails;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
+import com.hp.autonomy.types.requests.idol.actions.status.StatusActions;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
 import com.opentext.idol.types.responses.answer.GetStatusResponsedata;
 import com.opentext.idol.types.responses.answer.System;
-import com.hp.autonomy.types.requests.idol.actions.status.StatusActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +45,7 @@ class AnswerServerSystemServiceImpl implements AnswerServerSystemService {
 
     @Override
     public Collection<String> getSystemNames() {
-        return answerServerAciService.executeAction(new AciParameters(StatusActions.GetStatus.name()), processor)
+        return answerServerAciService.executeAction(new ActionParameters(StatusActions.GetStatus.name()), processor)
                 .getSystems()
                 .getSystem()
                 .stream()
@@ -55,7 +55,7 @@ class AnswerServerSystemServiceImpl implements AnswerServerSystemService {
 
     @Override
     public Collection<String> getSystemNames(final AciServerDetails aciServerDetails) {
-        return aciService.executeAction(aciServerDetails, new AciParameters(StatusActions.GetStatus.name()), processor)
+        return aciService.executeAction(aciServerDetails, new ActionParameters(StatusActions.GetStatus.name()), processor)
                 .getSystems()
                 .getSystem()
                 .stream()

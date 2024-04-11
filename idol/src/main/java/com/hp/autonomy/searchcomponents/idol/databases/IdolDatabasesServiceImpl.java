@@ -17,13 +17,13 @@ package com.hp.autonomy.searchcomponents.idol.databases;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.core.databases.DatabasesService;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
+import com.hp.autonomy.types.requests.idol.actions.status.StatusActions;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
 import com.opentext.idol.types.responses.Database;
 import com.opentext.idol.types.responses.GetStatusResponseData;
-import com.hp.autonomy.types.requests.idol.actions.status.StatusActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +50,7 @@ class IdolDatabasesServiceImpl implements IdolDatabasesService {
 
     @Override
     public Set<Database> getDatabases(final IdolDatabasesRequest request) throws AciErrorException {
-        final GetStatusResponseData responseData = contentAciService.executeAction(new AciParameters(StatusActions.GetStatus.name()), responseProcessor);
+        final GetStatusResponseData responseData = contentAciService.executeAction(new ActionParameters(StatusActions.GetStatus.name()), responseProcessor);
         final List<Database> allDatabases = responseData.getDatabases().getDatabase();
 
         return allDatabases.stream().filter(database -> !database.isInternal()).collect(Collectors.toCollection(LinkedHashSet::new));

@@ -17,7 +17,7 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
@@ -55,19 +55,19 @@ class QueryExecutorImpl implements QueryExecutor {
     }
 
     @Override
-    public QueryResponseData executeQuery(final AciParameters aciParameters, final QueryRequest.QueryType queryType) {
+    public QueryResponseData executeQuery(final ActionParameters aciParameters, final QueryRequest.QueryType queryType) {
         final AciService aciService = aciServiceRetriever.getAciService(queryType);
         return aciService.executeAction(aciParameters, queryResponseProcessor);
     }
 
     @Override
-    public SuggestResponseData executeSuggest(final AciParameters aciParameters, final QueryRequest.QueryType queryType) {
+    public SuggestResponseData executeSuggest(final ActionParameters aciParameters, final QueryRequest.QueryType queryType) {
         final AciService aciService = aciServiceRetriever.getAciService(queryType);
         return aciService.executeAction(aciParameters, suggestResponseProcessor);
     }
 
     @Override
-    public GetQueryTagValuesResponseData executeGetQueryTagValues(final AciParameters aciParameters, final QueryRequest.QueryType queryType) throws AciErrorException {
+    public GetQueryTagValuesResponseData executeGetQueryTagValues(final ActionParameters aciParameters, final QueryRequest.QueryType queryType) throws AciErrorException {
         final AciService aciService = aciServiceRetriever.getAciService(queryType);
         return aciService.executeAction(aciParameters, queryTagValuesResponseProcessor);
     }

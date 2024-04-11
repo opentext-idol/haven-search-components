@@ -15,22 +15,22 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciErrorException;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.aci.content.identifier.reference.Reference;
 import com.hp.autonomy.searchcomponents.core.search.DocumentsService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.core.search.StateTokenAndResultCount;
 import com.hp.autonomy.searchcomponents.core.search.TypedStateToken;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
-import com.opentext.idol.types.responses.Hit;
-import com.opentext.idol.types.responses.QueryResponseData;
-import com.opentext.idol.types.responses.SuggestResponseData;
 import com.hp.autonomy.types.requests.Documents;
 import com.hp.autonomy.types.requests.idol.actions.query.QueryActions;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SuggestParams;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
+import com.opentext.idol.types.responses.Hit;
+import com.opentext.idol.types.responses.QueryResponseData;
+import com.opentext.idol.types.responses.SuggestResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -71,7 +71,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
             return new Documents<>(Collections.emptyList(), 0, null, null, null, null);
         }
 
-        final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
+        final ActionParameters aciParameters = new ActionParameters(QueryActions.Query.name());
 
         parameterHandler.addSearchRestrictions(aciParameters, queryRequest.getQueryRestrictions());
         parameterHandler.addUserIdentifiers(aciParameters);
@@ -103,7 +103,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
 
     @Override
     public Documents<IdolSearchResult> findSimilar(final IdolSuggestRequest suggestRequest) throws AciErrorException {
-        final AciParameters aciParameters = new AciParameters(QueryActions.Suggest.name());
+        final ActionParameters aciParameters = new ActionParameters(QueryActions.Suggest.name());
         aciParameters.add(SuggestParams.Reference.name(), new Reference(suggestRequest.getReference()));
 
         parameterHandler.addSearchRestrictions(aciParameters, suggestRequest.getQueryRestrictions());
@@ -123,7 +123,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
 
         for(final IdolGetContentRequestIndex indexAndReferences : request.getIndexesAndReferences()) {
             // We use Query and not GetContent here so we can use Combine=simple to ensure returned references are unique
-            final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
+            final ActionParameters aciParameters = new ActionParameters(QueryActions.Query.name());
             parameterHandler.addGetDocumentOutputParameters(aciParameters, indexAndReferences, request);
 
             final QueryResponseData responseData = queryExecutor.executeQuery(aciParameters, QueryRequest.QueryType.RAW);
@@ -152,7 +152,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
         final QueryRequest.QueryType queryType,
         final boolean promotions
     ) throws AciErrorException {
-        final AciParameters aciParameters = new AciParameters(QueryActions.Query.name());
+        final ActionParameters aciParameters = new ActionParameters(QueryActions.Query.name());
         parameterHandler.addSecurityInfo(aciParameters);
         parameterHandler.addStoreStateParameters(aciParameters);
         aciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);
@@ -181,7 +181,7 @@ class IdolDocumentsServiceImpl implements IdolDocumentsService {
                 : TypedStateToken.StateTokenType.QUERY);
 
         // Now fetch result count with combine=simple
-        final AciParameters resultCountAciParameters = new AciParameters(QueryActions.Query.name());
+        final ActionParameters resultCountAciParameters = new ActionParameters(QueryActions.Query.name());
         parameterHandler.addSecurityInfo(resultCountAciParameters);
         resultCountAciParameters.add(QueryParams.TotalResults.name(), true);
         resultCountAciParameters.add(QueryParams.Print.name(), PrintParam.NoResults);

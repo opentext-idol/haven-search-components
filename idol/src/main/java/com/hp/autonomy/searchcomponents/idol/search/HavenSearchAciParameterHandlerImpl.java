@@ -14,7 +14,7 @@
 
 package com.hp.autonomy.searchcomponents.idol.search;
 
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.hp.autonomy.aci.content.database.Databases;
@@ -29,18 +29,11 @@ import com.hp.autonomy.searchcomponents.core.search.fields.DocumentFieldsService
 import com.hp.autonomy.searchcomponents.core.view.ViewingPart;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
-import com.hp.autonomy.types.requests.idol.actions.query.params.GetContentParams;
-import com.hp.autonomy.types.requests.idol.actions.query.params.HighlightParam;
-import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
-import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
-import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
+import com.hp.autonomy.types.requests.idol.actions.query.params.*;
 import com.hp.autonomy.types.requests.idol.actions.view.params.OutputTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.view.params.ViewParams;
 import com.hp.autonomy.types.requests.qms.actions.query.params.QmsQueryParams;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-
-import java.util.*;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,6 +42,7 @@ import org.springframework.stereotype.Component;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_END_TAG;
 import static com.hp.autonomy.searchcomponents.core.view.ViewServerService.HIGHLIGHT_START_TAG;
@@ -93,7 +87,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addSearchRestrictions(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
+    public void addSearchRestrictions(final ActionParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         aciParameters.add(QueryParams.Text.name(), queryRestrictions.getQueryText());
         if(!queryRestrictions.getDatabases().isEmpty()) {
             aciParameters.add(QueryParams.DatabaseMatch.name(), new Databases(queryRestrictions.getDatabases()));
@@ -117,7 +111,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addSearchOutputParameters(final AciParameters aciParameters, final IdolSearchRequest searchRequest) {
+    public void addSearchOutputParameters(final ActionParameters aciParameters, final IdolSearchRequest searchRequest) {
         addSecurityInfo(aciParameters);
 
         aciParameters.add(QueryParams.Start.name(), searchRequest.getStart());
@@ -142,7 +136,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addGetDocumentOutputParameters(final AciParameters aciParameters, final IdolGetContentRequestIndex indexAndReferences, final IdolGetContentRequest request) {
+    public void addGetDocumentOutputParameters(final ActionParameters aciParameters, final IdolGetContentRequestIndex indexAndReferences, final IdolGetContentRequest request) {
         addSecurityInfo(aciParameters);
 
         final IdolSearchCapable config = configService.getConfig();
@@ -168,7 +162,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
         addDefaultReferenceField(aciParameters);
     }
 
-    private void addDefaultReferenceField(final AciParameters aciParameters) {
+    private void addDefaultReferenceField(final ActionParameters aciParameters) {
         final String referenceField = configService.getConfig().getReferenceField();
         if(StringUtils.isNotEmpty(referenceField)) {
             aciParameters.add(QueryParams.ReferenceField.name(), referenceField);
@@ -176,7 +170,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     private void addPrintParameters(
-        final AciParameters aciParameters,
+        final ActionParameters aciParameters,
         final PrintParam print,
         final Collection<String> printFields,
         final String referenceField
@@ -194,7 +188,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     private void addPrintParameters(
-        final AciParameters aciParameters,
+        final ActionParameters aciParameters,
         final PrintParam print,
         final Collection<String> rawPrintFields
     ) {
@@ -207,7 +201,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addGetContentOutputParameters(final AciParameters parameters, final String database, final String documentReference, final String referenceField) {
+    public void addGetContentOutputParameters(final ActionParameters parameters, final String database, final String documentReference, final String referenceField) {
         addSecurityInfo(parameters);
 
         if(database != null) {
@@ -225,7 +219,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addLanguageRestriction(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
+    public void addLanguageRestriction(final ActionParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         // If the AnyLanguage parameter is true, documents with any language can be returned, otherwise documents matching
         // the MatchLanguage parameter are returned.
         if(queryRestrictions.isAnyLanguage()) {
@@ -241,7 +235,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addQmsParameters(final AciParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
+    public void addQmsParameters(final ActionParameters aciParameters, final IdolQueryRestrictions queryRestrictions) {
         aciParameters.add(QmsQueryParams.Blacklist.name(), configService.getConfig().getQueryManipulation().getBlacklist());
         aciParameters.add(QmsQueryParams.ExpandQuery.name(), configService.getConfig().getQueryManipulation().getExpandQuery());
         aciParameters.add(QmsQueryParams.SynonymDatabaseMatch.name(), configService.getConfig().getQueryManipulation().getSynonymDatabaseMatch());
@@ -255,7 +249,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addIntentBasedRankingParameters(final AciParameters aciParameters) {
+    public void addIntentBasedRankingParameters(final ActionParameters aciParameters) {
         CommunityPrincipal principal = authenticationInformationRetriever.getPrincipal();
         if (principal != null) {
             aciParameters.add("Username", principal.getName());
@@ -273,12 +267,12 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addSecurityInfo(final AciParameters aciParameters) {
+    public void addSecurityInfo(final ActionParameters aciParameters) {
         aciParameters.add(QueryParams.SecurityInfo.name(), getSecurityInfo());
     }
 
     @Override
-    public void addUserIdentifiers(final AciParameters aciParameters) {
+    public void addUserIdentifiers(final ActionParameters aciParameters) {
         if (this.userRequestPrefix != null) {
             final CommunityPrincipal principal = authenticationInformationRetriever.getPrincipal();
 
@@ -299,7 +293,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addStoreStateParameters(final AciParameters aciParameters) {
+    public void addStoreStateParameters(final ActionParameters aciParameters) {
         aciParameters.add(QueryParams.StoreState.name(), true);
         aciParameters.add(QueryParams.StoredStateTokenLifetime.name(), -1);  // negative value means no expiry (DAH)
         final String storedStateField = configService.getConfig().getStoredStateField();
@@ -309,7 +303,7 @@ class HavenSearchAciParameterHandlerImpl implements HavenSearchAciParameterHandl
     }
 
     @Override
-    public void addViewParameters(final AciParameters aciParameters, final String reference, final IdolViewRequest viewRequest) {
+    public void addViewParameters(final ActionParameters aciParameters, final String reference, final IdolViewRequest viewRequest) {
         aciParameters.add(ViewParams.NoACI.name(), true);
         aciParameters.add(ViewParams.Reference.name(), reference);
         addSecurityInfo(aciParameters);

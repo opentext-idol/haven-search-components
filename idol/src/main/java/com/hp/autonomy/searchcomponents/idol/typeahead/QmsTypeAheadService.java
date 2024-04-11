@@ -16,18 +16,18 @@ package com.hp.autonomy.searchcomponents.idol.typeahead;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadConstants;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
-import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
+import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.search.HavenSearchAciParameterHandler;
-import com.opentext.idol.types.marshalling.ProcessorFactory;
-import com.opentext.idol.types.responses.TypeAheadResponseData;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.TypeAheadActions;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.params.ModeParam;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.params.TypeAheadParams;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.TypeAheadResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +63,7 @@ class QmsTypeAheadService implements IdolTypeAheadService {
     public List<String> getSuggestions(final String text) {
         final ModeParam mode = configService.getConfig().getQueryManipulation().getTypeAheadMode();
 
-        final AciParameters parameters = new AciParameters(TypeAheadActions.TypeAhead.name());
+        final ActionParameters parameters = new ActionParameters(TypeAheadActions.TypeAhead.name());
         parameters.add(TypeAheadParams.Mode.name(), mode);
         parameters.add(TypeAheadParams.MaxResults.name(), TypeAheadConstants.MAX_RESULTS);
         parameters.add(TypeAheadParams.Text.name(), text);

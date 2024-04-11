@@ -15,7 +15,7 @@
 package com.hp.autonomy.searchcomponents.idol.search;
 
 import com.autonomy.aci.client.services.AciErrorException;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.opentext.idol.types.responses.GetQueryTagValuesResponseData;
 import com.opentext.idol.types.responses.QueryResponseData;
@@ -51,7 +51,7 @@ public interface QueryExecutor {
      * @return The IDOL response data
      * @throws AciErrorException The error thrown in the event of the IDOL's returning an error response
      */
-    QueryResponseData executeQuery(AciParameters aciParameters, QueryRequest.QueryType queryType) throws AciErrorException;
+    QueryResponseData executeQuery(ActionParameters aciParameters, QueryRequest.QueryType queryType) throws AciErrorException;
 
     /**
      * Executes a suggest action
@@ -61,7 +61,7 @@ public interface QueryExecutor {
      * @return The IDOL response data
      * @throws AciErrorException The error thrown in the event of the IDOL's returning an error response
      */
-    SuggestResponseData executeSuggest(AciParameters aciParameters, QueryRequest.QueryType queryType) throws AciErrorException;
+    SuggestResponseData executeSuggest(ActionParameters aciParameters, QueryRequest.QueryType queryType) throws AciErrorException;
 
     /**
      *
@@ -70,5 +70,5 @@ public interface QueryExecutor {
      * @return The IDOL response data
      * @throws AciErrorException The error thrown in the event of the IDOL's returning an error response
      */
-    GetQueryTagValuesResponseData executeGetQueryTagValues(AciParameters aciParameters, QueryRequest.QueryType queryType) throws AciErrorException;
+    GetQueryTagValuesResponseData executeGetQueryTagValues(ActionParameters aciParameters, QueryRequest.QueryType queryType) throws AciErrorException;
 }

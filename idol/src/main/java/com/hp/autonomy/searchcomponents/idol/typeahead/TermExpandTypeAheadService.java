@@ -16,16 +16,16 @@ package com.hp.autonomy.searchcomponents.idol.typeahead;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadConstants;
 import com.hp.autonomy.searchcomponents.core.typeahead.TypeAheadService;
 import com.hp.autonomy.searchcomponents.idol.annotations.IdolService;
-import com.opentext.idol.types.marshalling.ProcessorFactory;
-import com.opentext.idol.types.responses.TermExpandResponseData;
 import com.hp.autonomy.types.requests.idol.actions.term.TermActions;
 import com.hp.autonomy.types.requests.idol.actions.term.params.ExpandTypeParam;
 import com.hp.autonomy.types.requests.idol.actions.term.params.ExpansionParam;
 import com.hp.autonomy.types.requests.idol.actions.term.params.TermExpandParams;
+import com.opentext.idol.types.marshalling.ProcessorFactory;
+import com.opentext.idol.types.responses.TermExpandResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +55,7 @@ class TermExpandTypeAheadService implements IdolTypeAheadService {
 
     @Override
     public List<String> getSuggestions(final String text) {
-        final AciParameters parameters = new AciParameters(TermActions.TermExpand.name());
+        final ActionParameters parameters = new ActionParameters(TermActions.TermExpand.name());
         parameters.put(TermExpandParams.Expansion.name(), ExpansionParam.Wild);
         parameters.put(TermExpandParams.Stemming.name(), false);
         parameters.put(TermExpandParams.MaxTerms.name(), TypeAheadConstants.MAX_RESULTS);

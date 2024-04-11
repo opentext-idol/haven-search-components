@@ -16,13 +16,9 @@ package com.hp.autonomy.searchcomponents.idol.languages;
 
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.services.Processor;
-import com.autonomy.aci.client.util.AciParameters;
+import com.autonomy.aci.client.util.ActionParameters;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
-import com.opentext.idol.types.responses.GetStatusResponseData;
-import com.opentext.idol.types.responses.LanguageSettingsResponseData;
-import com.opentext.idol.types.responses.LanguageType;
-import com.opentext.idol.types.responses.LanguageTypeSettings;
-import com.opentext.idol.types.responses.Languages;
+import com.opentext.idol.types.responses.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,13 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -86,7 +78,7 @@ public class IdolLanguagesServiceTest {
         languages.setDefaultLanguageType(sampleLanguage);
         languageSettingsResponseData.setLanguages(languages);
 
-        when(contentAciService.executeAction(any(AciParameters.class), eq(languageSettingsProcessor))).thenReturn(languageSettingsResponseData);
+        when(contentAciService.executeAction(any(ActionParameters.class), eq(languageSettingsProcessor))).thenReturn(languageSettingsResponseData);
         assertEquals(sampleLanguage, idolLanguagesService.getDefaultLanguageId());
     }
 
@@ -108,7 +100,7 @@ public class IdolLanguagesServiceTest {
         languageTypes.add(newLanguageType("ENGLISH", "englishUTF8", "UTF8", 25));
         languageTypes.add(newLanguageType("FRENCH", "frenchASCII", "ASCII", 25));
         getStatusResponseData.setLanguageTypeSettings(languageTypeSettings);
-        when(contentAciService.executeAction(any(AciParameters.class), eq(getStatusProcessor))).thenReturn(getStatusResponseData);
+        when(contentAciService.executeAction(any(ActionParameters.class), eq(getStatusProcessor))).thenReturn(getStatusResponseData);
     }
 
     private LanguageType newLanguageType(final String language, final String name, final String encoding, final int numberOfDocuments) {

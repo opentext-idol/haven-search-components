@@ -21,7 +21,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
                 <executions>
                     <execution>
                         <id>test-jar</id>
@@ -38,7 +37,6 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend</groupId>
             <artifactId>aci-types</artifactId>
-            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.hp.autonomy.frontend</groupId>
