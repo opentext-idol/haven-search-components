@@ -98,7 +98,7 @@
                 <version>3.6.3</version>
                 <configuration>
                     <doclint>none</doclint>
-                    <isOffline>true</isOffline>
+                    <offline>true</offline>
                 </configuration>
             </plugin>
         </plugins>
