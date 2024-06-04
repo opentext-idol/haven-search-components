@@ -12,7 +12,7 @@ The haven search components library is available from maven:
     <dependency>
         <groupId>com.hp.autonomy.frontend</groupId>
         <artifactId>haven-search-components-idol</artifactId>
-        <version>1.2.0</version>
+        <version>1.3.0-SNAPSHOT</version>
     </dependency>
 
 ## License
