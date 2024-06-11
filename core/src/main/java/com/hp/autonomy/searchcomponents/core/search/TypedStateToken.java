@@ -1,13 +1,12 @@
 package com.hp.autonomy.searchcomponents.core.search;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**
@@ -17,6 +16,7 @@ import java.io.Serializable;
 @Embeddable
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class TypedStateToken implements Serializable {
     private static final long serialVersionUID = -1812490657701746949L;
 
@@ -24,15 +24,6 @@ public class TypedStateToken implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private StateTokenType type;
-
-    @JsonCreator
-    public TypedStateToken(
-            @JsonProperty("state_token") final String stateToken,
-            @JsonProperty("type") final StateTokenType type
-    ) {
-        this.stateToken = stateToken;
-        this.type = type;
-    }
 
     // serialized as String - do not rename constants
     public enum StateTokenType {

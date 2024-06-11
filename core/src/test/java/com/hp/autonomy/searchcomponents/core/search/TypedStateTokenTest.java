@@ -21,7 +21,7 @@ import java.io.IOException;
 public class TypedStateTokenTest extends SimpleRequestObjectTest<TypedStateToken> {
     @Override
     protected String json() throws IOException {
-        return "{\"state_token\": \"0-ABC\", \"type\": \"QUERY\"}";
+        return "{\"stateToken\": \"0-ABC\", \"type\": \"QUERY\"}";
     }
 
     @Override
