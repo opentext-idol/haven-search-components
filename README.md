@@ -5,16 +5,6 @@ This library exposes components useful for performing Haven Search, whether thro
 It is designed primarily for use in
 [OpenText Find](https://github.com/opentext-idol/find).
 
-## Usage
-
-The haven search components library is available from maven:
-
-    <dependency>
-        <groupId>com.hp.autonomy.frontend</groupId>
-        <artifactId>haven-search-components-idol</artifactId>
-        <version>1.3.0-SNAPSHOT</version>
-    </dependency>
-
 ## License
 
 Copyright 2014-2020 OpenText or one of its affiliates.
