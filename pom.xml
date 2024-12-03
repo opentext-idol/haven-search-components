@@ -22,7 +22,7 @@
 
     <groupId>com.hp.autonomy.frontend</groupId>
     <artifactId>haven-search-components</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0-SNAPSHOT</version>
 
     <name>OpenText Haven Search Components</name>
     <description>Reusable components for OpenText Haven Search.</description>
