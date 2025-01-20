@@ -19,11 +19,11 @@ import com.opentext.idol.types.marshalling.ProcessorFactory;
 import com.opentext.idol.types.responses.answer.AskAnswer;
 import com.opentext.idol.types.responses.answer.AskAnswers;
 import com.opentext.idol.types.responses.answer.AskResponsedata;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 
@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AskAnswerServerServiceTest {
     @Mock
     private AciService answerServerAciService;
@@ -44,7 +44,7 @@ public class AskAnswerServerServiceTest {
 
     private AskAnswerServerService service;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final AskResponsedata responsedata = new AskResponsedata();
         final AskAnswers answers = new AskAnswers();

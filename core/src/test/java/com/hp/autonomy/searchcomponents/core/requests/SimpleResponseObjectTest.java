@@ -16,8 +16,8 @@ package com.hp.autonomy.searchcomponents.core.requests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.core.ResolvableType;
@@ -34,7 +34,7 @@ public abstract class SimpleResponseObjectTest<O extends Serializable> extends S
     protected JacksonTester<O> json;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         super.setUp();
         setUpObjectMapper();

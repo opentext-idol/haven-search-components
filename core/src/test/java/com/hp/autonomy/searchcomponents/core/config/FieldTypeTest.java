@@ -1,7 +1,7 @@
 package com.hp.autonomy.searchcomponents.core.config;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -15,12 +15,12 @@ public class FieldTypeTest {
             ZonedDateTime.ofInstant(Instant.ofEpochSecond(946782245), ZoneOffset.UTC);
         final ZonedDateTime result =
             FieldType.DATE.parseValue(ZonedDateTime.class, "2000-01-02T03:04:05Z");
-        Assert.assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
     public void parseValue_invalidDate() {
-        Assert.assertNull(FieldType.DATE.parseValue(ZonedDateTime.class, "invalid"));
+        Assertions.assertNull(FieldType.DATE.parseValue(ZonedDateTime.class, "invalid"));
     }
 
 }

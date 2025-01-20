@@ -15,12 +15,13 @@
 package com.hp.autonomy.searchcomponents.idol.fields;
 
 import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.AUTN_DATABASE_FIELD;
 import static com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricValuesService.AUTN_DATE_FIELD;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class IdolFieldPathNormaliserTest {
     private static final String EXPECTED_NORMALISED_FIELD_PATH = "MY_FIELD";
@@ -29,19 +30,23 @@ public class IdolFieldPathNormaliserTest {
 
     private FieldPathNormaliser fieldPathNormaliser;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         fieldPathNormaliser = new IdolFieldPathNormaliserImpl();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nullArg() {
-        fieldPathNormaliser.normaliseFieldPath(null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            fieldPathNormaliser.normaliseFieldPath(null);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void emptyArg() {
-        fieldPathNormaliser.normaliseFieldPath("");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            fieldPathNormaliser.normaliseFieldPath("");
+        });
     }
 
     @Test

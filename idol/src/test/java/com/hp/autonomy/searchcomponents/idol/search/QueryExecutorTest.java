@@ -19,19 +19,20 @@ import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.configuration.AciServiceRetriever;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class QueryExecutorTest {
     @Mock
     private AciServiceRetriever aciServiceRetriever;
@@ -42,9 +43,9 @@ public class QueryExecutorTest {
 
     private QueryExecutor queryExecutor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        when(aciServiceRetriever.getAciService(any())).thenReturn(aciService);
+        Mockito.lenient().when(aciServiceRetriever.getAciService(any())).thenReturn(aciService);
 
         queryExecutor = new QueryExecutorImpl(aciServiceRetriever, processorFactory);
     }

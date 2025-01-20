@@ -19,7 +19,8 @@ import com.hp.autonomy.frontend.configuration.ConfigException;
 import com.hp.autonomy.frontend.configuration.ConfigurationComponentTest;
 import com.hp.autonomy.frontend.configuration.server.ServerConfig;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.boot.test.json.ObjectContent;
 
@@ -28,26 +29,30 @@ import java.io.IOException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AnswerServerConfigTest extends ConfigurationComponentTest<AnswerServerConfig> {
-    @Test(expected = ConfigException.class)
+    @Test
     public void noServer() throws ConfigException {
-        AnswerServerConfig.builder()
-                .systemName("something")
-                .enabled(true)
-                .build()
-                .basicValidate(null);
+        Assertions.assertThrows(ConfigException.class, () -> {
+            AnswerServerConfig.builder()
+                    .systemName("something")
+                    .enabled(true)
+                    .build()
+                    .basicValidate(null);
+        });
     }
 
-    @Test(expected = ConfigException.class)
+    @Test
     public void invalidServer() throws ConfigException {
-        AnswerServerConfig.builder()
-                .server(ServerConfig.builder().build())
-                .systemName("something")
-                .enabled(true)
-                .build()
-                .basicValidate(null);
+        Assertions.assertThrows(ConfigException.class, () -> {
+            AnswerServerConfig.builder()
+                    .server(ServerConfig.builder().build())
+                    .systemName("something")
+                    .enabled(true)
+                    .build()
+                    .basicValidate(null);
+        });
     }
 
     @Test

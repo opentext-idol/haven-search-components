@@ -22,24 +22,23 @@ import com.hp.autonomy.searchcomponents.core.view.ViewingPart;
 import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class HavenSearchAciParameterHandlerImplTest {
     private HavenSearchAciParameterHandler handler;
     @Mock
@@ -55,11 +54,11 @@ public class HavenSearchAciParameterHandlerImplTest {
 
     private ActionParameters aciParameters;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         handler = new HavenSearchAciParameterHandlerImpl(configService, documentFieldService, authenticationInformationRetriever, null, null);
 
-        when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
+        Mockito.lenient().when(configService.getConfig()).thenReturn(mock(IdolSearchCapable.class));
 
         aciParameters = new ActionParameters();
     }
@@ -124,8 +123,8 @@ public class HavenSearchAciParameterHandlerImplTest {
         assertThat(aciParameters.get("stripscript"), is("true"));
         assertThat(aciParameters.get("originalbaseurl"), is("true"));
         assertThat(aciParameters.get("outputtype"), is("HTML"));
-        Assert.assertNull(aciParameters.get("urlprefix"));
-        Assert.assertNull(aciParameters.get("linkspec"));
+        Assertions.assertNull(aciParameters.get("urlprefix"));
+        Assertions.assertNull(aciParameters.get("linkspec"));
     }
 
     @Test
@@ -133,7 +132,7 @@ public class HavenSearchAciParameterHandlerImplTest {
         when(viewRequest.getPart()).thenReturn(ViewingPart.DOCUMENT);
         when(viewRequest.getUrlPrefix()).thenReturn("http://www.example.com/subdoc?subref=");
         handler.addViewParameters(aciParameters, "the doc ref", viewRequest);
-        Assert.assertThat(aciParameters.get("urlprefix"), is("http://www.example.com/subdoc?subref="));
+        assertThat(aciParameters.get("urlprefix"), is("http://www.example.com/subdoc?subref="));
     }
 
     @Test
@@ -142,12 +141,12 @@ public class HavenSearchAciParameterHandlerImplTest {
         handler.addViewParameters(aciParameters, "the doc ref", viewRequest);
         assertThat(aciParameters.get("noaci"), is("true"));
         assertThat(aciParameters.get("reference"), is("the doc ref"));
-        Assert.assertNull(aciParameters.get("embedimages"));
-        Assert.assertNull(aciParameters.get("stripscript"));
-        Assert.assertNull(aciParameters.get("originalbaseurl"));
+        Assertions.assertNull(aciParameters.get("embedimages"));
+        Assertions.assertNull(aciParameters.get("stripscript"));
+        Assertions.assertNull(aciParameters.get("originalbaseurl"));
         assertThat(aciParameters.get("outputtype"), is("Raw"));
-        Assert.assertNull(aciParameters.get("urlprefix"));
-        Assert.assertNull(aciParameters.get("linkspec"));
+        Assertions.assertNull(aciParameters.get("urlprefix"));
+        Assertions.assertNull(aciParameters.get("linkspec"));
     }
 
     @Test
@@ -161,7 +160,7 @@ public class HavenSearchAciParameterHandlerImplTest {
         assertThat(aciParameters.get("stripscript"), is("true"));
         assertThat(aciParameters.get("originalbaseurl"), is("true"));
         assertThat(aciParameters.get("outputtype"), is("HTML"));
-        Assert.assertNull(aciParameters.get("urlprefix"));
+        Assertions.assertNull(aciParameters.get("urlprefix"));
         assertThat(aciParameters.get("linkspec"), is("thesubdoc"));
     }
 
@@ -170,7 +169,7 @@ public class HavenSearchAciParameterHandlerImplTest {
         when(viewRequest.getPart()).thenReturn(ViewingPart.SUBDOCUMENT);
         when(viewRequest.getUrlPrefix()).thenReturn("http://www.example.com/subdoc?subref=");
         handler.addViewParameters(aciParameters, "the doc ref", viewRequest);
-        Assert.assertThat(aciParameters.get("urlprefix"), is("http://www.example.com/subdoc?subref="));
+        assertThat(aciParameters.get("urlprefix"), is("http://www.example.com/subdoc?subref="));
     }
 
 }

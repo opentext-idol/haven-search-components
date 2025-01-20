@@ -27,13 +27,13 @@ import com.hp.autonomy.searchcomponents.idol.configuration.IdolSearchCapable;
 import com.hp.autonomy.searchcomponents.idol.search.IdolSearchResult;
 import com.opentext.idol.types.responses.DocContent;
 import com.opentext.idol.types.responses.Hit;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
@@ -43,14 +43,14 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"unused", "SpringJavaAutowiredMembersInspection"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     classes = {CoreTestContext.class, FieldsParserImpl.class, IdolDocumentFieldsServiceImpl.class},
     properties = CORE_CLASSES_PROPERTY,
@@ -67,7 +67,7 @@ public class FieldsParserTest {
     @Autowired
     private FieldsParser fieldsParser;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final FieldsInfo fieldsInfo = FieldsInfo.builder()
             .populateResponseMap("Custom Date", FieldInfo.<ZonedDateTime>builder()

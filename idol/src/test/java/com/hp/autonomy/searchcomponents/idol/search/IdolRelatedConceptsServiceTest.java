@@ -17,11 +17,11 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.opentext.idol.types.responses.Qs;
 import com.opentext.idol.types.responses.QsElement;
 import com.opentext.idol.types.responses.QueryResponseData;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class IdolRelatedConceptsServiceTest {
     @Mock
     private HavenSearchAciParameterHandler parameterHandler;
@@ -45,7 +45,7 @@ public class IdolRelatedConceptsServiceTest {
 
     private IdolRelatedConceptsService idolRelatedConceptsService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         idolRelatedConceptsService = new IdolRelatedConceptsServiceImpl(parameterHandler, queryExecutor);
     }

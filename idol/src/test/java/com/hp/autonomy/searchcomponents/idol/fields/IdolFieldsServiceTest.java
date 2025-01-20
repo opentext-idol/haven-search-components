@@ -17,15 +17,15 @@ package com.hp.autonomy.searchcomponents.idol.fields;
 import com.autonomy.aci.client.services.AciService;
 import com.autonomy.aci.client.transport.AciParameter;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
+import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
 import com.opentext.idol.types.responses.GetTagNamesResponseData;
-import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
@@ -36,7 +36,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class IdolFieldsServiceTest {
     @Mock
     private AciService contentAciService;
@@ -49,7 +49,7 @@ public class IdolFieldsServiceTest {
 
     private IdolFieldsService idolFieldsService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         idolFieldsService = new IdolFieldsServiceImpl(contentAciService, tagNameFactory, processorFactory);
     }

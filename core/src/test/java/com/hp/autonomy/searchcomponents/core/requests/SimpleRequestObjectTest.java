@@ -16,13 +16,12 @@ package com.hp.autonomy.searchcomponents.core.requests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.Serializable;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 /**
@@ -31,7 +30,7 @@ import static org.hamcrest.Matchers.equalTo;
 public abstract class SimpleRequestObjectTest<O extends Serializable> extends SerializableObjectTest<O> {
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Before
+    @BeforeEach
     public void setUpObjectMapper() {
         objectMapper.registerModule(new JavaTimeModule());
     }

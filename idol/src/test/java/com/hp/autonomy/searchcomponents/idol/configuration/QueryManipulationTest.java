@@ -19,22 +19,26 @@ import com.hp.autonomy.frontend.configuration.ConfigurationComponentTest;
 import com.hp.autonomy.frontend.configuration.server.ServerConfig;
 import com.hp.autonomy.types.requests.qms.actions.typeahead.params.ModeParam;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.boot.test.json.ObjectContent;
 
 import java.io.IOException;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class QueryManipulationTest extends ConfigurationComponentTest<QueryManipulation> {
-    @Test(expected = ConfigException.class)
+    @Test
     public void validateBadConfig() throws ConfigException {
-        QueryManipulation.builder()
-                .enabled(true)
-                .build()
-                .basicValidate(null);
+        Assertions.assertThrows(ConfigException.class, () -> {
+            QueryManipulation.builder()
+                    .enabled(true)
+                    .build()
+                    .basicValidate(null);
+        });
     }
 
     @Test

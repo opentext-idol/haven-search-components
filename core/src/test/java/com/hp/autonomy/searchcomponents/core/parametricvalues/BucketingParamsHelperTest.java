@@ -17,11 +17,13 @@ package com.hp.autonomy.searchcomponents.core.parametricvalues;
 import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
 import com.hp.autonomy.types.requests.idol.actions.tags.NumericRangeInfo;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -30,15 +32,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BucketingParamsHelperTest {
     @Mock
     private ParametricRequest<?> parametricRequest;
@@ -49,9 +48,9 @@ public class BucketingParamsHelperTest {
 
     private BucketingParamsHelper bucketingParamsHelper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        when(parametricRequest.getFieldNames()).thenReturn(Arrays.asList(field1, field2));
+        Mockito.lenient().when(parametricRequest.getFieldNames()).thenReturn(Arrays.asList(field1, field2));
 
         bucketingParamsHelper = new BucketingParamsHelperImpl();
     }
@@ -67,25 +66,33 @@ public class BucketingParamsHelperTest {
         bucketingParamsHelper.validateBucketingParams(parametricRequest, ImmutableMap.of(field1, new BucketingParams<>(5, now.minusMinutes(5), now), field2, new BucketingParams<>(5, now.minusMinutes(5), now)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void validateBucketingParamsMissingField() {
-        bucketingParamsHelper.validateBucketingParams(parametricRequest, ImmutableMap.of(field1, new BucketingParams<>(5, 0D, 1D)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            bucketingParamsHelper.validateBucketingParams(parametricRequest, ImmutableMap.of(field1, new BucketingParams<>(5, 0D, 1D)));
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void validateBucketingParamsInvalidTargetNumberOfBuckets() {
-        bucketingParamsHelper.validateBucketingParams(parametricRequest, ImmutableMap.of(field1, new BucketingParams<>(0, 0D, 1D), field2, new BucketingParams<>(10, -8.9, 100D)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            bucketingParamsHelper.validateBucketingParams(parametricRequest, ImmutableMap.of(field1, new BucketingParams<>(0, 0D, 1D), field2, new BucketingParams<>(10, -8.9, 100D)));
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void validateBucketingParamsInvalidMinAndMax() {
-        bucketingParamsHelper.validateBucketingParams(parametricRequest, ImmutableMap.of(field1, new BucketingParams<>(5, 1D, 0D), field2, new BucketingParams<>(10, -8.9, 100D)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            bucketingParamsHelper.validateBucketingParams(parametricRequest, ImmutableMap.of(field1, new BucketingParams<>(5, 1D, 0D), field2, new BucketingParams<>(10, -8.9, 100D)));
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void validateBucketingParamsInvalidMinAndMaxDate() {
         final ZonedDateTime now = ZonedDateTime.now();
-        bucketingParamsHelper.validateBucketingParams(parametricRequest, ImmutableMap.of(field1, new BucketingParams<>(5, now, now.minusMinutes(5)), field2, new BucketingParams<>(5, now.minusMinutes(5), now)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            bucketingParamsHelper.validateBucketingParams(parametricRequest, ImmutableMap.of(field1, new BucketingParams<>(5, now, now.minusMinutes(5)), field2, new BucketingParams<>(5, now.minusMinutes(5), now)));
+        });
     }
 
     @Test

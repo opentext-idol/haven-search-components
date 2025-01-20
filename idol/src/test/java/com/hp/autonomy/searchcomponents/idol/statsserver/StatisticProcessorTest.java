@@ -16,8 +16,8 @@ package com.hp.autonomy.searchcomponents.idol.statsserver;
 
 import com.autonomy.aci.client.annotations.IdolAnnotationsProcessorFactoryImpl;
 import com.hp.autonomy.test.xml.XmlTestUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -30,7 +30,7 @@ import static org.hamcrest.core.IsNot.not;
 public class StatisticProcessorTest {
     private StatisticProcessor processor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         processor = new StatisticProcessor(new IdolAnnotationsProcessorFactoryImpl());
     }

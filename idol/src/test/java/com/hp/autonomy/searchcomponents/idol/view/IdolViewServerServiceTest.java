@@ -31,11 +31,13 @@ import com.opentext.idol.types.responses.Hit;
 import com.opentext.idol.types.responses.QueryResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -44,11 +46,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class IdolViewServerServiceTest {
     private static final String SAMPLE_REFERENCE_FIELD_NAME = "URL";
 
@@ -78,16 +80,16 @@ public class IdolViewServerServiceTest {
 
     private IdolViewServerService idolViewServerService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final ViewConfig viewConfig = ViewConfig.builder().referenceField(SAMPLE_REFERENCE_FIELD_NAME).build();
-        when(viewCapableConfig.getViewConfig()).thenReturn(viewConfig);
-        when(configService.getConfig()).thenReturn(viewCapableConfig);
+        Mockito.lenient().when(viewCapableConfig.getViewConfig()).thenReturn(viewConfig);
+        Mockito.lenient().when(configService.getConfig()).thenReturn(viewCapableConfig);
 
-        when(request.getDocumentReference()).thenReturn("dede952d-8a4d-4f54-ac1f-5187bf10a744");
-        when(request.getHighlightExpression()).thenReturn("SomeText");
+        Mockito.lenient().when(request.getDocumentReference()).thenReturn("dede952d-8a4d-4f54-ac1f-5187bf10a744");
+        Mockito.lenient().when(request.getHighlightExpression()).thenReturn("SomeText");
 
-        when(rawContentViewer.formatRawContent(any())).then(invocation -> {
+        Mockito.lenient().when(rawContentViewer.formatRawContent(any())).then(invocation -> {
             return IOUtils.toInputStream("raw_content", StandardCharsets.UTF_8);
         });
 
@@ -104,9 +106,11 @@ public class IdolViewServerServiceTest {
         verify(viewAciService).executeAction(any(), any());
     }
 
-    @Test(expected = NotImplementedException.class)
+    @Test
     public void viewStaticContentPromotion() throws IOException {
-        idolViewServerService.viewStaticContentPromotion("SomeReference", mock(OutputStream.class));
+        Assertions.assertThrows(NotImplementedException.class, () -> {
+            idolViewServerService.viewStaticContentPromotion("SomeReference", mock(OutputStream.class));
+        });
     }
 
     @Test
@@ -118,16 +122,20 @@ public class IdolViewServerServiceTest {
         idolViewServerService.viewDocument(mock(IdolViewRequest.class), mock(OutputStream.class));
     }
 
-    @Test(expected = ViewDocumentNotFoundException.class)
+    @Test
     public void errorGettingContent() throws IOException {
         when(contentAciService.executeAction(any(ActionParameters.class), any())).thenThrow(new AciErrorException());
-        idolViewServerService.viewDocument(request, mock(OutputStream.class));
+        Assertions.assertThrows(ViewDocumentNotFoundException.class, () -> {
+            idolViewServerService.viewDocument(request, mock(OutputStream.class));
+        });
     }
 
-    @Test(expected = ViewDocumentNotFoundException.class)
+    @Test
     public void noDocumentFound() throws IOException {
         when(contentAciService.executeAction(any(ActionParameters.class), any())).thenReturn(new GetContentResponseData());
-        idolViewServerService.viewDocument(request, mock(OutputStream.class));
+        Assertions.assertThrows(ViewDocumentNotFoundException.class, () -> {
+            idolViewServerService.viewDocument(request, mock(OutputStream.class));
+        });
     }
 
     @Test
@@ -180,13 +188,15 @@ public class IdolViewServerServiceTest {
         verify(rawContentViewer).formatRawContent(eq(expectedRawDocument));
     }
 
-    @Test(expected = ViewServerErrorException.class)
+    @Test
     public void viewServer404() throws IOException {
         final GetContentResponseData responseData = mockResponseData();
         when(contentAciService.executeAction(any(ActionParameters.class), any())).thenReturn(responseData);
         when(viewAciService.executeAction(any(ActionParameters.class), any())).thenThrow(new AciServiceException());
 
-        idolViewServerService.viewDocument(request, mock(OutputStream.class));
+        Assertions.assertThrows(ViewServerErrorException.class, () -> {
+            idolViewServerService.viewDocument(request, mock(OutputStream.class));
+        });
     }
 
     private GetContentResponseData mockResponseData() {
@@ -209,8 +219,8 @@ public class IdolViewServerServiceTest {
         when(referenceNode.getLocalName()).thenReturn(SAMPLE_REFERENCE_FIELD_NAME);
 
         final Node textNode = mock(Node.class);
-        when(textNode.getNodeValue()).thenReturn("http://en.wikipedia.org/wiki/Car");
-        when(referenceNode.getFirstChild()).thenReturn(textNode);
+        Mockito.lenient().when(textNode.getNodeValue()).thenReturn("http://en.wikipedia.org/wiki/Car");
+        Mockito.lenient().when(referenceNode.getFirstChild()).thenReturn(textNode);
         when(childNodes.item(0)).thenReturn(referenceNode);
 
         return responseData;

@@ -28,12 +28,12 @@ import com.hp.autonomy.types.requests.idol.actions.query.params.QueryParams;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hpe.bigdata.frontend.spring.authentication.AuthenticationInformationRetriever;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -45,7 +45,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class HavenSearchAciParameterHandlerTest {
     @Mock
     private ConfigService<IdolSearchCapable> configService;
@@ -82,7 +82,7 @@ public class HavenSearchAciParameterHandlerTest {
 
     private ActionParameters aciParameters;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Mockito.lenient().when(mockPrincipal.getName()).thenReturn("the user");
         aciParameters = new ActionParameters();

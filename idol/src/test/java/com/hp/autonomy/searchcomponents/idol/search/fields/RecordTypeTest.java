@@ -1,12 +1,12 @@
 package com.hp.autonomy.searchcomponents.idol.search.fields;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.w3c.dom.Element;
 
-import jakarta.xml.bind.annotation.XmlRootElement;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -80,7 +80,7 @@ public class RecordTypeTest {
         return children;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         xmlMarshaller = new Jaxb2Marshaller();
         xmlMarshaller.setClassesToBeBound(FieldContainer.class);
@@ -89,13 +89,13 @@ public class RecordTypeTest {
     @Test
     public void testText() {
         final Serializable result = parseXml("<field>text</field>");
-        Assert.assertEquals("should return string containing node text", "text", result);
+        Assertions.assertEquals("text", result, "should return string containing node text");
     }
 
     @Test
     public void testEmpty() {
         final Serializable result = parseXml("<field></field>");
-        Assert.assertEquals("should return empty string", "", result);
+        Assertions.assertEquals("", result, "should return empty string");
     }
 
     @Test
@@ -106,19 +106,19 @@ public class RecordTypeTest {
             "    <second>child 2</second>" +
             "</field>");
 
-        Assert.assertEquals("should return map of children", buildChildren(
+        Assertions.assertEquals(buildChildren(
             buildChild("first", "child 1"),
             buildChild("second", "child 2")
-        ), result);
+        ), result, "should return map of children");
     }
 
     @Test
     public void testAttributes() {
         final Serializable result = parseXml("<field first=\"attr 1\" second=\"attr 2\"></field>");
-        Assert.assertEquals("should return map of attributes with prefixed names", buildChildren(
+        Assertions.assertEquals(buildChildren(
             buildChild("@first", "attr 1"),
             buildChild("@second", "attr 2")
-        ), result);
+        ), result, "should return map of attributes with prefixed names");
     }
 
     @Test
@@ -128,10 +128,10 @@ public class RecordTypeTest {
             "    <CHILD>child val</CHILD>" +
             "</field>");
 
-        Assert.assertEquals("should lowercase child and attribute names", buildChildren(
+        Assertions.assertEquals(buildChildren(
             buildChild("@attr", "attr val"),
             buildChild("child", "child val")
-        ), result);
+        ), result, "should lowercase child and attribute names");
     }
 
     @Test
@@ -142,20 +142,20 @@ public class RecordTypeTest {
             "    <second>child 2</second> after" +
             "</field>");
 
-        Assert.assertEquals("should ignore node text", buildChildren(
+        Assertions.assertEquals(buildChildren(
             buildChild("first", "child 1"),
             buildChild("second", "child 2")
-        ), result);
+        ), result, "should ignore node text");
     }
 
     @Test
     public void testAttributesAndText() {
         final Serializable result = parseXml(
             "<field first=\"attr 1\" second=\"attr 2\">some text</field>");
-        Assert.assertEquals("should ignore node text", buildChildren(
+        Assertions.assertEquals(buildChildren(
             buildChild("@first", "attr 1"),
             buildChild("@second", "attr 2")
-        ), result);
+        ), result, "should ignore node text");
     }
 
     @Test
@@ -168,10 +168,10 @@ public class RecordTypeTest {
             "    <first>child 1c</first>" +
             "</field>");
 
-        Assert.assertEquals("should return all values in child array", buildChildren(
+        Assertions.assertEquals(buildChildren(
             buildChild("first", "child 1a", "child 1b", "child 1c"),
             buildChild("second", "child 2")
-        ), result);
+        ), result, "should return all values in child array");
     }
 
     @Test
@@ -184,10 +184,10 @@ public class RecordTypeTest {
             "    <First>child 1c</First>" +
             "</field>");
 
-        Assert.assertEquals("should return all values in child array", buildChildren(
+        Assertions.assertEquals(buildChildren(
             buildChild("first", "child 1a", "child 1b", "child 1c"),
             buildChild("second", "child 2")
-        ), result);
+        ), result, "should return all values in child array");
     }
 
     @Test
@@ -200,16 +200,16 @@ public class RecordTypeTest {
             "</field>");
 
         // attributes aren't in source order
-        Assert.assertTrue(result instanceof Map);
+        Assertions.assertTrue(result instanceof Map);
         final Map<?, ?> resultMap = (Map<?, ?>) result;
-        Assert.assertEquals(1, resultMap.size());
-        Assert.assertTrue(resultMap.containsKey("@first"));
-        Assert.assertTrue(resultMap.get("@first") instanceof List);
+        Assertions.assertEquals(1, resultMap.size());
+        Assertions.assertTrue(resultMap.containsKey("@first"));
+        Assertions.assertTrue(resultMap.get("@first") instanceof List);
         final List<?> attrList = (List<?>) resultMap.get("@first");
-        Assert.assertEquals(3, attrList.size());
-        Assert.assertTrue(attrList.contains("attr 1a"));
-        Assert.assertTrue(attrList.contains("attr 1b"));
-        Assert.assertTrue(attrList.contains("attr 1c"));
+        Assertions.assertEquals(3, attrList.size());
+        Assertions.assertTrue(attrList.contains("attr 1a"));
+        Assertions.assertTrue(attrList.contains("attr 1b"));
+        Assertions.assertTrue(attrList.contains("attr 1c"));
     }
 
     @Test
@@ -225,7 +225,7 @@ public class RecordTypeTest {
             "    <outer>after</outer>" +
             "</field>");
 
-        Assert.assertEquals("should return all values in child array", buildChildren(
+        Assertions.assertEquals(buildChildren(
             buildChild("outer",
                 buildChildren(buildChild("@attr", "attr val")),
                 buildChildren(
@@ -240,7 +240,7 @@ public class RecordTypeTest {
                 ),
                 "after"
             )
-        ), result);
+        ), result, "should return all values in child array");
     }
 
 }

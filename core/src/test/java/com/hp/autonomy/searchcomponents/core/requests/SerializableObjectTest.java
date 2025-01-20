@@ -15,13 +15,13 @@
 package com.hp.autonomy.searchcomponents.core.requests;
 
 import org.apache.commons.lang3.SerializationUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Simple abstract test class for any object intended to be {@link Serializable}
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class SerializableObjectTest<O extends Serializable> {
     protected O object;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         object = constructObject();
     }

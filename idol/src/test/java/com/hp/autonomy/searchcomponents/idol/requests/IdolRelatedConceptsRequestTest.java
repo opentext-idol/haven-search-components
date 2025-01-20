@@ -19,14 +19,14 @@ import com.hp.autonomy.searchcomponents.core.search.RelatedConceptsRequestTest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolRelatedConceptsRequest;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
 
 public class IdolRelatedConceptsRequestTest extends RelatedConceptsRequestTest<IdolQueryRestrictions> {
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         super.setUp();
         objectMapper.addMixIn(QueryRestrictions.class, IdolQueryRestrictionsMixin.class);

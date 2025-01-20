@@ -25,12 +25,12 @@ import com.opentext.idol.types.responses.Database;
 import com.opentext.idol.types.responses.Hit;
 import com.opentext.idol.types.responses.QueryResponseData;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectFactory;
 
 import java.io.Serializable;
@@ -43,14 +43,14 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("WeakerAccess")
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class QueryResponseParserTest {
     @Mock
     private FieldsParser documentFieldsService;
@@ -75,12 +75,12 @@ public class QueryResponseParserTest {
 
     private QueryResponseParser queryResponseParser;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        when(databasesRequestBuilderFactory.getObject()).thenReturn(databasesRequestBuilder);
+        Mockito.lenient().when(databasesRequestBuilderFactory.getObject()).thenReturn(databasesRequestBuilder);
 
-        when(queryRestrictions.getDatabases()).thenReturn(Arrays.asList("Database1", "Database2"));
-        when(searchRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
+        Mockito.lenient().when(queryRestrictions.getDatabases()).thenReturn(Arrays.asList("Database1", "Database2"));
+        Mockito.lenient().when(searchRequest.getQueryRestrictions()).thenReturn(queryRestrictions);
 
         queryResponseParser = new QueryResponseParserImpl(documentFieldsService, databasesService, databasesRequestBuilderFactory);
     }

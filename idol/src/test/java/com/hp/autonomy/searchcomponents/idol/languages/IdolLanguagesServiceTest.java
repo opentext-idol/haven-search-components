@@ -19,11 +19,11 @@ import com.autonomy.aci.client.services.Processor;
 import com.autonomy.aci.client.util.ActionParameters;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
 import com.opentext.idol.types.responses.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Map;
@@ -31,12 +31,12 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class IdolLanguagesServiceTest {
     @Mock
     private AciService contentAciService;
@@ -49,7 +49,7 @@ public class IdolLanguagesServiceTest {
 
     private IdolLanguagesService idolLanguagesService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(aciResponseProcessorFactory.getResponseDataProcessor(GetStatusResponseData.class)).thenReturn(getStatusProcessor);
         when(aciResponseProcessorFactory.getResponseDataProcessor(LanguageSettingsResponseData.class)).thenReturn(languageSettingsProcessor);

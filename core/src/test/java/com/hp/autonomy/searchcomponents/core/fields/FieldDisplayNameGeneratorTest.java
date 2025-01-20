@@ -16,32 +16,28 @@ package com.hp.autonomy.searchcomponents.core.fields;
 
 import com.google.common.collect.ImmutableMap;
 import com.hp.autonomy.frontend.configuration.ConfigService;
-import com.hp.autonomy.searchcomponents.core.config.FieldInfo;
-import com.hp.autonomy.searchcomponents.core.config.FieldType;
-import com.hp.autonomy.searchcomponents.core.config.FieldValue;
-import com.hp.autonomy.searchcomponents.core.config.FieldsInfo;
-import com.hp.autonomy.searchcomponents.core.config.HavenSearchCapable;
+import com.hp.autonomy.searchcomponents.core.config.*;
 import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import com.hp.autonomy.types.requests.idol.actions.tags.FieldPath;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"SpringJavaAutowiredMembersInspection", "unused"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class FieldDisplayNameGeneratorTest {
     @MockBean
@@ -55,7 +51,7 @@ public class FieldDisplayNameGeneratorTest {
     @Mock
     private FieldsInfo fieldsInfo;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(configService.getConfig()).thenReturn(config);
         when(config.getFieldsInfo()).thenReturn(fieldsInfo);

@@ -20,8 +20,9 @@ import com.hp.autonomy.searchcomponents.idol.exceptions.codes.AnswerServerErrorC
 import com.hp.autonomy.searchcomponents.idol.exceptions.codes.IdolErrorCodes;
 import com.opentext.idol.types.marshalling.marshallers.AciErrorExceptionBuilder;
 import com.opentext.idol.types.responses.Error;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,13 +30,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.stereotype.Service;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.hp.autonomy.searchcomponents.idol.exceptions.AciErrorExceptionAspectTest.ACI_ERROR_EXCEPTION_ASPECT_TEST_PROPERTY;
 import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = AciErrorExceptionAspectTest.AciErrorExceptionAspectConfiguration.class, properties = ACI_ERROR_EXCEPTION_ASPECT_TEST_PROPERTY, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class AciErrorExceptionAspectTest {
     static final String ACI_ERROR_EXCEPTION_ASPECT_TEST_PROPERTY = "aciErrorExceptionAspectTest";
@@ -43,19 +44,25 @@ public class AciErrorExceptionAspectTest {
     @Autowired
     private TestService testService;
 
-    @Test(expected = EnumeratedAciErrorException.class)
+    @Test
     public void recognisedError() {
-        testService.throwRecognisedException();
+        Assertions.assertThrows(EnumeratedAciErrorException.class, () -> {
+            testService.throwRecognisedException();
+        });
     }
 
-    @Test(expected = AciErrorException.class)
+    @Test
     public void unrecognisedError() {
-        testService.throwUnrecognisedException();
+        Assertions.assertThrows(AciErrorException.class, () -> {
+            testService.throwUnrecognisedException();
+        });
     }
 
-    @Test(expected = EnumeratedAciServiceException.class)
+    @Test
     public void serviceError() {
-        testService.throwServiceException();
+        Assertions.assertThrows(EnumeratedAciServiceException.class, () -> {
+            testService.throwServiceException();
+        });
     }
 
     @ComponentScan

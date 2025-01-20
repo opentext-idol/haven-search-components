@@ -17,7 +17,8 @@ package com.hp.autonomy.searchcomponents.idol.search;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.searchcomponents.core.search.*;
 import com.hp.autonomy.searchcomponents.idol.beanconfiguration.HavenSearchIdolConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,12 +26,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @SpringBootTest(classes = HavenSearchIdolConfiguration.class)
@@ -49,7 +47,7 @@ public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<IdolQueryRe
         assertThat(typedStateToken.getType(), is(notNullValue()));
     }
 
-    @Test(expected = AutoCorrectException.class)
+    @Test
     public void queryWithInvalidAutoCorrect() throws AciErrorException {
         final IdolQueryRequest queryRequest = queryRequestBuilderFactory.getObject()
             .queryRestrictions(queryRestrictionsBuilder.getObject()
@@ -67,6 +65,8 @@ public class IdolDocumentServiceIT extends AbstractDocumentServiceIT<IdolQueryRe
             .autoCorrect(true)
             .build();
 
-        documentsService.queryTextIndex(queryRequest);
+        Assertions.assertThrows(AutoCorrectException.class, () -> {
+            documentsService.queryTextIndex(queryRequest);
+        });
     }
 }

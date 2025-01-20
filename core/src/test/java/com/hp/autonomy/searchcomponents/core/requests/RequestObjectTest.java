@@ -14,10 +14,10 @@
 
 package com.hp.autonomy.searchcomponents.core.requests;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Simple abstract test class for any object intended to be passed to a HavenSearch controller endpoint complex enough to deserve a builder

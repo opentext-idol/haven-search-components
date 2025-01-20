@@ -18,18 +18,18 @@ import com.autonomy.aci.client.util.ActionParameters;
 import com.hp.autonomy.searchcomponents.idol.requests.IdolGetContentRequestImpl;
 import com.hp.autonomy.searchcomponents.idol.view.IdolViewRequest;
 import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class HavenSearchAciParameterHandlerProxyTest {
     @Mock
     private HavenSearchAciParameterHandler parameterHandler;
@@ -48,7 +48,7 @@ public class HavenSearchAciParameterHandlerProxyTest {
 
     private HavenSearchAciParameterHandler proxy;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         proxy = new HavenSearchAciParameterHandlerProxy() {
         };
@@ -105,7 +105,7 @@ public class HavenSearchAciParameterHandlerProxyTest {
     @Test
     public void getSecurityInfo() {
         Mockito.doReturn("secInfo").when(parameterHandler).getSecurityInfo();
-        Assert.assertEquals("secInfo", proxy.getSecurityInfo());
+        Assertions.assertEquals("secInfo", proxy.getSecurityInfo());
     }
 
     @Test

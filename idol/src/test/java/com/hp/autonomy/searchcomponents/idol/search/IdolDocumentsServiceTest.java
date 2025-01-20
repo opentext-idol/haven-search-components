@@ -23,12 +23,12 @@ import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.opentext.idol.types.responses.Hit;
 import com.opentext.idol.types.responses.QueryResponseData;
 import com.opentext.idol.types.responses.SuggestResponseData;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("WeakerAccess")
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class IdolDocumentsServiceTest {
     private static final String MOCK_STATE_TOKEN = "mock-state-token";
     private static final int MOCK_TOTAL_HITS = 42;
@@ -74,7 +74,7 @@ public class IdolDocumentsServiceTest {
 
     private IdolDocumentsService idolDocumentsService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         idolDocumentsService = new IdolDocumentsServiceImpl(parameterHandler, queryExecutor, queryResponseParser);
     }

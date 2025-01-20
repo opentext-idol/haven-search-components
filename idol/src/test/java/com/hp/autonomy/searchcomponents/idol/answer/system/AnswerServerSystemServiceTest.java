@@ -21,11 +21,11 @@ import com.opentext.idol.types.marshalling.ProcessorFactory;
 import com.opentext.idol.types.responses.answer.GetStatusResponsedata;
 import com.opentext.idol.types.responses.answer.System;
 import com.opentext.idol.types.responses.answer.Systems;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AnswerServerSystemServiceTest {
     @Mock
     private AciService aciService;
@@ -46,7 +46,7 @@ public class AnswerServerSystemServiceTest {
 
     private AnswerServerSystemService answerServerSystemService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         answerServerSystemService = new AnswerServerSystemServiceImpl(aciService, answerServerAciService, processorFactory);
     }

@@ -22,14 +22,14 @@ import com.hp.autonomy.types.requests.idol.actions.query.params.PrintParam;
 import com.hp.autonomy.types.requests.idol.actions.query.params.SummaryParam;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
 
 public class IdolSuggestRequestTest extends SuggestRequestTest<IdolQueryRestrictions> {
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         super.setUp();
         objectMapper.addMixIn(QueryRestrictions.class, IdolQueryRestrictionsMixin.class);

@@ -23,12 +23,12 @@ import com.hp.autonomy.searchcomponents.idol.parametricvalues.IdolParametricRequ
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.SortParam;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -37,7 +37,7 @@ import java.util.Arrays;
 import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CLASSES_PROPERTY;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @AutoConfigureJson
 @SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY)
 public class IdolParametricRequestTest extends ParametricRequestTest<IdolQueryRestrictions> {
@@ -47,7 +47,7 @@ public class IdolParametricRequestTest extends ParametricRequestTest<IdolQueryRe
     private TagNameFactory tagNameFactory;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         super.setUp();
         springObjectMapper.addMixIn(QueryRestrictions.class, IdolQueryRestrictionsMixin.class);

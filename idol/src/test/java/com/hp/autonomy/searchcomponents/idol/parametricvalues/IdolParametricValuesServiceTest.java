@@ -30,19 +30,17 @@ import com.hp.autonomy.types.requests.idol.actions.tags.*;
 import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import com.opentext.idol.types.responses.*;
 import jakarta.xml.bind.JAXBElement;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
 import javax.xml.namespace.QName;
 import java.io.Serializable;
@@ -62,20 +60,15 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY)
 public class IdolParametricValuesServiceTest {
-    @ClassRule
-    public static final SpringClassRule SCR = new SpringClassRule();
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
-
     @Mock
     private HavenSearchAciParameterHandler parameterHandler;
 
@@ -103,10 +96,10 @@ public class IdolParametricValuesServiceTest {
     private IdolParametricValuesService parametricValuesService;
 
     @SuppressWarnings("CastToConcreteClass")
-    @Before
+    @BeforeEach
     public void setUp() {
-        when(fieldsRequestBuilderFactory.getObject()).thenReturn(fieldsRequestBuilder);
-        when(fieldsRequestBuilder.fieldType(any())).thenReturn(fieldsRequestBuilder);
+        Mockito.lenient().when(fieldsRequestBuilderFactory.getObject()).thenReturn(fieldsRequestBuilder);
+        Mockito.lenient().when(fieldsRequestBuilder.fieldType(any())).thenReturn(fieldsRequestBuilder);
 
         parametricValuesService = new IdolParametricValuesServiceImpl(
             parameterHandler,
@@ -281,16 +274,20 @@ public class IdolParametricValuesServiceTest {
         assertEquals(new NumericRangeInfo.Value(5D, 6D, 0), iterator.next());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void getNumericParametricValuesZeroBucketsZeroBuckets() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(0, 1.0, 5.0)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(0, 1.0, 5.0)));
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void getNumericParametricValuesNoParams() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, Collections.emptyMap());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            parametricValuesService.getNumericParametricValuesInBuckets(idolParametricRequest, Collections.emptyMap());
+        });
     }
 
     @Test
@@ -352,17 +349,21 @@ public class IdolParametricValuesServiceTest {
         assertEquals(new DateRangeInfo.Value(max.minusSeconds(2), max.plusSeconds(1), 0), iterator.next());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void getDateParametricValuesZeroBucketsZeroBuckets() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
         final ZonedDateTime now = ZonedDateTime.now();
-        parametricValuesService.getDateParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(0, now.minusMinutes(5), now)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            parametricValuesService.getDateParametricValuesInBuckets(idolParametricRequest, ImmutableMap.of(tagNameFactory.getFieldPath("ParametricNumericDateField"), new BucketingParams<>(0, now.minusMinutes(5), now)));
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void getDateParametricValuesNoParams() {
         final IdolParametricRequest idolParametricRequest = mockRequest(Collections.singletonList("ParametricNumericDateField"));
-        parametricValuesService.getDateParametricValuesInBuckets(idolParametricRequest, Collections.emptyMap());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            parametricValuesService.getDateParametricValuesInBuckets(idolParametricRequest, Collections.emptyMap());
+        });
     }
 
     @Test
@@ -416,12 +417,12 @@ public class IdolParametricValuesServiceTest {
         when(parametricRequest.getFieldNames()).thenReturn(paths);
 
         final IdolParametricRequestBuilder parametricRequestBuilder = mock(IdolParametricRequestBuilder.class);
-        when(parametricRequestBuilder.maxValues(any())).thenReturn(parametricRequestBuilder);
-        when(parametricRequestBuilder.ranges(any())).thenReturn(parametricRequestBuilder);
-        when(parametricRequestBuilder.start(any())).thenReturn(parametricRequestBuilder);
-        when(parametricRequestBuilder.sort(any())).thenReturn(parametricRequestBuilder);
-        when(parametricRequest.toBuilder()).thenReturn(parametricRequestBuilder);
-        when(parametricRequestBuilder.build()).thenReturn(parametricRequest);
+        Mockito.lenient().when(parametricRequestBuilder.maxValues(any())).thenReturn(parametricRequestBuilder);
+        Mockito.lenient().when(parametricRequestBuilder.ranges(any())).thenReturn(parametricRequestBuilder);
+        Mockito.lenient().when(parametricRequestBuilder.start(any())).thenReturn(parametricRequestBuilder);
+        Mockito.lenient().when(parametricRequestBuilder.sort(any())).thenReturn(parametricRequestBuilder);
+        Mockito.lenient().when(parametricRequest.toBuilder()).thenReturn(parametricRequestBuilder);
+        Mockito.lenient().when(parametricRequestBuilder.build()).thenReturn(parametricRequest);
 
         return parametricRequest;
     }

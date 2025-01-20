@@ -18,14 +18,14 @@ import com.hp.autonomy.searchcomponents.core.search.GetContentRequestIndex;
 import com.hp.autonomy.searchcomponents.core.search.GetContentRequestTest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolGetContentRequest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolGetContentRequestIndex;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.IOException;
 import java.util.Collections;
 
 public class IdolGetContentRequestTest extends GetContentRequestTest<IdolGetContentRequestIndex> {
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         super.setUp();
         objectMapper.addMixIn(GetContentRequestIndex.class, IdolGetContentRequestIndexMixin.class);
