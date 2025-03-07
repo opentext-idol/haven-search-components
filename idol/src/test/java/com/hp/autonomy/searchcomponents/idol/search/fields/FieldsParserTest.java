@@ -33,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -56,13 +57,13 @@ import static org.mockito.Mockito.when;
     properties = CORE_CLASSES_PROPERTY,
     webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class FieldsParserTest {
-    @MockBean
+    @MockitoBean
     private ConfigService<IdolSearchCapable> configService;
-    @MockBean
+    @MockitoBean
     private IdolSearchCapable config;
     @Autowired
     private FieldPathNormaliser fieldPathNormaliser;
-    @MockBean
+    @MockitoBean
     private FieldDisplayNameGenerator fieldDisplayNameGenerator;
     @Autowired
     private FieldsParser fieldsParser;

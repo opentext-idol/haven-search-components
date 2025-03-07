@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.Serializable;
@@ -40,7 +41,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class FieldDisplayNameGeneratorTest {
-    @MockBean
+    @MockitoBean
     private ConfigService<HavenSearchCapable> configService;
     @Autowired
     private FieldPathNormaliser fieldPathNormaliser;

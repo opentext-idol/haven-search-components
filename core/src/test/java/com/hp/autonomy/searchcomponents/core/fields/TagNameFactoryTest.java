@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,9 +20,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = TagNameFactoryImpl.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class TagNameFactoryTest {
-    @MockBean
+    @MockitoBean
     private FieldPathNormaliser fieldPathNormaliser;
-    @MockBean
+    @MockitoBean
     private FieldDisplayNameGenerator fieldDisplayNameGenerator;
     @Autowired
     private TagNameFactory tagNameFactory;
