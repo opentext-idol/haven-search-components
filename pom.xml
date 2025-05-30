@@ -109,12 +109,12 @@
             <dependency>
                 <groupId>com.hp.autonomy.aci.client</groupId>
                 <artifactId>aci-annotations-processor</artifactId>
-                <version>25.2.0</version>
+                <version>25.3.0</version>
             </dependency>
             <dependency>
                 <groupId>com.hp.autonomy.aci.client</groupId>
                 <artifactId>aci-api</artifactId>
-                <version>25.2.0</version>
+                <version>25.3.0</version>
             </dependency>
             <dependency>
                 <groupId>com.hp.autonomy.frontend</groupId>
@@ -129,32 +129,32 @@
             <dependency>
                 <groupId>com.hp.autonomy.frontend.configuration</groupId>
                 <artifactId>configuration-authentication</artifactId>
-                <version>1.5.0</version>
+                <version>1.6.0</version>
             </dependency>
             <dependency>
                 <groupId>com.hp.autonomy.frontend.configuration</groupId>
                 <artifactId>configuration-idol</artifactId>
-                <version>6.5.0</version>
+                <version>6.6.0</version>
             </dependency>
             <dependency>
                 <groupId>com.hp.autonomy.frontend.configuration</groupId>
                 <artifactId>configuration-impl</artifactId>
-                <version>3.4.0</version>
+                <version>3.5.0</version>
             </dependency>
             <dependency>
                 <groupId>com.hp.autonomy.aci.content</groupId>
                 <artifactId>content-parameter-api</artifactId>
-                <version>25.2.0</version>
+                <version>25.3.0</version>
             </dependency>
             <dependency>
                 <groupId>com.hp.autonomy.frontend</groupId>
                 <artifactId>idol-types</artifactId>
-                <version>25.2.0</version>
+                <version>25.3.0</version>
             </dependency>
             <dependency>
                 <groupId>com.hp.autonomy.idol</groupId>
                 <artifactId>indexing-api</artifactId>
-                <version>4.1.0</version>
+                <version>4.2.0</version>
             </dependency>
             <dependency>
                 <groupId>com.hp.autonomy.test.xml</groupId>
@@ -164,7 +164,7 @@
             <dependency>
                 <groupId>com.hp.bigdata.frontend</groupId>
                 <artifactId>spring-authentication-utils</artifactId>
-                <version>1.4.0</version>
+                <version>1.5.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -241,7 +241,7 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-impl</artifactId>
-            <version>3.4.0</version>
+            <version>3.5.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
