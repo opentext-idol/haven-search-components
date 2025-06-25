@@ -11,11 +11,6 @@
 
     <artifactId>haven-search-components-idol</artifactId>
 
-    <properties>
-        <gpg.publicKeyring>${project.basedir}/../public.gpg</gpg.publicKeyring>
-        <gpg.secretKeyring>${project.basedir}/../secret.gpg</gpg.secretKeyring>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
