@@ -11,6 +11,10 @@
 
     <artifactId>haven-search-components-idol</artifactId>
 
+    <name>OpenText Haven Search Components IDOL</name>
+    <description>Reusable components for OpenText Haven Search.</description>
+    <url>https://github.com/opentext-idol/haven-search-components</url>
+
     <build>
         <plugins>
             <plugin>

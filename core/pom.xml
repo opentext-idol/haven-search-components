@@ -11,6 +11,10 @@
 
     <artifactId>haven-search-components-core</artifactId>
 
+    <name>OpenText Haven Search Components Core</name>
+    <description>Reusable components for OpenText Haven Search.</description>
+    <url>https://github.com/opentext-idol/haven-search-components</url>
+
     <build>
         <plugins>
             <plugin>
