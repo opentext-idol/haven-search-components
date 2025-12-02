@@ -17,7 +17,7 @@ package com.hp.autonomy.searchcomponents.idol.configuration;
 import com.autonomy.aci.client.services.AciService;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

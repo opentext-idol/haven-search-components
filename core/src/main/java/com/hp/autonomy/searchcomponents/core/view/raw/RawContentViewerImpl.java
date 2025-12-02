@@ -2,7 +2,7 @@ package com.hp.autonomy.searchcomponents.core.view.raw;
 
 import com.hp.autonomy.searchcomponents.core.search.DocumentTitleResolver;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -27,18 +27,18 @@ class RawContentViewerImpl implements RawContentViewer {
         while(matcher.find()) {
             final int start = matcher.start();
             if (prev < start) {
-                sb.append(StringEscapeUtils.escapeHtml(input.substring(prev, start)));
+                sb.append(StringEscapeUtils.escapeHtml4(input.substring(prev, start)));
             }
 
             prev = matcher.end();
 
             sb.append(HIGHLIGHT_START_TAG)
-              .append(StringEscapeUtils.escapeHtml(matcher.group(1)))
+              .append(StringEscapeUtils.escapeHtml4(matcher.group(1)))
               .append(HIGHLIGHT_END_TAG);
         }
 
         if (prev < input.length()) {
-            sb.append(StringEscapeUtils.escapeHtml(input.substring(prev)));
+            sb.append(StringEscapeUtils.escapeHtml4(input.substring(prev)));
         }
 
         return sb.toString();
