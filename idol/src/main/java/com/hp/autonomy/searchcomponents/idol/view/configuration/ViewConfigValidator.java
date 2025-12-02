@@ -20,7 +20,7 @@ import com.hp.autonomy.frontend.configuration.validation.ValidationResult;
 import com.hp.autonomy.frontend.configuration.validation.Validator;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
 import lombok.Data;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class ViewConfigValidator implements Validator<ViewConfig> {
     private final AciService validatorAciService;

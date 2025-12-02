@@ -21,7 +21,7 @@ import com.hp.autonomy.frontend.configuration.validation.Validator;
 import com.opentext.idol.types.marshalling.ProcessorFactory;
 import com.opentext.idol.types.responses.answer.GetStatusResponsedata;
 import com.hp.autonomy.types.requests.idol.actions.answer.AnswerServerActions;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import static com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfigValidator.Validation.INVALID_CONVERSATION_SYSTEM_NAME;
 import static com.hp.autonomy.searchcomponents.idol.answer.configuration.AnswerServerConfigValidator.Validation.INVALID_SYSTEM_NAME;
