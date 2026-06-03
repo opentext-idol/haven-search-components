@@ -108,6 +108,23 @@
                     <execution>
                         <id>upload-central-bundle</id>
                         <phase>none</phase>
+                        <goals><goal>exec</goal></goals>
+                        <configuration>
+                            <skip>${skipDeploy}</skip>
+                            <executable>bash</executable>
+                            <arguments>
+                                <argument>-c</argument>
+                                <argument>
+                                    set -euo pipefail
+                                    if [[ "${project.version}" == *-SNAPSHOT ]]; then exit 0; fi
+                                    TOKEN=$(printf '%s:%s' "$SONATYPE_USERNAME" "$SONATYPE_PASSWORD" | base64 | tr -d '\n')
+                                    curl --fail --show-error --request POST \
+                                    --header "Authorization: Bearer $TOKEN" \
+                                    --form bundle=@${project.build.directory}/central-publishing/central-bundle.zip \
+                                    'https://central.sonatype.com/api/v1/publisher/upload?publishingType=AUTOMATIC'
+                                </argument>
+                            </arguments>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
