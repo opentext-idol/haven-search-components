@@ -9,11 +9,6 @@
         <module>idol</module>
     </modules>
 
-    <properties>
-        <!-- Disabling integration tests by default until we figure out how to run them on the build servers (CCUK-3480) -->
-        <skipITs>true</skipITs>
-    </properties>
-
     <parent>
         <groupId>com.hp.autonomy</groupId>
         <artifactId>foss-spring-boot-master-pom</artifactId>
@@ -100,15 +95,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.12.4</version>
+                <version>3.5.6</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
-                        <configuration>
-                            <skipITs>${skipITs}</skipITs>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
