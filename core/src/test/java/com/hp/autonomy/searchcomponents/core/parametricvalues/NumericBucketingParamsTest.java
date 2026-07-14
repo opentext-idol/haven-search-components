@@ -14,8 +14,8 @@
 
 package com.hp.autonomy.searchcomponents.core.parametricvalues;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.hp.autonomy.searchcomponents.core.requests.SimpleRequestObjectTest;
+import tools.jackson.core.type.TypeReference;
 
 import java.io.IOException;
 

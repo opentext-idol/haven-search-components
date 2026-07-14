@@ -14,13 +14,13 @@
 
 package com.hp.autonomy.searchcomponents.core.requests;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.core.ResolvableType;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -29,7 +29,9 @@ import java.io.Serializable;
  * Simple abstract test class for any object returned by a HavenSearch controller endpoint
  */
 public abstract class SimpleResponseObjectTest<O extends Serializable> extends SerializableObjectTest<O> {
-    protected final ObjectMapper objectMapper = new ObjectMapper();
+    protected final JsonMapper objectMapper = JsonMapper.builder()
+            .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, true)
+            .build();
 
     protected JacksonTester<O> json;
 
@@ -41,7 +43,6 @@ public abstract class SimpleResponseObjectTest<O extends Serializable> extends S
     }
 
     protected void setUpObjectMapper() {
-        objectMapper.registerModule(new JavaTimeModule());
         json = new JacksonTester<>(getClass(), ResolvableType.forClass(object.getClass()), objectMapper);
     }
 

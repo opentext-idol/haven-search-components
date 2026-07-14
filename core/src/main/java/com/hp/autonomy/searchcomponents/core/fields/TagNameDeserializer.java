@@ -14,23 +14,20 @@
 
 package com.hp.autonomy.searchcomponents.core.fields;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jackson.JsonComponent;
-import org.springframework.boot.jackson.JsonObjectDeserializer;
-
-import java.io.IOException;
+import org.springframework.boot.jackson.JacksonComponent;
+import org.springframework.boot.jackson.ObjectValueDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Custom deserializer for {@link TagName} which takes a String path and produces a normalised id and a prettified display name
  */
-@JsonComponent
-class TagNameDeserializer extends JsonObjectDeserializer<TagName> {
+@JacksonComponent
+class TagNameDeserializer extends ObjectValueDeserializer<TagName> {
     private final TagNameFactory tagNameFactory;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -41,7 +38,7 @@ class TagNameDeserializer extends JsonObjectDeserializer<TagName> {
     }
 
     @Override
-    protected TagName deserializeObject(final JsonParser jsonParser, final DeserializationContext context, final ObjectCodec codec, final JsonNode tree) throws IOException {
+    protected TagName deserializeObject(final JsonParser jsonParser, final DeserializationContext context, final JsonNode tree) {
         final String path = objectMapper.treeToValue(tree, String.class);
         return tagNameFactory.buildTagName(path);
     }

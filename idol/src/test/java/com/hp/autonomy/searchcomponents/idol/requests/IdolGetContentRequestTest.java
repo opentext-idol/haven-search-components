@@ -28,7 +28,9 @@ public class IdolGetContentRequestTest extends GetContentRequestTest<IdolGetCont
     @BeforeEach
     public void setUp() {
         super.setUp();
-        objectMapper.addMixIn(GetContentRequestIndex.class, IdolGetContentRequestIndexMixin.class);
+        objectMapper = objectMapper.rebuild()
+                .addMixIn(GetContentRequestIndex.class, IdolGetContentRequestIndexMixin.class)
+                .build();
     }
 
     @Override

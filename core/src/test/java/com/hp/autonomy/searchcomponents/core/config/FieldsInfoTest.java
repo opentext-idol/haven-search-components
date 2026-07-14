@@ -14,7 +14,6 @@
 
 package com.hp.autonomy.searchcomponents.core.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.autonomy.frontend.configuration.ConfigurationComponentTest;
 import com.hp.autonomy.searchcomponents.core.fields.FieldPathNormaliser;
 import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
@@ -28,6 +27,7 @@ import org.springframework.boot.test.json.JsonContent;
 import org.springframework.boot.test.json.ObjectContent;
 import org.springframework.core.ResolvableType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.util.Map;
@@ -45,12 +45,14 @@ public class FieldsInfoTest extends ConfigurationComponentTest<FieldsInfo> {
     @Autowired
     private FieldPathNormaliser fieldPathNormaliser;
     @Autowired
-    private ObjectMapper objectMapper;
+    private JsonMapper objectMapper;
 
     @Override
     public void setUp() {
-        objectMapper.addMixIn(FieldInfo.class, FieldInfoConfigMixins.class);
-        objectMapper.addMixIn(FieldValue.class, FieldValueConfigMixins.class);
+        objectMapper = objectMapper.rebuild()
+                .addMixIn(FieldInfo.class, FieldInfoConfigMixins.class)
+                .addMixIn(FieldValue.class, FieldValueConfigMixins.class)
+                .build();
         json = new JacksonTester<>(getClass(), ResolvableType.forClass(getType()), objectMapper);
     }
 

@@ -14,7 +14,6 @@
 
 package com.hp.autonomy.searchcomponents.core.fields;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.autonomy.searchcomponents.core.requests.SimpleRequestResponseObjectTest;
 import com.hp.autonomy.searchcomponents.core.test.CoreTestContext;
 import com.hp.autonomy.types.requests.idol.actions.tags.TagName;
@@ -27,6 +26,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.core.ResolvableType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,7 @@ import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CL
 @SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class TagNameTest extends SimpleRequestResponseObjectTest<TagName> {
     @Autowired
-    private ObjectMapper springObjectMapper;
+    private JsonMapper springObjectMapper;
 
     @Override
     public void setUpObjectMapper() {

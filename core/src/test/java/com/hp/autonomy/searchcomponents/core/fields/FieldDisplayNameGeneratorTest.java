@@ -23,9 +23,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"SpringJavaAutowiredMembersInspection", "unused"})
-@ExtendWith(SpringExtension.class)
+@ExtendWith({ SpringExtension.class, MockitoExtension.class })
 @SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class FieldDisplayNameGeneratorTest {
     @MockitoBean
@@ -54,8 +55,8 @@ public class FieldDisplayNameGeneratorTest {
 
     @BeforeEach
     public void setUp() {
-        when(configService.getConfig()).thenReturn(config);
-        when(config.getFieldsInfo()).thenReturn(fieldsInfo);
+        Mockito.lenient().when(configService.getConfig()).thenReturn(config);
+        Mockito.lenient().when(config.getFieldsInfo()).thenReturn(fieldsInfo);
     }
 
     @Test
@@ -90,7 +91,6 @@ public class FieldDisplayNameGeneratorTest {
 
     @Test
     public void generateDisplayNameFromConfiguredId() {
-        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>());
         assertEquals("Foo Bar", fieldDisplayNameGenerator.generateDisplayNameFromId("foo_bar"));
     }
 
@@ -102,7 +102,6 @@ public class FieldDisplayNameGeneratorTest {
 
     @Test
     public void prettifyFieldValueFromId() {
-        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>());
         assertEquals("Value", fieldDisplayNameGenerator.generateDisplayValueFromId("fooBar", "Value", FieldType.STRING));
     }
 
@@ -190,9 +189,6 @@ public class FieldDisplayNameGeneratorTest {
     @Test
     public void generateDisplayValueForNullValue() {
         final FieldPath path = fieldPathNormaliser.normaliseFieldPath("/DOCUMENT/FOO");
-        when(fieldsInfo.getFieldConfigByName()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(path, FieldInfo.builder()
-                .name(path)
-                .build())));
         assertEquals(null, fieldDisplayNameGenerator.generateDisplayValue(path, null, FieldType.STRING));
     }
 
@@ -229,9 +225,6 @@ public class FieldDisplayNameGeneratorTest {
     @Test
     public void generateDisplayValueFromIdForNullValue() {
         final String id = "foo_bar";
-        when(fieldsInfo.getFieldConfig()).thenReturn(new LinkedHashMap<>(ImmutableMap.of(id, FieldInfo.builder()
-                .id(id)
-                .build())));
         assertEquals(null, fieldDisplayNameGenerator.generateDisplayValueFromId(id, null, FieldType.STRING));
     }
 

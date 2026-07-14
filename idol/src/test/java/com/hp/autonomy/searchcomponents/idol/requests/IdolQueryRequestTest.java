@@ -33,7 +33,9 @@ public class IdolQueryRequestTest extends SearchRequestTest<IdolQueryRestriction
     @BeforeEach
     public void setUp() {
         super.setUp();
-        objectMapper.addMixIn(QueryRestrictions.class, IdolQueryRestrictionsMixin.class);
+        objectMapper = objectMapper.rebuild()
+                .addMixIn(QueryRestrictions.class, IdolQueryRestrictionsMixin.class)
+                .build();
     }
 
     @Override

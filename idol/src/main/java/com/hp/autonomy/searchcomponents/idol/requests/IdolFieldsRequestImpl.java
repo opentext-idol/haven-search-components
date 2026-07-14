@@ -14,8 +14,6 @@
 
 package com.hp.autonomy.searchcomponents.idol.requests;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequest;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsRequestBuilder;
 import com.hp.autonomy.searchcomponents.idol.fields.IdolFieldsService;
@@ -23,6 +21,8 @@ import com.hp.autonomy.types.requests.idol.actions.tags.params.FieldTypeParam;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 import java.util.Collection;
 

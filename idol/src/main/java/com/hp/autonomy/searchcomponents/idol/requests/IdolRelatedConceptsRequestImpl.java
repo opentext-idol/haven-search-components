@@ -14,14 +14,14 @@
 
 package com.hp.autonomy.searchcomponents.idol.requests;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.core.search.QueryRequest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolQueryRestrictions;
 import com.hp.autonomy.searchcomponents.idol.search.IdolRelatedConceptsRequest;
 import com.hp.autonomy.searchcomponents.idol.search.IdolRelatedConceptsRequestBuilder;
 import lombok.Builder;
 import lombok.Data;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 @SuppressWarnings({"FieldMayBeFinal", "WeakerAccess"})
 @Data

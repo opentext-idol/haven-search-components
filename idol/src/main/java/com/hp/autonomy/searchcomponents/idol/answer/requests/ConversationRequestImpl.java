@@ -14,13 +14,12 @@
 
 package com.hp.autonomy.searchcomponents.idol.answer.requests;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.hp.autonomy.searchcomponents.idol.answer.ask.AskAnswerServerRequest;
 import com.hp.autonomy.searchcomponents.idol.answer.ask.ConversationRequest;
 import com.hp.autonomy.searchcomponents.idol.answer.ask.ConversationRequestBuilder;
 import lombok.Builder;
 import lombok.Data;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * Default implementation of {@link ConversationRequest}

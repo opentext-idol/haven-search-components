@@ -14,7 +14,6 @@
 
 package com.hp.autonomy.searchcomponents.idol.requests;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.autonomy.searchcomponents.core.fields.TagNameFactory;
 import com.hp.autonomy.searchcomponents.core.parametricvalues.ParametricRequestTest;
 import com.hp.autonomy.searchcomponents.core.search.QueryRestrictions;
@@ -29,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -42,7 +42,7 @@ import static com.hp.autonomy.searchcomponents.core.test.CoreTestContext.CORE_CL
 @SpringBootTest(classes = CoreTestContext.class, properties = CORE_CLASSES_PROPERTY)
 public class IdolParametricRequestTest extends ParametricRequestTest<IdolQueryRestrictions> {
     @Autowired
-    private ObjectMapper springObjectMapper;
+    private JsonMapper springObjectMapper;
     @Autowired
     private TagNameFactory tagNameFactory;
 
@@ -50,7 +50,9 @@ public class IdolParametricRequestTest extends ParametricRequestTest<IdolQueryRe
     @BeforeEach
     public void setUp() {
         super.setUp();
-        springObjectMapper.addMixIn(QueryRestrictions.class, IdolQueryRestrictionsMixin.class);
+        springObjectMapper = springObjectMapper.rebuild()
+                .addMixIn(QueryRestrictions.class, IdolQueryRestrictionsMixin.class)
+                .build();
     }
 
     @Override

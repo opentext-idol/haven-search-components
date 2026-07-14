@@ -29,7 +29,9 @@ public class IdolRelatedConceptsRequestTest extends RelatedConceptsRequestTest<I
     @BeforeEach
     public void setUp() {
         super.setUp();
-        objectMapper.addMixIn(QueryRestrictions.class, IdolQueryRestrictionsMixin.class);
+        objectMapper = objectMapper.rebuild()
+                .addMixIn(QueryRestrictions.class, IdolQueryRestrictionsMixin.class)
+                .build();
     }
 
     @Override

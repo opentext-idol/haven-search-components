@@ -14,10 +14,8 @@
 
 package com.hp.autonomy.searchcomponents.core.requests;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -29,12 +27,7 @@ import static org.hamcrest.Matchers.equalTo;
  * Simple abstract test class for any object intended to be passed to a HavenSearch controller endpoint
  */
 public abstract class SimpleRequestObjectTest<O extends Serializable> extends SerializableObjectTest<O> {
-    protected final ObjectMapper objectMapper = new ObjectMapper();
-
-    @BeforeEach
-    public void setUpObjectMapper() {
-        objectMapper.registerModule(new JavaTimeModule());
-    }
+    protected JsonMapper objectMapper = new JsonMapper();
 
     /**
      * Json as String to be converted into a Java object

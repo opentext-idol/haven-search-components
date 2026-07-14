@@ -14,16 +14,16 @@
 
 package com.hp.autonomy.searchcomponents.idol.answer.requests;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hp.autonomy.searchcomponents.idol.answer.ask.AskAnswerServerRequest;
 import com.hp.autonomy.searchcomponents.idol.answer.ask.AskAnswerServerRequestBuilder;
 import com.hp.autonomy.types.requests.idol.actions.answer.params.AskSortParam;
-import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
