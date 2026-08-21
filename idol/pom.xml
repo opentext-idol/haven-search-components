@@ -15,8 +15,27 @@
     <description>Reusable components for OpenText Haven Search.</description>
     <url>https://github.com/opentext-idol/haven-search-components</url>
 
+    <properties>
+        <frontend.docker.content.skip>false</frontend.docker.content.skip>
+        <frontend.docker.view.skip>false</frontend.docker.view.skip>
+        <frontend.docker.answerserver.skip>false</frontend.docker.answerserver.skip>
+        <frontend.docker.answerbankAgentstore.skip>false</frontend.docker.answerbankAgentstore.skip>
+    </properties>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -156,6 +175,33 @@
             <artifactId>stax-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hp.autonomy.frontend.configuration</groupId>
+            <artifactId>configuration-impl</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.hp.autonomy.frontend</groupId>
             <artifactId>haven-search-components-core</artifactId>

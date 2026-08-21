@@ -32,7 +32,7 @@ import java.util.Collections;
 @Component
 public class IdolTestUtils implements TestUtils<IdolQueryRestrictions> {
     public static final String TEST_DATABASE_PROPERTY = "test.database";
-    public static final String DEFAULT_TEST_DATABASE = "Wookiepedia";
+    public static final String DEFAULT_TEST_DATABASE = "Default";
 
     @Autowired
     private ObjectFactory<IdolQueryRestrictionsBuilder> queryRestrictionsBuilderFactory;

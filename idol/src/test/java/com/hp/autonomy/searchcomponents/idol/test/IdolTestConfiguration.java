@@ -30,27 +30,26 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SuppressWarnings("WeakerAccess")
 @Configuration
 @ConditionalOnProperty(value = "mock.configuration", matchIfMissing = true)
 public class IdolTestConfiguration {
     public static final String CONTENT_HOST_PROPERTY = "test.content.host";
-    public static final String CONTENT_HOST = "ida-idol";
+    public static final String CONTENT_HOST = "localhost";
     public static final String CONTENT_PORT_PROPERTY = "test.content.port";
-    public static final int CONTENT_PORT = 9000;
+    public static final int CONTENT_PORT = 20000;
     public static final String VIEW_SERVER_HOST_PROPERTY = "test.view.host";
-    public static final String VIEW_SERVER_HOST = "ida-idol";
+    public static final String VIEW_SERVER_HOST = "localhost";
     public static final String VIEW_SERVER_PORT_PROPERTY = "test.view.port";
-    public static final int VIEW_SERVER_PORT = 9080;
+    public static final int VIEW_SERVER_PORT = 20010;
     public static final String VIEW_SERVER_REFERENCE_FIELD = "DREREFERENCE";
     public static final String ANSWER_SERVER_HOST_PROPERTY = "test.answer.host";
-    public static final String ANSWER_SERVER_HOST = "ida-answer";
+    public static final String ANSWER_SERVER_HOST = "localhost";
     public static final String ANSWER_SERVER_PORT_PROPERTY = "test.answer.port";
-    public static final int ANSWER_SERVER_PORT = 7700;
+    public static final int ANSWER_SERVER_PORT = 20020;
     public static final String ANSWER_SERVER_SYSTEM_PROPERTY = "test.answer.system";
-    public static final String ANSWER_SERVER_SYSTEM_NAME = "answerbank0";
+    public static final String ANSWER_SERVER_SYSTEM_NAME = "AnswerBank";
 
     @Autowired
     private Environment environment;

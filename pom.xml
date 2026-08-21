@@ -24,6 +24,626 @@
     <url>https://github.com/opentext-idol/haven-search-components</url>
     <inceptionYear>2015</inceptionYear>
 
+    <properties>
+        <!-- maven.build.timestamp used in docker container names, so can't contain ':' -->
+        <maven.build.timestamp.format>yyyy-MM-dd-HH-mm-ss</maven.build.timestamp.format>
+
+        <docker.autoCreateCustomNetworks>true</docker.autoCreateCustomNetworks>
+
+        <idol.docker.registry>cs-knowledgediscovery-docker-dev.orgartifactory.swinfra.net</idol.docker.registry>
+        <idol.version>26.3.0</idol.version>
+        <idol.licenseServer.host>cbgdevdish.swinfra.net</idol.licenseServer.host>
+        <idol.licenseServer.port>20000</idol.licenseServer.port>
+        <frontend.docker.registry.dev>dev/frontend</frontend.docker.registry.dev>
+
+        <frontend.docker.content.skip>true</frontend.docker.content.skip>
+        <frontend.docker.view.skip>true</frontend.docker.view.skip>
+        <frontend.docker.answerserver.skip>true</frontend.docker.answerserver.skip>
+        <frontend.docker.community.skip>true</frontend.docker.community.skip>
+        <frontend.docker.agentstore.skip>true</frontend.docker.agentstore.skip>
+        <frontend.docker.qms.skip>true</frontend.docker.qms.skip>
+        <frontend.docker.statsserver.skip>true</frontend.docker.statsserver.skip>
+        <frontend.docker.answerbankAgentstore.skip>true</frontend.docker.answerbankAgentstore.skip>
+        <frontend.docker.qmsAgentstore.skip>true</frontend.docker.qmsAgentstore.skip>
+
+        <frontend.docker.content.config><![CDATA[
+[License] < "content.cfg" [License]
+< :ENV LICENSE_SERVER_HOST : LicenseServerHost
+< :ENV LICENSE_SERVER_PORT : LicenseServerACIPort
+
+< "content.cfg" [SSLSettings]
+< "content.cfg" [Service]
+< "content.cfg" [Server]
+< "content.cfg" [EnableSSL]
+< "content.cfg" [IndexServer]
+< "content.cfg" [AuthorizationRoles]
+< "content.cfg" [AdminRole]
+< "content.cfg" [QueryRole]
+< "content.cfg" [IndexRole]
+< "content.cfg" [Logging]
+< "content.cfg" [Databases]
+< "content.cfg" [Database0]
+< "content.cfg" [Database1]
+< "content.cfg" [IndexCache]
+< "content.cfg" [Paths]
+< "content.cfg" [FieldProcessing]
+< "content.cfg" [SetReferenceFields]
+< "content.cfg" [SetParentReferenceFields]
+< "content.cfg" [SetRootFamilyReferenceFields]
+< "content.cfg" [SetRootParentReferenceFields]
+< "content.cfg" [SetAutnIdentifierFields]
+< "content.cfg" [SetUUIDFields]
+< "content.cfg" [SetVNodeReferenceField]
+< "content.cfg" [SetSectionBreakFields]
+< "content.cfg" [SetDateFields]
+< "content.cfg" [SetDatabaseFields]
+< "content.cfg" [SetAutnRankFields]
+< "content.cfg" [SetAclFields]
+< "content.cfg" [DetectNT_V4Security]
+< "content.cfg" [DetectNotes_V4Security]
+< "content.cfg" [DetectNetware_V4Security]
+< "content.cfg" [DetectExchange_V4Security]
+< "content.cfg" [DetectDocumentum_V4Security]
+< "content.cfg" [SetTitleFields]
+< "content.cfg" [SetIndexFields]
+< "content.cfg" [SetIndexAndWeightHigher]
+< "content.cfg" [SetSourceFields]
+< "content.cfg" [SetFieldCheckFields]
+< "content.cfg" [SetNumericFields]
+< "content.cfg" [SetNumericDateFields]
+< "content.cfg" [SetParametricFields]
+< "content.cfg" [SetMatchFields]
+< "content.cfg" [SetHighlightFields]
+< "content.cfg" [SetPrintFields]
+< "content.cfg" [SetNonReversibleFields]
+< "content.cfg" [IndexFields]
+< "content.cfg" [IndexWeightFields]
+< "content.cfg" [SectionFields]
+< "content.cfg" [DateFields]
+< "content.cfg" [DatabaseFields]
+< "content.cfg" [ReferenceFields]
+< "content.cfg" [TitleFields]
+< "content.cfg" [HighlightFields]
+< "content.cfg" [SourceFields]
+< "content.cfg" [NumericFields]
+< "content.cfg" [NumericDateFields]
+< "content.cfg" [ParametricFields]
+< "content.cfg" [MatchFields]
+< "content.cfg" [FieldCheckFields]
+< "content.cfg" [SecurityNT_V4]
+< "content.cfg" [SecurityNotes_V4]
+< "content.cfg" [SecurityNetware_V4]
+< "content.cfg" [SecurityExchange_V4]
+< "content.cfg" [SecurityDocumentum_V4]
+< "content.cfg" [AclFields]
+< "content.cfg" [PrintFields]
+< "content.cfg" [NonReversibleFields]
+< "content.cfg" [AutnRankFields]
+< "content.cfg" [VNodeReferenceField]
+< "content.cfg" [ApplicationLogStream]
+< "content.cfg" [QueryLogStream]
+< "content.cfg" [IndexLogStream]
+< "content.cfg" [QueryTermsLogStream]
+< "content.cfg" [LanguageTypes]
+< "content.cfg" [afrikaans]
+< "content.cfg" [albanian]
+< "content.cfg" [arabic]
+< "content.cfg" [armenian]
+< "content.cfg" [azeri]
+< "content.cfg" [basque]
+< "content.cfg" [belorussian]
+< "content.cfg" [bengali]
+< "content.cfg" [bosnian]
+< "content.cfg" [breton]
+< "content.cfg" [bulgarian]
+< "content.cfg" [burmese]
+< "content.cfg" [catalan]
+< "content.cfg" [chinese]
+< "content.cfg" [croatian]
+< "content.cfg" [czech]
+< "content.cfg" [danish]
+< "content.cfg" [dutch]
+< "content.cfg" [english]
+< "content.cfg" [esperanto]
+< "content.cfg" [estonian]
+< "content.cfg" [ethiopic]
+< "content.cfg" [faroese]
+< "content.cfg" [finnish]
+< "content.cfg" [french]
+< "content.cfg" [gaelic]
+< "content.cfg" [galician]
+< "content.cfg" [georgian]
+< "content.cfg" [german]
+< "content.cfg" [greek]
+< "content.cfg" [gujarati]
+< "content.cfg" [hausa]
+< "content.cfg" [hebrew]
+< "content.cfg" [hindi]
+< "content.cfg" [hungarian]
+< "content.cfg" [icelandic]
+< "content.cfg" [indonesian]
+< "content.cfg" [italian]
+< "content.cfg" [japanese]
+< "content.cfg" [kannada]
+< "content.cfg" [kazakh]
+< "content.cfg" [khmer]
+< "content.cfg" [korean]
+< "content.cfg" [kurdish]
+< "content.cfg" [lao]
+< "content.cfg" [latin]
+< "content.cfg" [latvian]
+< "content.cfg" [lithuanian]
+< "content.cfg" [luxembourgish]
+< "content.cfg" [macedonian]
+< "content.cfg" [malay]
+< "content.cfg" [malayalam]
+< "content.cfg" [maori]
+< "content.cfg" [mongolian]
+< "content.cfg" [nepali]
+< "content.cfg" [norwegian]
+< "content.cfg" [oriya]
+< "content.cfg" [panjabi]
+< "content.cfg" [persian]
+< "content.cfg" [polish]
+< "content.cfg" [portuguese]
+< "content.cfg" [pushto]
+< "content.cfg" [romanian]
+< "content.cfg" [russian]
+< "content.cfg" [serbian]
+< "content.cfg" [singhalese]
+< "content.cfg" [slovak]
+< "content.cfg" [slovenian]
+< "content.cfg" [somali]
+< "content.cfg" [spanish]
+< "content.cfg" [swahili]
+< "content.cfg" [swedish]
+< "content.cfg" [tagalog]
+< "content.cfg" [tajik]
+< "content.cfg" [tamil]
+< "content.cfg" [tatar]
+< "content.cfg" [telugu]
+< "content.cfg" [thai]
+< "content.cfg" [tibetan]
+< "content.cfg" [turkish]
+< "content.cfg" [ukrainian]
+< "content.cfg" [urdu]
+< "content.cfg" [uzbek]
+< "content.cfg" [vietnamese]
+< "content.cfg" [welsh]
+< "content.cfg" [xhosa]
+< "content.cfg" [yiddish]
+< "content.cfg" [zulu]
+< "content.cfg" [general]
+]]></frontend.docker.content.config>
+
+        <frontend.docker.view.config><![CDATA[
+[License] < "view.cfg" [License]
+< :ENV LICENSE_SERVER_HOST : LicenseServerHost
+< :ENV LICENSE_SERVER_PORT : LicenseServerACIPort
+
+< "view.cfg" [SSLSettings]
+< "view.cfg" [Service]
+< "view.cfg" [Server]
+< "view.cfg" [EnableSSL]
+< "view.cfg" [Viewing]
+< "view.cfg" [UniversalViewing]
+< "view.cfg" [SSLSection]
+< "view.cfg" [AuthorizationRoles]
+< "view.cfg" [AdminRole]
+< "view.cfg" [QueryRole]
+< "view.cfg" [Logging]
+< "view.cfg" [Paths]
+< "view.cfg" [ApplicationLogStream]
+< "view.cfg" [QueryLogStream]
+< "view.cfg" [CustomViewingErrors]
+]]></frontend.docker.view.config>
+
+        <frontend.docker.answerserver.config><![CDATA[
+[License] < "answerserver.cfg" [License]
+< :ENV LICENSE_SERVER_HOST : LicenseServerHost
+< :ENV LICENSE_SERVER_PORT : LicenseServerACIPort
+
+[Systems]
+0=AnswerBank
+
+[AnswerBank] < "answerserver.cfg" [AnswerBank]
+IdolHost=answerbank-agentstore
+IdolAciPort=12200
+
+< "answerserver.cfg" [SSLSettings]
+< "answerserver.cfg" [Service]
+< "answerserver.cfg" [Server]
+< "answerserver.cfg" [AuthorizationRoles]
+< "answerserver.cfg" [AdminRole]
+< "answerserver.cfg" [QueryRole]
+< "answerserver.cfg" [EnableSSL]
+< "answerserver.cfg" [Logging]
+< "answerserver.cfg" [Paths]
+< "answerserver.cfg" [ApplicationLogStream]
+< "answerserver.cfg" [ActionLogStream]
+< "answerserver.cfg" [FactBankLogStream]
+< "answerserver.cfg" [AnswerBankLogStream]
+< "answerserver.cfg" [PassageExtractorLogStream]
+< "answerserver.cfg" [ConversationModuleLogStream]
+]]></frontend.docker.answerserver.config>
+
+        <frontend.docker.community.config><![CDATA[
+[License] < "community.cfg" [License]
+< :ENV LICENSE_SERVER_HOST : LicenseServerHost
+< :ENV LICENSE_SERVER_PORT : LicenseServerACIPort
+
+[Security] < "community.cfg" [Security]
+SecurityInfoKeys=13,138,94,61
+
+< "community.cfg" [AgentDRE]
+< "community.cfg" [DataDRE]
+< "community.cfg" [SSLSettings]
+< "community.cfg" [Service]
+< "community.cfg" [Server]
+< "community.cfg" [AuthorizationRoles]
+< "community.cfg" [AdminRole]
+< "community.cfg" [QueryRole]
+< "community.cfg" [EnableSSL]
+< "community.cfg" [Logging]
+< "community.cfg" [Paths]
+< "community.cfg" [Autonomy]
+< "community.cfg" [User]
+< "community.cfg" [Role]
+< "community.cfg" [Agent]
+< "community.cfg" [Profile]
+< "community.cfg" [Community]
+< "community.cfg" [ApplicationLogStream]
+< "community.cfg" [ActionLogStream]
+< "community.cfg" [TermLogStream]
+< "community.cfg" [MailerLogStream]
+< "community.cfg" [UserLogStream]
+]]></frontend.docker.community.config>
+
+        <frontend.docker.agentstore.config><![CDATA[
+[License] < "agentstore.cfg" [License]
+< :ENV LICENSE_SERVER_HOST : LicenseServerHost
+< :ENV LICENSE_SERVER_PORT : LicenseServerACIPort
+
+< "agentstore.cfg" [SSLSettings]
+< "agentstore.cfg" [Service]
+< "agentstore.cfg" [Server]
+< "agentstore.cfg" [EnableSSL]
+< "agentstore.cfg" [IndexServer]
+< "agentstore.cfg" [AuthorizationRoles]
+< "agentstore.cfg" [AdminRole]
+< "agentstore.cfg" [QueryRole]
+< "agentstore.cfg" [IndexRole]
+< "agentstore.cfg" [Logging]
+< "agentstore.cfg" [IndexCache]
+< "agentstore.cfg" [Paths]
+< "agentstore.cfg" [FieldProcessing]
+< "agentstore.cfg" [SetIndexFields]
+< "agentstore.cfg" [SetIndexWeightFields]
+< "agentstore.cfg" [SetSectionBreakFields]
+< "agentstore.cfg" [SetDateFields]
+< "agentstore.cfg" [SetDatabaseFields]
+< "agentstore.cfg" [SetReferenceFields]
+< "agentstore.cfg" [SetTitleFields]
+< "agentstore.cfg" [SetHighlightFields]
+< "agentstore.cfg" [SetSourceFields]
+< "agentstore.cfg" [SetTextParseIndexFields]
+< "agentstore.cfg" [SetAlwaysMatchFields]
+< "agentstore.cfg" [IndexFields]
+< "agentstore.cfg" [IndexWeightFields]
+< "agentstore.cfg" [SectionFields]
+< "agentstore.cfg" [DateFields]
+< "agentstore.cfg" [DatabaseFields]
+< "agentstore.cfg" [ReferenceFields]
+< "agentstore.cfg" [TitleFields]
+< "agentstore.cfg" [HighlightFields]
+< "agentstore.cfg" [SourceFields]
+< "agentstore.cfg" [TextParseIndexFields]
+< "agentstore.cfg" [AlwaysMatchFields]
+< "agentstore.cfg" [ApplicationLogStream]
+< "agentstore.cfg" [QueryLogStream]
+< "agentstore.cfg" [IndexLogStream]
+< "agentstore.cfg" [LanguageTypes]
+< "agentstore.cfg" [afrikaans]
+< "agentstore.cfg" [albanian]
+< "agentstore.cfg" [arabic]
+< "agentstore.cfg" [armenian]
+< "agentstore.cfg" [azeri]
+< "agentstore.cfg" [basque]
+< "agentstore.cfg" [belorussian]
+< "agentstore.cfg" [bengali]
+< "agentstore.cfg" [bosnian]
+< "agentstore.cfg" [breton]
+< "agentstore.cfg" [bulgarian]
+< "agentstore.cfg" [burmese]
+< "agentstore.cfg" [catalan]
+< "agentstore.cfg" [chinese]
+< "agentstore.cfg" [croatian]
+< "agentstore.cfg" [czech]
+< "agentstore.cfg" [danish]
+< "agentstore.cfg" [dutch]
+< "agentstore.cfg" [english]
+< "agentstore.cfg" [esperanto]
+< "agentstore.cfg" [estonian]
+< "agentstore.cfg" [ethiopic]
+< "agentstore.cfg" [faroese]
+< "agentstore.cfg" [finnish]
+< "agentstore.cfg" [french]
+< "agentstore.cfg" [gaelic]
+< "agentstore.cfg" [galician]
+< "agentstore.cfg" [georgian]
+< "agentstore.cfg" [german]
+< "agentstore.cfg" [greek]
+< "agentstore.cfg" [gujarati]
+< "agentstore.cfg" [hausa]
+< "agentstore.cfg" [hebrew]
+< "agentstore.cfg" [hindi]
+< "agentstore.cfg" [hungarian]
+< "agentstore.cfg" [icelandic]
+< "agentstore.cfg" [indonesian]
+< "agentstore.cfg" [italian]
+< "agentstore.cfg" [japanese]
+< "agentstore.cfg" [kannada]
+< "agentstore.cfg" [kazakh]
+< "agentstore.cfg" [khmer]
+< "agentstore.cfg" [korean]
+< "agentstore.cfg" [kurdish]
+< "agentstore.cfg" [lao]
+< "agentstore.cfg" [latin]
+< "agentstore.cfg" [latvian]
+< "agentstore.cfg" [lithuanian]
+< "agentstore.cfg" [luxembourgish]
+< "agentstore.cfg" [macedonian]
+< "agentstore.cfg" [malay]
+< "agentstore.cfg" [malayalam]
+< "agentstore.cfg" [maori]
+< "agentstore.cfg" [mongolian]
+< "agentstore.cfg" [nepali]
+< "agentstore.cfg" [norwegian]
+< "agentstore.cfg" [oriya]
+< "agentstore.cfg" [panjabi]
+< "agentstore.cfg" [persian]
+< "agentstore.cfg" [polish]
+< "agentstore.cfg" [portuguese]
+< "agentstore.cfg" [pushto]
+< "agentstore.cfg" [romanian]
+< "agentstore.cfg" [russian]
+< "agentstore.cfg" [serbian]
+< "agentstore.cfg" [singhalese]
+< "agentstore.cfg" [slovak]
+< "agentstore.cfg" [slovenian]
+< "agentstore.cfg" [somali]
+< "agentstore.cfg" [spanish]
+< "agentstore.cfg" [swahili]
+< "agentstore.cfg" [swedish]
+< "agentstore.cfg" [tagalog]
+< "agentstore.cfg" [tajik]
+< "agentstore.cfg" [tamil]
+< "agentstore.cfg" [tatar]
+< "agentstore.cfg" [telugu]
+< "agentstore.cfg" [thai]
+< "agentstore.cfg" [tibetan]
+< "agentstore.cfg" [turkish]
+< "agentstore.cfg" [ukrainian]
+< "agentstore.cfg" [urdu]
+< "agentstore.cfg" [uzbek]
+< "agentstore.cfg" [vietnamese]
+< "agentstore.cfg" [welsh]
+< "agentstore.cfg" [xhosa]
+< "agentstore.cfg" [yiddish]
+< "agentstore.cfg" [zulu]
+< "agentstore.cfg" [Databases]
+< "agentstore.cfg" [Database0]
+< "agentstore.cfg" [Database1]
+< "agentstore.cfg" [Database2]
+< "agentstore.cfg" [Database3]
+]]></frontend.docker.agentstore.config>
+
+        <frontend.docker.qms.config><![CDATA[
+[License] < "qms.cfg" [License]
+< :ENV LICENSE_SERVER_HOST : LicenseServerHost
+< :ENV LICENSE_SERVER_PORT : LicenseServerACIPort
+
+[IDOL] < "qms.cfg" [IDOL]
+Host=content
+Port=9100
+
+[Community] < "qms.cfg" [Community]
+Host=community
+Port=9030
+
+[PromotionAgentstore] < "qms.cfg" [PromotionAgentstore]
+Host=qms-agentstore
+Port=20050
+
+// 26.3 crashes when trying to read language configuration from Content
+[LanguageTypes] < "qms.cfg" [LanguageTypes]
+0=english
+
+[english]
+Encodings=UTF8:englishUTF8
+Stoplist=english.dat
+
+< "qms.cfg" [SSLSettings]
+< "qms.cfg" [Service]
+< "qms.cfg" [Server]
+< "qms.cfg" [EnableSSL]
+< "qms.cfg" [AuthorizationRoles]
+< "qms.cfg" [AdminRole]
+< "qms.cfg" [QueryRole]
+< "qms.cfg" [Logging]
+< "qms.cfg" [Paths]
+< "qms.cfg" [ApplicationLogStream]
+< "qms.cfg" [QueryLogStream]
+]]></frontend.docker.qms.config>
+
+        <frontend.docker.statsserver.config><![CDATA[
+[License] < "statsserver.cfg" [License]
+< :ENV LICENSE_SERVER_HOST : LicenseServerHost
+< :ENV LICENSE_SERVER_PORT : LicenseServerACIPort
+
+< "statsserver.cfg" [Statistics]
+< "statsserver.cfg" [ContentQueryTenMinuteCount]
+< "statsserver.cfg" [ContentQueryHourlyCount]
+< "statsserver.cfg" [ContentQueryDailyCount]
+< "statsserver.cfg" [ContentQueryHourlyTop10Terms]
+< "statsserver.cfg" [ContentQueryDailyTop10Terms]
+< "statsserver.cfg" [ContentQueryWeeklyTop10Terms]
+< "statsserver.cfg" [ContentZeroHitTenMinuteCount]
+< "statsserver.cfg" [ContentZeroHitQueryHourlyCount]
+< "statsserver.cfg" [ContentZeroHitQueryDailyCount]
+< "statsserver.cfg" [ContentZeroHitQueryWeeklyTop10Terms]
+< "statsserver.cfg" [QmsRulesHourlyTop100000]
+< "statsserver.cfg" [QmsRulesDailyTop100000]
+< "statsserver.cfg" [QmsRulesWeeklyTop100000]
+< "statsserver.cfg" [count_queries]
+< "statsserver.cfg" [count_terms]
+< "statsserver.cfg" [count_zerohits]
+< "statsserver.cfg" [count_promotions]
+< "statsserver.cfg" [count_promotionsitems_day]
+< "statsserver.cfg" [count_synonym_day]
+< "statsserver.cfg" [count_synonymuserquery_day]
+< "statsserver.cfg" [topn_queries]
+< "statsserver.cfg" [topn_terms]
+< "statsserver.cfg" [topn_zerohits]
+< "statsserver.cfg" [topn_promotions]
+< "statsserver.cfg" [topn_promotionitems_day]
+< "statsserver.cfg" [adaptiveranking]
+< "statsserver.cfg" [topn_synonyms_day]
+< "statsserver.cfg" [topn_synonymuserqueries_day]
+< "statsserver.cfg" [topn_users]
+< "statsserver.cfg" [avg_numterms]
+< "statsserver.cfg" [avg_duration]
+< "statsserver.cfg" [topn_resultspage]
+< "statsserver.cfg" [count_spellcheck]
+< "statsserver.cfg" [topn_spellcheck]
+< "statsserver.cfg" [count_parametric]
+< "statsserver.cfg" [topn_parametricfields]
+< "statsserver.cfg" [topn_parametricvalues_doctype]
+< "statsserver.cfg" [topn_parametricvalues_category]
+
+< "statsserver.cfg" [SSLSettings]
+< "statsserver.cfg" [Service]
+< "statsserver.cfg" [Server]
+< "statsserver.cfg" [EnableSSL]
+< "statsserver.cfg" [AuthorizationRoles]
+< "statsserver.cfg" [AdminRole]
+< "statsserver.cfg" [QueryRole]
+< "statsserver.cfg" [Logging]
+< "statsserver.cfg" [IDOLStatistics]
+< "statsserver.cfg" [Paths]
+< "statsserver.cfg" [ApplicationLogStream]
+< "statsserver.cfg" [QueryLogStream]
+< "statsserver.cfg" [EventLogStream]
+]]></frontend.docker.statsserver.config>
+
+        <frontend.docker.answerbankAgentstore.config><![CDATA[
+[License] < "agentstore.cfg" [License]
+< :ENV LICENSE_SERVER_HOST : LicenseServerHost
+< :ENV LICENSE_SERVER_PORT : LicenseServerACIPort
+
+< "agentstore.cfg" [SSLSettings]
+< "agentstore.cfg" [Service]
+< "agentstore.cfg" [Server]
+< "agentstore.cfg" [IndexServer]
+< "agentstore.cfg" [EnableSSL]
+< "agentstore.cfg" [AuthorizationRoles]
+< "agentstore.cfg" [AdminRole]
+< "agentstore.cfg" [QueryRole]
+< "agentstore.cfg" [IndexRole]
+< "agentstore.cfg" [Logging]
+< "agentstore.cfg" [IndexCache]
+< "agentstore.cfg" [Paths]
+< "agentstore.cfg" [FieldProcessing]
+< "agentstore.cfg" [SetReferenceFields]
+< "agentstore.cfg" [SetDateFields]
+< "agentstore.cfg" [SetDatabaseFields]
+< "agentstore.cfg" [SetIndexFields]
+< "agentstore.cfg" [SetNumericDateFields]
+< "agentstore.cfg" [SetMatchFields]
+< "agentstore.cfg" [SetExpireDateFields]
+< "agentstore.cfg" [SetNumericFields]
+< "agentstore.cfg" [SetSortFields]
+< "agentstore.cfg" [IndexFields]
+< "agentstore.cfg" [DateFields]
+< "agentstore.cfg" [DatabaseFields]
+< "agentstore.cfg" [ReferenceFields]
+< "agentstore.cfg" [NumericDateFields]
+< "agentstore.cfg" [MatchFields]
+< "agentstore.cfg" [ExpireDateFields]
+< "agentstore.cfg" [NumericFields]
+< "agentstore.cfg" [SortFields]
+< "agentstore.cfg" [ApplicationLogStream]
+< "agentstore.cfg" [QueryLogStream]
+< "agentstore.cfg" [IndexLogStream]
+< "agentstore.cfg" [QueryTermsLogStream]
+< "agentstore.cfg" [LanguageTypes]
+< "agentstore.cfg" [english]
+< "agentstore.cfg" [Databases]
+< "agentstore.cfg" [Database0]
+< "agentstore.cfg" [Database1]
+< "agentstore.cfg" [Database2]
+< "agentstore.cfg" [Database3]
+< "agentstore.cfg" [Schedule]
+]]></frontend.docker.answerbankAgentstore.config>
+
+        <frontend.docker.qmsAgentstore.config><![CDATA[
+[License] < "agentstore.cfg" [License]
+< :ENV LICENSE_SERVER_HOST : LicenseServerHost
+< :ENV LICENSE_SERVER_PORT : LicenseServerACIPort
+
+< "agentstore.cfg" [SSLSettings]
+< "agentstore.cfg" [Service]
+< "agentstore.cfg" [Server]
+< "agentstore.cfg" [EnableSSL]
+< "agentstore.cfg" [IndexServer]
+< "agentstore.cfg" [AuthorizationRoles]
+< "agentstore.cfg" [AdminRole]
+< "agentstore.cfg" [QueryRole]
+< "agentstore.cfg" [IndexRole]
+< "agentstore.cfg" [Logging]
+< "agentstore.cfg" [TermCache]
+< "agentstore.cfg" [IndexCache]
+< "agentstore.cfg" [SectionBreaking]
+< "agentstore.cfg" [PATHS]
+< "agentstore.cfg" [FieldProcessing]
+< "agentstore.cfg" [IndexFields]
+< "agentstore.cfg" [IndexAndWeightHigher]
+< "agentstore.cfg" [SectionBreakFields]
+< "agentstore.cfg" [DateFields]
+< "agentstore.cfg" [ExpireDateFields]
+< "agentstore.cfg" [DatabaseFields]
+< "agentstore.cfg" [SetupReferenceFields]
+< "agentstore.cfg" [SetTitleFields]
+< "agentstore.cfg" [SetPrintFields]
+< "agentstore.cfg" [HighlightFields]
+< "agentstore.cfg" [SourceFields]
+< "agentstore.cfg" [TextParseIndexFields]
+< "agentstore.cfg" [NumericFields]
+< "agentstore.cfg" [FieldCheckFields]
+< "agentstore.cfg" [Index]
+< "agentstore.cfg" [IndexWeight]
+< "agentstore.cfg" [Section]
+< "agentstore.cfg" [Date]
+< "agentstore.cfg" [ExpireDate]
+< "agentstore.cfg" [Database]
+< "agentstore.cfg" [ReferenceFields]
+< "agentstore.cfg" [TitleFields]
+< "agentstore.cfg" [PrintFields]
+< "agentstore.cfg" [Highlight]
+< "agentstore.cfg" [Source]
+< "agentstore.cfg" [textparse]
+< "agentstore.cfg" [Numeric]
+< "agentstore.cfg" [FieldCheck]
+< "agentstore.cfg" [DATABASES]
+< "agentstore.cfg" [INDEX_LOG_STREAM]
+< "agentstore.cfg" [QUERY_LOG_STREAM]
+< "agentstore.cfg" [APP_LOG_STREAM]
+< "agentstore.cfg" [LanguageTypes]
+< "agentstore.cfg" [english]
+< "agentstore.cfg" [consoleLogStream]
+]]></frontend.docker.qmsAgentstore.config>
+    </properties>
+
     <licenses>
         <license>
             <name>MIT License</name>
@@ -62,6 +682,22 @@
 
     <profiles>
         <profile>
+            <id>fixed-docker-ports</id>
+            <properties>
+                <idol.content.ports.aci>20000</idol.content.ports.aci>
+                <idol.content.ports.index>20001</idol.content.ports.index>
+                <idol.content.ports.service>20002</idol.content.ports.service>
+                <idol.view.ports.aci>20010</idol.view.ports.aci>
+                <idol.answerserver.ports.aci>20020</idol.answerserver.ports.aci>
+                <idol.community.ports.aci>20030</idol.community.ports.aci>
+                <idol.agentstore.ports.aci>20040</idol.agentstore.ports.aci>
+                <idol.agentstore.ports.index>20041</idol.agentstore.ports.index>
+                <idol.agentstore.ports.service>20042</idol.agentstore.ports.service>
+                <idol.qms.ports.aci>20050</idol.qms.ports.aci>
+                <idol.statsserver.ports.aci>20060</idol.statsserver.ports.aci>
+            </properties>
+        </profile>
+        <profile>
             <id>release</id>
             <build>
                 <plugins>
@@ -83,29 +719,506 @@
     <build>
         <pluginManagement>
             <plugins>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>generate-idol-docker-config</id>
+                            <phase>generate-resources</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <target>
+                                    <mkdir dir="${project.build.directory}/idol-docker-config" />
+                                    <echo file="${project.build.directory}/idol-docker-config/content.cfg">${frontend.docker.content.config}</echo>
+                                    <echo file="${project.build.directory}/idol-docker-config/view.cfg">${frontend.docker.view.config}</echo>
+                                    <echo file="${project.build.directory}/idol-docker-config/answerserver.cfg">${frontend.docker.answerserver.config}</echo>
+                                    <echo file="${project.build.directory}/idol-docker-config/community.cfg">${frontend.docker.community.config}</echo>
+                                    <echo file="${project.build.directory}/idol-docker-config/agentstore.cfg">${frontend.docker.agentstore.config}</echo>
+                                    <echo file="${project.build.directory}/idol-docker-config/qms.cfg">${frontend.docker.qms.config}</echo>
+                                    <echo file="${project.build.directory}/idol-docker-config/statsserver.cfg">${frontend.docker.statsserver.config}</echo>
+                                    <echo file="${project.build.directory}/idol-docker-config/answerbank-agentstore.cfg">${frontend.docker.answerbankAgentstore.config}</echo>
+                                    <echo file="${project.build.directory}/idol-docker-config/qms-agentstore.cfg">${frontend.docker.qmsAgentstore.config}</echo>
+                                </target>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>0.49.0</version>
+                    <executions>
+                        <execution>
+                            <id>build-docker-container</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>build</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>start</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>start</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>stop</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>stop</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <verbose>true</verbose>
+                        <images>
+
+                            <image>
+                                <alias>content</alias>
+                                <name>${frontend.docker.registry.dev}/content:${idol.version}</name>
+                                <build>
+                                    <skip>${frontend.docker.content.skip}</skip>
+                                    <from>${idol.docker.registry}/content:${idol.version}</from>
+                                    <assembly>
+                                        <mode>tar</mode>
+                                        <targetDir>/</targetDir>
+                                        <user>idoluser:root</user>
+                                        <inline>
+                                            <files>
+                                                <file>
+                                                    <source>${project.build.directory}/idol-docker-config/content.cfg</source>
+                                                    <outputDirectory>/content/cfg</outputDirectory>
+                                                    <destName>frontend-content.cfg</destName>
+                                                </file>
+                                            </files>
+                                        </inline>
+                                    </assembly>
+                                </build>
+                                <run>
+                                    <skip>${frontend.docker.content.skip}</skip>
+                                    <network><name>frontend-${maven.build.timestamp}</name></network>
+                                    <hostname>content</hostname>
+                                    <containerNamePattern>%a-${maven.build.timestamp}</containerNamePattern>
+                                    <ports>
+                                        <port>idol.content.ports.aci:9100</port>
+                                        <port>idol.content.ports.index:9101</port>
+                                        <port>idol.content.ports.service:9102</port>
+                                    </ports>
+                                    <env>
+                                        <IDOL_COMPONENT_CFG>/content/cfg/frontend-content.cfg</IDOL_COMPONENT_CFG>
+                                        <LICENSE_SERVER_HOST>${idol.licenseServer.host}</LICENSE_SERVER_HOST>
+                                        <LICENSE_SERVER_PORT>${idol.licenseServer.port}</LICENSE_SERVER_PORT>
+                                    </env>
+                                    <wait>
+                                        <log>00-Always: Startup Successful.</log>
+                                        <time>30000</time>
+                                    </wait>
+                                    <log><enabled>true</enabled></log>
+                                </run>
+                            </image>
+
+                            <image>
+                                <alias>view</alias>
+                                <name>${frontend.docker.registry.dev}/view:${idol.version}</name>
+                                <build>
+                                    <skip>${frontend.docker.view.skip}</skip>
+                                    <from>${idol.docker.registry}/view:${idol.version}</from>
+                                    <assembly>
+                                        <mode>tar</mode>
+                                        <targetDir>/</targetDir>
+                                        <user>idoluser:root</user>
+                                        <inline>
+                                            <files>
+                                                <file>
+                                                    <source>${project.build.directory}/idol-docker-config/view.cfg</source>
+                                                    <outputDirectory>/view/cfg</outputDirectory>
+                                                    <destName>frontend-view.cfg</destName>
+                                                </file>
+                                            </files>
+                                        </inline>
+                                    </assembly>
+                                </build>
+                                <run>
+                                    <skip>${frontend.docker.view.skip}</skip>
+                                    <network><name>frontend-${maven.build.timestamp}</name></network>
+                                    <hostname>view</hostname>
+                                    <containerNamePattern>%a-${maven.build.timestamp}</containerNamePattern>
+                                    <ports>
+                                        <port>idol.view.ports.aci:9080</port>
+                                    </ports>
+                                    <env>
+                                        <IDOL_COMPONENT_CFG>/view/cfg/frontend-view.cfg</IDOL_COMPONENT_CFG>
+                                        <LICENSE_SERVER_HOST>${idol.licenseServer.host}</LICENSE_SERVER_HOST>
+                                        <LICENSE_SERVER_PORT>${idol.licenseServer.port}</LICENSE_SERVER_PORT>
+                                    </env>
+                                    <wait>
+                                        <log>00-Always: Initialising thread</log>
+                                        <time>30000</time>
+                                    </wait>
+                                    <log><enabled>true</enabled></log>
+                                </run>
+                            </image>
+
+                            <image>
+                                <alias>answerserver</alias>
+                                <name>${frontend.docker.registry.dev}/answerserver:${idol.version}</name>
+                                <build>
+                                    <skip>${frontend.docker.answerserver.skip}</skip>
+                                    <from>${idol.docker.registry}/answerserver:${idol.version}</from>
+                                    <assembly>
+                                        <mode>tar</mode>
+                                        <targetDir>/</targetDir>
+                                        <user>idoluser:root</user>
+                                        <inline>
+                                            <files>
+                                                <file>
+                                                    <source>${project.build.directory}/idol-docker-config/answerserver.cfg</source>
+                                                    <outputDirectory>/answerserver/cfg</outputDirectory>
+                                                    <destName>frontend-answerserver.cfg</destName>
+                                                </file>
+                                            </files>
+                                        </inline>
+                                    </assembly>
+                                </build>
+                                <run>
+                                    <skip>${frontend.docker.answerserver.skip}</skip>
+                                    <network><name>frontend-${maven.build.timestamp}</name></network>
+                                    <hostname>answerserver</hostname>
+                                    <containerNamePattern>%a-${maven.build.timestamp}</containerNamePattern>
+                                    <ports>
+                                        <port>idol.answerserver.ports.aci:12000</port>
+                                    </ports>
+                                    <env>
+                                        <IDOL_COMPONENT_CFG>/answerserver/cfg/frontend-answerserver.cfg</IDOL_COMPONENT_CFG>
+                                        <LICENSE_SERVER_HOST>${idol.licenseServer.host}</LICENSE_SERVER_HOST>
+                                        <LICENSE_SERVER_PORT>${idol.licenseServer.port}</LICENSE_SERVER_PORT>
+                                    </env>
+                                    <dependsOn>
+                                        <container>answerbank-agentstore</container>
+                                    </dependsOn>
+                                    <wait>
+                                        <log>00-Always: ACI Server thread 1 initialized</log>
+                                        <time>30000</time>
+                                    </wait>
+                                    <log><enabled>true</enabled></log>
+                                </run>
+                            </image>
+
+                            <image>
+                                <alias>community</alias>
+                                <name>${frontend.docker.registry.dev}/community:${idol.version}</name>
+                                <build>
+                                    <skip>${frontend.docker.community.skip}</skip>
+                                    <from>${idol.docker.registry}/community:${idol.version}</from>
+                                    <assembly>
+                                        <mode>tar</mode>
+                                        <targetDir>/</targetDir>
+                                        <user>idoluser:root</user>
+                                        <inline>
+                                            <files>
+                                                <file>
+                                                    <source>${project.build.directory}/idol-docker-config/community.cfg</source>
+                                                    <outputDirectory>/community/cfg</outputDirectory>
+                                                    <destName>frontend-community.cfg</destName>
+                                                </file>
+                                            </files>
+                                        </inline>
+                                    </assembly>
+                                </build>
+                                <run>
+                                    <skip>${frontend.docker.community.skip}</skip>
+                                    <network><name>frontend-${maven.build.timestamp}</name></network>
+                                    <hostname>community</hostname>
+                                    <containerNamePattern>%a-${maven.build.timestamp}</containerNamePattern>
+                                    <ports>
+                                        <port>idol.community.ports.aci:9030</port>
+                                    </ports>
+                                    <env>
+                                        <IDOL_COMPONENT_CFG>/community/cfg/frontend-community.cfg</IDOL_COMPONENT_CFG>
+                                        <LICENSE_SERVER_HOST>${idol.licenseServer.host}</LICENSE_SERVER_HOST>
+                                        <LICENSE_SERVER_PORT>${idol.licenseServer.port}</LICENSE_SERVER_PORT>
+                                        <IDOL_CONTENT_HOST>content</IDOL_CONTENT_HOST>
+                                        <IDOL_CONTENT_PORT>9100</IDOL_CONTENT_PORT>
+                                        <IDOL_AGENTSTORE_HOST>agentstore</IDOL_AGENTSTORE_HOST>
+                                        <IDOL_AGENTSTORE_PORT>9050</IDOL_AGENTSTORE_PORT>
+                                    </env>
+                                    <dependsOn>
+                                        <container>agentstore</container>
+                                        <container>content</container>
+                                    </dependsOn>
+                                    <wait>
+                                        <log>00-Always: Started.</log>
+                                        <time>30000</time>
+                                    </wait>
+                                    <log><enabled>true</enabled></log>
+                                </run>
+                            </image>
+
+                            <image>
+                                <alias>agentstore</alias>
+                                <name>${frontend.docker.registry.dev}/agentstore:${idol.version}</name>
+                                <build>
+                                    <skip>${frontend.docker.agentstore.skip}</skip>
+                                    <from>${idol.docker.registry}/agentstore:${idol.version}</from>
+                                    <assembly>
+                                        <mode>tar</mode>
+                                        <targetDir>/</targetDir>
+                                        <user>idoluser:root</user>
+                                        <inline>
+                                            <files>
+                                                <file>
+                                                    <source>${project.build.directory}/idol-docker-config/agentstore.cfg</source>
+                                                    <outputDirectory>/content/cfg</outputDirectory>
+                                                    <destName>frontend-agentstore.cfg</destName>
+                                                </file>
+                                            </files>
+                                        </inline>
+                                    </assembly>
+                                </build>
+                                <run>
+                                    <skip>${frontend.docker.agentstore.skip}</skip>
+                                    <network><name>frontend-${maven.build.timestamp}</name></network>
+                                    <hostname>agentstore</hostname>
+                                    <containerNamePattern>%a-${maven.build.timestamp}</containerNamePattern>
+                                    <ports>
+                                        <port>idol.agentstore.ports.aci:9050</port>
+                                        <port>idol.agentstore.ports.index:9051</port>
+                                        <port>idol.agentstore.ports.service:9052</port>
+                                    </ports>
+                                    <env>
+                                        <IDOL_COMPONENT_CFG>/content/cfg/frontend-agentstore.cfg</IDOL_COMPONENT_CFG>
+                                        <LICENSE_SERVER_HOST>${idol.licenseServer.host}</LICENSE_SERVER_HOST>
+                                        <LICENSE_SERVER_PORT>${idol.licenseServer.port}</LICENSE_SERVER_PORT>
+                                    </env>
+                                    <wait>
+                                        <log>00-Always: Startup Successful.</log>
+                                        <time>30000</time>
+                                    </wait>
+                                    <log><enabled>true</enabled></log>
+                                </run>
+                            </image>
+
+                            <image>
+                                <alias>qms</alias>
+                                <name>${frontend.docker.registry.dev}/qms:${idol.version}</name>
+                                <build>
+                                    <skip>${frontend.docker.qms.skip}</skip>
+                                    <from>${idol.docker.registry}/qms:${idol.version}</from>
+                                    <assembly>
+                                        <mode>tar</mode>
+                                        <targetDir>/</targetDir>
+                                        <user>idoluser:root</user>
+                                        <inline>
+                                            <files>
+                                                <file>
+                                                    <source>${project.build.directory}/idol-docker-config/qms.cfg</source>
+                                                    <outputDirectory>/qms/cfg</outputDirectory>
+                                                    <destName>frontend-qms.cfg</destName>
+                                                </file>
+                                            </files>
+                                        </inline>
+                                    </assembly>
+                                </build>
+                                <run>
+                                    <skip>${frontend.docker.qms.skip}</skip>
+                                    <network><name>frontend-${maven.build.timestamp}</name></network>
+                                    <hostname>qms</hostname>
+                                    <containerNamePattern>%a-${maven.build.timestamp}</containerNamePattern>
+                                    <ports>
+                                        <port>idol.qms.ports.aci:16000</port>
+                                    </ports>
+                                    <env>
+                                        <IDOL_COMPONENT_CFG>/qms/cfg/frontend-qms.cfg</IDOL_COMPONENT_CFG>
+                                        <LICENSE_SERVER_HOST>${idol.licenseServer.host}</LICENSE_SERVER_HOST>
+                                        <LICENSE_SERVER_PORT>${idol.licenseServer.port}</LICENSE_SERVER_PORT>
+                                    </env>
+                                    <dependsOn>
+                                        <container>content</container>
+                                        <container>community</container>
+                                        <container>qms-agentstore</container>
+                                    </dependsOn>
+                                    <wait>
+                                        <log>00-Always: Initialising thread</log>
+                                        <time>30000</time>
+                                    </wait>
+                                    <log><enabled>true</enabled></log>
+                                </run>
+                            </image>
+
+                            <image>
+                                <alias>statsserver</alias>
+                                <name>${frontend.docker.registry.dev}/statsserver:${idol.version}</name>
+                                <build>
+                                    <skip>${frontend.docker.statsserver.skip}</skip>
+                                    <from>${idol.docker.registry}/statsserver:${idol.version}</from>
+                                    <assembly>
+                                        <mode>tar</mode>
+                                        <targetDir>/</targetDir>
+                                        <user>idoluser:root</user>
+                                        <inline>
+                                            <files>
+                                                <file>
+                                                    <source>${project.build.directory}/idol-docker-config/statsserver.cfg</source>
+                                                    <outputDirectory>/statsserver/cfg</outputDirectory>
+                                                    <destName>frontend-statsserver.cfg</destName>
+                                                </file>
+                                            </files>
+                                        </inline>
+                                    </assembly>
+                                </build>
+                                <run>
+                                    <skip>${frontend.docker.statsserver.skip}</skip>
+                                    <network><name>frontend-${maven.build.timestamp}</name></network>
+                                    <hostname>statsserver</hostname>
+                                    <containerNamePattern>%a-${maven.build.timestamp}</containerNamePattern>
+                                    <ports>
+                                        <port>idol.statsserver.ports.aci:19870</port>
+                                    </ports>
+                                    <env>
+                                        <IDOL_COMPONENT_CFG>/statsserver/cfg/frontend-statsserver.cfg</IDOL_COMPONENT_CFG>
+                                        <LICENSE_SERVER_HOST>${idol.licenseServer.host}</LICENSE_SERVER_HOST>
+                                        <LICENSE_SERVER_PORT>${idol.licenseServer.port}</LICENSE_SERVER_PORT>
+                                    </env>
+                                    <wait>
+                                        <log>30-Normal: ACI Server successfully loaded admin UI.</log>
+                                        <time>30000</time>
+                                    </wait>
+                                    <log><enabled>true</enabled></log>
+                                </run>
+                            </image>
+
+                            <image>
+                                <alias>answerbank-agentstore</alias>
+                                <name>${frontend.docker.registry.dev}/answerbank-agentstore:${idol.version}</name>
+                                <build>
+                                    <skip>${frontend.docker.answerbankAgentstore.skip}</skip>
+                                    <from>${idol.docker.registry}/answerbank-agentstore:${idol.version}</from>
+                                    <assembly>
+                                        <mode>tar</mode>
+                                        <targetDir>/</targetDir>
+                                        <user>idoluser:root</user>
+                                        <inline>
+                                            <files>
+                                                <file>
+                                                    <source>${project.build.directory}/idol-docker-config/answerbank-agentstore.cfg</source>
+                                                    <outputDirectory>/content/cfg</outputDirectory>
+                                                    <destName>frontend-answerbank-agentstore.cfg</destName>
+                                                </file>
+                                            </files>
+                                        </inline>
+                                    </assembly>
+                                </build>
+                                <run>
+                                    <skip>${frontend.docker.answerbankAgentstore.skip}</skip>
+                                    <network><name>frontend-${maven.build.timestamp}</name></network>
+                                    <hostname>answerbank-agentstore</hostname>
+                                    <containerNamePattern>%a-${maven.build.timestamp}</containerNamePattern>
+                                    <env>
+                                        <IDOL_COMPONENT_CFG>/content/cfg/frontend-answerbank-agentstore.cfg</IDOL_COMPONENT_CFG>
+                                        <LICENSE_SERVER_HOST>${idol.licenseServer.host}</LICENSE_SERVER_HOST>
+                                        <LICENSE_SERVER_PORT>${idol.licenseServer.port}</LICENSE_SERVER_PORT>
+                                    </env>
+                                    <wait>
+                                        <log>00-Always: Startup Successful.</log>
+                                        <time>30000</time>
+                                    </wait>
+                                    <log><enabled>true</enabled></log>
+                                </run>
+                            </image>
+
+                            <image>
+                                <alias>qms-agentstore</alias>
+                                <name>${frontend.docker.registry.dev}/qms-agentstore:${idol.version}</name>
+                                <build>
+                                    <skip>${frontend.docker.qmsAgentstore.skip}</skip>
+                                    <from>${idol.docker.registry}/qms-agentstore:${idol.version}</from>
+                                    <assembly>
+                                        <mode>tar</mode>
+                                        <targetDir>/</targetDir>
+                                        <user>idoluser:root</user>
+                                        <inline>
+                                            <files>
+                                                <file>
+                                                    <source>${project.build.directory}/idol-docker-config/qms-agentstore.cfg</source>
+                                                    <outputDirectory>/content/cfg</outputDirectory>
+                                                    <destName>frontend-qms-agentstore.cfg</destName>
+                                                </file>
+                                            </files>
+                                        </inline>
+                                    </assembly>
+                                </build>
+                                <run>
+                                    <skip>${frontend.docker.qmsAgentstore.skip}</skip>
+                                    <network><name>frontend-${maven.build.timestamp}</name></network>
+                                    <hostname>qms-agentstore</hostname>
+                                    <containerNamePattern>%a-${maven.build.timestamp}</containerNamePattern>
+                                    <env>
+                                        <IDOL_COMPONENT_CFG>/content/cfg/frontend-qms-agentstore.cfg</IDOL_COMPONENT_CFG>
+                                        <LICENSE_SERVER_HOST>${idol.licenseServer.host}</LICENSE_SERVER_HOST>
+                                        <LICENSE_SERVER_PORT>${idol.licenseServer.port}</LICENSE_SERVER_PORT>
+                                    </env>
+                                    <wait>
+                                        <log>00-Always: Startup Successful.</log>
+                                        <time>30000</time>
+                                    </wait>
+                                    <log><enabled>true</enabled></log>
+                                </run>
+                            </image>
+
+                        </images>
+                    </configuration>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.3.0</version>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.5.6</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                            <configuration>
+                                <systemPropertyVariables>
+                                    <test.content.host>${docker.host.address}</test.content.host>
+                                    <test.content.port>${idol.content.ports.aci}</test.content.port>
+                                    <test.content.index.port>${idol.content.ports.index}</test.content.index.port>
+                                    <test.content.service.port>${idol.content.ports.service}</test.content.service.port>
+                                    <test.view.host>${docker.host.address}</test.view.host>
+                                    <test.view.port>${idol.view.ports.aci}</test.view.port>
+                                    <test.answer.host>${docker.host.address}</test.answer.host>
+                                    <test.answer.port>${idol.answerserver.ports.aci}</test.answer.port>
+                                    <test.community.host>${docker.host.address}</test.community.host>
+                                    <test.community.port>${idol.community.ports.aci}</test.community.port>
+                                    <test.agentstore.host>${docker.host.address}</test.agentstore.host>
+                                    <test.agentstore.port>${idol.agentstore.ports.aci}</test.agentstore.port>
+                                    <test.agentstore.index.port>${idol.agentstore.ports.index}</test.agentstore.index.port>
+                                    <test.agentstore.service.port>${idol.agentstore.ports.service}</test.agentstore.service.port>
+                                    <test.qms.host>${docker.host.address}</test.qms.host>
+                                    <test.qms.port>${idol.qms.ports.aci}</test.qms.port>
+                                    <test.stats.host>${docker.host.address}</test.stats.host>
+                                    <test.stats.port>${idol.statsserver.ports.aci}</test.stats.port>
+                                </systemPropertyVariables>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
             </plugins>
         </pluginManagement>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.5.6</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 
     <dependencyManagement>
@@ -144,6 +1257,12 @@
                 <groupId>com.hp.autonomy.frontend.configuration</groupId>
                 <artifactId>configuration-impl</artifactId>
                 <version>3.10.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hp.autonomy.frontend.configuration</groupId>
+                <artifactId>configuration-impl</artifactId>
+                <version>3.10.0</version>
+                <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>com.hp.autonomy.aci.content</groupId>
@@ -229,35 +1348,4 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.hp.autonomy.frontend.configuration</groupId>
-            <artifactId>configuration-impl</artifactId>
-            <version>3.10.0</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 </project>
